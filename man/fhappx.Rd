@@ -41,7 +41,7 @@ If \code{val} is a function it will be evaluated on the grid.
 }
 \examples{
 \dontrun{
- 
+
 ## evenly spaced grid-points
 su <- seq(0,1,length.out=10)
 ## irregularly spaced grid-points

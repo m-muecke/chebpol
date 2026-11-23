@@ -4,8 +4,7 @@
 \alias{chebeval}
 \title{Evaluate a Chebyshev interpolation in a point}
 \usage{
-chebeval(x, coef, intervals = NULL,
-  threads = getOption("chebpol.threads"))
+chebeval(x, coef, intervals = NULL, threads = getOption("chebpol.threads"))
 }
 \arguments{
 \item{x}{The point to evaluate.}

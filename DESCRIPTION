@@ -32,5 +32,5 @@ Classification/ACM: G.1.2
 Classification/MSC: 41A05, 41A10, 41A50, 41A63, 65D05, 65T40
 Copyright: 2013-2019, Simen Gaure
 Encoding: UTF-8
-RoxygenNote: 6.1.1
 SystemRequirements: fftw3 (>= 3.1.2), gsl
+Config/roxygen2/version: 8.1.1

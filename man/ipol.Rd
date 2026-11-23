@@ -4,10 +4,17 @@
 \alias{ipol}
 \title{Create interpolating function.}
 \usage{
-ipol(val, dims = NULL, intervals = NULL, grid = NULL, knots = NULL,
-  k = NULL, method = c("chebyshev", "multilinear", "fh", "uniform",
-  "general", "polyharmonic", "simplexlinear", "hstalker", "stalker",
-  "crbf", "oldstalker"), ...)
+ipol(
+  val,
+  dims = NULL,
+  intervals = NULL,
+  grid = NULL,
+  knots = NULL,
+  k = NULL,
+  method = c("chebyshev", "multilinear", "fh", "uniform", "general", "polyharmonic",
+    "simplexlinear", "hstalker", "stalker", "crbf", "oldstalker"),
+  ...
+)
 }
 \arguments{
 \item{val}{array or function. Function values on a grid, or the function
@@ -120,7 +127,7 @@ ph2 <- ipol(f, knots=knots, k=2, method='poly')
 sl2 <- ipol(f, knots=knots, method='simplexlinear')
 # my alglib is a bit slow, so stick to 100 knots
 if(havealglib()) crb <- ipol(f, knots=knots[,1:100], method='crbf',
-  rbase=2, layers=5, lambda=0) 
+  rbase=2, layers=5, lambda=0)
 # make 7 points in R3 to test them on
 m <- matrix(runif(3*7),3)
 rbind(true=apply(m,2,f), ml=ml2(m), fh=fh2(m), cheb=ch2(m), poly=ph2(m), sl=sl2(m),hst=hst(m),

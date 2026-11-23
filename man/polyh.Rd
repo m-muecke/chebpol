@@ -52,7 +52,7 @@ each dimension.  Set \code{normalize=FALSE} if you do not want any scaling.
 r <- runif(20)
 r <- r/sum(r)
 f <- function(x) 1/mean(log1p(r*x))
-# 1000 random knots 
+# 1000 random knots
 knots <- matrix(runif(20000), 20)
 phs <- polyh(f, knots, 3)
 # test it in a random point

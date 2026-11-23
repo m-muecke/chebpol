@@ -50,7 +50,6 @@
 #'
 #' @name chebpol-package
 #' @aliases chebpol-package chebpol
-#' @docType package
 #' @concept DCT Floater-Hormann
 #' @keywords DCT Chebyshev interpolation Floater-Hormann
 #' @seealso \link{ipol}, \link{interpolant}
@@ -75,4 +74,4 @@
 #' rbind(true=apply(m,2,f), cheb=ch(m), fh=fh(m))
 #'
 #' @useDynLib chebpol, .registration=TRUE, .fixes='C_'
-NULL
+"_PACKAGE"

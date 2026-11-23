@@ -76,7 +76,7 @@ dims <- c(x=50,y=50,z=50)
 f <- function(x) sqrt(1+x[1])*exp(x[2])*sin(5*x[3])^2
 value <- evalongrid(f , dims)
 ##fit a Chebyshev approximation to it. Note that the value-array contains the
-##grid-structure. 
+##grid-structure.
 ch <- ipol(value,method='cheb')
 ## To see the full grid, use the chebknots function and expand.grid
 \dontrun{
@@ -92,6 +92,15 @@ rbind(true=apply(m,2,f), cheb=ch(m), fh=fh(m))
 }
 \seealso{
 \link{ipol}, \link{interpolant}
+}
+\author{
+\strong{Maintainer}: Simen Gaure \email{Simen.Gaure@frisch.uio.no} (\href{https://orcid.org/0000-0001-7251-8747}{ORCID})
+
+Authors:
+\itemize{
+  \item Simen Gaure \email{Simen.Gaure@frisch.uio.no} (\href{https://orcid.org/0000-0001-7251-8747}{ORCID})
+}
+
 }
 \concept{DCT Floater-Hormann}
 \keyword{Chebyshev}
