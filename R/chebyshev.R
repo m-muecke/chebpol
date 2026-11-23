@@ -83,7 +83,10 @@ chebknots <- function(dims, intervals = NULL) {
 #' chebcoef(a)
 #' @export
 chebcoef <- function(val, dct = FALSE) {
-  structure(.Call(C_chebcoef, as.array(val), dct, getOption("chebpol.threads")), dimnames = dimnames(val))
+  structure(
+    .Call(C_chebcoef, as.array(val), dct, getOption("chebpol.threads")),
+    dimnames = dimnames(val)
+  )
 }
 
 

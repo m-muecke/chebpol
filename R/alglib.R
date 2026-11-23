@@ -1,6 +1,4 @@
 rbf.alglib <- function(val, knots, rbase = 2, layers = 5, lambda = 0, ...) {
-  x <- threads <- NULL
-  rm(x, threads)
   if (is.null(dim(knots))) {
     dim(knots) <- c(1, length(knots))
   }
