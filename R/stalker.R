@@ -28,7 +28,7 @@ oldstalkerappx <- function(val, grid, r = 2, ...) {
     stop("length of values ", length(val), " do not match size of grid ", gl)
   }
 
-  r <- rep(as.numeric(r), length.out = length(grid))
+  r <- rep_len(as.numeric(r), length(grid))
   uniform <- vapply(grid, \(g) all(abs(diff(g, differences = 2L)) < 1e-8), logical(1))
   # precompute distance between grid points
   dmin <- lapply(grid, \(gr) c(NaN, diff(gr)))
@@ -49,7 +49,7 @@ oldstalkerappx <- function(val, grid, r = 2, ...) {
     ) {
       blend <- switch(match.arg(blend), linear = 0L, sigmoid = 1L, parodic = 2L, cubic = 3L, square = 4L)
       if (!identical(degree, r)) {
-        degree <- rep(as.numeric(degree), length.out = length(grid))
+        degree <- rep_len(as.numeric(degree), length(grid))
         if (!havegsl() && any(is.na(degree) & !uniform)) {
           stop("Non-uniform grid and varying degree needs GSL. Recompile with GSL.")
         }
