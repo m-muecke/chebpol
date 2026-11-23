@@ -48,40 +48,45 @@ aware that it may be highly erratic there, especially if of high degree.
 }
 \examples{
 \dontrun{
+  f <- function(x) exp(-sum(x^2))
+  ## we want 3 dimensions, i.e. something like
+  ## f(x,y,z) = exp(-(x^2 + y^2 + z^2))
+  ## 8 points in each dimension
+  gridsize <- list(8, 8, 8)
+  # get the function values on the Chebyshev grid
+  values <- evalongrid(f, gridsize)
+  # make an approximation
+  ch <- chebappx(values)
+  ## test it:
+  a <- runif(3, -1, 1)
+  ch(a) - f(a)
 
-f <- function(x) exp(-sum(x^2))
-## we want 3 dimensions, i.e. something like
-## f(x,y,z) = exp(-(x^2 + y^2 + z^2))
-## 8 points in each dimension
-gridsize <- list(8,8,8)
-# get the function values on the Chebyshev grid
-values <- evalongrid(f,gridsize)
-# make an approximation
-ch <- chebappx(values)
-## test it:
-a <- runif(3,-1,1);ch(a)-f(a)
+  ## then one with domain [0.1,0.3] x [-1,-0.5] x [0.5,2]
+  intervals <- list(c(0.1, 0.3), c(-1, -0.5), c(0.5, 2))
+  # evaluate on the grid
+  values <- evalongrid(f, gridsize, intervals)
+  # make an approximation
+  ch2 <- chebappx(values, intervals)
+  a <- c(0.25, -0.68, 1.43)
+  ch2(a) - f(a)
+  # outside of domain:
+  a <- runif(3)
+  ch2(a)
+  f(a)
 
-## then one with domain [0.1,0.3] x [-1,-0.5] x [0.5,2]
-intervals <- list(c(0.1,0.3),c(-1,-0.5),c(0.5,2))
-# evaluate on the grid
-values <- evalongrid(f,gridsize,intervals)
-# make an approximation
-ch2 <- chebappx(values,intervals)
-a <- c(0.25,-0.68,1.43); ch2(a)-f(a)
-# outside of domain:
-a <- runif(3) ; ch2(a); f(a)
+  # Make a function on [0,2] x [0,1]
+  f <- function(y) uniroot(function(x) x - y[[1]] * cos(pi * x^2), lower = 0, upper = 1)$root * sum(y^2)
+  # approximate it
+  ch <- chebappxf(f, c(12, 12), intervals = list(c(0, 2), c(0, 1)))
+  # test it:
+  a <- c(runif(1, 0, 2), runif(1, 0, 1))
+  ch(a)
+  f(a)
 
-# Make a function on [0,2] x [0,1]
-f <- function(y) uniroot(function(x) x-y[[1]]*cos(pi*x^2),lower=0,upper=1)$root*sum(y^2)
-# approximate it
-ch <- chebappxf(f,c(12,12),intervals=list(c(0,2),c(0,1)))
-# test it:
-a <- c(runif(1,0,2),runif(1,0,1)); ch(a); f(a)
-
-# Lambert's W:
-f <- function(y) uniroot(function(x) y - x*exp(x), lower=-1,upper=3)$root
-W <- chebappxf(f,100,c(-exp(-1),3*exp(3)))
-W(10*pi)*exp(W(10*pi))/pi
+  # Lambert's W:
+  f <- function(y) uniroot(function(x) y - x * exp(x), lower = -1, upper = 3)$root
+  W <- chebappxf(f, 100, c(-exp(-1), 3 * exp(3)))
+  W(10 * pi) * exp(W(10 * pi)) / pi
 }
 }
 \keyword{internal}

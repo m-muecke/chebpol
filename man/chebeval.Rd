@@ -25,27 +25,25 @@ A numeric. The interpolated value.
 Given Chebyshev coefficients, evaluate the interpolation in a point.
 }
 \examples{
-
 # make a function which is known to be unsuitable for Chebyshev approximation
 f <- function(x) sign(x)
 # make a standard Chebyshev interpolation
-ch <- ipol(f,dims=50,method="chebyshev")
+ch <- ipol(f, dims = 50, method = "chebyshev")
 # then do a truncated interpolation
-val <- evalongrid(f,50)
+val <- evalongrid(f, 50)
 coef <- chebcoef(val)
 # truncate the high frequencies
 coef[-(1:10)] <- 0
 # make a truncated approximation
-tch <- Vectorize(function(x) chebeval(x,coef))
+tch <- Vectorize(function(x) chebeval(x, coef))
 # make a lower degree also
-ch2 <- ipol(f,dims=10,method="chebyshev")
+ch2 <- ipol(f, dims = 10, method = "chebyshev")
 # plot the functions
 \dontrun{
-s <- seq(-1,1,length.out=400)
-plot(s,ch(s),col="red",type="l")
-lines(s,tch(s),col="blue")
-lines(s,f(s))
-lines(s,ch2(s),col="green")
+  s <- seq(-1, 1, length.out = 400)
+  plot(s, ch(s), col = "red", type = "l")
+  lines(s, tch(s), col = "blue")
+  lines(s, f(s))
+  lines(s, ch2(s), col = "green")
 }
-
 }

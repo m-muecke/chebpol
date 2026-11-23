@@ -115,21 +115,22 @@ separgs <- function(fun, ...) {
 #' \code{dim} attribute has been appropriately set for the grid.  If \code{fun}
 #' returns a vector, this will be the first dimension of the returned array.
 #' @examples
-#'
-#' f <- function(x) {a <- sum(x^2); ifelse(a == 0,0,exp(-1/a))}
+#' f <- function(x) {
+#'   a <- sum(x^2)
+#'   ifelse(a == 0, 0, exp(-1 / a))
+#' }
 #' ## Standard Chebyshev grid
-#' evalongrid(f,dims=c(3,5))
+#' evalongrid(f, dims = c(3, 5))
 #' ## Then Chebyshev on [0,1] x [2,3]
-#' evalongrid(f,dims=c(3,5),intervals=list(c(0,1),c(2,3)))
+#' evalongrid(f, dims = c(3, 5), intervals = list(c(0, 1), c(2, 3)))
 #' ## And on my own grid
-#' grid <- list(sort(rnorm(3)),sort(rnorm(5)))
-#' evalongrid(f,grid=grid)
-#' g <- ipol(f,grid=grid,method="fh")
-#' evalongridV(g, grid=grid, threads=2)
+#' grid <- list(sort(rnorm(3)), sort(rnorm(5)))
+#' evalongrid(f, grid = grid)
+#' g <- ipol(f, grid = grid, method = "fh")
+#' evalongridV(g, grid = grid, threads = 2)
 #' ## vector valued function
-#' f <- function(x) c(prod(x),sum(x^2))
-#' evalongrid(f,grid=grid)
-#'
+#' f <- function(x) c(prod(x), sum(x^2))
+#' evalongrid(f, grid = grid)
 #' @export
 evalongrid <- function(fun, dims, intervals = NULL, ..., grid = NULL) {
   # do a call to stuff which doesn't really expand the grid

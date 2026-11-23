@@ -31,16 +31,16 @@
 #' approximating the given function.
 #' @examples
 #' \dontrun{
-#' # a function on a 20-dimensional space
-#' r <- runif(20)
-#' r <- r/sum(r)
-#' f <- function(x) 1/mean(log1p(r*x))
-#' # 1000 random knots
-#' knots <- matrix(runif(20000), 20)
-#' phs <- polyh(f, knots, 3)
-#' # test it in a random point
-#' s <- runif(20)
-#' c(true=f(s), phs(s))
+#'   # a function on a 20-dimensional space
+#'   r <- runif(20)
+#'   r <- r / sum(r)
+#'   f <- function(x) 1 / mean(log1p(r * x))
+#'   # 1000 random knots
+#'   knots <- matrix(runif(20000), 20)
+#'   phs <- polyh(f, knots, 3)
+#'   # test it in a random point
+#'   s <- runif(20)
+#'   c(true = f(s), phs(s))
 #' }
 #' @export
 #' @keywords internal

@@ -41,24 +41,25 @@ If \code{val} is a function it will be evaluated on the grid.
 }
 \examples{
 \dontrun{
+  ## evenly spaced grid-points
+  su <- seq(0, 1, length.out = 10)
+  ## irregularly spaced grid-points
+  s <- su^3
+  ## create approximation on the irregularly spaced grid
+  fh1 <- fhappx(exp, grid = list(s))
+  ## test it
+  fh1(su) - exp(su)
 
-## evenly spaced grid-points
-su <- seq(0,1,length.out=10)
-## irregularly spaced grid-points
-s <- su^3
-## create approximation on the irregularly spaced grid
-fh1 <- fhappx(exp,grid=list(s))
-## test it
-fh1(su) - exp(su)
+  ## two dimensional approximation
+  f <- function(x) exp(sum(x^2))
+  grid <- list(s, su)
 
-## two dimensional approximation
-f <- function(x) exp(sum(x^2))
-grid <- list(s,su)
+  fh2 <- fhappx(evalongrid(f, grid = grid), grid = grid)
+  # an equivalent would be fh2 <- fhappx(f,grid)
 
-fh2 <- fhappx(evalongrid(f,grid=grid),grid=grid)
-# an equivalent would be fh2 <- fhappx(f,grid)
-
-a <- runif(2); fh2(a); f(a)
+  a <- runif(2)
+  fh2(a)
+  f(a)
 }
 }
 \keyword{internal}

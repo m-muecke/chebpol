@@ -28,18 +28,16 @@ chebknots1 <- function(n, interval = NULL) {
 #' of the hypercube.
 #' @return A array of dimension \code{dims}.  The Chebyshev grid-points.
 #' @examples
-#'
 #' ## Standard knots for degree 3
 #' chebknots(4)
 #' ## Knots in the interval [2,3] for degree 3
-#' chebknots(4,interval=c(2,3))
+#' chebknots(4, interval = c(2, 3))
 #' ## Multivariate knots
-#' chebknots(c(x=3,y=4,z=3))
+#' chebknots(c(x = 3, y = 4, z = 3))
 #' ## Multivariate grid
 #' \dontrun{
-#' expand.grid(chebknots(c(x=3,y=4,z=5), list(c(1,3), c(4,6), c(800,900))))
+#'   expand.grid(chebknots(c(x = 3, y = 4, z = 5), list(c(1, 3), c(4, 6), c(800, 900))))
 #' }
-#'
 #' @export
 chebknots <- function(dims, intervals = NULL) {
   if (is.null(intervals)) {
@@ -80,11 +78,9 @@ chebknots <- function(dims, intervals = NULL) {
 #' Chebyshev-polynomial.
 #' @seealso \code{\link{havefftw}}
 #' @examples
-#'
 #' ## Coefficients for a 2x3x4 grid
-#' a <- array(rnorm(24),dim=c(2,3,4))
+#' a <- array(rnorm(24), dim = c(2, 3, 4))
 #' chebcoef(a)
-#'
 #' @export
 chebcoef <- function(val, dct = FALSE) {
   structure(.Call(C_chebcoef, as.array(val), dct, getOption("chebpol.threads")), dimnames = dimnames(val))
@@ -105,29 +101,27 @@ chebcoef <- function(val, dct = FALSE) {
 #' use this number of threads in parallel to evaluate.
 #' @return A numeric. The interpolated value.
 #' @examples
-#'
 #' # make a function which is known to be unsuitable for Chebyshev approximation
 #' f <- function(x) sign(x)
 #' # make a standard Chebyshev interpolation
-#' ch <- ipol(f,dims=50,method="chebyshev")
+#' ch <- ipol(f, dims = 50, method = "chebyshev")
 #' # then do a truncated interpolation
-#' val <- evalongrid(f,50)
+#' val <- evalongrid(f, 50)
 #' coef <- chebcoef(val)
 #' # truncate the high frequencies
 #' coef[-(1:10)] <- 0
 #' # make a truncated approximation
-#' tch <- Vectorize(function(x) chebeval(x,coef))
+#' tch <- Vectorize(function(x) chebeval(x, coef))
 #' # make a lower degree also
-#' ch2 <- ipol(f,dims=10,method="chebyshev")
+#' ch2 <- ipol(f, dims = 10, method = "chebyshev")
 #' # plot the functions
 #' \dontrun{
-#' s <- seq(-1,1,length.out=400)
-#' plot(s,ch(s),col="red",type="l")
-#' lines(s,tch(s),col="blue")
-#' lines(s,f(s))
-#' lines(s,ch2(s),col="green")
+#'   s <- seq(-1, 1, length.out = 400)
+#'   plot(s, ch(s), col = "red", type = "l")
+#'   lines(s, tch(s), col = "blue")
+#'   lines(s, f(s))
+#'   lines(s, ch2(s), col = "green")
 #' }
-#'
 #' @export
 chebeval <- function(x, coef, intervals = NULL, threads = getOption("chebpol.threads")) {
   if (is.null(intervals)) {
@@ -167,40 +161,45 @@ chebeval <- function(x, coef, intervals = NULL, threads = getOption("chebpol.thr
 #' the function \code{fun}, or the values provided in \code{val}.
 #' @examples
 #' \dontrun{
+#'   f <- function(x) exp(-sum(x^2))
+#'   ## we want 3 dimensions, i.e. something like
+#'   ## f(x,y,z) = exp(-(x^2 + y^2 + z^2))
+#'   ## 8 points in each dimension
+#'   gridsize <- list(8, 8, 8)
+#'   # get the function values on the Chebyshev grid
+#'   values <- evalongrid(f, gridsize)
+#'   # make an approximation
+#'   ch <- chebappx(values)
+#'   ## test it:
+#'   a <- runif(3, -1, 1)
+#'   ch(a) - f(a)
 #'
-#' f <- function(x) exp(-sum(x^2))
-#' ## we want 3 dimensions, i.e. something like
-#' ## f(x,y,z) = exp(-(x^2 + y^2 + z^2))
-#' ## 8 points in each dimension
-#' gridsize <- list(8,8,8)
-#' # get the function values on the Chebyshev grid
-#' values <- evalongrid(f,gridsize)
-#' # make an approximation
-#' ch <- chebappx(values)
-#' ## test it:
-#' a <- runif(3,-1,1);ch(a)-f(a)
+#'   ## then one with domain [0.1,0.3] x [-1,-0.5] x [0.5,2]
+#'   intervals <- list(c(0.1, 0.3), c(-1, -0.5), c(0.5, 2))
+#'   # evaluate on the grid
+#'   values <- evalongrid(f, gridsize, intervals)
+#'   # make an approximation
+#'   ch2 <- chebappx(values, intervals)
+#'   a <- c(0.25, -0.68, 1.43)
+#'   ch2(a) - f(a)
+#'   # outside of domain:
+#'   a <- runif(3)
+#'   ch2(a)
+#'   f(a)
 #'
-#' ## then one with domain [0.1,0.3] x [-1,-0.5] x [0.5,2]
-#' intervals <- list(c(0.1,0.3),c(-1,-0.5),c(0.5,2))
-#' # evaluate on the grid
-#' values <- evalongrid(f,gridsize,intervals)
-#' # make an approximation
-#' ch2 <- chebappx(values,intervals)
-#' a <- c(0.25,-0.68,1.43); ch2(a)-f(a)
-#' # outside of domain:
-#' a <- runif(3) ; ch2(a); f(a)
+#'   # Make a function on [0,2] x [0,1]
+#'   f <- function(y) uniroot(function(x) x - y[[1]] * cos(pi * x^2), lower = 0, upper = 1)$root * sum(y^2)
+#'   # approximate it
+#'   ch <- chebappxf(f, c(12, 12), intervals = list(c(0, 2), c(0, 1)))
+#'   # test it:
+#'   a <- c(runif(1, 0, 2), runif(1, 0, 1))
+#'   ch(a)
+#'   f(a)
 #'
-#' # Make a function on [0,2] x [0,1]
-#' f <- function(y) uniroot(function(x) x-y[[1]]*cos(pi*x^2),lower=0,upper=1)$root*sum(y^2)
-#' # approximate it
-#' ch <- chebappxf(f,c(12,12),intervals=list(c(0,2),c(0,1)))
-#' # test it:
-#' a <- c(runif(1,0,2),runif(1,0,1)); ch(a); f(a)
-#'
-#' # Lambert's W:
-#' f <- function(y) uniroot(function(x) y - x*exp(x), lower=-1,upper=3)$root
-#' W <- chebappxf(f,100,c(-exp(-1),3*exp(3)))
-#' W(10*pi)*exp(W(10*pi))/pi
+#'   # Lambert's W:
+#'   f <- function(y) uniroot(function(x) y - x * exp(x), lower = -1, upper = 3)$root
+#'   W <- chebappxf(f, 100, c(-exp(-1), 3 * exp(3)))
+#'   W(10 * pi) * exp(W(10 * pi)) / pi
 #' }
 #' @export
 #' @keywords internal
@@ -307,40 +306,45 @@ chebappxf.real <- function(fun, dims, intervals = NULL, ...) {
 #' given function.
 #' @examples
 #' \dontrun{
-#' ## evenly spaced grid-points
-#' su <- seq(0,1,length.out=10)
-#' ## irregularly spaced grid-points
-#' s <- su^3
-#' ## create approximation on the irregularly spaced grid
-#' ch <- Vectorize(chebappxg(exp(s),list(s)))
-#' ## test it:
-#' ch(su) - exp(su)
-#' # try one with three variables
-#' f <- function(x) exp(-sum(x^2))
-#' grid <- list(s,su,su^2)
-#' ch2 <- chebappxg(evalongrid(f,grid=grid),grid)
-#' # test it at 10 random points
-#' replicate(10,{a<-runif(3); ch2(a)-f(a)})
+#'   ## evenly spaced grid-points
+#'   su <- seq(0, 1, length.out = 10)
+#'   ## irregularly spaced grid-points
+#'   s <- su^3
+#'   ## create approximation on the irregularly spaced grid
+#'   ch <- Vectorize(chebappxg(exp(s), list(s)))
+#'   ## test it:
+#'   ch(su) - exp(su)
+#'   # try one with three variables
+#'   f <- function(x) exp(-sum(x^2))
+#'   grid <- list(s, su, su^2)
+#'   ch2 <- chebappxg(evalongrid(f, grid = grid), grid)
+#'   # test it at 10 random points
+#'   replicate(10, {
+#'     a <- runif(3)
+#'     ch2(a) - f(a)
+#'   })
 #'
-#' # Try Runge's function on a uniformly spaced grid.
-#' # Ordinary polynomial fitting of high degree of Runge's function on a uniform grid
-#' # creates large oscillations near the end of the interval. Not so with chebappxgf
-#' f <- function(x) 1/(1+25*x^2)
-#' chg <- Vectorize(chebappxgf(f,seq(-1,1,length.out=15)))
-#' # also compare with Chebyshev interpolation
-#' ch <- Vectorize(chebappxf(f,15))
-#' \dontrun{
-#'  # plot it
-#'  s <- seq(-1,1,length.out=200)
-#'  plot(s, f(s), type="l", col="black")
-#'  lines(s, chg(s), col="blue")
-#'  lines(s, ch(s), col="red")
-#'  legend("topright",
-#'         legend=c("Runge function","chebappxg on uniform grid","Chebyshev"),
-#'         col=c("black","blue","red"), lty=1)
+#'   # Try Runge's function on a uniformly spaced grid.
+#'   # Ordinary polynomial fitting of high degree of Runge's function on a uniform grid
+#'   # creates large oscillations near the end of the interval. Not so with chebappxgf
+#'   f <- function(x) 1 / (1 + 25 * x^2)
+#'   chg <- Vectorize(chebappxgf(f, seq(-1, 1, length.out = 15)))
+#'   # also compare with Chebyshev interpolation
+#'   ch <- Vectorize(chebappxf(f, 15))
+#'   \dontrun{
+#'     # plot it
+#'     s <- seq(-1, 1, length.out = 200)
+#'     plot(s, f(s), type = "l", col = "black")
+#'     lines(s, chg(s), col = "blue")
+#'     lines(s, ch(s), col = "red")
+#'     legend(
+#'       "topright",
+#'       legend = c("Runge function", "chebappxg on uniform grid", "Chebyshev"),
+#'       col = c("black", "blue", "red"),
+#'       lty = 1
+#'     )
+#'   }
 #' }
-#' }
-#'
 #' @export
 #' @keywords internal
 chebappxg <- function(...) deprecated("chebappxg", ...)

@@ -35,27 +35,29 @@ If \code{val} is a function it will be evaluated on the grid.
 }
 \examples{
 \dontrun{
+  ## evenly spaced grid-points
+  su <- seq(0, 1, length.out = 10)
+  ## irregularly spaced grid-points
+  s <- su^3
+  ## create approximation on the irregularly spaced grid
+  ml1 <- Vectorize(mlappx(exp, list(s)))
+  ## test it, since exp is convex, the linear approximation lies above
+  ## the exp between the grid points
+  ml1(su) - exp(su)
 
-## evenly spaced grid-points
-su <- seq(0,1,length.out=10)
-## irregularly spaced grid-points
-s <- su^3
-## create approximation on the irregularly spaced grid
-ml1 <- Vectorize(mlappx(exp,list(s)))
-## test it, since exp is convex, the linear approximation lies above
-## the exp between the grid points
-ml1(su) - exp(su)
+  ## multi linear approx
+  f <- function(x) exp(sum(x^2))
+  grid <- list(s, su)
 
-## multi linear approx
-f <- function(x) exp(sum(x^2))
-grid <- list(s,su)
+  ml2 <- mlappx(evalongrid(f, grid = grid), grid)
+  # an equivalent would be ml2 <- mlappx(f,grid)
 
-ml2 <- mlappx(evalongrid(f,grid=grid),grid)
-# an equivalent would be ml2 <- mlappx(f,grid)
-
-a <- runif(2); ml2(a); f(a)
-# we also get an approximation outside of the domain, of disputable quality
-ml2(c(1,2)); f(c(1,2))
+  a <- runif(2)
+  ml2(a)
+  f(a)
+  # we also get an approximation outside of the domain, of disputable quality
+  ml2(c(1, 2))
+  f(c(1, 2))
 }
 }
 \keyword{internal}

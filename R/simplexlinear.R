@@ -14,13 +14,12 @@
 #' argument \code{epol=TRUE}.
 #' @examples
 #' \dontrun{
-#' knots <- matrix(runif(3*1000), 3)
-#' f <- function(x) exp(-sum(x^2))
-#' g <- slappx(f, knots)
-#' a <- matrix(runif(3*6), 3)
-#' rbind(true=apply(a,2,f), sl=g(a))
-#'}
-#'
+#'   knots <- matrix(runif(3 * 1000), 3)
+#'   f <- function(x) exp(-sum(x^2))
+#'   g <- slappx(f, knots)
+#'   a <- matrix(runif(3 * 6), 3)
+#'   rbind(true = apply(a, 2, f), sl = g(a))
+#' }
 #' @export
 #' @keywords internal
 slappx <- function(...) deprecated("slappx", ...)

@@ -53,17 +53,19 @@ As the example shows, this approximation is better than the Chebyshev
 approximation for some functions.
 }
 \examples{
-
 \dontrun{
-# Runge function
-f <- function(x) 1/(1+25*x^2)
-grid <- seq(-1,1,length.out=15)
-val <- f(grid)
-uc <- Vectorize(ucappx(val))
-# and the Chebyshev
-ch <- Vectorize(chebappxf(f,15))
-# test it at 10 random points
-t(replicate(10,{a<-runif(1,-1,1); c(arg=a, uc=uc(a), true=f(a), cheb=ch(a))}))
+  # Runge function
+  f <- function(x) 1 / (1 + 25 * x^2)
+  grid <- seq(-1, 1, length.out = 15)
+  val <- f(grid)
+  uc <- Vectorize(ucappx(val))
+  # and the Chebyshev
+  ch <- Vectorize(chebappxf(f, 15))
+  # test it at 10 random points
+  t(replicate(10, {
+    a <- runif(1, -1, 1)
+    c(arg = a, uc = uc(a), true = f(a), cheb = ch(a))
+  }))
 }
 }
 \keyword{internal}
