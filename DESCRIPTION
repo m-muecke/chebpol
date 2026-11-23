@@ -1,25 +1,36 @@
 Package: chebpol
+Title: Multivariate Interpolation
 Version: 2.1-2
 Date: 2019-12-09
-Title: Multivariate Interpolation
-Authors@R: person("Simen", "Gaure", email="Simen.Gaure@frisch.uio.no", role=c("aut","cre"),
- comment=c(ORCID="https://orcid.org/0000-0001-7251-8747"))
-Copyright: 2013-2019, Simen Gaure
-Imports: compiler, stats, geometry
-Suggests: lattice, knitr, cubature, plot3D
-SystemRequirements: fftw3 (>= 3.1.2), gsl
+Authors@R: 
+    person("Simen", "Gaure", , "Simen.Gaure@frisch.uio.no", role = c("aut", "cre"),
+           comment = c(ORCID = "https://orcid.org/0000-0001-7251-8747"))
 Description: Contains methods for creating multivariate/multidimensional
-  interpolations of functions on a hypercube. If available through fftw3, the DCT-II/FFT
-  is used to compute coefficients for a Chebyshev interpolation.
-  Other interpolation methods for arbitrary Cartesian grids are also provided, a piecewise multilinear,
-  and the Floater-Hormann barycenter method. For scattered data polyharmonic splines with a linear term
-  is provided. The time-critical parts are written in C for speed. All interpolants are parallelized if
-  used to evaluate more than one point.
+    interpolations of functions on a hypercube. If available through
+    fftw3, the DCT-II/FFT is used to compute coefficients for a Chebyshev
+    interpolation.  Other interpolation methods for arbitrary Cartesian
+    grids are also provided, a piecewise multilinear, and the
+    Floater-Hormann barycenter method. For scattered data polyharmonic
+    splines with a linear term is provided. The time-critical parts are
+    written in C for speed. All interpolants are parallelized if used to
+    evaluate more than one point.
 License: Artistic-2.0
-Classification/MSC: 41A05, 41A10, 41A50, 41A63, 65D05, 65T40
-Classification/ACM: G.1.2
 URL: https://github.com/sgaure/chebpol
-VignetteBuilder: knitr
 BugReports: https://github.com/sgaure/chebpol/issues
+Imports: 
+    compiler,
+    geometry,
+    stats
+Suggests: 
+    cubature,
+    knitr,
+    lattice,
+    plot3D
+VignetteBuilder: 
+    knitr
+Classification/ACM: G.1.2
+Classification/MSC: 41A05, 41A10, 41A50, 41A63, 65D05, 65T40
+Copyright: 2013-2019, Simen Gaure
 Encoding: UTF-8
 RoxygenNote: 6.1.1
+SystemRequirements: fftw3 (>= 3.1.2), gsl
