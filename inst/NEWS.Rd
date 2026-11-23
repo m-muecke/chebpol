@@ -1,7 +1,8 @@
 \name{NEWS}
 \title{chebpol news}
-\section{Changes in development version}{
+\section{Changes in version 2.1-2.9000}{
   \itemize{
+    \item The functions \code{chebappx()}, \code{chebappxf()}, \code{chebappxg()}, \code{chebappxgf()}, \code{fhappx()}, \code{mlappx()}, \code{polyh()}, \code{slappx()}, \code{ucappx()} and \code{ucappxf()}, deprecated since version 1.7, have been removed. Use \code{ipol()} instead.
     \item \code{ipol()} with \code{method = "fh"} now forwards extra arguments in \code{...} to the function being interpolated.
   }
 }

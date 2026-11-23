@@ -1,28 +1,3 @@
-#' Simplex Linear approximation on scattered data
-#'
-#' A call \code{fun <- slappx(val, knots)} creates a piecewise multilinear interpolation
-#' on the Delaunay triangulation of the \code{knots}.
-#'
-#' @param val Array or function. Function values in the knots, or the function
-#' itself.
-#' @param knots matrix. Each column is a point in M-dimensional space.
-#' @param ... Further arguments to the function, if \code{is.function(val)}.
-#' @return A \code{function(x)} interpolating the values.
-#' @note
-#' By default, the interpolant will yield NaN for points outside the convex hull of the knots,
-#' but some extrapolation will be returned instead if the interpolant is called with the
-#' argument \code{epol=TRUE}.
-#' @examples
-#' \dontrun{
-#'   knots <- matrix(runif(3 * 1000), 3)
-#'   f <- function(x) exp(-sum(x^2))
-#'   g <- slappx(f, knots)
-#'   a <- matrix(runif(3 * 6), 3)
-#'   rbind(true = apply(a, 2, f), sl = g(a))
-#' }
-#' @export
-#' @keywords internal
-slappx <- function(...) deprecated("slappx", ...)
 slappx.real <- function(val, knots, ...) {
   if (is.function(val)) {
     val <- apply(knots, 2, val)

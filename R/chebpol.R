@@ -15,12 +15,3 @@
   }
   options(chebpol.threads = thr)
 }
-
-deprecated <- function(fun, ...) {
-  realfun <- call(":::", quote(chebpol), as.name(paste0(fun, ".real")))
-  .Deprecated("ipol", "chebpol", old = fun)
-  mc <- match.call(expand.dots = TRUE)
-  mc[[1L]] <- realfun
-  mc <- mc[-2]
-  eval.parent(mc)
-}
