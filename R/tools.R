@@ -67,7 +67,7 @@ separgs <- function(fun, ...) {
   }
   args <- as.list(sys.call())[-(1:2)]
   formals(f) <- args
-  compiler::cmpfun(f)
+  f
 }
 
 # evaluate a function on a Chebyshev grid
