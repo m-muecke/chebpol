@@ -3011,7 +3011,7 @@ $as_echo_n "checking for working fftw_plan_r2r in R... " >&6; }
   }
 
 EOF
-  ${R_HOME}/bin/R CMD SHLIB -o conftest.so conftest.c $FFTW_LIBS >& /dev/null
+  PKG_CPPFLAGS="$FFTW_CFLAGS" ${R_HOME}/bin/R CMD SHLIB -o conftest.so conftest.c $FFTW_LIBS >& /dev/null
   echo "dyn.load('conftest.so'); .Call('xxx_check')" > conftest.R
   ${R_HOME}/bin/R --slave < conftest.R
   stat=$?
@@ -3038,7 +3038,7 @@ $as_echo "$as_me: WARNING: Your FFTW can't do 2d r2r-transforms, could it be MKL
 $as_echo_n "checking whether static linking of FFTW solves it... " >&6; }
       TESTLIBS="-Wl,-Bstatic,-Bsymbolic-functions $FFTW_LIBS -Wl,-Bdynamic"
       touch conftest.c
-      ${R_HOME}/bin/R CMD SHLIB -o conftest.so conftest.c $TESTLIBS >& /dev/null
+      PKG_CPPFLAGS="$FFTW_CFLAGS" ${R_HOME}/bin/R CMD SHLIB -o conftest.so conftest.c $TESTLIBS >& /dev/null
       ${R_HOME}/bin/R --slave >& /dev/null < conftest.R
       stat=$?
       if test "x$stat" = "x1"; then :

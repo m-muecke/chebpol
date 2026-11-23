@@ -79,7 +79,7 @@ AS_IF([test "x$have_fftw" = "xyes" ], [
   }
 ]
 EOF 
-  ${R_HOME}/bin/R CMD SHLIB -o conftest.so conftest.c $FFTW_LIBS >& /dev/null
+  PKG_CPPFLAGS="$FFTW_CFLAGS" ${R_HOME}/bin/R CMD SHLIB -o conftest.so conftest.c $FFTW_LIBS >& /dev/null
   echo "dyn.load('conftest.so'); .Call('xxx_check')" > conftest.R
   ${R_HOME}/bin/R --slave < conftest.R
   stat=$?
@@ -94,7 +94,7 @@ EOF
       AC_MSG_CHECKING(whether static linking of FFTW solves it)
       TESTLIBS="-Wl,-Bstatic,-Bsymbolic-functions $FFTW_LIBS -Wl,-Bdynamic"
       touch conftest.c
-      ${R_HOME}/bin/R CMD SHLIB -o conftest.so conftest.c $TESTLIBS >& /dev/null    
+      PKG_CPPFLAGS="$FFTW_CFLAGS" ${R_HOME}/bin/R CMD SHLIB -o conftest.so conftest.c $TESTLIBS >& /dev/null    
       ${R_HOME}/bin/R --slave >& /dev/null < conftest.R
       stat=$?
       AS_IF([test "x$stat" = "x1"], [AC_MSG_RESULT(yes); FFTW_LIBS=${TESTLIBS}], [AC_MSG_RESULT(no)])

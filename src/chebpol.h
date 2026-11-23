@@ -1,5 +1,9 @@
 #ifndef _CHEBPOL
 #define _CHEBPOL
+#ifndef USE_FC_LEN_T
+#define USE_FC_LEN_T
+#endif
+#include <float.h>
 #include <math.h>
 #include <Rmath.h>
 #include <R.h>
@@ -10,6 +14,10 @@
 #include <R_ext/Applic.h>
 #include <R_ext/Visibility.h>
 #include "config.h"
+
+#ifndef FCONE
+#define FCONE
+#endif
 
 SEXP R_makerbf(SEXP, SEXP, SEXP, SEXP);
 SEXP R_evalrbf(SEXP, SEXP, SEXP);
