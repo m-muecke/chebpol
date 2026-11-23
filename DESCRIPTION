@@ -26,6 +26,7 @@ Suggests:
     knitr,
     lattice,
     plot3D,
+    rmarkdown,
     testthat (>= 3.3.0),
     withr (>= 2.4.2)
 VignetteBuilder: 

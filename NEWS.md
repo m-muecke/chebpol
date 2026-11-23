@@ -11,6 +11,10 @@
 * `ipol()` with `method = "fh"` now forwards extra arguments in `...` to the function being interpolated.
 * `ipol()` interpolants created with `method = "oldstalker"` now report both ranks when given input of the wrong dimension.
 
+## Documentation
+
+* The vignettes are now R Markdown documents rendered to HTML instead of Sweave documents rendered to PDF.
+
 # chebpol 2.0
 
 * The stalker spline now works in N dimensions.
