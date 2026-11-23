@@ -8,6 +8,7 @@ stalkercontext <- function(dmin, dplus, r, grid) {
   })
   list(det = det, pmin = powmin, pplus = powplus)
 }
+
 oldstalkerappx <- function(val, grid, r = 2, ...) {
   if (!is.list(grid)) {
     grid <- list(grid)

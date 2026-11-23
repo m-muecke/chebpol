@@ -30,6 +30,7 @@ vectorfun <- function(fun, arity, domain = NULL) {
 }
 
 defaultblend <- c("linear", "cubic", "sigmoid", "parodic", "square", "mean")
+
 blenddef <- function(fun, blend = defaultblend) {
   if (is.null(blend)) {
     return(fun)

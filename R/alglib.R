@@ -14,6 +14,7 @@ rbf.alglib <- function(val, knots, rbase = 2, layers = 5, lambda = 0, ...) {
     domain = data.frame(apply(knots, 1, range))
   )
 }
+
 #' Check whether chebpol has the ALGLIB library
 #'
 #' If ALGLIB was available at compile time, it can be used for compact
