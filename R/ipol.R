@@ -158,7 +158,7 @@ ipol <- function(
       if (is.null(blend)) {
         return(mlappx.real(val, grid, ...))
       }
-      newarg <- args[-match(c("blend"), names(args), nomatch = 0)]
+      newarg <- args[-match("blend", names(args), nomatch = 0)]
       return(blenddef(do.call(mlappx.real, c(list(val, grid), newarg)), blend))
     },
     simplexlinear = {
@@ -173,7 +173,7 @@ ipol <- function(
       if (is.null(blend)) {
         return(slappx.real(val, knots, ...))
       }
-      newarg <- args[-match(c("blend"), names(args), nomatch = 0)]
+      newarg <- args[-match("blend", names(args), nomatch = 0)]
       return(blenddef(do.call(slappx.real, c(list(val, knots), newarg)), blend))
     },
     fh = {
@@ -267,7 +267,7 @@ ipol <- function(
       if (is.null(blend)) {
         return(oldstalkerappx(val, grid, r = k, ...))
       }
-      newarg <- args[-match(c("blend"), names(args), nomatch = 0)]
+      newarg <- args[-match("blend", names(args), nomatch = 0)]
       return(blenddef(do.call(oldstalkerappx, c(list(val, grid, r = k), newarg)), blend))
     },
     hstalker = {
@@ -285,7 +285,7 @@ ipol <- function(
       if (is.null(blend)) {
         return(hstalkerappx(val, grid, ...))
       }
-      newarg <- args[-match(c("blend"), names(args), nomatch = 0)]
+      newarg <- args[-match("blend", names(args), nomatch = 0)]
       return(blenddef(do.call(hstalkerappx, c(list(val, grid), newarg)), blend))
     },
     stalker = {
@@ -303,7 +303,7 @@ ipol <- function(
       if (is.null(blend)) {
         return(stalkerappx(val, grid, ...))
       }
-      newarg <- args[-match(c("blend"), names(args), nomatch = 0)]
+      newarg <- args[-match("blend", names(args), nomatch = 0)]
       return(blenddef(do.call(stalkerappx, c(list(val, grid), newarg)), blend))
     },
     crbf = {
