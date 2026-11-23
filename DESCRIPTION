@@ -27,7 +27,9 @@ Suggests:
     cubature,
     knitr,
     lattice,
-    plot3D
+    plot3D,
+    testthat (>= 3.3.0),
+    withr
 VignetteBuilder: 
     knitr
 Classification/ACM: G.1.2
@@ -36,3 +38,4 @@ Config/roxygen2/version: 8.1.1
 Copyright: 2013-2019, Simen Gaure
 Encoding: UTF-8
 SystemRequirements: fftw3 (>= 3.1.2), gsl
+Config/testthat/edition: 3
