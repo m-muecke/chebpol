@@ -197,7 +197,7 @@ ipol <- function(
       if (is.null(k)) {
         k <- pmin(4, lengths(grid) - 1)
       }
-      return(fhappx.real(val, grid, d = k))
+      return(fhappx.real(val, grid, d = k, ...))
     },
     uniform = {
       if (is.function(val) && is.null(dims)) {
