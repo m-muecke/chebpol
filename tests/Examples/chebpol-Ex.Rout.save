@@ -21,7 +21,6 @@ Type 'q()' to quit R.
 > source(file.path(R.home("share"), "R", "examples-header.R"))
 > options(warn = 1)
 > base::assign(".ExTimings", "chebpol-Ex.timings", pos = 'CheckExEnv')
-> base::cat("name\tuser\tsystem\telapsed\n", file=base::get(".ExTimings", pos = 'CheckExEnv'))
 > base::assign(".format_ptime",
 + function(x) {
 +   if(!is.na(x[4L])) x[1L] <- x[1L] + x[4L]
@@ -42,7 +41,6 @@ Type 'q()' to quit R.
 > 
 > flush(stderr()); flush(stdout())
 > 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: chebappx
 > ### Title: Chebyshev interpolation on a hypercube
 > ### Aliases: chebappx chebappxf
@@ -96,15 +94,12 @@ Type 'q()' to quit R.
 > 
 > 
 > 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("chebappx", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("chebappxg")
 > ### * chebappxg
 > 
 > flush(stderr()); flush(stdout())
 > 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: chebappxg
 > ### Title: Interpolation on a non-Chebyshev grid
 > ### Aliases: chebappxg chebappxgf
@@ -155,15 +150,12 @@ Type 'q()' to quit R.
 > 
 > 
 > 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("chebappxg", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("chebcoef")
 > ### * chebcoef
 > 
 > flush(stderr()); flush(stdout())
 > 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: chebcoef
 > ### Title: Compute Chebyshev-coefficients given values on a Chebyshev grid
 > ### Aliases: chebcoef
@@ -200,15 +192,12 @@ Type 'q()' to quit R.
 > 
 > 
 > 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("chebcoef", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("chebeval")
 > ### * chebeval
 > 
 > flush(stderr()); flush(stdout())
 > 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: chebeval
 > ### Title: Evaluate a Chebyshev interpolation in a point
 > ### Aliases: chebeval
@@ -239,15 +228,12 @@ Type 'q()' to quit R.
 > 
 > 
 > 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("chebeval", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("chebknots")
 > ### * chebknots
 > 
 > flush(stderr()); flush(stdout())
 > 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: chebknots
 > ### Title: Create a Chebyshev-grid
 > ### Aliases: chebknots
@@ -282,15 +268,12 @@ $z
 > 
 > 
 > 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("chebknots", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("chebpol-package")
 > ### * chebpol-package
 > 
 > flush(stderr()); flush(stdout())
 > 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: chebpol-package
 > ### Title: Methods for creating multivariate interpolations on hypercubes
 > ### Aliases: chebpol-package chebpol
@@ -325,15 +308,12 @@ fh   0.2501152 0.4132112 1.751460 0.001677869 0.1709544
 > 
 > 
 > 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("chebpol-package", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("evalongrid")
 > ### * evalongrid
 > 
 > flush(stderr()); flush(stdout())
 > 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: evalongrid
 > ### Title: Evaluate a function on a grid
 > ### Aliases: evalongrid evalongridV
@@ -405,15 +385,12 @@ fh   0.2501152 0.4132112 1.751460 0.001677869 0.1709544
 > 
 > 
 > 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("evalongrid", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("fhappx")
 > ### * fhappx
 > 
 > flush(stderr()); flush(stdout())
 > 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: fhappx
 > ### Title: Floater-Hormann interpolation on a grid
 > ### Aliases: fhappx
@@ -445,15 +422,12 @@ fh   0.2501152 0.4132112 1.751460 0.001677869 0.1709544
 > 
 > 
 > 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("fhappx", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("interpolant")
 > ### * interpolant
 > 
 > flush(stderr()); flush(stdout())
 > 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: interpolant
 > ### Title: Evaluate an interpolant in a point
 > ### Aliases: interpolant
@@ -471,15 +445,12 @@ fh   0.2501152 0.4132112 1.751460 0.001677869 0.1709544
 > 
 > 
 > 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("interpolant", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("ipol")
 > ### * ipol
 > 
 > flush(stderr()); flush(stdout())
 > 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: ipol
 > ### Title: Create interpolating function.
 > ### Aliases: ipol
@@ -542,15 +513,12 @@ hst  1.166729 0.6569404 1.552856 0.9696696 0.5326136 1.416647 0.7832519
 > 
 > 
 > 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("ipol", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("mlappx")
 > ### * mlappx
 > 
 > flush(stderr()); flush(stdout())
 > 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: mlappx
 > ### Title: Multilinear interpolation on a grid
 > ### Aliases: mlappx mlappxf
@@ -586,15 +554,12 @@ hst  1.166729 0.6569404 1.552856 0.9696696 0.5326136 1.416647 0.7832519
 > 
 > 
 > 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("mlappx", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("polyh")
 > ### * polyh
 > 
 > flush(stderr()); flush(stdout())
 > 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: polyh
 > ### Title: Polyharmonic splines on scattered data
 > ### Aliases: polyh
@@ -617,15 +582,12 @@ hst  1.166729 0.6569404 1.552856 0.9696696 0.5326136 1.416647 0.7832519
 > 
 > 
 > 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("polyh", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("slappx")
 > ### * slappx
 > 
 > flush(stderr()); flush(stdout())
 > 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: slappx
 > ### Title: Simplex Linear approximation on scattered data
 > ### Aliases: slappx
@@ -643,15 +605,12 @@ hst  1.166729 0.6569404 1.552856 0.9696696 0.5326136 1.416647 0.7832519
 > 
 > 
 > 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("slappx", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("ucappx")
 > ### * ucappx
 > 
 > flush(stderr()); flush(stdout())
 > 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: ucappx
 > ### Title: Interpolation on a uniform grid
 > ### Aliases: ucappx ucappxf
@@ -676,8 +635,6 @@ hst  1.166729 0.6569404 1.552856 0.9696696 0.5326136 1.416647 0.7832519
 > 
 > 
 > 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("ucappx", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > ### * <FOOTER>
 > ###
 > cleanEx()
