@@ -2,7 +2,7 @@
 
 # The Chebyshev knots of order n on an interval
 chebknots1 <- function(n, interval = NULL) {
-  kn <- cos(pi * ((1:n) - 0.5) / n)
+  kn <- cos(pi * (seq_len(n) - 0.5) / n)
   if ((n %% 2) == 1) {
     kn[[(n + 1) / 2]] <- 0
   }
@@ -128,7 +128,7 @@ chebeval <- function(x, coef, intervals = NULL, threads = getOption("chebpol.thr
     return(.Call(C_evalcheb, coef, x, threads, NULL))
   }
   # map into intervals
-  .Call(C_evalcheb, coef, mapply(function(x, i) 2 * (x[[1]] - mean(i)) / diff(i), x, intervals), threads, NULL)
+  .Call(C_evalcheb, coef, mapply(\(x, i) 2 * (x[[1]] - mean(i)) / diff(i), x, intervals), threads, NULL)
 }
 
 # return a function which is a Chebyshev interpolation
@@ -231,14 +231,14 @@ chebappx.real <- function(val, intervals = NULL) {
     if (!is.list(intervals)) {
       stop("intervals should be a list")
     }
-    if (any(sapply(intervals, length) != 2)) {
+    if (any(lengths(intervals) != 2)) {
       stop("interval elements should have length 2")
     }
     if (length(intervals) != length(dim(val))) {
       stop("values should have the same dimension as intervals ", length(intervals), " ", length(dim(val)))
     }
-    ispan <- sapply(intervals, function(x) 2 / diff(x))
-    mid <- sapply(intervals, function(x) mean(x))
+    ispan <- vapply(intervals, \(x) 2 / diff(x), numeric(1))
+    mid <- vapply(intervals, mean, numeric(1))
     imap <- function(x) (x - mid) * ispan
 
     fun <- vectorfun(
@@ -363,10 +363,10 @@ chebappxg.real <- function(val, grid = NULL, mapdim = NULL) {
   if (!is.list(grid) && length(grid) == length(val)) {
     grid <- list(grid)
   }
-  if (prod(sapply(grid, length)) != length(val)) {
+  if (prod(lengths(grid)) != length(val)) {
     stop("grid size must match data length")
   }
-  dim(val) <- sapply(grid, length)
+  dim(val) <- lengths(grid)
 
   # ok, grid is something like list(c(...),c(...),c(...))
   # create piecewise linear functions which maps grid-points to chebyshev grids
@@ -377,9 +377,9 @@ chebappxg.real <- function(val, grid = NULL, mapdim = NULL) {
   #  gridmaps <- mapply(polyh, chebknots(dim(val)), grid, MoreArgs=list(k=1))
   gridmap <- function(x) {
     if (!is.matrix(x)) {
-      return(mapply(function(gm, x) gm(x), gridmaps, x))
+      return(mapply(\(gm, x) gm(x), gridmaps, x))
     }
-    apply(x, 2, function(x) mapply(function(gm, x) gm(x), gridmaps, x))
+    apply(x, 2, \(x) mapply(\(gm, x) gm(x), gridmaps, x))
   }
   ch <- chebappx.real(val)
   vectorfun(

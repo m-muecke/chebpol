@@ -16,7 +16,7 @@
 }
 
 deprecated <- function(fun, ...) {
-  realfun <- eval(parse(text = paste("quote(chebpol:::", fun, ".real)", sep = "")))
+  realfun <- call(":::", quote(chebpol), as.name(paste0(fun, ".real")))
   .Deprecated("ipol", "chebpol", old = fun)
   mc <- match.call(expand.dots = TRUE)
   mc[[1L]] <- realfun

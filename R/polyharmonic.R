@@ -116,13 +116,13 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     #    w <- solve(A,val - B %*% v)
   } else {
     mat <- matrix(0, nrow(A) + nrow(B), nrow(A) + nrow(B))
-    mat[1:nrow(A), 1:ncol(A)] <- A
-    mat[(nrow(A) + 1):nrow(mat), 1:ncol(B)] <- B
-    mat[1:ncol(B), (ncol(A) + 1):ncol(mat)] <- t(B)
+    mat[seq_len(nrow(A)), seq_len(ncol(A))] <- A
+    mat[(nrow(A) + 1):nrow(mat), seq_len(ncol(B))] <- B
+    mat[seq_len(ncol(B)), (ncol(A) + 1):ncol(mat)] <- t(B)
     #    mat <- cbind(rbind(A,B),rbind(t(B),matrix(0,M+1,M+1)))
     rhs <- c(val, rep(0, M + 1))
-    wv <- try(solve(mat, rhs), silent = TRUE)
-    if (inherits(wv, "try-error")) {
+    wv <- tryCatch(solve(mat, rhs), error = \(e) NULL)
+    if (is.null(wv)) {
       if (!nowarn) {
         warning(
           "Failed to fit exactly, fallback to least squares fit.",
@@ -132,7 +132,7 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
       wv <- stats::lm.fit(mat, rhs)$coefficients
       wv[is.na(wv)] <- 0
     }
-    w <- wv[1:N]
+    w <- wv[seq_len(N)]
     v <- wv[(N + 1):length(wv)]
     rm(mat, rhs, wv)
   }

@@ -64,7 +64,7 @@ fhappx.real <- function(val, grid = NULL, d = 1, ...) {
     val <- evalongrid(val, grid = grid, ...)
   }
   if (!is.array(val)) {
-    dim(val) <- sapply(grid, length)
+    dim(val) <- lengths(grid)
   }
   dd <- as.integer(d)
   dd <- rep(dd, length(grid) %/% length(d))

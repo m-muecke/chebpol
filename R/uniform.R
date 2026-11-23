@@ -63,12 +63,12 @@ ucappx.real <- function(val, intervals = NULL) {
   dims <- dim(val)
   ch <- chebappx.real(val)
   if (is.null(intervals)) {
-    gridmap <- function(x) mapply(function(xi, d) ugm(xi, d), x, dims)
+    gridmap <- function(x) mapply(\(xi, d) ugm(xi, d), x, dims)
   } else {
     # precompute interval mid points and inverse lengths
     md <- lapply(intervals, mean)
-    ispan <- lapply(intervals, function(i) 2 / diff(i))
-    gridmap <- function(x) mapply(function(xi, mid, is, d) ugm(is * (xi - mid), d), x, md, ispan, dims)
+    ispan <- lapply(intervals, \(i) 2 / diff(i))
+    gridmap <- function(x) mapply(\(xi, mid, is, d) ugm(is * (xi - mid), d), x, md, ispan, dims)
   }
   gm <- function(x) {
     if (is.matrix(x)) apply(x, 2, gridmap) else gridmap(x)
@@ -89,7 +89,7 @@ ucappx.real <- function(val, intervals = NULL) {
 ucappxf <- function(...) deprecated("ucappxf", ...)
 ucappxf.real <- function(fun, dims, intervals = NULL, ...) {
   if (is.null(intervals)) {
-    return(ucappx.real(evalongrid(fun, ..., grid = lapply(dims, function(d) seq(-1, 1, length.out = d)))))
+    return(ucappx.real(evalongrid(fun, ..., grid = lapply(dims, \(d) seq(-1, 1, length.out = d)))))
   }
   if (is.numeric(intervals) && length(intervals) == 2) {
     intervals <- list(intervals)
@@ -99,7 +99,7 @@ ucappxf.real <- function(fun, dims, intervals = NULL, ...) {
       evalongrid(
         fun,
         ...,
-        grid = mapply(function(d, i) seq(min(i), max(i), length.out = d), dims, intervals, SIMPLIFY = FALSE)
+        grid = mapply(\(d, i) seq(min(i), max(i), length.out = d), dims, intervals, SIMPLIFY = FALSE)
       ),
       intervals
     )

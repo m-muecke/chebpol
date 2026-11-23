@@ -195,7 +195,7 @@ ipol <- function(
       }
       grid <- lapply(grid, as.numeric)
       if (is.null(k)) {
-        k <- pmin(4, sapply(grid, length) - 1)
+        k <- pmin(4, lengths(grid) - 1)
       }
       return(fhappx.real(val, grid, d = k))
     },
@@ -350,5 +350,5 @@ ipol <- function(
 }
 
 unsortedgrid <- function(g) {
-  any(sapply(g, function(s) is.unsorted(s, strictly = TRUE) && is.unsorted(-s, strictly = TRUE)))
+  any(vapply(g, \(s) is.unsorted(s, strictly = TRUE) && is.unsorted(-s, strictly = TRUE), logical(1)))
 }

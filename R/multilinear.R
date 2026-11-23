@@ -52,7 +52,7 @@ mlappx.real <- function(val, grid, ...) {
   if (is.numeric(grid)) {
     grid <- list(grid)
   }
-  if (any(sapply(grid, is.unsorted))) {
+  if (any(vapply(grid, is.unsorted, logical(1)))) {
     if (!is.function(val)) {
       stop("Grid points must be ordered in increasing order")
     }
@@ -61,7 +61,7 @@ mlappx.real <- function(val, grid, ...) {
   if (is.function(val)) {
     val <- evalongrid(val, grid = grid, ...)
   }
-  gl <- prod(sapply(grid, length))
+  gl <- prod(lengths(grid))
   if (length(val) != gl) {
     stop("length of values ", length(val), " do not match size of grid ", gl)
   }

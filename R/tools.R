@@ -59,7 +59,7 @@ separgs <- function(fun, ...) {
     mc <- match.call()
     mc[[1L]] <- quote(list)
     arg <- eval.parent(mc)
-    nn <- sapply(arg, length)
+    nn <- lengths(arg)
     if (all(nn == 1)) {
       return(fun(as.numeric(arg)))
     }
@@ -141,7 +141,7 @@ evalongrid <- function(fun, dims, intervals = NULL, ..., grid = NULL) {
     grid <- chebknots(dims, intervals)
   }
   mf <- match.fun(fun)
-  .Call(C_evalongrid, function(x) mf(x, ...), grid)
+  .Call(C_evalongrid, \(x) mf(x, ...), grid)
 }
 
 #' @rdname evalongrid
@@ -154,7 +154,7 @@ evalongridV <- function(fun, dims, intervals = NULL, ..., grid = NULL) {
     grid <- chebknots(dims, intervals)
   }
   fun <- match.fun(fun)
-  structure(fun(t(expand.grid(grid)), ...), dim = if (length(grid) > 1) sapply(grid, length) else NULL)
+  structure(fun(t(expand.grid(grid)), ...), dim = if (length(grid) > 1) lengths(grid) else NULL)
 }
 
 
