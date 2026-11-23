@@ -49,11 +49,11 @@
 #' }
 #' @export
 #' @keywords internal
-fhappx <- function(...) deprecated('fhappx', ...)
+fhappx <- function(...) deprecated("fhappx", ...)
 
 fhappx.real <- function(val, grid = NULL, d = 1, ...) {
   if (is.null(grid)) {
-    stop('Must specify grid')
+    stop("Must specify grid")
   }
   if (!is.list(grid)) {
     grid <- list(grid)
@@ -68,10 +68,10 @@ fhappx.real <- function(val, grid = NULL, d = 1, ...) {
   dd <- as.integer(d)
   dd <- rep(dd, length(grid) %/% length(d))
   # calculate weights, formula 18 in Floater & Hormann, in C, parallelized
-  weights <- .Call(C_FHweights, grid, dd, getOption('chebpol.threads'))
+  weights <- .Call(C_FHweights, grid, dd, getOption("chebpol.threads"))
   rm(dd, d)
   vectorfun(
-    function(x, threads = getOption('chebpol.threads')) .Call(C_FH, x, val, grid, weights, threads, NULL),
+    function(x, threads = getOption("chebpol.threads")) .Call(C_FH, x, val, grid, weights, threads, NULL),
     arity = length(grid),
     domain = lapply(grid, range)
   )

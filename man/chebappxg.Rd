@@ -36,7 +36,7 @@ A call \code{fun <- chebappxg(val,grid)} does the following.  A Chebyshev
 interpolation \code{ch} for \code{val} is created, on the [-1,1] hypercube.
 For each dimension a grid-map function \code{gm} is created which maps the
 grid-points monotonically into Chebyshev knots. For this, the function
-\code{\link{splinefun}} with \code{method='hyman'} is used.  When
+\code{\link{splinefun}} with \code{method="hyman"} is used.  When
 \code{fun(x)} is called, it translates to \code{ch(gm(x))}.  For uniform
 grids, the function \code{\link{ucappx}} will produce a faster interpolation
 in that a closed form \code{gm} is used.
@@ -75,12 +75,12 @@ ch <- Vectorize(chebappxf(f,15))
 \dontrun{
  # plot it
  s <- seq(-1,1,length.out=200)
- plot(s, f(s), type='l', col='black')
- lines(s, chg(s), col='blue')
- lines(s, ch(s), col='red')
- legend('topright',
-        legend=c('Runge function','chebappxg on uniform grid','Chebyshev'),
-        col=c('black','blue','red'), lty=1)
+ plot(s, f(s), type="l", col="black")
+ lines(s, chg(s), col="blue")
+ lines(s, ch(s), col="red")
+ legend("topright",
+        legend=c("Runge function","chebappxg on uniform grid","Chebyshev"),
+        col=c("black","blue","red"), lty=1)
 }
 }
 

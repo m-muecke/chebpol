@@ -53,7 +53,7 @@ ugm <- function(x, n) sin(0.5 * pi * x * (1 - n) / n)
 #' }
 #' @export
 #' @keywords internal
-ucappx <- function(...) deprecated('ucappx', ...)
+ucappx <- function(...) deprecated("ucappx", ...)
 ucappx.real <- function(val, intervals = NULL) {
   if (is.null(dim(val))) {
     dim(val) <- length(val)
@@ -72,7 +72,7 @@ ucappx.real <- function(val, intervals = NULL) {
     if (is.matrix(x)) apply(x, 2, gridmap) else gridmap(x)
   }
   vectorfun(
-    function(x, threads = getOption('chebpol.threads')) ch(gm(x), threads),
+    function(x, threads = getOption("chebpol.threads")) ch(gm(x), threads),
     arity = length(dims),
     domain = if (is.null(intervals)) lapply(rep(-1, length(dim(val))), c, 1) else intervals
   )
@@ -84,7 +84,7 @@ ucappx.real <- function(val, intervals = NULL) {
 #' @param ... Further arguments to \code{fun}.
 #' @export
 #' @keywords internal
-ucappxf <- function(...) deprecated('ucappxf', ...)
+ucappxf <- function(...) deprecated("ucappxf", ...)
 ucappxf.real <- function(fun, dims, intervals = NULL, ...) {
   if (is.null(intervals)) {
     return(ucappx.real(evalongrid(fun, ..., grid = lapply(dims, function(d) seq(-1, 1, length.out = d)))))

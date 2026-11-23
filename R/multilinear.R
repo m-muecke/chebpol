@@ -45,14 +45,14 @@
 #' }
 #' @export
 #' @keywords internal
-mlappx <- function(...) deprecated('mlappx', ...)
+mlappx <- function(...) deprecated("mlappx", ...)
 mlappx.real <- function(val, grid, ...) {
   if (is.numeric(grid)) {
     grid <- list(grid)
   }
   if (any(sapply(grid, is.unsorted))) {
     if (!is.function(val)) {
-      stop('Grid points must be ordered in increasing order')
+      stop("Grid points must be ordered in increasing order")
     }
     grid <- lapply(grid, sort)
   }
@@ -68,7 +68,7 @@ mlappx.real <- function(val, grid, ...) {
   #    val <- val + (val - .Call(C_predmlip,grid,as.numeric(val)))*adjust
   #  }
   vectorfun(
-    function(x, threads = getOption('chebpol.threads'), blend = c('linear', 'cubic', 'sigmoid', 'parodic', 'square')) {
+    function(x, threads = getOption("chebpol.threads"), blend = c("linear", "cubic", "sigmoid", "parodic", "square")) {
       blend <- switch(match.arg(blend), linear = 0L, sigmoid = 1L, parodic = 2L, cubic = 3L, square = 4L)
       .Call(C_evalmlip, grid, val, x, threads, blend)
     },

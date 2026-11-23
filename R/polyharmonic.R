@@ -44,7 +44,7 @@
 #' }
 #' @export
 #' @keywords internal
-polyh <- function(...) deprecated('polyh', ...)
+polyh <- function(...) deprecated("polyh", ...)
 polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   # Linear polyharmonic splines. Centres are columns in matrix knots. Function values in val.
   # Quite slow for ncol(knots) > 3000 or so.  k=2 yields thin-plate splines.
@@ -66,7 +66,7 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   M <- nrow(knots)
   if (k > 0) {
     if (abs(round(k) - k) > sqrt(.Machine$double.eps)) {
-      stop(sprintf('k is positive, but not an integer: %.17f', k))
+      stop(sprintf("k is positive, but not an integer: %.17f", k))
     } else {
       k <- as.integer(round(k))
     }
@@ -79,7 +79,7 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   }
   if (is.matrix(normalize)) {
     if (M %% nrow(normalize) != 0 || ncol(normalize) != 2) {
-      stop('normalize must but be a n x 2 matrix with ', M, ' divisible by n(', nrow(normalize), ')')
+      stop("normalize must but be a n x 2 matrix with ", M, " divisible by n(", nrow(normalize), ")")
     }
     wa <- normalize[, 1]
     wb <- normalize[, 2]
@@ -98,12 +98,12 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
 
   # trickery to get it in place
   phi <- function(x) {
-    eval.parent(as.call(list(quote(.Call), C_phifunc, substitute(x), k, getOption('chebpol.threads'))))
+    eval.parent(as.call(list(quote(.Call), C_phifunc, substitute(x), k, getOption("chebpol.threads"))))
   }
 
   #A <- phi(apply(knots,2, function(ck) colSums((ck-knots)^2)))
   # one day I will look into a faster solver,
-  A <- phi(.Call(C_sqdiffs, knots, knots, getOption('chebpol.threads')))
+  A <- phi(.Call(C_sqdiffs, knots, knots, getOption("chebpol.threads")))
   B <- rbind(1, knots)
   if (FALSE) {
     # Outta https://mathematica.stackexchange.com/questions/65763/understanding-polyharmonic-splines
@@ -122,11 +122,11 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     #    mat <- cbind(rbind(A,B),rbind(t(B),matrix(0,M+1,M+1)))
     rhs <- c(val, rep(0, M + 1))
     wv <- try(solve(mat, rhs), silent = TRUE)
-    if (inherits(wv, 'try-error')) {
+    if (inherits(wv, "try-error")) {
       if (!nowarn) {
         warning(
-          'Failed to fit exactly, fallback to least squares fit.',
-          if (!normalize) ' You could try normalize=TRUE.' else ''
+          "Failed to fit exactly, fallback to least squares fit.",
+          if (!normalize) " You could try normalize=TRUE." else ""
         )
       }
       wv <- stats::lm.fit(mat, rhs)$coefficients
@@ -138,7 +138,7 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   }
   rm(A, B)
   vectorfun(
-    function(x, threads = getOption('chebpol.threads')) .Call(C_evalpolyh, normfun(x), knots, w, v, k, threads, NULL),
+    function(x, threads = getOption("chebpol.threads")) .Call(C_evalpolyh, normfun(x), knots, w, v, k, threads, NULL),
     arity = M,
     domain = data.frame(apply(knots, 1, range))
   )

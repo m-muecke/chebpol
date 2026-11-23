@@ -40,7 +40,7 @@ dimension.  These need not be Chebyshev-knots, nor evenly spaced.}
 extra arguments for interpolant creation described in section Details.}
 }
 \value{
-A \code{function(x, threads=getOption('chebpol.threads'))} defined on a hypercube, an \link{interpolant}
+A \code{function(x, threads=getOption("chebpol.threads"))} defined on a hypercube, an \link{interpolant}
 for the given function. The argument \code{x} can be a matrix of column
 vectors which are evaluated in parallel in a number of threads.  The
 function yields values for arguments outside the hypercube as well, though
@@ -96,7 +96,7 @@ It is only available if ALGLIB was available at
 compile time. It takes the extra arguments \code{"rbase"}, \code{"layers"}, and
 \code{"lambda"}. These are discussed in the ALGLIB documentation.
 
-There are also some usage examples and more in \code{vignette("chebpol")} and \code{vignette('chebusage')}.
+There are also some usage examples and more in \code{vignette("chebpol")} and \code{vignette("chebusage")}.
 }
 \examples{
 
@@ -105,8 +105,8 @@ su <- seq(0,1,length.out=10)
 ## irregularly spaced grid-points
 s <- su^3
 ## create approximation on the irregularly spaced grid
-ml1 <- ipol(exp, grid=list(s), method='multilin')
-fh1 <- ipol(exp, grid=list(s), method='fh')
+ml1 <- ipol(exp, grid=list(s), method="multilin")
+fh1 <- ipol(exp, grid=list(s), method="fh")
 ## test it, since exp is convex, the linear approximation lies above
 ## the exp between the grid points
 ml1(su) - exp(su)
@@ -118,15 +118,15 @@ f <- function(x) 10/(1+25*mean(x^2))
 grid <- list(s, su, sort(1-s))
 
 # make multilinear, Floater-Hormann, Chebyshev and polyharmonic spline.
-ml2 <- ipol(f, grid=grid, method='multilin')
-fh2 <- ipol(f, grid=grid, method='fh')
-hst <- ipol(f, grid=grid, method='hstalker')
-ch2 <- ipol(f, dims=c(10,10,10), intervals=list(0:1,0:1,0:1), method='cheb')
+ml2 <- ipol(f, grid=grid, method="multilin")
+fh2 <- ipol(f, grid=grid, method="fh")
+hst <- ipol(f, grid=grid, method="hstalker")
+ch2 <- ipol(f, dims=c(10,10,10), intervals=list(0:1,0:1,0:1), method="cheb")
 knots <- matrix(runif(3*1000),3)
-ph2 <- ipol(f, knots=knots, k=2, method='poly')
-sl2 <- ipol(f, knots=knots, method='simplexlinear')
+ph2 <- ipol(f, knots=knots, k=2, method="poly")
+sl2 <- ipol(f, knots=knots, method="simplexlinear")
 # my alglib is a bit slow, so stick to 100 knots
-if(havealglib()) crb <- ipol(f, knots=knots[,1:100], method='crbf',
+if(havealglib()) crb <- ipol(f, knots=knots[,1:100], method="crbf",
   rbase=2, layers=5, lambda=0)
 # make 7 points in R3 to test them on
 m <- matrix(runif(3*7),3)

@@ -69,7 +69,7 @@ evalongrid(f,dims=c(3,5),intervals=list(c(0,1),c(2,3)))
 ## And on my own grid
 grid <- list(sort(rnorm(3)),sort(rnorm(5)))
 evalongrid(f,grid=grid)
-g <- ipol(f,grid=grid,method='fh')
+g <- ipol(f,grid=grid,method="fh")
 evalongridV(g, grid=grid, threads=2)
 ## vector valued function
 f <- function(x) c(prod(x),sum(x^2))

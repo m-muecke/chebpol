@@ -16,20 +16,20 @@ vectorfun <- function(fun, arity, domain = NULL) {
     if (length(x) %% arity == 0) {
       numvec <- length(x) / arity
       if (numvec > 1) {
-        warning(sprintf('Coercing vector of length %d into %dx%d matrix', length(x), arity, numvec))
+        warning(sprintf("Coercing vector of length %d into %dx%d matrix", length(x), arity, numvec))
       }
       dim(x) <- c(arity, numvec)
       arglist[[1]] <- x
       do.call(fun, arglist)
     } else {
-      stop(sprintf('Function should take %d arguments, you supplied a vector of length %d', arity, length(x)))
+      stop(sprintf("Function should take %d arguments, you supplied a vector of length %d", arity, length(x)))
     }
   }
   formals(f) <- formals(fun)
-  structure(f, arity = arity, domain = as.data.frame(domain), chebpol.version = utils::packageVersion('chebpol'))
+  structure(f, arity = arity, domain = as.data.frame(domain), chebpol.version = utils::packageVersion("chebpol"))
 }
 
-defaultblend <- c('linear', 'cubic', 'sigmoid', 'parodic', 'square', 'mean')
+defaultblend <- c("linear", "cubic", "sigmoid", "parodic", "square", "mean")
 blenddef <- function(fun, blend = defaultblend) {
   if (is.null(blend)) {
     return(fun)
@@ -37,19 +37,19 @@ blenddef <- function(fun, blend = defaultblend) {
   blend <- match.arg(blend)
   pos <- match(blend, defaultblend)
   f <- formals(fun)
-  if (!('blend' %in% names(f))) {
+  if (!("blend" %in% names(f))) {
     return(f)
   }
-  f[['blend']] <- as.call(c(list(as.name('c')), c(defaultblend[pos], defaultblend[-pos])))
+  f[["blend"]] <- as.call(c(list(as.name("c")), c(defaultblend[pos], defaultblend[-pos])))
   formals(fun) <- f
-  ffun <- get('fun', environment(fun))
+  ffun <- get("fun", environment(fun))
   ff <- formals(ffun)
-  if (!('blend' %in% names(ff))) {
+  if (!("blend" %in% names(ff))) {
     return(fun)
   }
-  ff[['blend']] <- f[['blend']]
+  ff[["blend"]] <- f[["blend"]]
   formals(ffun) <- ff
-  assign('fun', ffun, envir = environment(fun))
+  assign("fun", ffun, envir = environment(fun))
   fun
 }
 
@@ -124,7 +124,7 @@ separgs <- function(fun, ...) {
 #' ## And on my own grid
 #' grid <- list(sort(rnorm(3)),sort(rnorm(5)))
 #' evalongrid(f,grid=grid)
-#' g <- ipol(f,grid=grid,method='fh')
+#' g <- ipol(f,grid=grid,method="fh")
 #' evalongridV(g, grid=grid, threads=2)
 #' ## vector valued function
 #' f <- function(x) c(prod(x),sum(x^2))

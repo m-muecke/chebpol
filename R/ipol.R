@@ -46,7 +46,7 @@
 #' compile time. It takes the extra arguments \code{"rbase"}, \code{"layers"}, and
 #' \code{"lambda"}. These are discussed in the ALGLIB documentation.
 #'
-#' There are also some usage examples and more in \code{vignette("chebpol")} and \code{vignette('chebusage')}.
+#' There are also some usage examples and more in \code{vignette("chebpol")} and \code{vignette("chebusage")}.
 #'
 #' @param val array or function. Function values on a grid, or the function
 #' itself. If it is the values, the \code{"dim"}-attribute must be
@@ -62,7 +62,7 @@
 #' @param method character. The interpolation method to use.
 #' @param ... Further arguments to the function, if \code{is.function(val)}. And some
 #' extra arguments for interpolant creation described in section Details.
-#' @return A \code{function(x, threads=getOption('chebpol.threads'))} defined on a hypercube, an \link{interpolant}
+#' @return A \code{function(x, threads=getOption("chebpol.threads"))} defined on a hypercube, an \link{interpolant}
 #' for the given function. The argument \code{x} can be a matrix of column
 #' vectors which are evaluated in parallel in a number of threads.  The
 #' function yields values for arguments outside the hypercube as well, though
@@ -76,8 +76,8 @@
 #' ## irregularly spaced grid-points
 #' s <- su^3
 #' ## create approximation on the irregularly spaced grid
-#' ml1 <- ipol(exp, grid=list(s), method='multilin')
-#' fh1 <- ipol(exp, grid=list(s), method='fh')
+#' ml1 <- ipol(exp, grid=list(s), method="multilin")
+#' fh1 <- ipol(exp, grid=list(s), method="fh")
 #' ## test it, since exp is convex, the linear approximation lies above
 #' ## the exp between the grid points
 #' ml1(su) - exp(su)
@@ -89,15 +89,15 @@
 #' grid <- list(s, su, sort(1-s))
 #'
 #' # make multilinear, Floater-Hormann, Chebyshev and polyharmonic spline.
-#' ml2 <- ipol(f, grid=grid, method='multilin')
-#' fh2 <- ipol(f, grid=grid, method='fh')
-#' hst <- ipol(f, grid=grid, method='hstalker')
-#' ch2 <- ipol(f, dims=c(10,10,10), intervals=list(0:1,0:1,0:1), method='cheb')
+#' ml2 <- ipol(f, grid=grid, method="multilin")
+#' fh2 <- ipol(f, grid=grid, method="fh")
+#' hst <- ipol(f, grid=grid, method="hstalker")
+#' ch2 <- ipol(f, dims=c(10,10,10), intervals=list(0:1,0:1,0:1), method="cheb")
 #' knots <- matrix(runif(3*1000),3)
-#' ph2 <- ipol(f, knots=knots, k=2, method='poly')
-#' sl2 <- ipol(f, knots=knots, method='simplexlinear')
+#' ph2 <- ipol(f, knots=knots, k=2, method="poly")
+#' sl2 <- ipol(f, knots=knots, method="simplexlinear")
 #' # my alglib is a bit slow, so stick to 100 knots
-#' if(havealglib()) crb <- ipol(f, knots=knots[,1:100], method='crbf',
+#' if(havealglib()) crb <- ipol(f, knots=knots[,1:100], method="crbf",
 #'   rbase=2, layers=5, lambda=0)
 #' # make 7 points in R3 to test them on
 #' m <- matrix(runif(3*7),3)
@@ -113,17 +113,17 @@ ipol <- function(
   knots = NULL,
   k = NULL,
   method = c(
-    'chebyshev',
-    'multilinear',
-    'fh',
-    'uniform',
-    'general',
-    'polyharmonic',
-    'simplexlinear',
-    'hstalker',
-    'stalker',
-    'crbf',
-    'oldstalker'
+    "chebyshev",
+    "multilinear",
+    "fh",
+    "uniform",
+    "general",
+    "polyharmonic",
+    "simplexlinear",
+    "hstalker",
+    "stalker",
+    "crbf",
+    "oldstalker"
   ),
   ...
 ) {
@@ -133,7 +133,7 @@ ipol <- function(
     method,
     chebyshev = {
       if (is.function(val) && is.null(dims)) {
-        stop('dims must be specified')
+        stop("dims must be specified")
       }
       if (is.function(val)) {
         return(chebappxf.real(val, dims, intervals, ...))
@@ -145,7 +145,7 @@ ipol <- function(
     },
     multilinear = {
       if (is.null(grid)) {
-        stop('grid must be specified for multi linear interpolation')
+        stop("grid must be specified for multi linear interpolation")
       }
       if (!is.list(grid)) {
         grid <- list(grid)
@@ -154,11 +154,11 @@ ipol <- function(
       if (unsortedgrid(grid)) {
         stop("grid must be distinct ordered values")
       }
-      blend <- args[['blend']]
+      blend <- args[["blend"]]
       if (is.null(blend)) {
         return(mlappx.real(val, grid, ...))
       }
-      newarg <- args[-match(c('blend'), names(args), nomatch = 0)]
+      newarg <- args[-match(c("blend"), names(args), nomatch = 0)]
       return(blenddef(do.call(mlappx.real, c(list(val, grid), newarg)), blend))
     },
     simplexlinear = {
@@ -166,19 +166,19 @@ ipol <- function(
         if (!is.null(grid)) {
           knots <- t(expand.grid(grid))
         } else {
-          stop('knots must be specified for simplex linear interpolation')
+          stop("knots must be specified for simplex linear interpolation")
         }
       }
-      blend <- args[['blend']]
+      blend <- args[["blend"]]
       if (is.null(blend)) {
         return(slappx.real(val, knots, ...))
       }
-      newarg <- args[-match(c('blend'), names(args), nomatch = 0)]
+      newarg <- args[-match(c("blend"), names(args), nomatch = 0)]
       return(blenddef(do.call(slappx.real, c(list(val, knots), newarg)), blend))
     },
     fh = {
       if (is.null(grid)) {
-        stop('grid must be specified for Floater-Hormann interpolation')
+        stop("grid must be specified for Floater-Hormann interpolation")
       }
       if (!is.list(grid)) {
         grid <- list(grid)
@@ -194,7 +194,7 @@ ipol <- function(
     },
     uniform = {
       if (is.function(val) && is.null(dims)) {
-        stop('Must specify dims for uniform intervals')
+        stop("Must specify dims for uniform intervals")
       }
       if (is.null(intervals) && !is.null(grid)) {
         intervals <- lapply(grid, range)
@@ -210,7 +210,7 @@ ipol <- function(
     },
     general = {
       if (is.null(grid)) {
-        stop('grid must be specified for general interpolation')
+        stop("grid must be specified for general interpolation")
       }
       if (!is.list(grid)) {
         grid <- list(grid)
@@ -229,7 +229,7 @@ ipol <- function(
         if (!is.null(grid)) {
           knots <- t(expand.grid(grid))
         } else {
-          stop('Must specify knots for polyharmonic splines.')
+          stop("Must specify knots for polyharmonic splines.")
         }
       }
       if (is.null(k)) {
@@ -238,77 +238,77 @@ ipol <- function(
       # Now, ... may contain normalize and nowarn in addition to
       # arguments to val if it is a function
       # peel off normalize and nowarn
-      normalize <- args[['normalize']]
+      normalize <- args[["normalize"]]
       if (is.null(normalize)) {
         normalize <- NA
       }
-      nowarn <- args[['nowarn']]
+      nowarn <- args[["nowarn"]]
       if (is.null(nowarn)) {
         nowarn <- FALSE
       }
-      newarg <- args[-match(c('normalize', 'nowarn'), names(args), nomatch = 0)]
+      newarg <- args[-match(c("normalize", "nowarn"), names(args), nomatch = 0)]
       return(do.call(polyh.real, c(list(val, knots, k, normalize, nowarn), newarg)))
     },
     oldstalker = {
       if (is.null(grid)) {
-        stop('grid must be specified for stalker interpolation')
+        stop("grid must be specified for stalker interpolation")
       }
       if (!is.list(grid)) {
         grid <- list(grid)
       }
       if (unsortedgrid(grid)) {
-        stop('grid must be distinct ordered values')
+        stop("grid must be distinct ordered values")
       }
       grid <- lapply(grid, as.numeric)
       if (is.null(k)) {
         k <- 2
       }
-      blend <- args[['blend']]
+      blend <- args[["blend"]]
       if (is.null(blend)) {
         return(oldstalkerappx(val, grid, r = k, ...))
       }
-      newarg <- args[-match(c('blend'), names(args), nomatch = 0)]
+      newarg <- args[-match(c("blend"), names(args), nomatch = 0)]
       return(blenddef(do.call(oldstalkerappx, c(list(val, grid, r = k), newarg)), blend))
     },
     hstalker = {
       if (is.null(grid)) {
-        stop('grid must be specified for stalker interpolation')
+        stop("grid must be specified for stalker interpolation")
       }
       if (!is.list(grid)) {
         grid <- list(grid)
       }
       if (unsortedgrid(grid)) {
-        stop('grid must be distinct ordered values')
+        stop("grid must be distinct ordered values")
       }
       grid <- lapply(grid, as.numeric)
-      blend <- args[['blend']]
+      blend <- args[["blend"]]
       if (is.null(blend)) {
         return(hstalkerappx(val, grid, ...))
       }
-      newarg <- args[-match(c('blend'), names(args), nomatch = 0)]
+      newarg <- args[-match(c("blend"), names(args), nomatch = 0)]
       return(blenddef(do.call(hstalkerappx, c(list(val, grid), newarg)), blend))
     },
     stalker = {
       if (is.null(grid)) {
-        stop('grid must be specified for stalker interpolation')
+        stop("grid must be specified for stalker interpolation")
       }
       if (!is.list(grid)) {
         grid <- list(grid)
       }
       if (unsortedgrid(grid)) {
-        stop('grid must be distinct ordered values')
+        stop("grid must be distinct ordered values")
       }
       grid <- lapply(grid, as.numeric)
-      blend <- args[['blend']]
+      blend <- args[["blend"]]
       if (is.null(blend)) {
         return(stalkerappx(val, grid, ...))
       }
-      newarg <- args[-match(c('blend'), names(args), nomatch = 0)]
+      newarg <- args[-match(c("blend"), names(args), nomatch = 0)]
       return(blenddef(do.call(stalkerappx, c(list(val, grid), newarg)), blend))
     },
     crbf = {
       if (is.null(knots)) {
-        stop('Must specify knots for radial basis functions.')
+        stop("Must specify knots for radial basis functions.")
       }
       if (length(args) == 0) {
         # old interface
@@ -323,22 +323,22 @@ ipol <- function(
         }
         return(rbf.alglib(val, knots, rbase, layers, lambda))
       }
-      rbase <- args[['rbase']]
+      rbase <- args[["rbase"]]
       if (is.null(rbase)) {
         rbase <- 2
       }
-      layers <- args[['layers']]
+      layers <- args[["layers"]]
       if (is.null(layers)) {
         layers <- 5L
       }
-      lambda <- args[['lambda']]
+      lambda <- args[["lambda"]]
       if (is.null(lambda)) {
         lambda <- 0
       }
-      newarg <- args[-match(c('rbase', 'layers', 'lambda'), names(args), nomatch = 0)]
+      newarg <- args[-match(c("rbase", "layers", "lambda"), names(args), nomatch = 0)]
       return(do.call(rbf.alglib, c(list(val, knots, rbase, layers, lambda), newarg)))
     },
-    stop('Unknown interpolation method: ', method)
+    stop("Unknown interpolation method: ", method)
   )
 }
 

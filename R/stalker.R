@@ -15,7 +15,7 @@ oldstalkerappx <- function(val, grid, r = 2, ...) {
   grid <- lapply(grid, as.numeric)
   if (any(sapply(grid, is.unsorted))) {
     if (!is.function(val)) {
-      stop('Grid points must be ordered in increasing order')
+      stop("Grid points must be ordered in increasing order")
     }
     grid <- lapply(grid, sort)
   }
@@ -36,21 +36,21 @@ oldstalkerappx <- function(val, grid, r = 2, ...) {
   stalker <- c(list(val = val, grid = grid), stalkercontext(dmin, dplus, r, grid), uniform = list(uniform))
 
   if (!havegsl() && any(is.na(r) & !uniform)) {
-    stop('Non-uniform grid and varying degree needs GSL. Recompile with GSL.')
+    stop("Non-uniform grid and varying degree needs GSL. Recompile with GSL.")
   }
 
   vectorfun(
     function(
       x,
-      threads = getOption('chebpol.threads'),
+      threads = getOption("chebpol.threads"),
       degree = r,
-      blend = c('linear', 'cubic', 'sigmoid', 'parodic', 'square')
+      blend = c("linear", "cubic", "sigmoid", "parodic", "square")
     ) {
       blend <- switch(match.arg(blend), linear = 0L, sigmoid = 1L, parodic = 2L, cubic = 3L, square = 4L)
       if (!identical(degree, r)) {
         degree <- rep(as.numeric(degree), length.out = length(grid))
         if (!havegsl() && any(is.na(degree) & !uniform)) {
-          stop('Non-uniform grid and varying degree needs GSL. Recompile with GSL.')
+          stop("Non-uniform grid and varying degree needs GSL. Recompile with GSL.")
         }
         stalker <- c(list(val = val, grid = grid), stalkercontext(dmin, dplus, degree, grid), uniform = list(uniform))
       }
@@ -68,7 +68,7 @@ hstalkerappx <- function(val, grid, ...) {
   grid <- lapply(grid, as.numeric)
   if (any(sapply(grid, is.unsorted))) {
     if (!is.function(val)) {
-      stop('Grid points must be ordered in increasing order')
+      stop("Grid points must be ordered in increasing order")
     }
     grid <- lapply(grid, sort)
   }
@@ -79,8 +79,8 @@ hstalkerappx <- function(val, grid, ...) {
   vectorfun(
     function(
       x,
-      threads = getOption('chebpol.threads'),
-      blend = c('cubic', 'linear', 'sigmoid', 'parodic', 'square', 'mean')
+      threads = getOption("chebpol.threads"),
+      blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
     ) {
       blend <- switch(match.arg(blend), linear = 0L, sigmoid = 1L, parodic = 2L, cubic = 3L, square = 4L, mean = 5L)
       .Call(C_evalhyp, x, stalker, as.integer(blend), as.integer(threads))
@@ -97,7 +97,7 @@ stalkerappx <- function(val, grid, ...) {
   grid <- lapply(grid, as.numeric)
   if (any(sapply(grid, is.unsorted))) {
     if (!is.function(val)) {
-      stop('Grid points must be ordered in increasing order')
+      stop("Grid points must be ordered in increasing order")
     }
     grid <- lapply(grid, sort)
   }
@@ -108,8 +108,8 @@ stalkerappx <- function(val, grid, ...) {
   vectorfun(
     function(
       x,
-      threads = getOption('chebpol.threads'),
-      blend = c('cubic', 'linear', 'sigmoid', 'parodic', 'square', 'mean')
+      threads = getOption("chebpol.threads"),
+      blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
     ) {
       blend <- switch(match.arg(blend), linear = 0L, sigmoid = 1L, parodic = 2L, cubic = 3L, square = 4L, mean = 5L)
       .Call(C_evalstalk, x, stalker, as.integer(blend), as.integer(threads))

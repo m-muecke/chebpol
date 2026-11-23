@@ -9,7 +9,7 @@ rbf.alglib <- function(val, knots, rbase = 2, layers = 5, lambda = 0, ...) {
   }
   model <- .Call(C_makerbf, rbind(knots, val), layers, rbase, lambda)
   vectorfun(
-    function(x, threads = getOption('chebpol.threads')) .Call(C_evalrbf, model, x, threads),
+    function(x, threads = getOption("chebpol.threads")) .Call(C_evalrbf, model, x, threads),
     arity = nrow(knots),
     domain = data.frame(apply(knots, 1, range))
   )
