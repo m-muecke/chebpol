@@ -729,19 +729,13 @@ SEXP R_makestalk(SEXP Sval, SEXP Sgrid) {
   SEXP Sb = PROTECT(Rf_allocMatrix(REALSXP, nrank, len));
   SEXP Sc = PROTECT(Rf_allocMatrix(REALSXP, nrank, len));
   SEXP Sr = PROTECT(Rf_allocMatrix(REALSXP, nrank, len));
-  SEXP ret = PROTECT(Rf_allocVector(VECSXP, 5));
-  SEXP names = PROTECT(Rf_allocVector(STRSXP, 5));
-  Rf_setAttrib(ret, R_NamesSymbol, names);
+  const char *names[] = {"b", "c", "r", "val", "grid", ""};
+  SEXP ret = PROTECT(Rf_mkNamed(VECSXP, names));
   SET_VECTOR_ELT(ret, 0, Sb);
-  SET_STRING_ELT(names, 0, Rf_mkChar("b"));
   SET_VECTOR_ELT(ret, 1, Sc);
-  SET_STRING_ELT(names, 1, Rf_mkChar("c"));
   SET_VECTOR_ELT(ret, 2, Sr);
-  SET_STRING_ELT(names, 2, Rf_mkChar("r"));
   SET_VECTOR_ELT(ret, 3, Sval);
-  SET_STRING_ELT(names, 3, Rf_mkChar("val"));
   SET_VECTOR_ELT(ret, 4, Sgrid);
-  SET_STRING_ELT(names, 4, Rf_mkChar("grid"));
 #ifdef HAVE_GSL
   gsl_error_handler_t *gslh = gsl_set_error_handler_off();
 #else
@@ -761,7 +755,7 @@ SEXP R_makestalk(SEXP Sval, SEXP Sgrid) {
   gsl_set_error_handler(gslh);
 #endif
 
-  UNPROTECT(5);
+  UNPROTECT(4);
   return ret;
 }
 
@@ -785,24 +779,17 @@ SEXP R_makehyp(SEXP Sval, SEXP Sgrid) {
   SEXP Sb = PROTECT(Rf_allocMatrix(REALSXP, nrank, len));
   SEXP Sc = PROTECT(Rf_allocMatrix(REALSXP, nrank, len));
   SEXP Sd = PROTECT(Rf_allocMatrix(REALSXP, nrank, len));
-  SEXP ret = PROTECT(Rf_allocVector(VECSXP, 6));
-  SEXP names = PROTECT(Rf_allocVector(STRSXP, 6));
-  Rf_setAttrib(ret, R_NamesSymbol, names);
+  const char *names[] = {"a", "b", "c", "d", "val", "grid", ""};
+  SEXP ret = PROTECT(Rf_mkNamed(VECSXP, names));
   SET_VECTOR_ELT(ret, 0, Sa);
-  SET_STRING_ELT(names, 0, Rf_mkChar("a"));
   SET_VECTOR_ELT(ret, 1, Sb);
-  SET_STRING_ELT(names, 1, Rf_mkChar("b"));
   SET_VECTOR_ELT(ret, 2, Sc);
-  SET_STRING_ELT(names, 2, Rf_mkChar("c"));
   SET_VECTOR_ELT(ret, 3, Sd);
-  SET_STRING_ELT(names, 3, Rf_mkChar("d"));
   SET_VECTOR_ELT(ret, 4, Sval);
-  SET_STRING_ELT(names, 4, Rf_mkChar("val"));
   SET_VECTOR_ELT(ret, 5, Sgrid);
-  SET_STRING_ELT(names, 5, Rf_mkChar("grid"));
 
   makehyp(nrank, dims, grid, val, REAL(Sa), REAL(Sb), REAL(Sc), REAL(Sd), 0, point);
-  UNPROTECT(6);
+  UNPROTECT(5);
   return ret;
 }
 
@@ -902,7 +889,8 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
   if (LENGTH(Sdegree) != nrank) {
     Rf_error("degree length must match dimension (%d)", nrank);
   }
-  const double *degree = REAL_RO(Rf_coerceVector(Sdegree, REALSXP));
+  SEXP Sdeg = PROTECT(Rf_coerceVector(Sdegree, REALSXP));
+  const double *degree = REAL_RO(Sdeg);
   const double *grid[nrank];
   for (int i = 0; i < nrank; i++)
     grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
@@ -929,7 +917,7 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
 #ifdef HAVE_GSL
   gsl_set_error_handler(gslh);
 #endif
-  UNPROTECT(1);
+  UNPROTECT(2);
   return ret;
 }
 

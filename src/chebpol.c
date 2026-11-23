@@ -314,14 +314,15 @@ SEXP R_fhweights(SEXP Sgrid, SEXP Sd, SEXP Sthreads) {
     wlist[i] = REAL(VECTOR_ELT(ret, i));
   }
 
-  const int *dd = INTEGER_RO(Rf_coerceVector(Sd, INTSXP));
+  SEXP Sdd = PROTECT(Rf_coerceVector(Sd, INTSXP));
+  const int *dd = INTEGER_RO(Sdd);
   int threads = Rf_asInteger(Sthreads);
   for (int r = 0; r < rank; r++) {
     // The paper use index from 0 to n, i.e. n+1 knots in each dimension. Therefore dims[r]-1
     fhweights(dims[r] - 1, grid[r], dd[r], wlist[r], threads);
   }
 
-  UNPROTECT(1);
+  UNPROTECT(2);
   return ret;
 }
 
