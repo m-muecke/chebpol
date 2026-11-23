@@ -20,15 +20,35 @@
 #define FCONE
 #endif
 
+/* .Call entry points, registered in init.c */
+SEXP R_evalcheb(SEXP, SEXP, SEXP, SEXP);
+SEXP R_chebcoef(SEXP, SEXP, SEXP);
+SEXP R_FH(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP R_fhweights(SEXP, SEXP, SEXP);
+SEXP R_evalmlip(SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP R_mlippred(SEXP, SEXP);
+SEXP R_evalongrid(SEXP, SEXP);
+SEXP R_havefftw(void);
+SEXP R_sqdiffs(SEXP, SEXP, SEXP);
+SEXP R_phifunc(SEXP, SEXP, SEXP);
 SEXP R_makerbf(SEXP, SEXP, SEXP, SEXP);
 SEXP R_evalrbf(SEXP, SEXP, SEXP);
+SEXP R_havealglib(void);
+SEXP R_evalpolyh(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP R_evalsl(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP R_evalstalker(SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP R_makehyp(SEXP, SEXP);
 SEXP R_evalhyp(SEXP, SEXP, SEXP, SEXP);
 SEXP R_makestalk(SEXP, SEXP);
 SEXP R_evalstalk(SEXP, SEXP, SEXP, SEXP);
-SEXP R_havealglib();
-SEXP havegsl();
+SEXP R_analyzesimplex(SEXP, SEXP, SEXP);
+SEXP havegsl(void);
+
+/* C entry points made available to other packages in init.c */
+double C_evalcheb(double *cf, double *x, int *dims, const int rank);
+double C_evalmlip(const int rank, double *x, double **grid, int *dims, double *values, int blend);
+void C_evalongrid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, double **grid,
+                  const int *dims, const int rank, const int valuedim, double *result, void *userdata);
 
 static R_INLINE double blendfun(double w, int blend) {
   switch (blend) {

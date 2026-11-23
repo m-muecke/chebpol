@@ -147,7 +147,7 @@ static void chebcoef(double *x, int *dims, const int rank, double *F, int dct, i
   }
 }
 
-static SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
+SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
 
   SEXP dim;
   int rank;
@@ -229,7 +229,7 @@ static double FH(double *fv, double *x, double **knots, int *dims, const int ran
   return num / denom;
 }
 
-static SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spare) {
+SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spare) {
   int *dims;
   int siz = 1;
   double *val = REAL(vals);
@@ -295,7 +295,7 @@ R_INLINE static void fhweights(const int n, const double *grid, const int d, dou
 }
 
 // Compute the weights for Floater-Hormann. Formula (18) of the FH-paper
-static SEXP R_fhweights(SEXP Sgrid, SEXP Sd, SEXP Sthreads) {
+SEXP R_fhweights(SEXP Sgrid, SEXP Sd, SEXP Sthreads) {
   if (LENGTH(Sgrid) != LENGTH(Sd))
     Rf_error("Length of grid (%d) should equal length of d (%d)", LENGTH(Sgrid), LENGTH(Sd));
 
@@ -324,7 +324,7 @@ static SEXP R_fhweights(SEXP Sgrid, SEXP Sd, SEXP Sthreads) {
   return ret;
 }
 
-static double C_evalcheb(double *cf, double *x, int *dims, const int rank) {
+double C_evalcheb(double *cf, double *x, int *dims, const int rank) {
   if (rank == 0)
     return cf[0];
   // Otherwise, use the Clenshaw algorithm
@@ -354,7 +354,7 @@ static double C_evalcheb(double *cf, double *x, int *dims, const int rank) {
   return bn - x[newrank] * bn1;
 }
 
-static SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
+SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
   int *dims;
   int siz = 1;
   double *cf = REAL(coef);
@@ -472,8 +472,8 @@ SEXP R_evalpolyh(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, SE
 }
 
 // an R-free evalongrid. Recursive
-static void C_evalongrid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, double **grid,
-                         const int *dims, const int rank, const int valuedim, double *result, void *userdata) {
+void C_evalongrid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, double **grid,
+                  const int *dims, const int rank, const int valuedim, double *result, void *userdata) {
   int mrank = rank - 1;
   int stride = valuedim;
 
@@ -500,7 +500,7 @@ static void C_call(double *x, double *y, const int valuedim, void *userdata) {
     y[i] = fv[i];
 }
 
-static SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
+SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
   int rank = LENGTH(sgrid);
   double *grid[rank];
   int *dims;
@@ -616,7 +616,7 @@ static void C_predmlip(const int rank, double **grid, int *dims, double *values,
   }
 }
 
-static SEXP R_mlippred(SEXP sgrid, SEXP values) {
+SEXP R_mlippred(SEXP sgrid, SEXP values) {
   int rank = LENGTH(sgrid);
   int gridsize = 1;
   int dims[rank];
@@ -641,7 +641,7 @@ static SEXP R_mlippred(SEXP sgrid, SEXP values) {
   return resvec;
 }
 
-static double C_evalmlip(const int rank, double *x, double **grid, int *dims, double *values, int blend) {
+double C_evalmlip(const int rank, double *x, double **grid, int *dims, double *values, int blend) {
 
   double weight[rank];
   int valpos = 0;
@@ -693,7 +693,7 @@ static double C_evalmlip(const int rank, double *x, double **grid, int *dims, do
 }
 
 /* Then a multilinear approximation */
-static SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
+SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   const int rank = LENGTH(sgrid);
   int gridsize = 1;
   int dims[rank];
@@ -734,7 +734,7 @@ static SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sble
   return resvec;
 }
 
-static SEXP R_sqdiffs(SEXP x1, SEXP x2, SEXP Sthreads) {
+SEXP R_sqdiffs(SEXP x1, SEXP x2, SEXP Sthreads) {
   // each column in x1 should be subtracted from each column in x2,
   // the squared column sums should be returned.
   const int r1 = Rf_nrows(x1), c1 = Rf_ncols(x1), r2 = Rf_nrows(x2), c2 = Rf_ncols(x2);
@@ -852,8 +852,7 @@ static double findsimplex(double *x, double *knots, int *dtri, double *lumats, i
   return NA_REAL;
 }
 
-static SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extrapolate, SEXP Sthreads,
-                     SEXP Sblend) {
+SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extrapolate, SEXP Sthreads, SEXP Sblend) {
   // Loop over the triangulation
   int *dtri = INTEGER(Sdtri);
   const int numsimplex = Rf_ncols(Sdtri);
@@ -882,7 +881,7 @@ static SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SE
   return ret;
 }
 
-static SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
+SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
   int threads = Rf_asInteger(Sthreads);
   int *dtri = INTEGER(Sdtri);
   double *knots = REAL(Sknots);
@@ -931,7 +930,7 @@ static SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
   return retlist;
 }
 
-static SEXP R_havefftw() {
+SEXP R_havefftw(void) {
 #ifdef HAVE_FFTW
   return Rf_ScalarLogical(TRUE);
 #else
@@ -940,7 +939,7 @@ static SEXP R_havefftw() {
 }
 
 // inplace to save memory, do repated multiplication instead of pow(). It's faster.
-static SEXP R_phifunc(SEXP Sx, SEXP Sk, SEXP Sthreads) {
+SEXP R_phifunc(SEXP Sx, SEXP Sk, SEXP Sthreads) {
   double k = Rf_asReal(Sk);
   double *x = REAL(Sx);
   int threads = Rf_asInteger(Sthreads);
@@ -1005,49 +1004,6 @@ SEXP R_evalrbf(SEXP a, SEXP b, SEXP c) {
   Rf_error("ALGLIB not available");
   return R_NilValue;
 }
-SEXP R_havealglib() { return Rf_ScalarLogical(FALSE); }
+SEXP R_havealglib(void) { return Rf_ScalarLogical(FALSE); }
 
-#endif
-
-R_CallMethodDef callMethods[] = {{"evalcheb", (DL_FUNC)&R_evalcheb, 4},
-                                 {"chebcoef", (DL_FUNC)&R_chebcoef, 3},
-                                 {"FH", (DL_FUNC)&R_FH, 6},
-                                 {"FHweights", (DL_FUNC)&R_fhweights, 3},
-                                 {"evalmlip", (DL_FUNC)&R_evalmlip, 5},
-                                 {"predmlip", (DL_FUNC)&R_mlippred, 2},
-                                 {"evalongrid", (DL_FUNC)&R_evalongrid, 2},
-                                 {"havefftw", (DL_FUNC)&R_havefftw, 0},
-                                 {"sqdiffs", (DL_FUNC)&R_sqdiffs, 3},
-                                 {"phifunc", (DL_FUNC)&R_phifunc, 3},
-                                 {"makerbf", (DL_FUNC)&R_makerbf, 4},
-                                 {"evalrbf", (DL_FUNC)&R_evalrbf, 3},
-                                 {"havealglib", (DL_FUNC)&R_havealglib, 0},
-                                 {"evalpolyh", (DL_FUNC)&R_evalpolyh, 7},
-                                 {"evalsl", (DL_FUNC)&R_evalsl, 8},
-                                 {"evalstalker", (DL_FUNC)&R_evalstalker, 5},
-                                 {"makehyp", (DL_FUNC)&R_makehyp, 2},
-                                 {"evalhyp", (DL_FUNC)&R_evalhyp, 4},
-                                 {"makestalk", (DL_FUNC)&R_makestalk, 2},
-                                 {"evalstalk", (DL_FUNC)&R_evalstalk, 4},
-                                 {"analyzesimplex", (DL_FUNC)&R_analyzesimplex, 3},
-                                 {"havegsl", (DL_FUNC)&havegsl, 0},
-                                 {NULL, NULL, 0}};
-
-void attribute_visible R_init_chebpol(DllInfo *info) {
-  if (info != NULL) {
-  }; // avoid warning about unused parameter
-  /* register our routines */
-  R_registerRoutines(info, NULL, callMethods, NULL, NULL);
-  R_useDynamicSymbols(info, FALSE);
-  R_RegisterCCallable("chebpol", "evalcheb", (DL_FUNC)C_evalcheb);
-  R_RegisterCCallable("chebpol", "evalmlip", (DL_FUNC)C_evalmlip);
-  R_RegisterCCallable("chebpol", "evalongrid", (DL_FUNC)C_evalongrid);
-}
-#ifdef HAVE_FFTW
-void attribute_visible R_unload_chebpol(DllInfo *info) {
-  if (info == NULL) {
-  };
-  // Clean up fftw
-  fftw_cleanup();
-}
 #endif

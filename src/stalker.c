@@ -933,7 +933,7 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
   return ret;
 }
 
-SEXP havegsl() {
+SEXP havegsl(void) {
 #ifdef HAVE_GSL
   return Rf_ScalarLogical(TRUE);
 #else
