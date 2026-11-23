@@ -16,3 +16,13 @@ test_that("multilinear interpolation approximates a smooth function", {
   s <- matrix(runif(300), 3)
   expect_equal(lip(s), apply(s, 2, f), tolerance = 0.05)
 })
+
+test_that("multilinear blends reproduce values at the grid points", {
+  f <- function(x) exp(-sum(x^2))
+  grid <- list(seq(-1, 1, length.out = 9), seq(-1, 1, length.out = 7))
+  pts <- grid_points(grid)
+  lip <- ipol(f, grid = grid, method = "multilinear")
+  for (blend in c("linear", "cubic", "sigmoid", "parodic", "square")) {
+    expect_equal(lip(pts, blend = blend), apply(pts, 2, f))
+  }
+})
