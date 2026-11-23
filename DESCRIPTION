@@ -17,6 +17,8 @@ Description: Contains methods for creating multivariate/multidimensional
 License: Artistic-2.0
 URL: https://github.com/sgaure/chebpol
 BugReports: https://github.com/sgaure/chebpol/issues
+Depends: 
+    R (>= 4.1.0)
 Imports: 
     compiler,
     geometry,
@@ -30,7 +32,7 @@ VignetteBuilder:
     knitr
 Classification/ACM: G.1.2
 Classification/MSC: 41A05, 41A10, 41A50, 41A63, 65D05, 65T40
+Config/roxygen2/version: 8.1.1
 Copyright: 2013-2019, Simen Gaure
 Encoding: UTF-8
 SystemRequirements: fftw3 (>= 3.1.2), gsl
-Config/roxygen2/version: 8.1.1
