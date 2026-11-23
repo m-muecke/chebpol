@@ -14,7 +14,7 @@ typedef struct {
   double kq, vmin, vplus;
 } sblock;
 typedef struct {
-  double *det, *pmin, *pplus;
+  const double *det, *pmin, *pplus;
   int uniform;
 } precomp;
 #ifdef HAVE_GSL
@@ -289,7 +289,7 @@ static R_INLINE double stalk1(double x, double vmin, double v0, double vplus, do
   }
 }
 
-static void makestalk(const int nrank, const int *dims, double **grid, const double *val, double *b, double *c,
+static void makestalk(const int nrank, const int *dims, const double **grid, const double *val, double *b, double *c,
                       double *r, int depth, int *point) {
   // Loop over every grid point
   // In each grid point, find the function living there, i.e. an a,
@@ -319,7 +319,7 @@ static void makestalk(const int nrank, const int *dims, double **grid, const dou
   stride = 1;
 
   for (int i = 0; i < nrank; i++) {
-    double *gr = grid[i];
+    const double *gr = grid[i];
     int idx = point[i];
 
     // Check border, we do it linearly there
@@ -386,8 +386,8 @@ static void makestalk(const int nrank, const int *dims, double **grid, const dou
     stride *= dims[i];
   }
 }
-double evalstalk(const double *x, const int nrank, const int *dims, double **grid, const double *val, int blend,
-                 double *b, double *c, double *r) {
+double evalstalk(const double *x, const int nrank, const int *dims, const double **grid, const double *val, int blend,
+                 const double *b, const double *c, const double *r) {
   // loop over the corners of the hypercube surrounding x.
   // For each corner, evaluate the function there.
   // Make weighted sum.
@@ -400,8 +400,8 @@ double evalstalk(const double *x, const int nrank, const int *dims, double **gri
   // Store in gpos
   for (int g = 0; g < nrank; g++) {
     int mflag;
-    double *gr = grid[g];
-    int gp = findInterval(gr, dims[g], x[g], TRUE, TRUE, 1, &mflag) - 1;
+    const double *gr = grid[g];
+    int gp = findInterval((double *)gr, dims[g], x[g], TRUE, TRUE, 1, &mflag) - 1;
     // gp is below x
     gbase[g] = gp;
     weight[g] = 1 - (x[g] - gr[gbase[g]]) / (gr[gbase[g] + 1] - gr[gbase[g]]);
@@ -426,7 +426,7 @@ double evalstalk(const double *x, const int nrank, const int *dims, double **gri
     int corner = llcorner;
     double cw = 1.0;
     for (int g = 0; g < nrank; g++) {
-      double *gr = grid[g];
+      const double *gr = grid[g];
       if (i & (1 << g)) {
         cw *= blendfun(1 - weight[g], blend);
         corner += stride;
@@ -443,7 +443,7 @@ double evalstalk(const double *x, const int nrank, const int *dims, double **gri
     //    cw = blendfun(cw,blend);
     // Nice. Now 'corner' is the index into our arrays
     // Find b, c, and r for the corner. These have stride 'nrank'
-    double *bb = &b[nrank * corner], *cc = &c[nrank * corner], *rr = &r[nrank * corner];
+    const double *bb = &b[nrank * corner], *cc = &c[nrank * corner], *rr = &r[nrank * corner];
     // These are for a zero-based function, i.e. based on the corner being 0,
     // and f(0)=0
     // Compute the hyperbolic stalker in x
@@ -468,8 +468,8 @@ double evalstalk(const double *x, const int nrank, const int *dims, double **gri
 
 // Find the parameters for the hyperbolic stalker in each grid point
 // use normalized coordinates as in the formulas, f(0) = 0
-static void makehyp(const int nrank, const int *dims, double **grid, const double *val, double *a, double *b, double *c,
-                    double *d, int depth, int *point) {
+static void makehyp(const int nrank, const int *dims, const double **grid, const double *val, double *a, double *b,
+                    double *c, double *d, int depth, int *point) {
   // Loop over every grid point
   // In each grid point, find the function living there, i.e. an a,
   // and b,c,d for each dimension.
@@ -500,7 +500,7 @@ static void makehyp(const int nrank, const int *dims, double **grid, const doubl
   a[index] = 0.0;
   stride = 1; // Redo this for each dimension
   for (int i = 0; i < nrank; i++) {
-    double *gr = grid[i];
+    const double *gr = grid[i];
     int idx = point[i];
 
     // Check border, we do it linearly there
@@ -559,8 +559,8 @@ static void makehyp(const int nrank, const int *dims, double **grid, const doubl
   }
 }
 
-double evalhyp(const double *x, const int nrank, const int *dims, double **grid, const double *val, int blend,
-               double *a, double *b, double *c, double *d) {
+double evalhyp(const double *x, const int nrank, const int *dims, const double **grid, const double *val, int blend,
+               const double *a, const double *b, const double *c, const double *d) {
   // loop over the corners of the hypercube surrounding x.
   // For each corner, evaluate the function there.
   // Make weighted sum.
@@ -573,8 +573,8 @@ double evalhyp(const double *x, const int nrank, const int *dims, double **grid,
   // Store in gpos
   for (int g = 0; g < nrank; g++) {
     int mflag;
-    double *gr = grid[g];
-    int gp = findInterval(gr, dims[g], x[g], TRUE, TRUE, 1, &mflag) - 1;
+    const double *gr = grid[g];
+    int gp = findInterval((double *)gr, dims[g], x[g], TRUE, TRUE, 1, &mflag) - 1;
     // gp is below x
     gbase[g] = gp;
     weight[g] = 1 - (x[g] - gr[gbase[g]]) / (gr[gbase[g] + 1] - gr[gbase[g]]);
@@ -599,7 +599,7 @@ double evalhyp(const double *x, const int nrank, const int *dims, double **grid,
     int corner = llcorner;
     double cw = 1.0;
     for (int g = 0; g < nrank; g++) {
-      double *gr = grid[g];
+      const double *gr = grid[g];
       if (i & (1 << g)) {
         cw *= blendfun(1 - weight[g], blend);
         corner += stride;
@@ -616,7 +616,7 @@ double evalhyp(const double *x, const int nrank, const int *dims, double **grid,
     //    cw = blendfun(cw,blend);
     // Nice. Now 'corner' is the index into our arrays
     // Find a, b, c, and d for the corner. These have stride 'nrank'
-    double *bb = &b[nrank * corner], *cc = &c[nrank * corner], *dd = &d[nrank * corner];
+    const double *bb = &b[nrank * corner], *cc = &c[nrank * corner], *dd = &d[nrank * corner];
     // These are for a zero-based function, i.e. based on the corner being 0,
     // and f(0)=0
     // Compute the hyperbolic stalker in x
@@ -639,24 +639,24 @@ double evalhyp(const double *x, const int nrank, const int *dims, double **grid,
   return V / sumw;
 }
 
-double evalstalker(const double *x, const int nrank, const int *dims, double **grid, const double *val, int blend,
+double evalstalker(const double *x, const int nrank, const int *dims, const double **grid, const double *val, int blend,
                    const double *degree, precomp *pcomp) {
 
   if (nrank == 0)
     return val[0];
   const int newrank = nrank - 1;
-  double *gr = grid[newrank];
+  const double *gr = grid[newrank];
   const int N = dims[newrank];
   const double xx = x[newrank];
   //  double *rdet = det[newrank], *rpmin = pmin[newrank], *rpplus = pplus[newrank];
-  double *rdet = pcomp[newrank].det, *rpmin = pcomp[newrank].pmin, *rpplus = pcomp[newrank].pplus;
+  const double *rdet = pcomp[newrank].det, *rpmin = pcomp[newrank].pmin, *rpplus = pcomp[newrank].pplus;
   int uniform = pcomp[newrank].uniform;
   int mflag;
   int stride = 1;
   for (int r = 0; r < newrank; r++)
     stride *= dims[r];
   // Find the interval of the last coordinate, convert to zero-based
-  const int imin = findInterval(gr, N, xx, TRUE, TRUE, 1, &mflag) - 1;
+  const int imin = findInterval((double *)gr, N, xx, TRUE, TRUE, 1, &mflag) - 1;
 
   // Now, find the function values on the two grid points on each side.
   // i.e. imin, imin-1, and imin+1 and imin+2
@@ -721,10 +721,10 @@ SEXP R_makestalk(SEXP Sval, SEXP Sgrid) {
   if (len != LENGTH(Sval)) {
     Rf_error("number of values (%d) does not match grid size (%d)\n", LENGTH(Sval), len);
   }
-  double *val = REAL(Sval);
-  double *grid[nrank];
+  const double *val = REAL_RO(Sval);
+  const double *grid[nrank];
   for (int i = 0; i < nrank; i++)
-    grid[i] = REAL(VECTOR_ELT(Sgrid, i));
+    grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
   int point[nrank];
   SEXP Sb = PROTECT(Rf_allocMatrix(REALSXP, nrank, len));
   SEXP Sc = PROTECT(Rf_allocMatrix(REALSXP, nrank, len));
@@ -747,7 +747,7 @@ SEXP R_makestalk(SEXP Sval, SEXP Sgrid) {
 #else
   // Check if grid is uniform
   for (int i = 0; i < nrank; i++) {
-    double *gr = grid[i];
+    const double *gr = grid[i];
     double df = gr[1] - gr[0];
     for (int j = 2; j < dims[i]; j++)
       if (fabs(gr[j] - gr[j - 1] - df) > MYEPS)
@@ -776,10 +776,10 @@ SEXP R_makehyp(SEXP Sval, SEXP Sgrid) {
   if (len != LENGTH(Sval)) {
     Rf_error("number of values (%d) does not match grid size (%d)\n", LENGTH(Sval), len);
   }
-  double *val = REAL(Sval);
-  double *grid[nrank];
+  const double *val = REAL_RO(Sval);
+  const double *grid[nrank];
   for (int i = 0; i < nrank; i++)
-    grid[i] = REAL(VECTOR_ELT(Sgrid, i));
+    grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
   int point[nrank];
   SEXP Sa = PROTECT(Rf_allocVector(REALSXP, len));
   SEXP Sb = PROTECT(Rf_allocMatrix(REALSXP, nrank, len));
@@ -807,20 +807,20 @@ SEXP R_makehyp(SEXP Sval, SEXP Sgrid) {
 }
 
 SEXP R_evalstalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
-  const double *x = REAL(Sx);
+  const double *x = REAL_RO(Sx);
   // const int K = Rf_nrows(Sx);
   const int N = Rf_ncols(Sx);
-  int blend = INTEGER(Sblend)[0];
+  int blend = INTEGER_RO(Sblend)[0];
   int threads = Rf_asInteger(Sthreads);
-  double *b = REAL(VECTOR_ELT(stalker, 0));
-  double *c = REAL(VECTOR_ELT(stalker, 1));
-  double *r = REAL(VECTOR_ELT(stalker, 2));
-  double *val = REAL(VECTOR_ELT(stalker, 3));
+  const double *b = REAL_RO(VECTOR_ELT(stalker, 0));
+  const double *c = REAL_RO(VECTOR_ELT(stalker, 1));
+  const double *r = REAL_RO(VECTOR_ELT(stalker, 2));
+  const double *val = REAL_RO(VECTOR_ELT(stalker, 3));
   SEXP Sgrid = VECTOR_ELT(stalker, 4);
   const int nrank = LENGTH(Sgrid);
-  double *grid[nrank];
+  const double *grid[nrank];
   for (int i = 0; i < nrank; i++)
-    grid[i] = REAL(VECTOR_ELT(Sgrid, i));
+    grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
   int dims[nrank];
   int len = 1;
   for (int r = 0; r < nrank; r++) {
@@ -841,21 +841,21 @@ SEXP R_evalstalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
 }
 
 SEXP R_evalhyp(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
-  const double *x = REAL(Sx);
+  const double *x = REAL_RO(Sx);
   // const int K = Rf_nrows(Sx);
   const int N = Rf_ncols(Sx);
-  int blend = INTEGER(Sblend)[0];
+  int blend = INTEGER_RO(Sblend)[0];
   int threads = Rf_asInteger(Sthreads);
-  double *a = REAL(VECTOR_ELT(stalker, 0));
-  double *b = REAL(VECTOR_ELT(stalker, 1));
-  double *c = REAL(VECTOR_ELT(stalker, 2));
-  double *d = REAL(VECTOR_ELT(stalker, 3));
-  double *val = REAL(VECTOR_ELT(stalker, 4));
+  const double *a = REAL_RO(VECTOR_ELT(stalker, 0));
+  const double *b = REAL_RO(VECTOR_ELT(stalker, 1));
+  const double *c = REAL_RO(VECTOR_ELT(stalker, 2));
+  const double *d = REAL_RO(VECTOR_ELT(stalker, 3));
+  const double *val = REAL_RO(VECTOR_ELT(stalker, 4));
   SEXP Sgrid = VECTOR_ELT(stalker, 5);
   const int nrank = LENGTH(Sgrid);
-  double *grid[nrank];
+  const double *grid[nrank];
   for (int i = 0; i < nrank; i++)
-    grid[i] = REAL(VECTOR_ELT(Sgrid, i));
+    grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
   int dims[nrank];
   int len = 1;
   for (int r = 0; r < nrank; r++) {
@@ -875,11 +875,11 @@ SEXP R_evalhyp(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
 }
 
 SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthreads) {
-  const double *x = REAL(Sx);
+  const double *x = REAL_RO(Sx);
   const int K = Rf_nrows(Sx);
   const int N = Rf_ncols(Sx);
   int threads = Rf_asInteger(Sthreads);
-  const double *val = REAL(VECTOR_ELT(stalker, 0));
+  const double *val = REAL_RO(VECTOR_ELT(stalker, 0));
   SEXP Sgrid = VECTOR_ELT(stalker, 1);
   SEXP Sdet = VECTOR_ELT(stalker, 2);
   SEXP Spmin = VECTOR_ELT(stalker, 3);
@@ -902,16 +902,16 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
   if (LENGTH(Sdegree) != nrank) {
     Rf_error("degree length must match dimension (%d)", nrank);
   }
-  double *degree = REAL(Rf_coerceVector(Sdegree, REALSXP));
-  double *grid[nrank];
+  const double *degree = REAL_RO(Rf_coerceVector(Sdegree, REALSXP));
+  const double *grid[nrank];
   for (int i = 0; i < nrank; i++)
-    grid[i] = REAL(VECTOR_ELT(Sgrid, i));
+    grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
   precomp pcomp[nrank];
   for (int i = 0; i < nrank; i++) {
-    pcomp[i].det = REAL(VECTOR_ELT(Sdet, i));
-    pcomp[i].pmin = REAL(VECTOR_ELT(Spmin, i));
-    pcomp[i].pplus = REAL(VECTOR_ELT(Spplus, i));
-    pcomp[i].uniform = LOGICAL(Suniform)[i];
+    pcomp[i].det = REAL_RO(VECTOR_ELT(Sdet, i));
+    pcomp[i].pmin = REAL_RO(VECTOR_ELT(Spmin, i));
+    pcomp[i].pplus = REAL_RO(VECTOR_ELT(Spplus, i));
+    pcomp[i].uniform = LOGICAL_RO(Suniform)[i];
 #ifndef HAVE_GSL
     if (!pcomp[i].uniform && isnan(degree[i]))
       Rf_error("Non-uniform grid in dimension %d not supported without GSL. Recompile with GSL.", i + 1);

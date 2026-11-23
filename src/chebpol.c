@@ -4,7 +4,7 @@
 #include <fftw3.h>
 #endif
 
-static void chebcoef(double *x, int *dims, const int rank, double *F, int dct, int threads) {
+static void chebcoef(const double *x, const int *dims, const int rank, double *F, int dct, int threads) {
   R_xlen_t siz = 1;
   for (int i = 0; i < rank; i++)
     siz *= dims[i];
@@ -24,7 +24,7 @@ static void chebcoef(double *x, int *dims, const int rank, double *F, int dct, i
 
   // Plan and execute
 
-  fftw_plan plan = fftw_plan_r2r(rank, rdims, x, F, kind, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
+  fftw_plan plan = fftw_plan_r2r(rank, rdims, (double *)x, F, kind, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
   if (plan != NULL) {
     fftw_execute(plan);
     fftw_destroy_plan(plan);
@@ -151,7 +151,7 @@ SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
 
   SEXP dim;
   int rank;
-  int *dims;
+  const int *dims;
   int siz;
   SEXP resvec;
   int sdims;
@@ -159,7 +159,7 @@ SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
   int threads = Rf_asInteger(Sthreads);
   if (!Rf_isLogical(sdct) || LENGTH(sdct) < 1)
     Rf_error("dct must be a logical");
-  dct = LOGICAL(sdct)[0];
+  dct = LOGICAL_RO(sdct)[0];
   dim = Rf_getAttrib(x, R_DimSymbol);
   // If no dim-attribute, assume one-dimensional
   if (Rf_isNull(dim)) {
@@ -171,7 +171,7 @@ SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
     rank = LENGTH(dim);
     if (rank <= 0)
       Rf_error("Rank must be positive");
-    dims = INTEGER(dim);
+    dims = INTEGER_RO(dim);
   }
   siz = 1;
   for (int i = 0; i < rank; i++)
@@ -180,7 +180,7 @@ SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
     Rf_error("array size must be positive");
 
   PROTECT(resvec = Rf_allocVector(REALSXP, siz));
-  chebcoef(REAL(x), dims, rank, REAL(resvec), dct, threads);
+  chebcoef(REAL_RO(x), dims, rank, REAL(resvec), dct, threads);
   Rf_setAttrib(resvec, R_DimSymbol, dim);
   Rf_setAttrib(resvec, R_DimNamesSymbol, Rf_getAttrib(x, R_DimNamesSymbol));
   UNPROTECT(1);
@@ -188,7 +188,8 @@ SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
   return resvec;
 }
 
-static double FH(double *fv, double *x, double **knots, int *dims, const int rank, double **weights) {
+static double FH(const double *fv, const double *x, const double **knots, const int *dims, const int rank,
+                 const double **weights) {
   // Use Floater-Hormann method
   if (rank == 0)
     return fv[0];
@@ -196,8 +197,8 @@ static double FH(double *fv, double *x, double **knots, int *dims, const int ran
   const int newrank = rank - 1;
   const int N = dims[newrank];
   const double xx = x[newrank];
-  double *kn = knots[newrank];
-  double *w = weights[newrank];
+  const double *kn = knots[newrank];
+  const double *w = weights[newrank];
   for (int i = 0; i < newrank; i++)
     siz *= dims[i];
   double num = 0, denom = 0;
@@ -230,16 +231,16 @@ static double FH(double *fv, double *x, double **knots, int *dims, const int ran
 }
 
 SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spare) {
-  int *dims;
+  const int *dims;
   int siz = 1;
-  double *val = REAL(vals);
+  const double *val = REAL_RO(vals);
   int threads = Rf_asInteger(Rthreads);
   SEXP dim;
   int rank;
   UNUSED(spare);
   // Create some pointers and stuff.
   dim = Rf_getAttrib(vals, R_DimSymbol);
-  dims = INTEGER(dim);
+  dims = INTEGER_RO(dim);
   rank = LENGTH(dim);
   if (rank <= 0)
     Rf_error("rank must be positive");
@@ -258,13 +259,13 @@ SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spa
 
   if (LENGTH(grid) != rank)
     Rf_error("There must be one value for each knot");
-  double **knots = (double **)R_alloc(rank, sizeof(double *));
-  double **weights = (double **)R_alloc(rank, sizeof(double *));
+  const double **knots = (const double **)R_alloc(rank, sizeof(double *));
+  const double **weights = (const double **)R_alloc(rank, sizeof(double *));
   for (int i = 0; i < rank; i++) {
-    knots[i] = REAL(VECTOR_ELT(grid, i));
-    weights[i] = REAL(VECTOR_ELT(Sweights, i));
+    knots[i] = REAL_RO(VECTOR_ELT(grid, i));
+    weights[i] = REAL_RO(VECTOR_ELT(Sweights, i));
   }
-  double *xp = REAL(inx);
+  const double *xp = REAL_RO(inx);
   const int numvec = Rf_isMatrix(inx) ? Rf_ncols(inx) : 1;
   SEXP resvec = PROTECT(Rf_allocVector(REALSXP, numvec));
   double *out = REAL(resvec);
@@ -300,10 +301,10 @@ SEXP R_fhweights(SEXP Sgrid, SEXP Sd, SEXP Sthreads) {
     Rf_error("Length of grid (%d) should equal length of d (%d)", LENGTH(Sgrid), LENGTH(Sd));
 
   const int rank = LENGTH(Sgrid);
-  double *grid[rank];
+  const double *grid[rank];
   int *dims = (int *)R_alloc(rank, sizeof(int));
   for (int i = 0; i < rank; i++) {
-    grid[i] = REAL(VECTOR_ELT(Sgrid, i));
+    grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
     dims[i] = LENGTH(VECTOR_ELT(Sgrid, i));
   }
   double *wlist[rank];
@@ -313,7 +314,7 @@ SEXP R_fhweights(SEXP Sgrid, SEXP Sd, SEXP Sthreads) {
     wlist[i] = REAL(VECTOR_ELT(ret, i));
   }
 
-  const int *dd = INTEGER(Rf_coerceVector(Sd, INTSXP));
+  const int *dd = INTEGER_RO(Rf_coerceVector(Sd, INTSXP));
   int threads = Rf_asInteger(Sthreads);
   for (int r = 0; r < rank; r++) {
     // The paper use index from 0 to n, i.e. n+1 knots in each dimension. Therefore dims[r]-1
@@ -324,7 +325,7 @@ SEXP R_fhweights(SEXP Sgrid, SEXP Sd, SEXP Sthreads) {
   return ret;
 }
 
-double C_evalcheb(double *cf, double *x, int *dims, const int rank) {
+double C_evalcheb(const double *cf, const double *x, const int *dims, const int rank) {
   if (rank == 0)
     return cf[0];
   // Otherwise, use the Clenshaw algorithm
@@ -355,16 +356,16 @@ double C_evalcheb(double *cf, double *x, int *dims, const int rank) {
 }
 
 SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
-  int *dims;
+  const int *dims;
   int siz = 1;
-  double *cf = REAL(coef);
+  const double *cf = REAL_RO(coef);
   int threads = Rf_asInteger(Rthreads);
   SEXP dim;
   int rank;
   UNUSED(spare);
   // Create some pointers and stuff.
   dim = Rf_getAttrib(coef, R_DimSymbol);
-  dims = INTEGER(dim);
+  dims = INTEGER_RO(dim);
   rank = LENGTH(dim);
   if (rank <= 0)
     Rf_error("rank must be positive");
@@ -381,7 +382,7 @@ SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
   if (LENGTH(coef) != siz)
     Rf_error("coefficient length(%d) does not match data length(%d)", LENGTH(coef), siz);
 
-  double *xp = REAL(inx);
+  const double *xp = REAL_RO(inx);
   const int numvec = Rf_isMatrix(inx) ? Rf_ncols(inx) : 1;
 #ifdef RETMAT
   SEXP resvec = PROTECT(Rf_allocMatrix(REALSXP, numvec, 1));
@@ -438,10 +439,10 @@ double C_evalpolyh(const double *x, const double *knots, const double *weights, 
   return wsum;
 }
 SEXP R_evalpolyh(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, SEXP Sthreads, SEXP spare) {
-  double *x = REAL(inx);
-  double *knots = REAL(Sknots);
-  double *w = REAL(weights);
-  double *lw = REAL(lweights);
+  const double *x = REAL_RO(inx);
+  const double *knots = REAL_RO(Sknots);
+  const double *w = REAL_RO(weights);
+  const double *lw = REAL_RO(lweights);
   double k = Rf_asReal(Sk);
   int threads = Rf_asInteger(Sthreads);
   int numvec;
@@ -472,7 +473,7 @@ SEXP R_evalpolyh(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, SE
 }
 
 // an R-free evalongrid. Recursive
-void C_evalongrid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, double **grid,
+void C_evalongrid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, const double **grid,
                   const int *dims, const int rank, const int valuedim, double *result, void *userdata) {
   int mrank = rank - 1;
   int stride = valuedim;
@@ -495,14 +496,14 @@ static void C_call(double *x, double *y, const int valuedim, void *userdata) {
   // R_fcall structure
   if (x == NULL) {
   }; // avoid warning
-  double *fv = REAL(Rf_eval(*(SEXP *)userdata, R_BaseEnv));
+  const double *fv = REAL_RO(Rf_eval(*(SEXP *)userdata, R_BaseEnv));
   for (int i = 0; i < valuedim; i++)
     y[i] = fv[i];
 }
 
 SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
   int rank = LENGTH(sgrid);
-  double *grid[rank];
+  const double *grid[rank];
   int *dims;
   R_xlen_t len = 1.0;
   SEXP resvec;
@@ -516,7 +517,7 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
   PROTECT(R_dim = Rf_allocVector(INTSXP, rank));
   dims = INTEGER(R_dim);
   for (int i = 0; i < rank; i++) {
-    grid[i] = REAL(VECTOR_ELT(sgrid, i));
+    grid[i] = REAL_RO(VECTOR_ELT(sgrid, i));
     dims[i] = LENGTH(VECTOR_ELT(sgrid, i));
     len *= dims[i];
   }
@@ -564,7 +565,7 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
 // we never return 0, if val < arr[0] we return 1
 // if val > arr[n-1], we return n-1
 // this is suited for our particular application
-static inline int binsearch(const int n, double *arr, const double val) {
+static inline int binsearch(const int n, const double *arr, const double val) {
   int toosmall, toolarge, test;
   toosmall = 0;
   toolarge = n - 1;
@@ -579,7 +580,7 @@ static inline int binsearch(const int n, double *arr, const double val) {
   return toolarge;
 }
 
-static void C_predmlip(const int rank, double **grid, int *dims, double *values, double *output) {
+static void C_predmlip(const int rank, const double **grid, const int *dims, const double *values, double *output) {
   int stride[rank + 1];
   stride[0] = 1;
   for (int i = 1; i <= rank; ++i)
@@ -604,7 +605,7 @@ static void C_predmlip(const int rank, double **grid, int *dims, double *values,
     for (int i = 0; i < rank; i++) {
       if (dim[i] <= 0 || dim[i] + 1 >= dims[i])
         continue;
-      double *gr = grid[i];
+      const double *gr = grid[i];
       double r = (gr[dim[i]] - gr[dim[i] - 1]) / (gr[dim[i] + 1] - gr[dim[i] - 1]);
       w++;
       pred += r * values[j + stride[i]] + (1 - r) * values[j - stride[i]];
@@ -620,7 +621,7 @@ SEXP R_mlippred(SEXP sgrid, SEXP values) {
   int rank = LENGTH(sgrid);
   int gridsize = 1;
   int dims[rank];
-  double *grid[rank];
+  const double *grid[rank];
   SEXP resvec;
   if (!Rf_isReal(values))
     Rf_error("values must be numeric");
@@ -628,7 +629,7 @@ SEXP R_mlippred(SEXP sgrid, SEXP values) {
   /* Make some pointers into the grid data */
   for (int i = 0; i < rank; i++) {
     dims[i] = LENGTH(VECTOR_ELT(sgrid, i));
-    grid[i] = REAL(VECTOR_ELT(sgrid, i));
+    grid[i] = REAL_RO(VECTOR_ELT(sgrid, i));
     gridsize *= dims[i];
   }
 
@@ -636,12 +637,13 @@ SEXP R_mlippred(SEXP sgrid, SEXP values) {
     Rf_error("grid has size %d, you supplied %d values", gridsize, LENGTH(values));
 
   PROTECT(resvec = Rf_allocVector(REALSXP, gridsize));
-  (void)C_predmlip(rank, grid, dims, REAL(values), REAL(resvec));
+  (void)C_predmlip(rank, grid, dims, REAL_RO(values), REAL(resvec));
   UNPROTECT(1);
   return resvec;
 }
 
-double C_evalmlip(const int rank, double *x, double **grid, int *dims, double *values, int blend) {
+double C_evalmlip(const int rank, const double *x, const double **grid, const int *dims, const double *values,
+                  int blend) {
 
   double weight[rank];
   int valpos = 0;
@@ -660,7 +662,7 @@ double C_evalmlip(const int rank, double *x, double **grid, int *dims, double *v
 
   int stride = 1;
   for (int i = 0; i < rank; i++) {
-    double *gdvec = grid[i];
+    const double *gdvec = grid[i];
     // We could use Rs findInterval, but how many ways are there to do this?
     int gp = binsearch(dims[i], gdvec, x[i]);
     weight[i] = (x[i] - gdvec[gp - 1]) / (gdvec[gp] - gdvec[gp - 1]);
@@ -698,7 +700,7 @@ SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   int gridsize = 1;
   int dims[rank];
   int threads = Rf_asInteger(Rthreads);
-  double *grid[rank];
+  const double *grid[rank];
   int blend = 0;
   if (!Rf_isReal(values))
     Rf_error("values must be numeric");
@@ -710,7 +712,7 @@ SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   /* Make some pointers into the grid data */
   for (int i = 0; i < rank; i++) {
     dims[i] = LENGTH(VECTOR_ELT(sgrid, i));
-    grid[i] = REAL(VECTOR_ELT(sgrid, i));
+    grid[i] = REAL_RO(VECTOR_ELT(sgrid, i));
     gridsize *= dims[i];
   }
 
@@ -719,7 +721,7 @@ SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   if (!Rf_isNull(Sblend))
     blend = Rf_asInteger(Sblend);
   const int numvec = Rf_isMatrix(x) ? Rf_ncols(x) : 1;
-  double *xp = REAL(x);
+  const double *xp = REAL_RO(x);
 #ifdef RETMAT
   SEXP resvec = PROTECT(Rf_allocMatrix(REALSXP, numvec, 1));
 #else
@@ -728,7 +730,7 @@ SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   double *out = REAL(resvec);
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
   for (int i = 0; i < numvec; i++) {
-    out[i] = C_evalmlip(rank, xp + i * rank, grid, dims, REAL(values), blend);
+    out[i] = C_evalmlip(rank, xp + i * rank, grid, dims, REAL_RO(values), blend);
   }
   UNPROTECT(1);
   return resvec;
@@ -745,9 +747,9 @@ SEXP R_sqdiffs(SEXP x1, SEXP x2, SEXP Sthreads) {
   double *np = dres;
 #pragma omp parallel for num_threads(threads) schedule(static) if (c1 > 1)
   for (int i = 0; i < c1; i++) {
-    double *x1p = REAL(x1) + i * r1;
+    const double *x1p = REAL_RO(x1) + i * r1;
     for (int j = 0; j < c2; j++) {
-      double *x2p = REAL(x2) + j * r2;
+      const double *x2p = REAL_RO(x2) + j * r2;
       double csum = 0.0;
       for (int k = 0; k < r1; k++) {
         csum += (x1p[k] - x2p[k]) * (x1p[k] - x2p[k]);
@@ -763,14 +765,15 @@ SEXP R_sqdiffs(SEXP x1, SEXP x2, SEXP Sthreads) {
   return res;
 }
 
-static double findsimplex(double *x, double *knots, int *dtri, double *lumats, int *ipivs, double *bbox, int epol,
-                          double *val, const int dim, const int numsimplex, int nknots, int blend) {
+static double findsimplex(const double *x, const double *knots, const int *dtri, const double *lumats, const int *ipivs,
+                          const double *bbox, int epol, const double *val, const int dim, const int numsimplex,
+                          int nknots, int blend) {
 
   double vec[dim + 1];
   int N = dim + 1, one = 1, info;
   for (int simplex = 0; simplex < numsimplex; simplex++) {
     // x must be in the bounding box. Perhaps we should do binary search, or organize them hierarchically?
-    double *box = bbox + simplex * 2 * dim;
+    const double *box = bbox + simplex * 2 * dim;
     int bad = 0;
     for (int i = 0; i < dim; i++) {
       if (x[i] < box[0] || x[i] > box[1]) {
@@ -783,8 +786,8 @@ static double findsimplex(double *x, double *knots, int *dtri, double *lumats, i
       continue;
 
     // bounding box matches. Transform to barycentric coordinates, check that they are positive.
-    double *lumat = lumats + simplex * N * N;
-    int *ipiv = ipivs + simplex * N;
+    const double *lumat = lumats + simplex * N * N;
+    const int *ipiv = ipivs + simplex * N;
     for (int d = 0; d < dim; d++)
       vec[d] = x[d];
     vec[dim] = 1.0;
@@ -837,8 +840,8 @@ static double findsimplex(double *x, double *knots, int *dtri, double *lumats, i
 
     if (nearest == -1)
       return NA_REAL;
-    double *lumat = lumats + nearest * N * N;
-    int *ipiv = ipivs + nearest * N;
+    const double *lumat = lumats + nearest * N * N;
+    const int *ipiv = ipivs + nearest * N;
     const int *tri = dtri + nearest * (dim + 1);
     for (int d = 0; d < dim; d++)
       vec[d] = x[d];
@@ -854,16 +857,16 @@ static double findsimplex(double *x, double *knots, int *dtri, double *lumats, i
 
 SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extrapolate, SEXP Sthreads, SEXP Sblend) {
   // Loop over the triangulation
-  int *dtri = INTEGER(Sdtri);
+  const int *dtri = INTEGER_RO(Sdtri);
   const int numsimplex = Rf_ncols(Sdtri);
-  double *lumats = REAL(VECTOR_ELT(adata, 0));
-  int *pivots = INTEGER(VECTOR_ELT(adata, 1));
-  double *bboxmat = REAL(VECTOR_ELT(adata, 2));
-  double *x = REAL(Sx);
+  const double *lumats = REAL_RO(VECTOR_ELT(adata, 0));
+  const int *pivots = INTEGER_RO(VECTOR_ELT(adata, 1));
+  const double *bboxmat = REAL_RO(VECTOR_ELT(adata, 2));
+  const double *x = REAL_RO(Sx);
   const int dim = Rf_nrows(Sknots);
   const int numvec = Rf_ncols(Sx);
-  double *knots = REAL(Sknots);
-  double *val = REAL(Sval);
+  const double *knots = REAL_RO(Sknots);
+  const double *val = REAL_RO(Sval);
   int threads = Rf_asInteger(Sthreads);
   SEXP ret = PROTECT(Rf_allocVector(REALSXP, Rf_ncols(Sx)));
   double *resvec = REAL(ret);
@@ -883,8 +886,8 @@ SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extr
 
 SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
   int threads = Rf_asInteger(Sthreads);
-  int *dtri = INTEGER(Sdtri);
-  double *knots = REAL(Sknots);
+  const int *dtri = INTEGER_RO(Sdtri);
+  const double *knots = REAL_RO(Sknots);
   const int dim = Rf_nrows(Sknots);
   const int numsimplex = Rf_ncols(Sdtri);
   int N = dim + 1;
@@ -899,7 +902,7 @@ SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
 
 #pragma omp parallel for num_threads(threads) schedule(static) if (threads > 1 && numsimplex > 1)
   for (int simplex = 0; simplex < numsimplex; simplex++) {
-    int *tri = dtri + simplex * (dim + 1);
+    const int *tri = dtri + simplex * (dim + 1);
     int *ipiv = pivots + simplex * N;
     for (int j = 0; j < N; j++)
       ipiv[j] = j + 1;

@@ -45,9 +45,10 @@ SEXP R_analyzesimplex(SEXP, SEXP, SEXP);
 SEXP havegsl(void);
 
 /* C entry points made available to other packages in init.c */
-double C_evalcheb(double *cf, double *x, int *dims, const int rank);
-double C_evalmlip(const int rank, double *x, double **grid, int *dims, double *values, int blend);
-void C_evalongrid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, double **grid,
+double C_evalcheb(const double *cf, const double *x, const int *dims, const int rank);
+double C_evalmlip(const int rank, const double *x, const double **grid, const int *dims, const double *values,
+                  int blend);
+void C_evalongrid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, const double **grid,
                   const int *dims, const int rank, const int valuedim, double *result, void *userdata);
 
 static R_INLINE double blendfun(double w, int blend) {
