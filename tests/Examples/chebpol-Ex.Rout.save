@@ -1,7 +1,7 @@
 
-R version 3.5.1 (2018-07-02) -- "Feather Spray"
-Copyright (C) 2018 The R Foundation for Statistical Computing
-Platform: x86_64-pc-linux-gnu (64-bit)
+R version 4.6.2 (2026-10-29) -- "Diversified Portfolio"
+Copyright (C) 2026 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin23
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -20,6 +20,18 @@ Type 'q()' to quit R.
 > pkgname <- "chebpol"
 > source(file.path(R.home("share"), "R", "examples-header.R"))
 > options(warn = 1)
+> base::assign(".ExTimings", "chebpol-Ex.timings", pos = 'CheckExEnv')
+> base::cat("name\tuser\tsystem\telapsed\n", file=base::get(".ExTimings", pos = 'CheckExEnv'))
+> base::assign(".format_ptime",
++ function(x) {
++   if(!is.na(x[4L])) x[1L] <- x[1L] + x[4L]
++   if(!is.na(x[5L])) x[2L] <- x[2L] + x[5L]
++   options(OutDec = '.')
++   format(x[1L:3L], digits = 7L)
++ },
++ pos = 'CheckExEnv')
+> 
+> ### * </HEADER>
 > library('chebpol')
 > 
 > base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
@@ -30,6 +42,7 @@ Type 'q()' to quit R.
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: chebappx
 > ### Title: Chebyshev interpolation on a hypercube
 > ### Aliases: chebappx chebappxf
@@ -38,50 +51,60 @@ Type 'q()' to quit R.
 > ### ** Examples
 > 
 > ## Not run: 
+> ##D   f <- function(x) exp(-sum(x^2))
+> ##D   ## we want 3 dimensions, i.e. something like
+> ##D   ## f(x,y,z) = exp(-(x^2 + y^2 + z^2))
+> ##D   ## 8 points in each dimension
+> ##D   gridsize <- list(8, 8, 8)
+> ##D   # get the function values on the Chebyshev grid
+> ##D   values <- evalongrid(f, gridsize)
+> ##D   # make an approximation
+> ##D   ch <- chebappx(values)
+> ##D   ## test it:
+> ##D   a <- runif(3, -1, 1)
+> ##D   ch(a) - f(a)
 > ##D 
-> ##D f <- function(x) exp(-sum(x^2))
-> ##D ## we want 3 dimensions, i.e. something like
-> ##D ## f(x,y,z) = exp(-(x^2 + y^2 + z^2))
-> ##D ## 8 points in each dimension
-> ##D gridsize <- list(8,8,8)
-> ##D # get the function values on the Chebyshev grid
-> ##D values <- evalongrid(f,gridsize)
-> ##D # make an approximation
-> ##D ch <- chebappx(values)
-> ##D ## test it:
-> ##D a <- runif(3,-1,1);ch(a)-f(a)
+> ##D   ## then one with domain [0.1,0.3] x [-1,-0.5] x [0.5,2]
+> ##D   intervals <- list(c(0.1, 0.3), c(-1, -0.5), c(0.5, 2))
+> ##D   # evaluate on the grid
+> ##D   values <- evalongrid(f, gridsize, intervals)
+> ##D   # make an approximation
+> ##D   ch2 <- chebappx(values, intervals)
+> ##D   a <- c(0.25, -0.68, 1.43)
+> ##D   ch2(a) - f(a)
+> ##D   # outside of domain:
+> ##D   a <- runif(3)
+> ##D   ch2(a)
+> ##D   f(a)
 > ##D 
-> ##D ## then one with domain [0.1,0.3] x [-1,-0.5] x [0.5,2]
-> ##D intervals <- list(c(0.1,0.3),c(-1,-0.5),c(0.5,2))
-> ##D # evaluate on the grid
-> ##D values <- evalongrid(f,gridsize,intervals)
-> ##D # make an approximation
-> ##D ch2 <- chebappx(values,intervals)
-> ##D a <- c(0.25,-0.68,1.43); ch2(a)-f(a)
-> ##D # outside of domain:
-> ##D a <- runif(3) ; ch2(a); f(a)
+> ##D   # Make a function on [0,2] x [0,1]
+> ##D   f <- function(y) {
+> ##D     uniroot(function(x) x - y[[1]] * cos(pi * x^2), lower = 0, upper = 1)$root * sum(y^2)
+> ##D   }
+> ##D   # approximate it
+> ##D   ch <- chebappxf(f, c(12, 12), intervals = list(c(0, 2), c(0, 1)))
+> ##D   # test it:
+> ##D   a <- c(runif(1, 0, 2), runif(1, 0, 1))
+> ##D   ch(a)
+> ##D   f(a)
 > ##D 
-> ##D # Make a function on [0,2] x [0,1]
-> ##D f <- function(y) uniroot(function(x) x-y[[1]]*cos(pi*x^2),lower=0,upper=1)$root*sum(y^2)
-> ##D # approximate it
-> ##D ch <- chebappxf(f,c(12,12),intervals=list(c(0,2),c(0,1)))
-> ##D # test it:
-> ##D a <- c(runif(1,0,2),runif(1,0,1)); ch(a); f(a)
-> ##D 
-> ##D # Lambert's W:
-> ##D f <- function(y) uniroot(function(x) y - x*exp(x), lower=-1,upper=3)$root
-> ##D W <- chebappxf(f,100,c(-exp(-1),3*exp(3)))
-> ##D W(10*pi)*exp(W(10*pi))/pi
+> ##D   # Lambert's W:
+> ##D   f <- function(y) uniroot(function(x) y - x * exp(x), lower = -1, upper = 3)$root
+> ##D   W <- chebappxf(f, 100, c(-exp(-1), 3 * exp(3)))
+> ##D   W(10 * pi) * exp(W(10 * pi)) / pi
 > ## End(Not run)
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("chebappx", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("chebappxg")
 > ### * chebappxg
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: chebappxg
 > ### Title: Interpolation on a non-Chebyshev grid
 > ### Aliases: chebappxg chebappxgf
@@ -90,58 +113,65 @@ Type 'q()' to quit R.
 > ### ** Examples
 > 
 > ## Not run: 
-> ##D ## evenly spaced grid-points
-> ##D su <- seq(0,1,length.out=10)
-> ##D ## irregularly spaced grid-points
-> ##D s <- su^3
-> ##D ## create approximation on the irregularly spaced grid
-> ##D ch <- Vectorize(chebappxg(exp(s),list(s)))
-> ##D ## test it:
-> ##D ch(su) - exp(su)
-> ##D # try one with three variables
-> ##D f <- function(x) exp(-sum(x^2))
-> ##D grid <- list(s,su,su^2)
-> ##D ch2 <- chebappxg(evalongrid(f,grid=grid),grid)
-> ##D # test it at 10 random points
-> ##D replicate(10,{a<-runif(3); ch2(a)-f(a)})
+> ##D   ## evenly spaced grid-points
+> ##D   su <- seq(0, 1, length.out = 10)
+> ##D   ## irregularly spaced grid-points
+> ##D   s <- su^3
+> ##D   ## create approximation on the irregularly spaced grid
+> ##D   ch <- Vectorize(chebappxg(exp(s), list(s)))
+> ##D   ## test it:
+> ##D   ch(su) - exp(su)
+> ##D   # try one with three variables
+> ##D   f <- function(x) exp(-sum(x^2))
+> ##D   grid <- list(s, su, su^2)
+> ##D   ch2 <- chebappxg(evalongrid(f, grid = grid), grid)
+> ##D   # test it at 10 random points
+> ##D   replicate(10, {
+> ##D     a <- runif(3)
+> ##D     ch2(a) - f(a)
+> ##D   })
 > ##D 
-> ##D # Try Runge's function on a uniformly spaced grid.
-> ##D # Ordinary polynomial fitting of high degree of Runge's function on a uniform grid
-> ##D # creates large oscillations near the end of the interval. Not so with chebappxgf
-> ##D f <- function(x) 1/(1+25*x^2)
-> ##D chg <- Vectorize(chebappxgf(f,seq(-1,1,length.out=15)))
-> ##D # also compare with Chebyshev interpolation
-> ##D ch <- Vectorize(chebappxf(f,15))
-> ##D \dontrun{
-> ##D  # plot it
-> ##D  s <- seq(-1,1,length.out=200)
-> ##D  plot(s, f(s), type='l', col='black')
-> ##D  lines(s, chg(s), col='blue')
-> ##D  lines(s, ch(s), col='red')
-> ##D  legend('topright',
-> ##D         legend=c('Runge function','chebappxg on uniform grid','Chebyshev'),
-> ##D         col=c('black','blue','red'), lty=1)
-> ##D }
+> ##D   # Try Runge's function on a uniformly spaced grid.
+> ##D   # Ordinary polynomial fitting of high degree of Runge's function on a uniform grid
+> ##D   # creates large oscillations near the end of the interval. Not so with chebappxgf
+> ##D   f <- function(x) 1 / (1 + 25 * x^2)
+> ##D   chg <- Vectorize(chebappxgf(f, seq(-1, 1, length.out = 15)))
+> ##D   # also compare with Chebyshev interpolation
+> ##D   ch <- Vectorize(chebappxf(f, 15))
+> ##D   \dontrun{
+> ##D     # plot it
+> ##D     s <- seq(-1, 1, length.out = 200)
+> ##D     plot(s, f(s), type = "l", col = "black")
+> ##D     lines(s, chg(s), col = "blue")
+> ##D     lines(s, ch(s), col = "red")
+> ##D     legend(
+> ##D       "topright",
+> ##D       legend = c("Runge function", "chebappxg on uniform grid", "Chebyshev"),
+> ##D       col = c("black", "blue", "red"),
+> ##D       lty = 1
+> ##D     )
+> ##D   }
 > ## End(Not run)
 > 
 > 
 > 
-> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("chebappxg", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("chebcoef")
 > ### * chebcoef
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: chebcoef
 > ### Title: Compute Chebyshev-coefficients given values on a Chebyshev grid
 > ### Aliases: chebcoef
 > 
 > ### ** Examples
 > 
-> 
 > ## Coefficients for a 2x3x4 grid
-> a <- array(rnorm(24),dim=c(2,3,4))
+> a <- array(rnorm(24), dim = c(2, 3, 4))
 > chebcoef(a)
 , , 1
 
@@ -170,57 +200,59 @@ Type 'q()' to quit R.
 > 
 > 
 > 
-> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("chebcoef", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("chebeval")
 > ### * chebeval
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: chebeval
 > ### Title: Evaluate a Chebyshev interpolation in a point
 > ### Aliases: chebeval
 > 
 > ### ** Examples
 > 
-> 
 > # make a function which is known to be unsuitable for Chebyshev approximation
 > f <- function(x) sign(x)
 > # make a standard Chebyshev interpolation
-> ch <- ipol(f,dims=50,method='chebyshev')
+> ch <- ipol(f, dims = 50, method = "chebyshev")
 > # then do a truncated interpolation
-> val <- evalongrid(f,50)
+> val <- evalongrid(f, 50)
 > coef <- chebcoef(val)
 > # truncate the high frequencies
 > coef[-(1:10)] <- 0
 > # make a truncated approximation
-> tch <- Vectorize(function(x) chebeval(x,coef))
+> tch <- Vectorize(function(x) chebeval(x, coef))
 > # make a lower degree also
-> ch2 <- ipol(f,dims=10,method='chebyshev')
+> ch2 <- ipol(f, dims = 10, method = "chebyshev")
 > # plot the functions
 > ## Not run: 
-> ##D s <- seq(-1,1,length.out=400)
-> ##D plot(s,ch(s),col='red',type='l')
-> ##D lines(s,tch(s),col='blue')
-> ##D lines(s,f(s))
-> ##D lines(s,ch2(s),col='green')
+> ##D   s <- seq(-1, 1, length.out = 400)
+> ##D   plot(s, ch(s), col = "red", type = "l")
+> ##D   lines(s, tch(s), col = "blue")
+> ##D   lines(s, f(s))
+> ##D   lines(s, ch2(s), col = "green")
 > ## End(Not run)
 > 
 > 
 > 
-> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("chebeval", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("chebknots")
 > ### * chebknots
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: chebknots
 > ### Title: Create a Chebyshev-grid
 > ### Aliases: chebknots
 > 
 > ### ** Examples
-> 
 > 
 > ## Standard knots for degree 3
 > chebknots(4)
@@ -228,12 +260,12 @@ Type 'q()' to quit R.
 [1]  0.9238795  0.3826834 -0.3826834 -0.9238795
 
 > ## Knots in the interval [2,3] for degree 3
-> chebknots(4,interval=c(2,3))
+> chebknots(4, interval = c(2, 3))
 [[1]]
 [1] 2.961940 2.691342 2.308658 2.038060
 
 > ## Multivariate knots
-> chebknots(c(x=3,y=4,z=3))
+> chebknots(c(x = 3, y = 4, z = 3))
 $x
 [1]  0.8660254  0.0000000 -0.8660254
 
@@ -245,18 +277,20 @@ $z
 
 > ## Multivariate grid
 > ## Not run: 
-> ##D expand.grid(chebknots(c(x=3,y=4,z=5), list(c(1,3), c(4,6), c(800,900))))
+> ##D   expand.grid(chebknots(c(x = 3, y = 4, z = 5), list(c(1, 3), c(4, 6), c(800, 900))))
 > ## End(Not run)
 > 
 > 
 > 
-> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("chebknots", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("chebpol-package")
 > ### * chebpol-package
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: chebpol-package
 > ### Title: Methods for creating multivariate interpolations on hypercubes
 > ### Aliases: chebpol-package chebpol
@@ -264,24 +298,26 @@ $z
 > 
 > ### ** Examples
 > 
-> 
 > ## make some function values on a 50x50x50 grid
-> dims <- c(x=50,y=50,z=50)
-> f <- function(x) sqrt(1+x[1])*exp(x[2])*sin(5*x[3])^2
-> value <- evalongrid(f , dims)
+> dims <- c(x = 50, y = 50, z = 50)
+> f <- function(x) sqrt(1 + x[1]) * exp(x[2]) * sin(5 * x[3])^2
+> value <- evalongrid(f, dims)
 > ##fit a Chebyshev approximation to it. Note that the value-array contains the
-> ##grid-structure. 
-> ch <- ipol(value,method='cheb')
+> ##grid-structure.
+> ch <- ipol(value, method = "cheb")
 > ## To see the full grid, use the chebknots function and expand.grid
 > ## Not run: 
-> ##D head(cbind(expand.grid(chebknots(dims)), value=as.numeric(value),
-> ##D       appx=as.numeric(evalongrid(ch,dims))))
+> ##D   head(cbind(
+> ##D     expand.grid(chebknots(dims)),
+> ##D     value = as.numeric(value),
+> ##D     appx = as.numeric(evalongrid(ch, dims))
+> ##D   ))
 > ## End(Not run)
 > ## Make a Floater-Hormann approximation on a uniform grid as well
-> fh <- ipol(f,grid=lapply(dims,function(n) seq(-1,1,length.out=n)),method='fh',k=5)
+> fh <- ipol(f, grid = lapply(dims, function(n) seq(-1, 1, length.out = n)), method = "fh", k = 5)
 > ## evaluate in some random points in R3
-> m <- matrix(runif(15,-1,1),3)
-> rbind(true=apply(m,2,f), cheb=ch(m), fh=fh(m))
+> m <- matrix(runif(15, -1, 1), 3)
+> rbind(true = apply(m, 2, f), cheb = ch(m), fh = fh(m))
           [,1]      [,2]     [,3]        [,4]      [,5]
 true 0.2501147 0.4132168 1.751484 0.001678009 0.1709505
 cheb 0.2501113 0.4132178 1.751485 0.001678273 0.1709498
@@ -289,49 +325,53 @@ fh   0.2501152 0.4132112 1.751460 0.001677869 0.1709544
 > 
 > 
 > 
-> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("chebpol-package", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("evalongrid")
 > ### * evalongrid
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: evalongrid
 > ### Title: Evaluate a function on a grid
 > ### Aliases: evalongrid evalongridV
 > 
 > ### ** Examples
 > 
-> 
-> f <- function(x) {a <- sum(x^2); ifelse(a == 0,0,exp(-1/a))}
+> f <- function(x) {
++   a <- sum(x^2)
++   ifelse(a == 0, 0, exp(-1 / a))
++ }
 > ## Standard Chebyshev grid
-> evalongrid(f,dims=c(3,5))
+> evalongrid(f, dims = c(3, 5))
           [,1]       [,2]      [,3]       [,4]      [,5]
 [1,] 0.5463972 0.40138578 0.2635971 0.40138578 0.5463972
 [2,] 0.3310212 0.05533071 0.0000000 0.05533071 0.3310212
 [3,] 0.5463972 0.40138578 0.2635971 0.40138578 0.5463972
 > ## Then Chebyshev on [0,1] x [2,3]
-> evalongrid(f,dims=c(3,5),intervals=list(c(0,1),c(2,3)))
+> evalongrid(f, dims = c(3, 5), intervals = list(c(0, 1), c(2, 3)))
           [,1]      [,2]      [,3]      [,4]      [,5]
 [1,] 0.9022755 0.8911381 0.8689764 0.8400496 0.8177098
 [2,] 0.8959733 0.8832618 0.8574039 0.8224805 0.7945613
 [3,] 0.8932498 0.8798220 0.8522416 0.8144193 0.7837026
 > ## And on my own grid
-> grid <- list(sort(rnorm(3)),sort(rnorm(5)))
-> evalongrid(f,grid=grid)
+> grid <- list(sort(rnorm(3)), sort(rnorm(5)))
+> evalongrid(f, grid = grid)
           [,1]         [,2]       [,3]      [,4]      [,5]
 [1,] 0.4823146 0.2895616943 0.34351197 0.4474245 0.7346671
 [2,] 0.3912427 0.1358873144 0.20449284 0.3441803 0.7114564
 [3,] 0.2430129 0.0008872401 0.02507725 0.1777160 0.6785477
-> g <- ipol(f,grid=grid,method='fh')
-> evalongridV(g, grid=grid, threads=2)
+> g <- ipol(f, grid = grid, method = "fh")
+> evalongridV(g, grid = grid, threads = 2)
           [,1]         [,2]       [,3]      [,4]      [,5]
 [1,] 0.4823146 0.2895616943 0.34351197 0.4474245 0.7346671
 [2,] 0.3912427 0.1358873144 0.20449284 0.3441803 0.7114564
 [3,] 0.2430129 0.0008872401 0.02507725 0.1777160 0.6785477
 > ## vector valued function
-> f <- function(x) c(prod(x),sum(x^2))
-> evalongrid(f,grid=grid)
+> f <- function(x) c(prod(x), sum(x^2))
+> evalongrid(f, grid = grid)
 , , 1
 
           [,1]      [,2]       [,3]
@@ -365,13 +405,15 @@ fh   0.2501152 0.4132112 1.751460 0.001677869 0.1709544
 > 
 > 
 > 
-> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("evalongrid", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("fhappx")
 > ### * fhappx
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: fhappx
 > ### Title: Floater-Hormann interpolation on a grid
 > ### Aliases: fhappx
@@ -380,126 +422,135 @@ fh   0.2501152 0.4132112 1.751460 0.001677869 0.1709544
 > ### ** Examples
 > 
 > ## Not run: 
-> ##D  
-> ##D ## evenly spaced grid-points
-> ##D su <- seq(0,1,length.out=10)
-> ##D ## irregularly spaced grid-points
-> ##D s <- su^3
-> ##D ## create approximation on the irregularly spaced grid
-> ##D fh1 <- fhappx(exp,grid=list(s))
-> ##D ## test it
-> ##D fh1(su) - exp(su)
+> ##D   ## evenly spaced grid-points
+> ##D   su <- seq(0, 1, length.out = 10)
+> ##D   ## irregularly spaced grid-points
+> ##D   s <- su^3
+> ##D   ## create approximation on the irregularly spaced grid
+> ##D   fh1 <- fhappx(exp, grid = list(s))
+> ##D   ## test it
+> ##D   fh1(su) - exp(su)
 > ##D 
-> ##D ## two dimensional approximation
-> ##D f <- function(x) exp(sum(x^2))
-> ##D grid <- list(s,su)
+> ##D   ## two dimensional approximation
+> ##D   f <- function(x) exp(sum(x^2))
+> ##D   grid <- list(s, su)
 > ##D 
-> ##D fh2 <- fhappx(evalongrid(f,grid=grid),grid=grid)
-> ##D # an equivalent would be fh2 <- fhappx(f,grid)
+> ##D   fh2 <- fhappx(evalongrid(f, grid = grid), grid = grid)
+> ##D   # an equivalent would be fh2 <- fhappx(f,grid)
 > ##D 
-> ##D a <- runif(2); fh2(a); f(a)
+> ##D   a <- runif(2)
+> ##D   fh2(a)
+> ##D   f(a)
 > ## End(Not run)
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("fhappx", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("interpolant")
 > ### * interpolant
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: interpolant
 > ### Title: Evaluate an interpolant in a point
 > ### Aliases: interpolant
 > 
 > ### ** Examples
 > 
-> grid <- list(x=seq(0,1,length.out=10), y=seq(0,1,length.out=10))
+> grid <- list(x = seq(0, 1, length.out = 10), y = seq(0, 1, length.out = 10))
 > val <- runif(100)
-> dim(val) <- c(10,10)
-> ip <- ipol(val, grid=grid, method='fh')
+> dim(val) <- c(10, 10)
+> ip <- ipol(val, grid = grid, method = "fh")
 > ip(c(0.3, 0.8))
 [1] 0.2284498
-> ip(matrix(runif(12),2), threads=2)
+> ip(matrix(runif(12), 2), threads = 2)
 [1] 0.74713282 0.83340490 0.00568654 0.70100518 0.39261432 0.71810846
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("interpolant", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("ipol")
 > ### * ipol
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: ipol
 > ### Title: Create interpolating function.
 > ### Aliases: ipol
 > 
 > ### ** Examples
 > 
-> 
 > ## evenly spaced grid-points
-> su <- seq(0,1,length.out=10)
+> su <- seq(0, 1, length.out = 10)
 > ## irregularly spaced grid-points
 > s <- su^3
 > ## create approximation on the irregularly spaced grid
-> ml1 <- ipol(exp, grid=list(s), method='multilin')
-> fh1 <- ipol(exp, grid=list(s), method='fh')
+> ml1 <- ipol(exp, grid = list(s), method = "multilin")
+> fh1 <- ipol(exp, grid = list(s), method = "fh")
 > ## test it, since exp is convex, the linear approximation lies above
 > ## the exp between the grid points
 > ml1(su) - exp(su)
  [1] 0.0000000000 0.0007963441 0.0023666771 0.0036681447 0.0028930495
  [6] 0.0111173403 0.0064666457 0.0191999204 0.0246303860 0.0000000000
 > fh1(su) - exp(su)
- [1]  0.000000e+00  1.442081e-09 -2.352987e-08  7.217914e-08  1.287041e-07
- [6] -7.880334e-07 -8.461016e-07  3.721003e-06  1.076322e-05  0.000000e+00
+ [1]  0.000000e+00  1.442078e-09 -2.352982e-08  7.217898e-08  1.287035e-07
+ [6] -7.880319e-07 -8.460980e-07  3.720989e-06  1.076317e-05  0.000000e+00
 > 
 > ## multi dimensional approximation
-> f <- function(x) 10/(1+25*mean(x^2))
+> f <- function(x) 10 / (1 + 25 * mean(x^2))
 > # a 3-dimensional 10x10x10 grid, first and third coordinate are non-uniform
-> grid <- list(s, su, sort(1-s))
+> grid <- list(s, su, sort(1 - s))
 > 
 > # make multilinear, Floater-Hormann, Chebyshev and polyharmonic spline.
-> ml2 <- ipol(f, grid=grid, method='multilin')
-> fh2 <- ipol(f, grid=grid, method='fh')
-> hst <- ipol(f, grid=grid, method='hstalker')
-> ch2 <- ipol(f, dims=c(10,10,10), intervals=list(0:1,0:1,0:1), method='cheb')
-> knots <- matrix(runif(3*1000),3)
-> ph2 <- ipol(f, knots=knots, k=2, method='poly')
-> sl2 <- ipol(f, knots=knots, method='simplexlinear')
-
-     PLEASE NOTE:  As of version 0.3-5, no degenerate (zero area) 
-     regions are returned with the "Qt" option since the R 
-     code removes them from the triangulation. 
-     See help("delaunayn").
-
-
+> ml2 <- ipol(f, grid = grid, method = "multilin")
+> fh2 <- ipol(f, grid = grid, method = "fh")
+> hst <- ipol(f, grid = grid, method = "hstalker")
+> ch2 <- ipol(f, dims = c(10, 10, 10), intervals = list(0:1, 0:1, 0:1), method = "cheb")
+> knots <- matrix(runif(3 * 1000), 3)
+> ph2 <- ipol(f, knots = knots, k = 2, method = "poly")
+> sl2 <- ipol(f, knots = knots, method = "simplexlinear")
 > # my alglib is a bit slow, so stick to 100 knots
-> if(havealglib()) crb <- ipol(f, knots=knots[,1:100], method='crbf',
-+   rbase=2, layers=5, lambda=0) 
+> if (havealglib()) {
++   crb <- ipol(f, knots = knots[, 1:100], method = "crbf", rbase = 2, layers = 5, lambda = 0)
++ }
 > # make 7 points in R3 to test them on
-> m <- matrix(runif(3*7),3)
-> rbind(true=apply(m,2,f), ml=ml2(m), fh=fh2(m), cheb=ch2(m), poly=ph2(m), sl=sl2(m),hst=hst(m),
-+ crbf=if(havealglib()) crb(m) else NULL )
+> m <- matrix(runif(3 * 7), 3)
+> rbind(
++   true = apply(m, 2, f),
++   ml = ml2(m),
++   fh = fh2(m),
++   cheb = ch2(m),
++   poly = ph2(m),
++   sl = sl2(m),
++   hst = hst(m),
++   crbf = if (havealglib()) crb(m) else NULL
++ )
          [,1]      [,2]     [,3]      [,4]      [,5]     [,6]      [,7]
 true 1.170558 0.6568743 1.552163 0.9664714 0.5314819 1.441940 0.7867956
 ml   1.179175 0.6557517 1.551257 0.9680901 0.5326367 1.415848 0.7860947
-fh   1.189234 0.6568705 1.552155 1.0086296 0.5315642 1.444985 0.7868997
+fh   1.189234 0.6568705 1.552155 1.0086290 0.5315642 1.444985 0.7868996
 cheb 1.170537 0.6568743 1.552185 0.9664563 0.5314819 1.441953 0.7867967
 poly 1.170018 0.6573040 1.552691 0.9648213 0.5316708 1.440624 0.7859224
 sl   1.186031 0.6786952 1.550582 0.9776420 0.5247542 1.478330 0.7961787
 hst  1.166729 0.6569404 1.552856 0.9696696 0.5326136 1.416647 0.7832519
-crbf 1.172243 0.6636280 1.546904 0.9577260 0.5307419 1.435105 0.6335464
 > 
 > 
 > 
-> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("ipol", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("mlappx")
 > ### * mlappx
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: mlappx
 > ### Title: Multilinear interpolation on a grid
 > ### Aliases: mlappx mlappxf
@@ -508,37 +559,42 @@ crbf 1.172243 0.6636280 1.546904 0.9577260 0.5307419 1.435105 0.6335464
 > ### ** Examples
 > 
 > ## Not run: 
+> ##D   ## evenly spaced grid-points
+> ##D   su <- seq(0, 1, length.out = 10)
+> ##D   ## irregularly spaced grid-points
+> ##D   s <- su^3
+> ##D   ## create approximation on the irregularly spaced grid
+> ##D   ml1 <- Vectorize(mlappx(exp, list(s)))
+> ##D   ## test it, since exp is convex, the linear approximation lies above
+> ##D   ## the exp between the grid points
+> ##D   ml1(su) - exp(su)
 > ##D 
-> ##D ## evenly spaced grid-points
-> ##D su <- seq(0,1,length.out=10)
-> ##D ## irregularly spaced grid-points
-> ##D s <- su^3
-> ##D ## create approximation on the irregularly spaced grid
-> ##D ml1 <- Vectorize(mlappx(exp,list(s)))
-> ##D ## test it, since exp is convex, the linear approximation lies above
-> ##D ## the exp between the grid points
-> ##D ml1(su) - exp(su)
+> ##D   ## multi linear approx
+> ##D   f <- function(x) exp(sum(x^2))
+> ##D   grid <- list(s, su)
 > ##D 
-> ##D ## multi linear approx
-> ##D f <- function(x) exp(sum(x^2))
-> ##D grid <- list(s,su)
+> ##D   ml2 <- mlappx(evalongrid(f, grid = grid), grid)
+> ##D   # an equivalent would be ml2 <- mlappx(f,grid)
 > ##D 
-> ##D ml2 <- mlappx(evalongrid(f,grid=grid),grid)
-> ##D # an equivalent would be ml2 <- mlappx(f,grid)
-> ##D 
-> ##D a <- runif(2); ml2(a); f(a)
-> ##D # we also get an approximation outside of the domain, of disputable quality
-> ##D ml2(c(1,2)); f(c(1,2))
+> ##D   a <- runif(2)
+> ##D   ml2(a)
+> ##D   f(a)
+> ##D   # we also get an approximation outside of the domain, of disputable quality
+> ##D   ml2(c(1, 2))
+> ##D   f(c(1, 2))
 > ## End(Not run)
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("mlappx", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("polyh")
 > ### * polyh
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: polyh
 > ### Title: Polyharmonic splines on scattered data
 > ### Aliases: polyh
@@ -547,26 +603,29 @@ crbf 1.172243 0.6636280 1.546904 0.9577260 0.5307419 1.435105 0.6335464
 > ### ** Examples
 > 
 > ## Not run: 
-> ##D # a function on a 20-dimensional space
-> ##D r <- runif(20)
-> ##D r <- r/sum(r)
-> ##D f <- function(x) 1/mean(log1p(r*x))
-> ##D # 1000 random knots 
-> ##D knots <- matrix(runif(20000), 20)
-> ##D phs <- polyh(f, knots, 3)
-> ##D # test it in a random point
-> ##D s <- runif(20)
-> ##D c(true=f(s), phs(s))
+> ##D   # a function on a 20-dimensional space
+> ##D   r <- runif(20)
+> ##D   r <- r / sum(r)
+> ##D   f <- function(x) 1 / mean(log1p(r * x))
+> ##D   # 1000 random knots
+> ##D   knots <- matrix(runif(20000), 20)
+> ##D   phs <- polyh(f, knots, 3)
+> ##D   # test it in a random point
+> ##D   s <- runif(20)
+> ##D   c(true = f(s), phs(s))
 > ## End(Not run)
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("polyh", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("slappx")
 > ### * slappx
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: slappx
 > ### Title: Simplex Linear approximation on scattered data
 > ### Aliases: slappx
@@ -575,22 +634,24 @@ crbf 1.172243 0.6636280 1.546904 0.9577260 0.5307419 1.435105 0.6335464
 > ### ** Examples
 > 
 > ## Not run: 
-> ##D knots <- matrix(runif(3*1000), 3)
-> ##D f <- function(x) exp(-sum(x^2))
-> ##D g <- slappx(f, knots)
-> ##D a <- matrix(runif(3*6), 3)
-> ##D rbind(true=apply(a,2,f), sl=g(a))
+> ##D   knots <- matrix(runif(3 * 1000), 3)
+> ##D   f <- function(x) exp(-sum(x^2))
+> ##D   g <- slappx(f, knots)
+> ##D   a <- matrix(runif(3 * 6), 3)
+> ##D   rbind(true = apply(a, 2, f), sl = g(a))
 > ## End(Not run)
 > 
 > 
 > 
-> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("slappx", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("ucappx")
 > ### * ucappx
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: ucappx
 > ### Title: Interpolation on a uniform grid
 > ### Aliases: ucappx ucappxf
@@ -598,27 +659,31 @@ crbf 1.172243 0.6636280 1.546904 0.9577260 0.5307419 1.435105 0.6335464
 > 
 > ### ** Examples
 > 
-> 
 > ## Not run: 
-> ##D # Runge function
-> ##D f <- function(x) 1/(1+25*x^2)
-> ##D grid <- seq(-1,1,length.out=15)
-> ##D val <- f(grid)
-> ##D uc <- Vectorize(ucappx(val))
-> ##D # and the Chebyshev
-> ##D ch <- Vectorize(chebappxf(f,15))
-> ##D # test it at 10 random points
-> ##D t(replicate(10,{a<-runif(1,-1,1); c(arg=a, uc=uc(a), true=f(a), cheb=ch(a))}))
+> ##D   # Runge function
+> ##D   f <- function(x) 1 / (1 + 25 * x^2)
+> ##D   grid <- seq(-1, 1, length.out = 15)
+> ##D   val <- f(grid)
+> ##D   uc <- Vectorize(ucappx(val))
+> ##D   # and the Chebyshev
+> ##D   ch <- Vectorize(chebappxf(f, 15))
+> ##D   # test it at 10 random points
+> ##D   t(replicate(10, {
+> ##D     a <- runif(1, -1, 1)
+> ##D     c(arg = a, uc = uc(a), true = f(a), cheb = ch(a))
+> ##D   }))
 > ## End(Not run)
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("ucappx", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > ### * <FOOTER>
 > ###
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  1.576 0.031 1.108 0 0 
+Time elapsed:  0.511 0.025 0.543 0 0 
 > grDevices::dev.off()
 null device 
           1 
