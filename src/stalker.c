@@ -686,24 +686,24 @@ SEXP R_makestalk(SEXP Sval, SEXP Sgrid) {
     len *= dims[r];
   }
   if(len != LENGTH(Sval)) {
-    error("number of values (%d) does not match grid size (%d)\n",
+    Rf_error("number of values (%d) does not match grid size (%d)\n",
 	  LENGTH(Sval), len);
   }
   double *val = REAL(Sval);
   double *grid[nrank];
   for(int i = 0; i < nrank; i++) grid[i] = REAL(VECTOR_ELT(Sgrid,i));
   int point[nrank];
-  SEXP Sb = PROTECT(allocMatrix(REALSXP,nrank,len));
-  SEXP Sc = PROTECT(allocMatrix(REALSXP,nrank,len));
-  SEXP Sr = PROTECT(allocMatrix(REALSXP,nrank,len));
-  SEXP ret = PROTECT(NEW_LIST(5));
-  SEXP names = PROTECT(allocVector(STRSXP,5));
-  SET_NAMES(ret,names);
-  SET_VECTOR_ELT(ret,0,Sb); SET_STRING_ELT(names, 0, mkChar("b"));
-  SET_VECTOR_ELT(ret,1,Sc); SET_STRING_ELT(names, 1, mkChar("c"));
-  SET_VECTOR_ELT(ret,2,Sr);  SET_STRING_ELT(names, 2, mkChar("r"));
-  SET_VECTOR_ELT(ret,3,Sval);  SET_STRING_ELT(names, 3, mkChar("val"));
-  SET_VECTOR_ELT(ret,4,Sgrid); SET_STRING_ELT(names, 4, mkChar("grid"));
+  SEXP Sb = PROTECT(Rf_allocMatrix(REALSXP,nrank,len));
+  SEXP Sc = PROTECT(Rf_allocMatrix(REALSXP,nrank,len));
+  SEXP Sr = PROTECT(Rf_allocMatrix(REALSXP,nrank,len));
+  SEXP ret = PROTECT(Rf_allocVector(VECSXP, 5));
+  SEXP names = PROTECT(Rf_allocVector(STRSXP,5));
+  Rf_setAttrib(ret, R_NamesSymbol, names);
+  SET_VECTOR_ELT(ret,0,Sb); SET_STRING_ELT(names, 0, Rf_mkChar("b"));
+  SET_VECTOR_ELT(ret,1,Sc); SET_STRING_ELT(names, 1, Rf_mkChar("c"));
+  SET_VECTOR_ELT(ret,2,Sr);  SET_STRING_ELT(names, 2, Rf_mkChar("r"));
+  SET_VECTOR_ELT(ret,3,Sval);  SET_STRING_ELT(names, 3, Rf_mkChar("val"));
+  SET_VECTOR_ELT(ret,4,Sgrid); SET_STRING_ELT(names, 4, Rf_mkChar("grid"));
 #ifdef HAVE_GSL
   gsl_error_handler_t *gslh = gsl_set_error_handler_off();
 #else
@@ -712,7 +712,7 @@ SEXP R_makestalk(SEXP Sval, SEXP Sgrid) {
     double *gr = grid[i];
     double df = gr[1]-gr[0];
     for(int j = 2; j < dims[i]; j++)
-      if(fabs(gr[j]-gr[j-1] - df) > MYEPS) warning("Non-uniform grid requires linking chebpol with GSL");
+      if(fabs(gr[j]-gr[j-1] - df) > MYEPS) Rf_warning("Non-uniform grid requires linking chebpol with GSL");
   }
 #endif
  
@@ -736,26 +736,26 @@ SEXP R_makehyp(SEXP Sval, SEXP Sgrid) {
     len *= dims[r];
   }
   if(len != LENGTH(Sval)) {
-    error("number of values (%d) does not match grid size (%d)\n",
+    Rf_error("number of values (%d) does not match grid size (%d)\n",
 	  LENGTH(Sval), len);
   }
   double *val = REAL(Sval);
   double *grid[nrank];
   for(int i = 0; i < nrank; i++) grid[i] = REAL(VECTOR_ELT(Sgrid,i));
   int point[nrank];
-  SEXP Sa = PROTECT(NEW_NUMERIC(len));
-  SEXP Sb = PROTECT(allocMatrix(REALSXP,nrank,len));
-  SEXP Sc = PROTECT(allocMatrix(REALSXP,nrank,len));
-  SEXP Sd = PROTECT(allocMatrix(REALSXP,nrank,len));
-  SEXP ret = PROTECT(NEW_LIST(6));
-  SEXP names = PROTECT(allocVector(STRSXP,6));
-  SET_NAMES(ret,names);
-  SET_VECTOR_ELT(ret,0,Sa); SET_STRING_ELT(names, 0, mkChar("a"));
-  SET_VECTOR_ELT(ret,1,Sb); SET_STRING_ELT(names, 1, mkChar("b"));
-  SET_VECTOR_ELT(ret,2,Sc);  SET_STRING_ELT(names, 2, mkChar("c"));
-  SET_VECTOR_ELT(ret,3,Sd); SET_STRING_ELT(names, 3, mkChar("d"));
-  SET_VECTOR_ELT(ret,4,Sval);  SET_STRING_ELT(names, 4, mkChar("val"));
-  SET_VECTOR_ELT(ret,5,Sgrid); SET_STRING_ELT(names, 5, mkChar("grid"));
+  SEXP Sa = PROTECT(Rf_allocVector(REALSXP, len));
+  SEXP Sb = PROTECT(Rf_allocMatrix(REALSXP,nrank,len));
+  SEXP Sc = PROTECT(Rf_allocMatrix(REALSXP,nrank,len));
+  SEXP Sd = PROTECT(Rf_allocMatrix(REALSXP,nrank,len));
+  SEXP ret = PROTECT(Rf_allocVector(VECSXP, 6));
+  SEXP names = PROTECT(Rf_allocVector(STRSXP,6));
+  Rf_setAttrib(ret, R_NamesSymbol, names);
+  SET_VECTOR_ELT(ret,0,Sa); SET_STRING_ELT(names, 0, Rf_mkChar("a"));
+  SET_VECTOR_ELT(ret,1,Sb); SET_STRING_ELT(names, 1, Rf_mkChar("b"));
+  SET_VECTOR_ELT(ret,2,Sc);  SET_STRING_ELT(names, 2, Rf_mkChar("c"));
+  SET_VECTOR_ELT(ret,3,Sd); SET_STRING_ELT(names, 3, Rf_mkChar("d"));
+  SET_VECTOR_ELT(ret,4,Sval);  SET_STRING_ELT(names, 4, Rf_mkChar("val"));
+  SET_VECTOR_ELT(ret,5,Sgrid); SET_STRING_ELT(names, 5, Rf_mkChar("grid"));
   
   makehyp(nrank, dims, grid, val, REAL(Sa), REAL(Sb), REAL(Sc), REAL(Sd), 0, point);
   UNPROTECT(6);
@@ -764,10 +764,10 @@ SEXP R_makehyp(SEXP Sval, SEXP Sgrid) {
 
 SEXP R_evalstalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   const double *x = REAL(Sx);
-  //const int K = nrows(Sx);
-  const int N = ncols(Sx);
+  //const int K = Rf_nrows(Sx);
+  const int N = Rf_ncols(Sx);
   int blend = INTEGER(Sblend)[0];
-  int threads = INTEGER(AS_INTEGER(Sthreads))[0];
+  int threads = Rf_asInteger(Sthreads);
   double *b = REAL(VECTOR_ELT(stalker,0));
   double *c = REAL(VECTOR_ELT(stalker,1));
   double *r = REAL(VECTOR_ELT(stalker,2));
@@ -783,7 +783,7 @@ SEXP R_evalstalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
     len *= dims[r];
   }
 
-  SEXP ret = PROTECT(NEW_NUMERIC(N));
+  SEXP ret = PROTECT(Rf_allocVector(REALSXP, N));
   double *out = REAL(ret);
 
 
@@ -798,10 +798,10 @@ SEXP R_evalstalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
 
 SEXP R_evalhyp(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   const double *x = REAL(Sx);
-  //const int K = nrows(Sx);
-  const int N = ncols(Sx);
+  //const int K = Rf_nrows(Sx);
+  const int N = Rf_ncols(Sx);
   int blend = INTEGER(Sblend)[0];
-  int threads = INTEGER(AS_INTEGER(Sthreads))[0];
+  int threads = Rf_asInteger(Sthreads);
   double *a = REAL(VECTOR_ELT(stalker,0));
   double *b = REAL(VECTOR_ELT(stalker,1));
   double *c = REAL(VECTOR_ELT(stalker,2));
@@ -818,7 +818,7 @@ SEXP R_evalhyp(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
     len *= dims[r];
   }
 
-  SEXP ret = PROTECT(NEW_NUMERIC(N));
+  SEXP ret = PROTECT(Rf_allocVector(REALSXP, N));
   double *out = REAL(ret);
 #pragma omp parallel for num_threads(threads) schedule(guided) if(N > 1 && threads > 1)
   for(int i = 0; i < N; i++)  {
@@ -833,18 +833,18 @@ SEXP R_evalhyp(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
 
 SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthreads) {
   const double *x = REAL(Sx);
-  const int K = nrows(Sx);
-  const int N = ncols(Sx);
-  int threads = INTEGER(AS_INTEGER(Sthreads))[0];
+  const int K = Rf_nrows(Sx);
+  const int N = Rf_ncols(Sx);
+  int threads = Rf_asInteger(Sthreads);
   const double *val = REAL(VECTOR_ELT(stalker,0));
   SEXP Sgrid = VECTOR_ELT(stalker,1);
   SEXP Sdet = VECTOR_ELT(stalker,2);
   SEXP Spmin = VECTOR_ELT(stalker,3);
   SEXP Spplus = VECTOR_ELT(stalker,4);
   SEXP Suniform = VECTOR_ELT(stalker,5);
-  int blend = INTEGER(AS_INTEGER(Sblend))[0];
+  int blend = Rf_asInteger(Sblend);
   const int nrank = LENGTH(Sgrid);
-  if(K != nrank) error("Rank of input(%d) does not match rank of spline",N,nrank);
+  if(K != nrank) Rf_error("Rank of input(%d) does not match rank of spline",N,nrank);
 
   int dims[nrank];
   int len = 1;
@@ -853,13 +853,13 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
     len *= dims[r];
   }
   if(len != LENGTH(VECTOR_ELT(stalker,0))) {
-    error("number of values (%d) does not match grid size (%d)\n",
+    Rf_error("number of values (%d) does not match grid size (%d)\n",
 	  LENGTH(VECTOR_ELT(stalker,0)), len);
   }
   if(LENGTH(Sdegree) != nrank) {
-    error("degree length must match dimension (%d)",nrank);
+    Rf_error("degree length must match dimension (%d)",nrank);
   }
-  double *degree = REAL(AS_NUMERIC(Sdegree));
+  double *degree = REAL(Rf_coerceVector(Sdegree, REALSXP));
   double *grid[nrank];
   for(int i = 0; i < nrank; i++) grid[i] = REAL(VECTOR_ELT(Sgrid,i));
   precomp pcomp[nrank];
@@ -870,13 +870,13 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
     pcomp[i].uniform = LOGICAL(Suniform)[i];
 #ifndef HAVE_GSL
     if(!pcomp[i].uniform && isnan(degree[i]))
-      error("Non-uniform grid in dimension %d not supported without GSL. Recompile with GSL.",i+1);
+      Rf_error("Non-uniform grid in dimension %d not supported without GSL. Recompile with GSL.",i+1);
 #endif
   }
 #ifdef HAVE_GSL
   gsl_error_handler_t *gslh = gsl_set_error_handler_off();
 #endif
-  SEXP ret = PROTECT(NEW_NUMERIC(N));
+  SEXP ret = PROTECT(Rf_allocVector(REALSXP, N));
   double *out = REAL(ret);
 #pragma omp parallel for num_threads(threads) schedule(guided) if(N > 1 && threads > 1)
   for(int i = 0; i < N; i++)  {
@@ -891,8 +891,8 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
 
 SEXP havegsl() {
 #ifdef HAVE_GSL
-  return ScalarLogical(TRUE);
+  return Rf_ScalarLogical(TRUE);
 #else
-  return ScalarLogical(FALSE);
+  return Rf_ScalarLogical(FALSE);
 #endif
 }

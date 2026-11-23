@@ -1,5 +1,6 @@
 #ifndef _CHEBPOL
 #define _CHEBPOL
+#define R_NO_REMAP
 #ifndef USE_FC_LEN_T
 #define USE_FC_LEN_T
 #endif
@@ -7,7 +8,7 @@
 #include <math.h>
 #include <Rmath.h>
 #include <R.h>
-#include <Rdefines.h>
+#include <Rinternals.h>
 #include <R_ext/Rdynload.h>
 #include <R_ext/BLAS.h>
 #include <R_ext/Lapack.h>

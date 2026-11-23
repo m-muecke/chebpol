@@ -42,7 +42,7 @@ static void chebcoef(double *x, int *dims, const int rank, double *F, int dct, i
       dim.os = stride;
       plan = fftw_plan_guru_r2r(1, &dim, 0, NULL, F, F, &kind, FFTW_ESTIMATE);
       if(plan == NULL) {
-	if(tlen > 10000) warning("FFTW fails on strided long (%d) vector, is it MKL?",tlen);
+	if(tlen > 10000) Rf_warning("FFTW fails on strided long (%d) vector, is it MKL?",tlen);
 	brokenfftw = 1;
 	break;
       }
@@ -75,7 +75,7 @@ static void chebcoef(double *x, int *dims, const int rank, double *F, int dct, i
     for(int j = 0; j < rank; j++) {
       // Is it there already?
       int N = dims[j];
-      if(N > 10000) warning("Long vector (%d), no FFTW. This may go wrong.",N);
+      if(N > 10000) Rf_warning("Long vector (%d), no FFTW. This may go wrong.",N);
       double *jmat = NULL;
       for(int k = 0; k < j; k++) {
 	if(dims[k] == N) {
@@ -151,29 +151,29 @@ static SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
   SEXP resvec;
   int sdims;
   int dct;
-  int threads = INTEGER(AS_INTEGER(Sthreads))[0];
-  if(!isLogical(sdct) || LENGTH(sdct) < 1) error("dct must be a logical");
+  int threads = Rf_asInteger(Sthreads);
+  if(!Rf_isLogical(sdct) || LENGTH(sdct) < 1) Rf_error("dct must be a logical");
   dct = LOGICAL(sdct)[0];
-  dim = getAttrib(x,R_DimSymbol);
+  dim = Rf_getAttrib(x,R_DimSymbol);
   // If no dim-attribute, assume one-dimensional
-  if(isNull(dim)) {
+  if(Rf_isNull(dim)) {
     sdims = LENGTH(x);
     dims = &sdims;
     rank = 1;
 
   } else {
     rank = LENGTH(dim);
-    if(rank <= 0) error("Rank must be positive");
+    if(rank <= 0) Rf_error("Rank must be positive");
     dims = INTEGER(dim);
   }
   siz = 1;
   for(int i = 0; i < rank; i++) siz *= dims[i];
-  if(siz == 0) error("array size must be positive");
+  if(siz == 0) Rf_error("array size must be positive");
 
-  PROTECT(resvec = NEW_NUMERIC(siz));
+  PROTECT(resvec = Rf_allocVector(REALSXP, siz));
   chebcoef(REAL(x),dims,rank,REAL(resvec),dct,threads);
-  setAttrib(resvec,R_DimSymbol,dim);
-  setAttrib(resvec,R_DimNamesSymbol,getAttrib(x,R_DimNamesSymbol));
+  Rf_setAttrib(resvec,R_DimSymbol,dim);
+  Rf_setAttrib(resvec,R_DimNamesSymbol,Rf_getAttrib(x,R_DimNamesSymbol));
   UNPROTECT(1);
 
   return resvec;
@@ -221,31 +221,31 @@ static SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, S
   int *dims;
   int siz = 1;
   double *val = REAL(vals);
-  int threads = INTEGER(AS_INTEGER(Rthreads))[0];
+  int threads = Rf_asInteger(Rthreads);
   SEXP dim;
   int rank;
   UNUSED(spare);
   // Create some pointers and stuff. 
-  dim = getAttrib(vals,R_DimSymbol);
+  dim = Rf_getAttrib(vals,R_DimSymbol);
   dims = INTEGER(dim);
   rank = LENGTH(dim);
-  if(rank <= 0) error("rank must be positive");
-  if(isMatrix(inx)) {
-    if(rank != nrows(inx))
-      error("coeffcient rank(%d) must match number of rows(%d)",LENGTH(dim),nrows(inx));
+  if(rank <= 0) Rf_error("rank must be positive");
+  if(Rf_isMatrix(inx)) {
+    if(rank != Rf_nrows(inx))
+      Rf_error("coeffcient rank(%d) must match number of rows(%d)",LENGTH(dim),Rf_nrows(inx));
   } else {
     if(rank != LENGTH(inx))
-      error("coefficient rank(%d) does not match argument length(%d)",
+      Rf_error("coefficient rank(%d) does not match argument length(%d)",
 	    LENGTH(dim),LENGTH(inx));
   }
   /* This shouldn't happen, but we check it anyway since we'll bomb if it's wrong */
   for(int i = 0; i < rank; i++)  siz *= dims[i];
   if(LENGTH(vals) != siz)
-    error("coefficient length(%d) does not match data length(%d)",
+    Rf_error("coefficient length(%d) does not match data length(%d)",
 	  LENGTH(vals),siz);
 
   if(LENGTH(grid) != rank)
-    error("There must be one value for each knot");
+    Rf_error("There must be one value for each knot");
   double **knots = (double **) R_alloc(rank,sizeof(double*));
   double **weights = (double **) R_alloc(rank, sizeof(double*));
   for(int i = 0; i < rank; i++) {
@@ -253,8 +253,8 @@ static SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, S
     weights[i] = REAL(VECTOR_ELT(Sweights,i));
   }
   double *xp = REAL(inx);
-  const int numvec = isMatrix(inx) ? ncols(inx) : 1;
-  SEXP resvec = PROTECT(NEW_NUMERIC(numvec));
+  const int numvec = Rf_isMatrix(inx) ? Rf_ncols(inx) : 1;
+  SEXP resvec = PROTECT(Rf_allocVector(REALSXP, numvec));
   double *out = REAL(resvec);
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
   for(int i = 0; i < numvec; i++) {
@@ -284,7 +284,7 @@ R_INLINE static void fhweights(const int n, const double *grid, const int d, dou
 // Compute the weights for Floater-Hormann. Formula (18) of the FH-paper
 static SEXP R_fhweights(SEXP Sgrid, SEXP Sd, SEXP Sthreads) {
   if(LENGTH(Sgrid) != LENGTH(Sd)) 
-    error("Length of grid (%d) should equal length of d (%d)",LENGTH(Sgrid),LENGTH(Sd));
+    Rf_error("Length of grid (%d) should equal length of d (%d)",LENGTH(Sgrid),LENGTH(Sd));
 
   const int rank = LENGTH(Sgrid);
   double *grid[rank];
@@ -294,14 +294,14 @@ static SEXP R_fhweights(SEXP Sgrid, SEXP Sd, SEXP Sthreads) {
     dims[i] = LENGTH(VECTOR_ELT(Sgrid,i));
   }
   double *wlist[rank];
-  SEXP ret = PROTECT(NEW_LIST(rank));
+  SEXP ret = PROTECT(Rf_allocVector(VECSXP, rank));
   for(int i = 0; i < rank; i++) {
-    SET_VECTOR_ELT(ret,i,NEW_NUMERIC(dims[i]));
+    SET_VECTOR_ELT(ret,i,Rf_allocVector(REALSXP, dims[i]));
     wlist[i] = REAL(VECTOR_ELT(ret,i));
   }
 
-  const int *dd = INTEGER(AS_INTEGER(Sd));
-  int threads = INTEGER(AS_INTEGER(Sthreads))[0];
+  const int *dd = INTEGER(Rf_coerceVector(Sd, INTSXP));
+  int threads = Rf_asInteger(Sthreads);
   for(int r = 0; r < rank; r++) {
     // The paper use index from 0 to n, i.e. n+1 knots in each dimension. Therefore dims[r]-1
     fhweights(dims[r]-1, grid[r], dd[r], wlist[r],threads);
@@ -341,35 +341,35 @@ static SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
   int *dims;
   int siz = 1;
   double *cf = REAL(coef);
-  int threads = INTEGER(AS_INTEGER(Rthreads))[0];
+  int threads = Rf_asInteger(Rthreads);
   SEXP dim;
   int rank;
   UNUSED(spare);
   // Create some pointers and stuff. 
-  dim = getAttrib(coef,R_DimSymbol);
+  dim = Rf_getAttrib(coef,R_DimSymbol);
   dims = INTEGER(dim);
   rank = LENGTH(dim);
-  if(rank <= 0) error("rank must be positive");
-  if(isMatrix(inx)) {
-    if(rank != nrows(inx))
-      error("coeffcient rank(%d) must match number of rows(%d)",LENGTH(dim),nrows(inx));
+  if(rank <= 0) Rf_error("rank must be positive");
+  if(Rf_isMatrix(inx)) {
+    if(rank != Rf_nrows(inx))
+      Rf_error("coeffcient rank(%d) must match number of rows(%d)",LENGTH(dim),Rf_nrows(inx));
   } else {
     if(rank != LENGTH(inx))
-      error("coefficient rank(%d) does not match argument length(%d)",
+      Rf_error("coefficient rank(%d) does not match argument length(%d)",
 	    LENGTH(dim),LENGTH(inx));
   }
   /* This shouldn't happen, but we check it anyway since we'll bomb if it's wrong */
   for(int i = 0; i < rank; i++)  siz *= dims[i];
   if(LENGTH(coef) != siz)
-    error("coefficient length(%d) does not match data length(%d)",
+    Rf_error("coefficient length(%d) does not match data length(%d)",
 	  LENGTH(coef),siz);
 
   double *xp = REAL(inx);
-  const int numvec = isMatrix(inx) ? ncols(inx) : 1;
+  const int numvec = Rf_isMatrix(inx) ? Rf_ncols(inx) : 1;
 #ifdef RETMAT
-  SEXP resvec = PROTECT(allocMatrix(REALSXP, numvec, 1));
+  SEXP resvec = PROTECT(Rf_allocMatrix(REALSXP, numvec, 1));
 #else
-  SEXP resvec = PROTECT(NEW_NUMERIC(numvec));
+  SEXP resvec = PROTECT(Rf_allocVector(REALSXP, numvec));
 #endif
   double *out = REAL(resvec);
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
@@ -419,32 +419,32 @@ SEXP R_evalpolyh(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, SE
   double *knots = REAL(Sknots);
   double *w = REAL(weights);
   double *lw = REAL(lweights);
-  double k = REAL(AS_NUMERIC(Sk))[0];
-  int threads = INTEGER(AS_INTEGER(Sthreads))[0];
+  double k = Rf_asReal(Sk);
+  int threads = Rf_asInteger(Sthreads);
   int numvec;
-  const int rank = nrows(Sknots);
+  const int rank = Rf_nrows(Sknots);
   UNUSED(spare);
   if(LENGTH(lweights) != rank+1) 
-    error("linear weights (%d) should be one longer than rank(%d)",
+    Rf_error("linear weights (%d) should be one longer than rank(%d)",
 	  LENGTH(lweights),rank);
-  if(LENGTH(weights) != ncols(Sknots))
-    error("number of weights (%d) should equal number of knots (%d)",
-	  LENGTH(weights), ncols(Sknots));
-  if(isMatrix(inx)) {
-    if(nrows(inx) != nrows(Sknots))
-      error("Dimension of input (%d) must match dimension of interpolant (%d)",nrows(inx),nrows(Sknots));
-    numvec = ncols(inx);
+  if(LENGTH(weights) != Rf_ncols(Sknots))
+    Rf_error("number of weights (%d) should equal number of knots (%d)",
+	  LENGTH(weights), Rf_ncols(Sknots));
+  if(Rf_isMatrix(inx)) {
+    if(Rf_nrows(inx) != Rf_nrows(Sknots))
+      Rf_error("Dimension of input (%d) must match dimension of interpolant (%d)",Rf_nrows(inx),Rf_nrows(Sknots));
+    numvec = Rf_ncols(inx);
   } else {
-    if(length(inx) != nrows(Sknots))
-      error("Dimension of input (%d) must match dimension of interpolant (%d)",length(inx),nrows(Sknots));
+    if(Rf_length(inx) != Rf_nrows(Sknots))
+      Rf_error("Dimension of input (%d) must match dimension of interpolant (%d)",Rf_length(inx),Rf_nrows(Sknots));
     numvec = 1;
   }
-  SEXP res = PROTECT(NEW_NUMERIC(numvec));
+  SEXP res = PROTECT(Rf_allocVector(REALSXP, numvec));
   double *out = REAL(res);
 
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
   for(int i = 0; i < numvec; i++) {
-    out[i] = C_evalpolyh(x + i*rank, knots, w, lw, rank, ncols(Sknots), k);
+    out[i] = C_evalpolyh(x + i*rank, knots, w, lw, rank, Rf_ncols(Sknots), k);
   }
   UNPROTECT(1);
   return res;
@@ -473,7 +473,7 @@ static void C_call(double *x, double *y, const int valuedim, void *userdata) {
     // don't need x, because the arg-pointer which is used is set in the
     // R_fcall structure
   if(x == NULL) {}; // avoid warning
-  double *fv = REAL(eval( *(SEXP*)userdata, R_BaseEnv));
+  double *fv = REAL(Rf_eval( *(SEXP*)userdata, R_BaseEnv));
   for(int i = 0; i < valuedim; i++) y[i] = fv[i];
 }
 
@@ -489,8 +489,8 @@ static SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
   SEXP R_dim;
   int valuedim;
 
-  if(!isFunction(fun)) error("'fun' must be a function");
-  PROTECT(R_dim = NEW_INTEGER(rank));
+  if(!Rf_isFunction(fun)) Rf_error("'fun' must be a function");
+  PROTECT(R_dim = Rf_allocVector(INTSXP, rank));
   dims = INTEGER(R_dim);
   for(int i = 0; i < rank; i++) {
     grid[i] = REAL(VECTOR_ELT(sgrid,i));
@@ -499,34 +499,34 @@ static SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
   }
 
   // Create a call to fun
-  PROTECT(R_fcall = lang2(fun, R_NilValue));
+  PROTECT(R_fcall = Rf_lang2(fun, R_NilValue));
   // and an argument list to it
-  PROTECT(R_arg = NEW_NUMERIC(rank));
+  PROTECT(R_arg = Rf_allocVector(REALSXP, rank));
   SETCADR(R_fcall, R_arg);
 
   // find the dimension of the result
   for(int i = 0; i < rank; i++) REAL(R_arg)[i] = grid[i][0];
-  SEXP fv = eval(R_fcall,R_BaseEnv);
-  if(!IS_NUMERIC(fv)) error("fun must return a real value");
+  SEXP fv = Rf_eval(R_fcall,R_BaseEnv);
+  if(!Rf_isReal(fv)) Rf_error("fun must return a real value");
   valuedim = LENGTH(fv);
   
   // Now, it's just to fill in arg, and 
-  // do REAL(eval(R_fcall,NULL))[0] 
-  PROTECT(resvec = NEW_NUMERIC(len*valuedim));
+  // do REAL(Rf_eval(R_fcall,NULL))[0] 
+  PROTECT(resvec = Rf_allocVector(REALSXP, len*valuedim));
   C_evalongrid(C_call,REAL(R_arg),grid,dims,rank,valuedim,REAL(resvec), (void*) &R_fcall);
 
   // Set the dim-attribute
   if(valuedim == 1) {
-    setAttrib(resvec,R_DimSymbol,R_dim);
+    Rf_setAttrib(resvec,R_DimSymbol,R_dim);
   } else {
     SEXP snewdim;
     int *newdim;
-    PROTECT(snewdim = NEW_INTEGER(rank+1));
+    PROTECT(snewdim = Rf_allocVector(INTSXP, rank+1));
     newdim = INTEGER(snewdim);
     newdim[0] = valuedim;
     for(int i = 1; i < rank+1; i++)
       newdim[i] = dims[i-1];
-    setAttrib(resvec,R_DimSymbol,snewdim);
+    Rf_setAttrib(resvec,R_DimSymbol,snewdim);
     UNPROTECT(1);
   }
   UNPROTECT(4);
@@ -596,7 +596,7 @@ static SEXP R_mlippred(SEXP sgrid, SEXP values) {
   int dims[rank];
   double *grid[rank];
   SEXP resvec;
-  if(!IS_NUMERIC(values)) error("values must be numeric");
+  if(!Rf_isReal(values)) Rf_error("values must be numeric");
 
   /* Make some pointers into the grid data */
   for(int i = 0; i < rank; i++) {
@@ -605,10 +605,10 @@ static SEXP R_mlippred(SEXP sgrid, SEXP values) {
     gridsize *= dims[i];
   }
 
-  if(LENGTH(values) != gridsize) error("grid has size %d, you supplied %d values",
+  if(LENGTH(values) != gridsize) Rf_error("grid has size %d, you supplied %d values",
 				       gridsize,LENGTH(values));
 
-  PROTECT(resvec = NEW_NUMERIC(gridsize));
+  PROTECT(resvec = Rf_allocVector(REALSXP, gridsize));
   (void) C_predmlip(rank,grid,dims,REAL(values),REAL(resvec));
   UNPROTECT(1);
   return resvec;
@@ -671,14 +671,14 @@ static SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sble
   const int rank = LENGTH(sgrid);
   int gridsize = 1;
   int dims[rank];
-  int threads = INTEGER(AS_INTEGER(Rthreads))[0];
+  int threads = Rf_asInteger(Rthreads);
   double *grid[rank];
   int blend = 0;
-  if(!IS_NUMERIC(values)) error("values must be numeric");
-  if(!IS_NUMERIC(x)) error("argument x must be numeric");  
-  if(isMatrix(x) ? (nrows(x) != rank) : (LENGTH(x) != rank))
-    error("grid has dimension %d, you supplied a length %d vector", 
-	  rank, isMatrix(x) ? nrows(x) : LENGTH(x));
+  if(!Rf_isReal(values)) Rf_error("values must be numeric");
+  if(!Rf_isReal(x)) Rf_error("argument x must be numeric");  
+  if(Rf_isMatrix(x) ? (Rf_nrows(x) != rank) : (LENGTH(x) != rank))
+    Rf_error("grid has dimension %d, you supplied a length %d vector", 
+	  rank, Rf_isMatrix(x) ? Rf_nrows(x) : LENGTH(x));
 
   /* Make some pointers into the grid data */
   for(int i = 0; i < rank; i++) {
@@ -687,15 +687,15 @@ static SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sble
     gridsize *= dims[i];
   }
 
-  if(LENGTH(values) != gridsize) error("grid has size %d, you supplied %d values",
+  if(LENGTH(values) != gridsize) Rf_error("grid has size %d, you supplied %d values",
 				       gridsize,LENGTH(values));
-  if(!isNull(Sblend)) blend = INTEGER(AS_INTEGER(Sblend))[0];
-  const int numvec = isMatrix(x) ? ncols(x) : 1;
+  if(!Rf_isNull(Sblend)) blend = Rf_asInteger(Sblend);
+  const int numvec = Rf_isMatrix(x) ? Rf_ncols(x) : 1;
   double *xp = REAL(x);
 #ifdef RETMAT
-  SEXP resvec = PROTECT(allocMatrix(REALSXP, numvec, 1));
+  SEXP resvec = PROTECT(Rf_allocMatrix(REALSXP, numvec, 1));
 #else
-  SEXP resvec = PROTECT(NEW_NUMERIC(numvec));
+  SEXP resvec = PROTECT(Rf_allocVector(REALSXP, numvec));
 #endif
   double *out = REAL(resvec);
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
@@ -709,10 +709,10 @@ static SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sble
 static SEXP R_sqdiffs(SEXP x1, SEXP x2, SEXP Sthreads) {
   // each column in x1 should be subtracted from each column in x2,
   // the squared column sums should be returned.
-  const int r1 = nrows(x1), c1 = ncols(x1), r2 = nrows(x2), c2 = ncols(x2);
+  const int r1 = Rf_nrows(x1), c1 = Rf_ncols(x1), r2 = Rf_nrows(x2), c2 = Rf_ncols(x2);
   int N = c1*c2;
-  int threads = INTEGER(AS_INTEGER(Sthreads))[0];
-  SEXP res = PROTECT(NEW_NUMERIC(N));
+  int threads = Rf_asInteger(Sthreads);
+  SEXP res = PROTECT(Rf_allocVector(REALSXP, N));
   double *dres = REAL(res);
   double *np = dres;
 #pragma omp parallel for num_threads(threads) schedule(static) if (c1 > 1)
@@ -727,10 +727,10 @@ static SEXP R_sqdiffs(SEXP x1, SEXP x2, SEXP Sthreads) {
       np[j + i*c2] = csum;
     }
   }
-  SEXP snewdim = PROTECT(NEW_INTEGER(2));
+  SEXP snewdim = PROTECT(Rf_allocVector(INTSXP, 2));
   INTEGER(snewdim)[0] = c1;
   INTEGER(snewdim)[1] = c2;
-  setAttrib(res,R_DimSymbol,snewdim);
+  Rf_setAttrib(res,R_DimSymbol,snewdim);
   UNPROTECT(2);
   return res;
 }
@@ -806,43 +806,43 @@ static SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval,
 		     SEXP extrapolate, SEXP Sthreads, SEXP Sblend) {
   // Loop over the triangulation
   int *dtri = INTEGER(Sdtri);
-  const int numsimplex = ncols(Sdtri);
+  const int numsimplex = Rf_ncols(Sdtri);
   double *lumats = REAL(VECTOR_ELT(adata,0));
   int *pivots = INTEGER(VECTOR_ELT(adata,1));
   double *bboxmat = REAL(VECTOR_ELT(adata,2));
   double *x = REAL(Sx);
-  const int dim = nrows(Sknots);
-  const int numvec = ncols(Sx);
+  const int dim = Rf_nrows(Sknots);
+  const int numvec = Rf_ncols(Sx);
   double *knots = REAL(Sknots);
   double *val = REAL(Sval);
-  int threads = INTEGER(AS_INTEGER(Sthreads))[0];
-  SEXP ret = PROTECT(NEW_NUMERIC(ncols(Sx)));
+  int threads = Rf_asInteger(Sthreads);
+  SEXP ret = PROTECT(Rf_allocVector(REALSXP, Rf_ncols(Sx)));
   double *resvec = REAL(ret);
-  int epol = LOGICAL(AS_LOGICAL(extrapolate))[0];
+  int epol = Rf_asLogical(extrapolate);
   int blend=0;
-  if(!isNull(Sblend)) blend = INTEGER(AS_INTEGER(Sblend))[0];
+  if(!Rf_isNull(Sblend)) blend = Rf_asInteger(Sblend);
 
 #pragma omp parallel for num_threads(threads) schedule(guided) if(threads > 1 && numvec > 1)
   for(int i = 0; i < numvec; i++) {
     resvec[i] = findsimplex(x + i*dim, knots, dtri, lumats, pivots, bboxmat,
-			    epol, val, dim, numsimplex, ncols(Sknots),blend);
+			    epol, val, dim, numsimplex, Rf_ncols(Sknots),blend);
   }
   UNPROTECT(1);
   return ret;
 }
 
 static SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
-  int threads = INTEGER(AS_INTEGER(Sthreads))[0];
+  int threads = Rf_asInteger(Sthreads);
   int *dtri = INTEGER(Sdtri);
   double *knots = REAL(Sknots);
-  const int dim = nrows(Sknots);
-  const int numsimplex = ncols(Sdtri);
+  const int dim = Rf_nrows(Sknots);
+  const int numsimplex = Rf_ncols(Sdtri);
   int N = dim+1;
-  SEXP retlist = PROTECT(NEW_LIST(3));
+  SEXP retlist = PROTECT(Rf_allocVector(VECSXP, 3));
   // Allocate everything before parallel for
-  SET_VECTOR_ELT(retlist, 0, NEW_NUMERIC(numsimplex*N*N));
-  SET_VECTOR_ELT(retlist, 1, NEW_INTEGER(numsimplex*N));
-  SET_VECTOR_ELT(retlist, 2, allocMatrix(REALSXP, 2*dim, numsimplex));
+  SET_VECTOR_ELT(retlist, 0, Rf_allocVector(REALSXP, numsimplex*N*N));
+  SET_VECTOR_ELT(retlist, 1, Rf_allocVector(INTSXP, numsimplex*N));
+  SET_VECTOR_ELT(retlist, 2, Rf_allocMatrix(REALSXP, 2*dim, numsimplex));
   double *lumats = REAL(VECTOR_ELT(retlist,0));
   int *pivots = INTEGER(VECTOR_ELT(retlist,1));
   double *bboxmat = REAL(VECTOR_ELT(retlist,2));
@@ -876,23 +876,23 @@ static SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
 
 static SEXP R_havefftw() {
 #ifdef HAVE_FFTW
-  return ScalarLogical(TRUE);
+  return Rf_ScalarLogical(TRUE);
 #else
-  return ScalarLogical(FALSE);
+  return Rf_ScalarLogical(FALSE);
 #endif
 }
 
 // inplace to save memory, do repated multiplication instead of pow(). It's faster.
 static SEXP R_phifunc(SEXP Sx, SEXP Sk, SEXP Sthreads) {
-  double k = REAL(AS_NUMERIC(Sk))[0];
+  double k = Rf_asReal(Sk);
   double *x = REAL(Sx);
-  int threads = INTEGER(AS_INTEGER(Sthreads))[0];
+  int threads = Rf_asInteger(Sthreads);
   double *y;
   SEXP res;
-  if(XLENGTH(Sx) == 1 && x[0] == 0.0) return ScalarReal((k<0)?1:0);
+  if(XLENGTH(Sx) == 1 && x[0] == 0.0) return Rf_ScalarReal((k<0)?1:0);
 
   if(MAYBE_REFERENCED(Sx)) {
-    res = PROTECT(NEW_NUMERIC(XLENGTH(Sx)));
+    res = PROTECT(Rf_allocVector(REALSXP, XLENGTH(Sx)));
     y = REAL(res);
   } else {
     res = Sx;
@@ -903,7 +903,7 @@ static SEXP R_phifunc(SEXP Sx, SEXP Sk, SEXP Sthreads) {
 #pragma omp parallel for num_threads(threads) schedule(static) if(threads > 1)
     for(R_xlen_t i = 0; i < XLENGTH(Sx); i++) y[i] = exp(k*x[i]);
   } else {
-    int ki = INTEGER(AS_INTEGER(Sk))[0];
+    int ki = Rf_asInteger(Sk);
     if(ki % 2 == 1) {
 #pragma omp parallel for num_threads(threads) schedule(static) if(threads > 1)
       for(R_xlen_t i = 0; i < XLENGTH(Sx); i++) {
@@ -926,16 +926,16 @@ static SEXP R_phifunc(SEXP Sx, SEXP Sk, SEXP Sthreads) {
 #ifndef HAVE_ALGLIB
 SEXP R_makerbf(SEXP a, SEXP b, SEXP c, SEXP d) {
   UNUSED(a); UNUSED(b); UNUSED(c); UNUSED(d);
-  error("ALGLIB not available");
+  Rf_error("ALGLIB not available");
   return R_NilValue;
 }
 SEXP R_evalrbf(SEXP a, SEXP b, SEXP c) {
   UNUSED(a); UNUSED(b); UNUSED(c);
-  error("ALGLIB not available");
+  Rf_error("ALGLIB not available");
   return R_NilValue;
 }
 SEXP R_havealglib() {
-  return ScalarLogical(FALSE);
+  return Rf_ScalarLogical(FALSE);
 }
 
 #endif
