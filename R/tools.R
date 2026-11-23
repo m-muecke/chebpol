@@ -64,7 +64,7 @@ separgs <- function(fun, ...) {
     if (all(nn == 1)) {
       return(fun(as.numeric(arg)))
     }
-    return(fun(do.call(rbind, arg)))
+    fun(do.call(rbind, arg))
   }
   args <- as.list(sys.call())[-(1:2)]
   formals(f) <- args

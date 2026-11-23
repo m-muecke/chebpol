@@ -36,14 +36,12 @@ ucappxf.real <- function(fun, dims, intervals = NULL, ...) {
   if (is.numeric(intervals) && length(intervals) == 2) {
     intervals <- list(intervals)
   }
-  return(
-    ucappx.real(
-      evalongrid(
-        fun,
-        ...,
-        grid = mapply(\(d, i) seq(min(i), max(i), length.out = d), dims, intervals, SIMPLIFY = FALSE)
-      ),
-      intervals
-    )
+  ucappx.real(
+    evalongrid(
+      fun,
+      ...,
+      grid = mapply(\(d, i) seq(min(i), max(i), length.out = d), dims, intervals, SIMPLIFY = FALSE)
+    ),
+    intervals
   )
 }
