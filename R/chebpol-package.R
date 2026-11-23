@@ -1,11 +1,11 @@
 #' Methods for creating multivariate interpolations on hypercubes
-#' 
+#'
 #' The package contains methods for creating multivariate/multidimensional
 #' interpolations for real-valued functions on hypercubes. The
 #' methods include classical Chebyshev interpolation, multilinear
 #' and Floater-Hormann for arbitrary Cartesian product grids, and simplex linear
 #' and polyharmonic spline for scattered multi dimensional data.
-#' 
+#'
 #' The primary method of the package is \code{\link{ipol}} which
 #' dispatches to some other method.  All the generated
 #' \link{interpolant}s accept as an argument a matrix of column
@@ -24,7 +24,7 @@
 #' @section Chebyshev:
 #' If we are free to evaluate the function to interpolate in arbitrary points, we can use
 #' a Chebyshev interpolation. The classical one is available with
-#' \code{\link{ipol}(...,method='chebyshev')}. 
+#' \code{\link{ipol}(...,method='chebyshev')}.
 #' @section Uniform grids:
 #' There are several options if your function must be evaluated in a uniform grid.
 #' There is the Floater-Hormann rational interpolation available with \code{\link{ipol}(...,method='fh')}.
@@ -47,7 +47,7 @@
 #' (\code{\link{chebknots}}) as well as a function for evaluating a
 #' function on a grid (\code{\link{evalongrid}}), and a function for finding
 #' the Chebyshev coefficients (\code{\link{chebcoef}}).
-#' 
+#'
 #' @name chebpol-package
 #' @aliases chebpol-package chebpol
 #' @docType package
@@ -55,13 +55,13 @@
 #' @keywords DCT Chebyshev interpolation Floater-Hormann
 #' @seealso \link{ipol}, \link{interpolant}
 #' @examples
-#' 
+#'
 #' ## make some function values on a 50x50x50 grid
 #' dims <- c(x=50,y=50,z=50)
 #' f <- function(x) sqrt(1+x[1])*exp(x[2])*sin(5*x[3])^2
 #' value <- evalongrid(f , dims)
 #' ##fit a Chebyshev approximation to it. Note that the value-array contains the
-#' ##grid-structure. 
+#' ##grid-structure.
 #' ch <- ipol(value,method='cheb')
 #' ## To see the full grid, use the chebknots function and expand.grid
 #' \dontrun{
@@ -73,6 +73,6 @@
 #' ## evaluate in some random points in R3
 #' m <- matrix(runif(15,-1,1),3)
 #' rbind(true=apply(m,2,f), cheb=ch(m), fh=fh(m))
-#' 
+#'
 #' @useDynLib chebpol, .registration=TRUE, .fixes='C_'
 NULL
