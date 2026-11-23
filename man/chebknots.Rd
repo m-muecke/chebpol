@@ -21,7 +21,7 @@ Create a Chebyshev grid on a hypercube.
 }
 \details{
 If \code{intervals} is not provided, it is assumed that the domain of the
-function in each dimension is [-1,1].  Thus, standard Chebyshev knots are
+function in each dimension is \verb{[-1, 1]}.  Thus, standard Chebyshev knots are
 produced.  If \code{dims} is of length 1, \code{intervals} may be a vector
 of length 2 rather than a list with a vector of length 2.
 }

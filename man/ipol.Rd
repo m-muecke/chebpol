@@ -40,7 +40,7 @@ dimension.  These need not be Chebyshev-knots, nor evenly spaced.}
 extra arguments for interpolant creation described in section Details.}
 }
 \value{
-A \code{function(x, threads=getOption("chebpol.threads"))} defined on a hypercube, an \link{interpolant}
+A \verb{function(x, threads=getOption("chebpol.threads"))} defined on a hypercube, an \link{interpolant}
 for the given function. The argument \code{x} can be a matrix of column
 vectors which are evaluated in parallel in a number of threads.  The
 function yields values for arguments outside the hypercube as well, though
@@ -60,12 +60,12 @@ in \code{vignette("chebpol",package="chebpol")}.
 The method \code{"chebyshev"} needs only the number of Chebyshev knots in
 each dimension. This is either the \code{"dim"} attribute of the array
 \code{val}, or the \code{dims} argument if \code{val} is a function.  Also
-the intervals can be specified if different from [-1, 1].
+the intervals can be specified if different from \verb{[-1, 1]}.
 
 The method \code{"uniform"} is similar to the \code{"chebyshev"}, but
 uniformly spaced knots are created.  The argument
 \code{intervals} generally goes with \code{dims} when something else than
-standard intervals \code{[-1, 1]} are used.
+standard intervals \verb{[-1, 1]} are used.
 
 The methods \code{"multilinear"}, \code{"fh"} (Floater-Hormann), \code{"stalker"},
 \code{"hstalker"}, and

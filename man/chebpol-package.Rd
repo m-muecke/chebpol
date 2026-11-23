@@ -13,7 +13,7 @@ and Floater-Hormann for arbitrary Cartesian product grids, and simplex linear
 and polyharmonic spline for scattered multi dimensional data.
 }
 \details{
-The primary method of the package is \code{\link{ipol}} which
+The primary method of the package is \code{\link[=ipol]{ipol()}} which
 dispatches to some other method.  All the generated
 \link{interpolant}s accept as an argument a matrix of column
 vectors. The generated functions also accept an argument
@@ -32,22 +32,22 @@ I can issue no such absolute guarantee.
 
 If we are free to evaluate the function to interpolate in arbitrary points, we can use
 a Chebyshev interpolation. The classical one is available with
-\code{\link{ipol}(...,method="chebyshev")}.
+\code{\link[=ipol]{ipol(...,method="chebyshev")}}.
 }
 
 \section{Uniform grids}{
 
 There are several options if your function must be evaluated in a uniform grid.
-There is the Floater-Hormann rational interpolation available with \code{\link{ipol}(...,method="fh")}.
-There is a transformed Chebyshev variant \code{\link{ipol}(..., method="uniform")}.
+There is the Floater-Hormann rational interpolation available with \code{\link[=ipol]{ipol(...,method="fh")}}.
+There is a transformed Chebyshev variant \code{\link[=ipol]{ipol(..., method="uniform")}}.
 }
 
 \section{Arbitrary grids}{
 
 For grids which are not uniform, but still Cartesian products of one-dimensional grids,
-there is the Floater-Hormann interpolation \code{\link{ipol}(...,method="fh")}, and a transformed
-Chebyshev variant \code{\link{ipol}(...,method="general")}, as well as a multilinear
-\code{\link{ipol}(...,method="multilinear")}. These methods work on uniform grids as well.
+there is the Floater-Hormann interpolation \code{\link[=ipol]{ipol(...,method="fh")}}, and a transformed
+Chebyshev variant \code{\link[=ipol]{ipol(...,method="general")}}, as well as a multilinear
+\code{\link[=ipol]{ipol(...,method="multilinear")}}. These methods work on uniform grids as well.
 There is also a \code{method="stalker"} which is a shape preserving spline, and a variant
 \code{method="hstalker"}. Both are described in a vignette. These splines in one dimension
 attempts to honour monotonicity and local extrema, in particular the \code{"hstalker"} is
@@ -57,16 +57,16 @@ positivity-preserving in the sense that it will preserve maxima and minima.
 \section{Scattered data}{
 
 For scattered data, not necessarily organised as a Cartesian product grid, there is
-a simplex linear interpolation available with \code{\link{ipol}(...,method="simplexlinear")},
-and a polyharmonic spline with \code{\link{ipol}(...,method="polyharmonic")}.
+a simplex linear interpolation available with \code{\link[=ipol]{ipol(...,method="simplexlinear")}},
+and a polyharmonic spline with \code{\link[=ipol]{ipol(...,method="polyharmonic")}}.
 }
 
 \section{Support functions}{
 
 There are also functions for producing Chebyshev grids
-(\code{\link{chebknots}}) as well as a function for evaluating a
-function on a grid (\code{\link{evalongrid}}), and a function for finding
-the Chebyshev coefficients (\code{\link{chebcoef}}).
+(\code{\link[=chebknots]{chebknots()}}) as well as a function for evaluating a
+function on a grid (\code{\link[=evalongrid]{evalongrid()}}), and a function for finding
+the Chebyshev coefficients (\code{\link[=chebcoef]{chebcoef()}}).
 }
 
 \examples{

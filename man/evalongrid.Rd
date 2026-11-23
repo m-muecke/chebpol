@@ -34,21 +34,21 @@ returns a vector, this will be the first dimension of the returned array.
 Evaluate a function on a Chebyshev grid, or on a user-specified grid.
 }
 \details{
-The function \code{fun} should be a \code{function(x,...)}, where
+The function \code{fun} should be a \verb{function(x,...)}, where
 \code{length(x)} equals \code{length(dims)} (or \code{length(grid)}).
 
 If \code{grid} is provided, \code{fun} is evaluated on each point in the
 Cartesian product of the vectors in \code{grid}.
 
 If \code{intervals} is not provided, it is assumed that the domain of the
-function is the hypercube [-1,1] x [-1,1] x ... x [-1,1].  Thus, the
+function is the hypercube \verb{[-1, 1] x [-1, 1] x ... x [-1, 1]}.  Thus, the
 function is evaluated on a standard Chebyshev grid.
 
 If \code{intervals} is provided, it should be a \code{list} with elements of
 length 2, providing minimum and maximum for each dimension.
 
 The grid itself may be produced by
-\code{expand.grid(\link{chebknots}(dims,intervals))}, or
+\code{expand.grid(chebknots(dims, intervals))}, or
 \code{expand.grid(grid)}.
 
 This function does the same as \code{apply(expand.grid(grid),1,fun)}, but

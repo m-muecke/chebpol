@@ -17,16 +17,16 @@ chebknots1 <- function(n, interval = NULL) {
 #'
 #' Create a Chebyshev grid on a hypercube.
 #'
-#' If \code{intervals} is not provided, it is assumed that the domain of the
-#' function in each dimension is [-1,1].  Thus, standard Chebyshev knots are
-#' produced.  If \code{dims} is of length 1, \code{intervals} may be a vector
+#' If `intervals` is not provided, it is assumed that the domain of the
+#' function in each dimension is `[-1, 1]`.  Thus, standard Chebyshev knots are
+#' produced.  If `dims` is of length 1, `intervals` may be a vector
 #' of length 2 rather than a list with a vector of length 2.
 #'
 #' @param dims The number of grid-points in each dimension.  For
-#' Chebyshev-polynomial of degree \code{dims-1}.
+#' Chebyshev-polynomial of degree `dims-1`.
 #' @param intervals A list of vectors of length 2.  The lower and upper bounds
 #' of the hypercube.
-#' @return A array of dimension \code{dims}.  The Chebyshev grid-points.
+#' @return A array of dimension `dims`.  The Chebyshev grid-points.
 #' @examples
 #' ## Standard knots for degree 3
 #' chebknots(4)
@@ -60,23 +60,23 @@ chebknots <- function(dims, intervals = NULL) {
 #' Compute the multivariate Chebyshev-coefficients, given values on a Chebyshev
 #' grid.
 #'
-#' If \code{val} has no \code{dim}-attribute, it is assumed to be
-#' one-dimensional of length the length of \code{val}.
+#' If `val` has no `dim`-attribute, it is assumed to be
+#' one-dimensional of length the length of `val`.
 #'
 #' If \pkg{chebpol} was compiled without \acronym{FFTW}, running
-#' \code{chebcoef} on large grids may be slow and memory-demanding.
+#' `chebcoef` on large grids may be slow and memory-demanding.
 #'
-#' @param val An \code{array} of function values on a Chebyshev grid.  The
-#' \code{dim}-attribute must be appropriately set.  If not set, it is assumed
+#' @param val An `array` of function values on a Chebyshev grid.  The
+#' `dim`-attribute must be appropriately set.  If not set, it is assumed
 #' to be one-dimensional.
 #' @param dct Logical. Since the Chebyshev coefficients are closely related to
-#' the DCT-II transform of \code{val}, the non-normalized real-even DCT-II
+#' the DCT-II transform of `val`, the non-normalized real-even DCT-II
 #' coefficients may be retrieved instead. I.e. those from FFTW_REDFT10 in each
 #' dimension.  This is not used anywhere in the package, it is merely provided
 #' as a convenience for those who might need it.
 #' @return An array of Chebyshev-coefficients for an interpolating
 #' Chebyshev-polynomial.
-#' @seealso \code{\link{havefftw}}
+#' @seealso [havefftw()]
 #' @examples
 #' ## Coefficients for a 2x3x4 grid
 #' a <- array(rnorm(24), dim = c(2, 3, 4))
@@ -94,10 +94,10 @@ chebcoef <- function(val, dct = FALSE) {
 #'
 #' @param x The point to evaluate.
 #' @param coef The Chebyshev coefficients. Typically from a call to
-#' \code{\link{chebcoef}}, possibly modified.
+#' [chebcoef()], possibly modified.
 #' @param intervals A list of minimum and maximum values. One for each
 #' dimension of the hypercube.
-#' @param threads And integer. In case \code{x} is a matrix of column vectors,
+#' @param threads And integer. In case `x` is a matrix of column vectors,
 #' use this number of threads in parallel to evaluate.
 #' @return A numeric. The interpolated value.
 #' @examples

@@ -3,70 +3,70 @@
 #' Create an interpolating function from given values. Several interpolation methods are
 #' supported.
 #'
-#' \code{ipol} is a wrapper around various interpolation methods in package \pkg{chebpol}.
+#' `ipol` is a wrapper around various interpolation methods in package \pkg{chebpol}.
 #' Which arguments to specify depends on the method. The interpolation methods are described
-#' in \code{vignette("chebpol",package="chebpol")}.
+#' in `vignette("chebpol",package="chebpol")`.
 #'
-#' The method \code{"chebyshev"} needs only the number of Chebyshev knots in
-#' each dimension. This is either the \code{"dim"} attribute of the array
-#' \code{val}, or the \code{dims} argument if \code{val} is a function.  Also
-#' the intervals can be specified if different from [-1, 1].
+#' The method `"chebyshev"` needs only the number of Chebyshev knots in
+#' each dimension. This is either the `"dim"` attribute of the array
+#' `val`, or the `dims` argument if `val` is a function.  Also
+#' the intervals can be specified if different from `[-1, 1]`.
 #'
-#' The method \code{"uniform"} is similar to the \code{"chebyshev"}, but
+#' The method `"uniform"` is similar to the `"chebyshev"`, but
 #' uniformly spaced knots are created.  The argument
-#' \code{intervals} generally goes with \code{dims} when something else than
-#' standard intervals \code{[-1, 1]} are used.
+#' `intervals` generally goes with `dims` when something else than
+#' standard intervals `[-1, 1]` are used.
 #'
-#' The methods \code{"multilinear"}, \code{"fh"} (Floater-Hormann), \code{"stalker"},
-#' \code{"hstalker"}, and
-#' \code{"general"} needs the argument \code{grid}.  These are the methods
+#' The methods `"multilinear"`, `"fh"` (Floater-Hormann), `"stalker"`,
+#' `"hstalker"`, and
+#' `"general"` needs the argument `grid`.  These are the methods
 #' which can use arbitrary Cartesian grids.
 #' The stalker spline
-#' is described in \code{vignette("stalker",package="chebpol")}. The Floater-Hormann
-#' method (\code{"fh"}) also needs the \code{k} argument, the degree of the blending
+#' is described in `vignette("stalker",package="chebpol")`. The Floater-Hormann
+#' method (`"fh"`) also needs the `k` argument, the degree of the blending
 #' polynomials. It defaults to 4.
 #'
-#' The method \code{"polyharmonic"} needs the arguments \code{knots} and
-#' \code{k}. In addition it can take the logical argument \code{normalize}
-#' for normalizing the knots to the unit hypercube. The default is \code{NA}, which
+#' The method `"polyharmonic"` needs the arguments `knots` and
+#' `k`. In addition it can take the logical argument `normalize`
+#' for normalizing the knots to the unit hypercube. The default is `NA`, which
 #' uses normalization if any of the knots are outside the unit hypercube. Also, a logical
-#' \code{nowarn} is accepted, it is used to suppress a warning in case the system can't
+#' `nowarn` is accepted, it is used to suppress a warning in case the system can't
 #' be solved exactly and a least squares fallback method is used.
 #'
-#' The method \code{"simplexlinear"} needs the argument \code{knots}. It creates a
+#' The method `"simplexlinear"` needs the argument `knots`. It creates a
 #' Delaunay triangulation from the knots, and does linear interpolation in each simplex
 #' by weighting the vertex values with the barycentric coordinates.
 #'
 #' If knots are required, but the grid argument is given, knots are constructed as
-#' \code{t(expand.grid(grid))}
+#' `t(expand.grid(grid))`
 #'
-#' The \code{"crbf"} is the multilayer compact radial basis function
-#' interpolation in ALGLIB (\url{http://www.alglib.net/interpolation/fastrbf.php}).
+#' The `"crbf"` is the multilayer compact radial basis function
+#' interpolation in ALGLIB (<http://www.alglib.net/interpolation/fastrbf.php>).
 #' It is only available if ALGLIB was available at
-#' compile time. It takes the extra arguments \code{"rbase"}, \code{"layers"}, and
-#' \code{"lambda"}. These are discussed in the ALGLIB documentation.
+#' compile time. It takes the extra arguments `"rbase"`, `"layers"`, and
+#' `"lambda"`. These are discussed in the ALGLIB documentation.
 #'
-#' There are also some usage examples and more in \code{vignette("chebpol")} and \code{vignette("chebusage")}.
+#' There are also some usage examples and more in `vignette("chebpol")` and `vignette("chebusage")`.
 #'
 #' @param val array or function. Function values on a grid, or the function
-#' itself. If it is the values, the \code{"dim"}-attribute must be
+#' itself. If it is the values, the `"dim"`-attribute must be
 #' appropriately set. If it is a function, it will be evaluated in the grid points.
 #' @param dims integer vector. The number of grid points in each dimension. Not
-#' needed if \code{val} is an array or \code{grid} is used.
+#' needed if `val` is an array or `grid` is used.
 #' @param intervals list of length 2 numeric vectors. The lower and upper bound
-#' in each dimension. Not used if \code{grid} is specified.
+#' in each dimension. Not used if `grid` is specified.
 #' @param grid list. Each element is a vector of ordered grid-points for a
 #' dimension.  These need not be Chebyshev-knots, nor evenly spaced.
 #' @param knots matrix. Each column is a point in an M-dimensional space.
 #' @param k numeric. Additional value, used with some methods.
 #' @param method character. The interpolation method to use.
-#' @param ... Further arguments to the function, if \code{is.function(val)}. And some
+#' @param ... Further arguments to the function, if `is.function(val)`. And some
 #' extra arguments for interpolant creation described in section Details.
-#' @return A \code{function(x, threads=getOption("chebpol.threads"))} defined on a hypercube, an \link{interpolant}
-#' for the given function. The argument \code{x} can be a matrix of column
+#' @return A `function(x, threads=getOption("chebpol.threads"))` defined on a hypercube, an [interpolant]
+#' for the given function. The argument `x` can be a matrix of column
 #' vectors which are evaluated in parallel in a number of threads.  The
 #' function yields values for arguments outside the hypercube as well, though
-#' it will typically be a poor approximation.  \code{threads} is an integer
+#' it will typically be a poor approximation.  `threads` is an integer
 #' specifying the number of parallel threads which should be used when
 #' evaluating a matrix of column vectors.
 #' @examples

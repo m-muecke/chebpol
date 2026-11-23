@@ -10,7 +10,7 @@ chebeval(x, coef, intervals = NULL, threads = getOption("chebpol.threads"))
 \item{x}{The point to evaluate.}
 
 \item{coef}{The Chebyshev coefficients. Typically from a call to
-\code{\link{chebcoef}}, possibly modified.}
+\code{\link[=chebcoef]{chebcoef()}}, possibly modified.}
 
 \item{intervals}{A list of minimum and maximum values. One for each
 dimension of the hypercube.}
