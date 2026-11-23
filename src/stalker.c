@@ -875,7 +875,7 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
   int blend = Rf_asInteger(Sblend);
   const int nrank = LENGTH(Sgrid);
   if (K != nrank)
-    Rf_error("Rank of input(%d) does not match rank of spline", N, nrank);
+    Rf_error("Rank of input (%d) does not match rank of spline (%d)", K, nrank);
 
   int dims[nrank];
   int len = 1;
