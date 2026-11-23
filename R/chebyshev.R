@@ -12,7 +12,6 @@ chebknots1 <- function(n, interval = NULL) {
   kn * diff(interval) / 2 + mean(interval)
 }
 
-
 #' Create a Chebyshev-grid
 #'
 #' Create a Chebyshev grid on a hypercube.
@@ -88,7 +87,6 @@ chebcoef <- function(val, dct = FALSE) {
     dimnames = dimnames(val)
   )
 }
-
 
 #' Evaluate a Chebyshev interpolation in a point
 #'
@@ -180,7 +178,6 @@ chebappx.real <- function(val, intervals = NULL) {
   }
   fun
 }
-
 
 chebappxf.real <- function(fun, dims, intervals = NULL, ...) {
   chebappx.real(evalongrid(fun, dims, intervals, ...), intervals)

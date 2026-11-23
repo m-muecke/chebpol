@@ -158,7 +158,6 @@ evalongridV <- function(fun, dims, intervals = NULL, ..., grid = NULL) {
   structure(fun(t(expand.grid(grid)), ...), dim = if (length(grid) > 1) lengths(grid) else NULL)
 }
 
-
 #' Check whether chebpol uses FFTW
 #'
 #' It is possible to compile chebpol without FFTW.  If this is done, it will

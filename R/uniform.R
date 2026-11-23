@@ -5,7 +5,6 @@
 
 ugm <- function(x, n) sin(0.5 * pi * x * (1 - n) / n)
 
-
 ucappx.real <- function(val, intervals = NULL) {
   if (is.null(dim(val))) {
     dim(val) <- length(val)
