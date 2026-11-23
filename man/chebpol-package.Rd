@@ -79,7 +79,11 @@ value <- evalongrid(f, dims)
 ch <- ipol(value, method = "cheb")
 ## To see the full grid, use the chebknots function and expand.grid
 \dontrun{
-  head(cbind(expand.grid(chebknots(dims)), value = as.numeric(value), appx = as.numeric(evalongrid(ch, dims))))
+  head(cbind(
+    expand.grid(chebknots(dims)),
+    value = as.numeric(value),
+    appx = as.numeric(evalongrid(ch, dims))
+  ))
 }
 ## Make a Floater-Hormann approximation on a uniform grid as well
 fh <- ipol(f, grid = lapply(dims, function(n) seq(-1, 1, length.out = n)), method = "fh", k = 5)

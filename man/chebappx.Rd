@@ -75,7 +75,9 @@ aware that it may be highly erratic there, especially if of high degree.
   f(a)
 
   # Make a function on [0,2] x [0,1]
-  f <- function(y) uniroot(function(x) x - y[[1]] * cos(pi * x^2), lower = 0, upper = 1)$root * sum(y^2)
+  f <- function(y) {
+    uniroot(function(x) x - y[[1]] * cos(pi * x^2), lower = 0, upper = 1)$root * sum(y^2)
+  }
   # approximate it
   ch <- chebappxf(f, c(12, 12), intervals = list(c(0, 2), c(0, 1)))
   # test it:
