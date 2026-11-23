@@ -13,6 +13,7 @@
 ^\.Renviron$
 ^\.Rproj\.user$
 ^\.ccache$
+^\.clang-format$
 ^\.dockerignore$
 ^\.editorconfig$
 ^\.git-blame-ignore-revs$
