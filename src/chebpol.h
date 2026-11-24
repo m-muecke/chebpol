@@ -1,5 +1,5 @@
-#ifndef _CHEBPOL
-#define _CHEBPOL
+#ifndef CHEBPOL_H
+#define CHEBPOL_H
 #ifndef R_NO_REMAP
 #define R_NO_REMAP
 #endif
