@@ -845,7 +845,7 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
 
   if (epol) {
     // Find the closest knot
-    double mindist = 1e99;
+    double mindist = INFINITY;
     int nearknot = 0;
     for (int k = 0; k < nknots; k++) {
       double dist = 0.0;
@@ -950,8 +950,8 @@ SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
     int info;
     double *m = bboxmat + simplex * 2 * dim;
     for (int j = 0; j < dim; j++) {
-      m[2 * j] = 1e100;
-      m[2 * j + 1] = -1e100;
+      m[2 * j] = INFINITY;
+      m[2 * j + 1] = -INFINITY;
     }
     // Copy all vertices into mat, with a final row of ones to LU-factorize
     // Preparation for transforming into barycentric coordinates
