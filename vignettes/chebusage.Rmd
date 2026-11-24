@@ -20,7 +20,7 @@ between the methods.
 
 Interpolating a function $f$ means to find a reasonably behaved function, an interpolant $g$ which
 agrees with $f$ on some points. I.e. given $N \in \mathbb{N}$ we have $\{x_i\}_{i=1}^N$ in the
-domain of $f$, and the interpolant $g$ satisifies $g(x_i) = f(x_i)$ for $1 \le i \le N$.
+domain of $f$, and the interpolant $g$ satisfies $g(x_i) = f(x_i)$ for $1 \le i \le N$.
 The points $x_i$ are often referred to as *knots*.
 
 We limit ourselves to functions $\mathbb{R}^n \mapsto \mathbb{R}$, or even compactly supported functions
@@ -387,7 +387,7 @@ print(ph2(m, threads = 3))
 This means
 that even if one has a function available in R, it might be faster to
 use an interpolant since it’s automatically parallelized.
-Even if one does not have more than one CPU, it is worthwile to use
+Even if one does not have more than one CPU, it is worthwhile to use
 the matrix interface if more than one point is to be evaluated (such
 as in the vector interface of package **cubature**), it is a lot
 faster with `ph2(m)` than with `apply(m,2,ph2)`.

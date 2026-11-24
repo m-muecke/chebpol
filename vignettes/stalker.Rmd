@@ -19,9 +19,9 @@ MathJax.Hub.Config({ TeX: { equationNumbers: { autoNumber: "AMS" } } });
 The idea behind the stalker spline in package **chebpol** is
 outlined. It was originally designed as a one-dimensional interpolation to be
 almost shape preserving in the sense that it attempts to honour
-monotonocity properties and local extreme points in the data, though
+monotonicity properties and local extreme points in the data, though
 not entirely. There is no fancy theory behind, but it once served a
-purpose for the author, and here it is. Indeed, it can proabably be
+purpose for the author, and here it is. Indeed, it can probably be
 phrased in terms of NURBS, wavelets or some such theory, but I am
 not in need of a certificate of completed apprenticeship
 (a.k.a. ph.d), and am free to phrase it with elementary
@@ -621,7 +621,7 @@ equal to zero, this yields $r_i=1$.
 
 ## Multidimensional hyperbolic stalker
 
-We have another shape preserving spline which is sligthly easier to
+We have another shape preserving spline which is slightly easier to
 work with. It’s a rational spline. We replace the low degree $|x|^r$
 with a hyperbola. We have the same grid and notation as before.
 
@@ -647,7 +647,7 @@ For each $i$ we also have equations for the two other grid points $k_i^-$ and $k
 \end{equation*}
 
 We first use equation $\eqref{zeroval}$ to replace $a+\sum_{j\neq i}^n d_j$ with $-d_i$, then
-we multiply each equation with the denominator occuring in them, to obtain:
+we multiply each equation with the denominator occurring in them, to obtain:
 
 \begin{equation}\label{dimequations}
   \begin{aligned}
@@ -860,7 +860,7 @@ We have no absolute guarantee that overshoot will not occur on the
 diagonal of the crosses. In some cases, additional local
 extrema can also be introduced.
 
-In Figure 6, we have some random values on a unform
+In Figure 6, we have some random values on a uniform
 4x4 grid. For illustration purposes we use a “mean” blender , i.e. at
 every point we compute the mean of the basis functions living there.
 The resulting interpolant is discontinuous, and we miss the given

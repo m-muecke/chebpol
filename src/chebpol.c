@@ -231,7 +231,7 @@ SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spa
     Rf_error("rank must be positive");
   if (Rf_isMatrix(inx)) {
     if (rank != Rf_nrows(inx))
-      Rf_error("coeffcient rank(%d) must match number of rows(%d)", LENGTH(dim), Rf_nrows(inx));
+      Rf_error("coefficient rank(%d) must match number of rows(%d)", LENGTH(dim), Rf_nrows(inx));
   } else {
     if (rank != LENGTH(inx))
       Rf_error("coefficient rank(%d) does not match argument length(%d)", LENGTH(dim), LENGTH(inx));
@@ -357,7 +357,7 @@ SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
     Rf_error("rank must be positive");
   if (Rf_isMatrix(inx)) {
     if (rank != Rf_nrows(inx))
-      Rf_error("coeffcient rank(%d) must match number of rows(%d)", LENGTH(dim), Rf_nrows(inx));
+      Rf_error("coefficient rank(%d) must match number of rows(%d)", LENGTH(dim), Rf_nrows(inx));
   } else {
     if (rank != LENGTH(inx))
       Rf_error("coefficient rank(%d) does not match argument length(%d)", LENGTH(dim), LENGTH(inx));
@@ -877,7 +877,7 @@ SEXP R_havefftw(void) {
 #endif
 }
 
-// inplace to save memory, do repated multiplication instead of pow(). It's faster.
+// inplace to save memory, do repeated multiplication instead of pow(). It's faster.
 SEXP R_phifunc(SEXP Sx, SEXP Sk, SEXP Sthreads) {
   double k = Rf_asReal(Sk);
   double *x = REAL(Sx);
