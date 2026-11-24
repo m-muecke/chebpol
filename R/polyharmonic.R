@@ -23,18 +23,22 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     }
   }
 
-  if (is.na(normalize)) {
+  if (length(normalize) == 1L && is.na(normalize)) {
     normalize <- min(knots) < 0 || max(knots) > 1
-  } else if (length(normalize) == 2L) {
+  } else if (!is.matrix(normalize) && length(normalize) == 2L) {
     dim(normalize) <- c(1L, 2L)
+  }
+  if (!is.matrix(normalize) && length(normalize) != 1L) {
+    stop("normalize must be a logical, a vector c(a, b), or a matrix with two columns")
   }
   if (is.matrix(normalize)) {
     if (M %% nrow(normalize) != 0L || ncol(normalize) != 2L) {
-      stop("normalize must but be a n x 2 matrix with ", M, " divisible by n(", nrow(normalize), ")")
+      stop("normalize must be a n x 2 matrix with ", M, " divisible by n (", nrow(normalize), ")")
     }
     wa <- normalize[, 1L]
     wb <- normalize[, 2L]
     normfun <- function(x) wa * (x - wb)
+    knots <- normfun(knots)
     normalize <- TRUE
   } else if (normalize) {
     wa <- as.vector(1 / diff(apply(knots, 1L, range)))

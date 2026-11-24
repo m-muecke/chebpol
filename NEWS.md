@@ -15,6 +15,7 @@
 * `ipol()` interpolants created with `method = "simplexlinear"` no longer return `NaN` with `blend = "square"` or `blend = "sigmoid"`. Square blending now uses the value at the vertex with the largest barycentric coordinate, and coordinates are clamped to `[0, 1]` before blending. `NA` or `NaN` input now gives `NA` for every blend.
 * `ipol()` with `method = "fh"` now forwards extra arguments in `...` to the function being interpolated.
 * `ipol()` with `method = "simplexlinear"` now forwards extra arguments in `...` to the function being interpolated.
+* `ipol()` with `method = "polyharmonic"` accepts `normalize` as a vector `c(a, b)` or a two-column matrix again. Both forms failed with "the condition has length > 1" on R >= 4.2, and the knots were never transformed, so the fit did not match the evaluation.
 * `ipol()` with `method = "polyharmonic"` no longer drops extra arguments in `...` for the function being interpolated when neither `normalize` nor `nowarn` is given.
 * `ipol()` interpolants created with `method = "stalker"`, `"hstalker"` or `"simplexlinear"` now stop with an error when given a matrix with the wrong number of rows. Previously they returned values silently, and could read past the end of the input.
 * `ipol()` interpolants created with `method = "oldstalker"` now report both ranks when given input of the wrong dimension.

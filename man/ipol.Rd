@@ -79,7 +79,9 @@ polynomials. It defaults to 4.
 The method \code{"polyharmonic"} needs the arguments \code{knots} and
 \code{k}. In addition it can take the logical argument \code{normalize}
 for normalizing the knots to the unit hypercube. The default is \code{NA}, which
-uses normalization if any of the knots are outside the unit hypercube. Also, a logical
+uses normalization if any of the knots are outside the unit hypercube. \code{normalize} can also
+be a vector \code{c(a, b)}, or a matrix with columns \code{a} and \code{b} and one row per dimension, in which
+case each coordinate is transformed as \code{a * (x - b)}. Also, a logical
 \code{nowarn} is accepted, it is used to suppress a warning in case the system can't
 be solved exactly and a least squares fallback method is used.
 Fitting solves a dense linear system with one row and column per knot, so it

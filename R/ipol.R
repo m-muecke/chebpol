@@ -29,7 +29,9 @@
 #' The method `"polyharmonic"` needs the arguments `knots` and
 #' `k`. In addition it can take the logical argument `normalize`
 #' for normalizing the knots to the unit hypercube. The default is `NA`, which
-#' uses normalization if any of the knots are outside the unit hypercube. Also, a logical
+#' uses normalization if any of the knots are outside the unit hypercube. `normalize` can also
+#' be a vector `c(a, b)`, or a matrix with columns `a` and `b` and one row per dimension, in which
+#' case each coordinate is transformed as `a * (x - b)`. Also, a logical
 #' `nowarn` is accepted, it is used to suppress a warning in case the system can't
 #' be solved exactly and a least squares fallback method is used.
 #' Fitting solves a dense linear system with one row and column per knot, so it
