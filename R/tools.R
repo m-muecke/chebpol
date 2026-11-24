@@ -40,14 +40,14 @@ blenddef <- function(fun, blend = defaultblend) {
   blend <- match.arg(blend)
   pos <- match(blend, defaultblend)
   f <- formals(fun)
-  if (!("blend" %in% names(f))) {
+  if (!"blend" %in% names(f)) {
     return(f)
   }
   f[["blend"]] <- as.call(c(list(as.name("c")), c(defaultblend[pos], defaultblend[-pos])))
   formals(fun) <- f
   ffun <- get("fun", environment(fun))
   ff <- formals(ffun)
-  if (!("blend" %in% names(ff))) {
+  if (!"blend" %in% names(ff)) {
     return(fun)
   }
   ff[["blend"]] <- f[["blend"]]

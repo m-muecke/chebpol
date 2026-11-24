@@ -26,7 +26,7 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   }
 
   if (is.na(normalize)) {
-    normalize <- (min(knots) < 0) || (max(knots) > 1)
+    normalize <- min(knots) < 0 || max(knots) > 1
   } else if (length(normalize) == 2L) {
     dim(normalize) <- c(1L, 2L)
   }
