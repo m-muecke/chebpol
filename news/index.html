@@ -68,6 +68,8 @@
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "multilinear"</code> now return <code>NA</code> for <code>NA</code> or <code>NaN</code> input. Previously the evaluation never returned. <code><a href="../reference/ipol.html">ipol()</a></code> also stops with an error for a multilinear grid dimension with a single point, which was read out of bounds.</li>
 <li>
+<code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "simplexlinear"</code> no longer return <code>NaN</code> with <code>blend = "square"</code> or <code>blend = "sigmoid"</code>. Square blending now uses the value at the vertex with the largest barycentric coordinate, and coordinates are clamped to <code>[0, 1]</code> before blending. <code>NA</code> or <code>NaN</code> input now gives <code>NA</code> for every blend.</li>
+<li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "fh"</code> now forwards extra arguments in <code>...</code> to the function being interpolated.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "simplexlinear"</code> now forwards extra arguments in <code>...</code> to the function being interpolated.</li>

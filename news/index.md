@@ -31,6 +31,12 @@
   [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) also
   stops with an error for a multilinear grid dimension with a single
   point, which was read out of bounds.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  interpolants created with `method = "simplexlinear"` no longer return
+  `NaN` with `blend = "square"` or `blend = "sigmoid"`. Square blending
+  now uses the value at the vertex with the largest barycentric
+  coordinate, and coordinates are clamped to `[0, 1]` before blending.
+  `NA` or `NaN` input now gives `NA` for every blend.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "fh"` now forwards extra arguments in `...` to the function
   being interpolated.
