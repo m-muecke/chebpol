@@ -165,7 +165,7 @@ ipol <- function(
       if (is.null(blend)) {
         return(mlappx.real(val, grid, ...))
       }
-      newarg <- args[-match("blend", names(args), nomatch = 0L)]
+      newarg <- args[!names(args) %in% "blend"]
       blenddef(do.call(mlappx.real, c(list(val, grid), newarg)), blend)
     },
     simplexlinear = {
@@ -180,7 +180,7 @@ ipol <- function(
       if (is.null(blend)) {
         return(slappx.real(val, knots, ...))
       }
-      newarg <- args[-match("blend", names(args), nomatch = 0L)]
+      newarg <- args[!names(args) %in% "blend"]
       blenddef(do.call(slappx.real, c(list(val, knots), newarg)), blend)
     },
     fh = {
@@ -253,7 +253,7 @@ ipol <- function(
       if (is.null(nowarn)) {
         nowarn <- FALSE
       }
-      newarg <- args[-match(c("normalize", "nowarn"), names(args), nomatch = 0L)]
+      newarg <- args[!names(args) %in% c("normalize", "nowarn")]
       do.call(polyh.real, c(list(val, knots, k, normalize, nowarn), newarg))
     },
     oldstalker = {
@@ -274,7 +274,7 @@ ipol <- function(
       if (is.null(blend)) {
         return(oldstalkerappx(val, grid, r = k, ...))
       }
-      newarg <- args[-match("blend", names(args), nomatch = 0L)]
+      newarg <- args[!names(args) %in% "blend"]
       blenddef(do.call(oldstalkerappx, c(list(val, grid, r = k), newarg)), blend)
     },
     hstalker = {
@@ -292,7 +292,7 @@ ipol <- function(
       if (is.null(blend)) {
         return(hstalkerappx(val, grid, ...))
       }
-      newarg <- args[-match("blend", names(args), nomatch = 0L)]
+      newarg <- args[!names(args) %in% "blend"]
       blenddef(do.call(hstalkerappx, c(list(val, grid), newarg)), blend)
     },
     stalker = {
@@ -310,7 +310,7 @@ ipol <- function(
       if (is.null(blend)) {
         return(stalkerappx(val, grid, ...))
       }
-      newarg <- args[-match("blend", names(args), nomatch = 0L)]
+      newarg <- args[!names(args) %in% "blend"]
       blenddef(do.call(stalkerappx, c(list(val, grid), newarg)), blend)
     },
     crbf = {
@@ -342,7 +342,7 @@ ipol <- function(
       if (is.null(lambda)) {
         lambda <- 0
       }
-      newarg <- args[-match(c("rbase", "layers", "lambda"), names(args), nomatch = 0L)]
+      newarg <- args[!names(args) %in% c("rbase", "layers", "lambda")]
       do.call(rbf.alglib, c(list(val, knots, rbase, layers, lambda), newarg))
     },
     stop("Unknown interpolation method: ", method)

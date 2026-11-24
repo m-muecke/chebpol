@@ -16,3 +16,11 @@ test_that("polyharmonic splines approximate a smooth function", {
     expect_equal(phs(a), apply(a, 2, f), tolerance = 0.1)
   }
 })
+
+test_that("polyharmonic splines forward extra arguments to the function", {
+  withr::local_seed(42)
+  f <- function(x, a) a * sum(x^2)
+  knots <- matrix(runif(200, -1, 1), 2L)
+  phs <- ipol(f, knots = knots, method = "polyharmonic", a = 3)
+  expect_equal(phs(knots), apply(knots, 2L, f, a = 3))
+})

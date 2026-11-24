@@ -9,6 +9,7 @@
 
 * chebpol compiles again with current versions of R. FFTW is now found when it is installed outside the default include path.
 * `ipol()` with `method = "fh"` now forwards extra arguments in `...` to the function being interpolated.
+* `ipol()` with `method = "polyharmonic"` no longer drops extra arguments in `...` for the function being interpolated when neither `normalize` nor `nowarn` is given.
 * `ipol()` interpolants created with `method = "oldstalker"` now report both ranks when given input of the wrong dimension.
 
 ## Documentation
