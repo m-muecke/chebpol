@@ -13,5 +13,7 @@
   if (is.na(thr)) {
     thr <- 1L
   }
-  options(chebpol.threads = thr)
+  if (is.null(getOption("chebpol.threads"))) {
+    options(chebpol.threads = thr)
+  }
 }

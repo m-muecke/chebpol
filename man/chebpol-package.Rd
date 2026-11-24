@@ -18,8 +18,8 @@ dispatches to some other method.  All the generated
 \link{interpolant}s accept as an argument a matrix of column
 vectors. The generated functions also accept an argument
 \code{threads = getOption("chebpol.threads")} to utilize more than
-one CPU if a matrix of column vectors is evaluated.  The option
-\code{chebpol.threads} is initialized from the environment variable
+one CPU if a matrix of column vectors is evaluated.  Unless the option
+\code{chebpol.threads} is already set, it is initialized from the environment variable
 \code{CHEBPOL_THREADS} upon loading of the package. It defaults to \code{1}.
 
 The interpolants are ordinary R-objects and can be saved with \code{save()} and loaded

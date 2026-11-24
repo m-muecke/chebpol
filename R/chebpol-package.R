@@ -11,8 +11,8 @@
 #' [interpolant]s accept as an argument a matrix of column
 #' vectors. The generated functions also accept an argument
 #' `threads = getOption("chebpol.threads")` to utilize more than
-#' one CPU if a matrix of column vectors is evaluated.  The option
-#' `chebpol.threads` is initialized from the environment variable
+#' one CPU if a matrix of column vectors is evaluated.  Unless the option
+#' `chebpol.threads` is already set, it is initialized from the environment variable
 #' `CHEBPOL_THREADS` upon loading of the package. It defaults to `1`.
 #'
 #' The interpolants are ordinary R-objects and can be saved with `save()` and loaded
