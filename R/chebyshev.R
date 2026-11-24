@@ -233,7 +233,7 @@ chebappxg.real <- function(val, grid = NULL, mapdim = NULL) {
 
   intervals <- lapply(grid, range)
   # create monotone splines with splinefun, method hyman
-  gridmaps <- mapply(stats::splinefun, grid, chebknots(dim(val)), MoreArgs = list(method = "hyman"))
+  gridmaps <- Map(stats::splinefun, grid, chebknots(dim(val)), MoreArgs = list(method = "hyman"))
   gridmap <- function(x) {
     if (!is.matrix(x)) {
       return(mapply(\(gm, x) gm(x), gridmaps, x))
