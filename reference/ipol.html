@@ -145,11 +145,14 @@ which can use arbitrary Cartesian grids.
 The stalker spline
 is described in <code><a href="../articles/stalker.html">vignette("stalker", package = "chebpol")</a></code>. The Floater-Hormann
 method (<code>"fh"</code>) also needs the <code>k</code> argument, the degree of the blending
-polynomials. It defaults to 4.</p>
+polynomials. It defaults to 4. It must be between 0 and one less than the number of grid points in
+each dimension.</p>
 <p>The method <code>"polyharmonic"</code> needs the arguments <code>knots</code> and
 <code>k</code>. In addition it can take the logical argument <code>normalize</code>
 for normalizing the knots to the unit hypercube. The default is <code>NA</code>, which
-uses normalization if any of the knots are outside the unit hypercube. Also, a logical
+uses normalization if any of the knots are outside the unit hypercube. <code>normalize</code> can also
+be a vector <code>c(a, b)</code>, or a matrix with columns <code>a</code> and <code>b</code> and one row per dimension, in which
+case each coordinate is transformed as <code>a * (x - b)</code>. Also, a logical
 <code>nowarn</code> is accepted, it is used to suppress a warning in case the system can't
 be solved exactly and a least squares fallback method is used.
 Fitting solves a dense linear system with one row and column per knot, so it

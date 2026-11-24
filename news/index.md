@@ -15,6 +15,21 @@
 
 - chebpol compiles again with current versions of R. FFTW is now found
   when it is installed outside the default include path.
+- Integer input is now accepted everywhere a number is expected: the
+  points passed to an interpolant, the values, grids and knots passed to
+  [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md), the
+  grid in
+  [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md),
+  and the arguments of
+  [`chebcoef()`](https://m-muecke.github.io/chebpol/reference/chebcoef.md)
+  and
+  [`chebeval()`](https://m-muecke.github.io/chebpol/reference/chebeval.md).
+  Previously most of these failed with “REAL() can only be applied to a
+  ‘numeric’”.
+- [`chebeval()`](https://m-muecke.github.io/chebpol/reference/chebeval.md)
+  now works with `intervals` for a matrix of points, and for a single
+  interval given as a vector `c(a, b)`. Before, only a single point in
+  two or more dimensions was mapped correctly.
 - [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
   and [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   now accept functions that return integer or logical values, and stop
@@ -38,11 +53,27 @@
   coordinate, and coordinates are clamped to `[0, 1]` before blending.
   `NA` or `NaN` input now gives `NA` for every blend.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "fh"` now stops with an error when the degree `k` is
+  negative or not smaller than the number of grid points in a dimension.
+  Before, the interpolant returned `NaN` between the grid points.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "fh"` now forwards extra arguments in `...` to the function
   being interpolated.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "uniform"` now accepts a single interval given as a vector
+  `c(a, b)` together with values. It already did when given a function.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "simplexlinear"` now forwards extra arguments in `...` to
   the function being interpolated.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "polyharmonic"` accepts `normalize` as a vector `c(a, b)` or
+  a two-column matrix again. Both forms failed with “the condition has
+  length \> 1” on R \>= 4.2, and the knots were never transformed, so
+  the fit did not match the evaluation.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  interpolants created with `method = "polyharmonic"` now report the
+  range of the knots in their `domain` attribute. With normalization it
+  was the range after scaling, `[0, 1]`.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "polyharmonic"` no longer drops extra arguments in `...` for
   the function being interpolated when neither `normalize` nor `nowarn`

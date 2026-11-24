@@ -93,16 +93,20 @@ methods which can use arbitrary Cartesian grids. The stalker spline is
 described in
 [`vignette("stalker", package = "chebpol")`](https://m-muecke.github.io/chebpol/articles/stalker.md).
 The Floater-Hormann method (`"fh"`) also needs the `k` argument, the
-degree of the blending polynomials. It defaults to 4.
+degree of the blending polynomials. It defaults to 4. It must be between
+0 and one less than the number of grid points in each dimension.
 
 The method `"polyharmonic"` needs the arguments `knots` and `k`. In
 addition it can take the logical argument `normalize` for normalizing
 the knots to the unit hypercube. The default is `NA`, which uses
-normalization if any of the knots are outside the unit hypercube. Also,
-a logical `nowarn` is accepted, it is used to suppress a warning in case
-the system can't be solved exactly and a least squares fallback method
-is used. Fitting solves a dense linear system with one row and column
-per knot, so it becomes slow beyond a few thousand knots.
+normalization if any of the knots are outside the unit hypercube.
+`normalize` can also be a vector `c(a, b)`, or a matrix with columns `a`
+and `b` and one row per dimension, in which case each coordinate is
+transformed as `a * (x - b)`. Also, a logical `nowarn` is accepted, it
+is used to suppress a warning in case the system can't be solved exactly
+and a least squares fallback method is used. Fitting solves a dense
+linear system with one row and column per knot, so it becomes slow
+beyond a few thousand knots.
 
 The method `"simplexlinear"` needs the argument `knots`. It creates a
 Delaunay triangulation from the knots, and does linear interpolation in
