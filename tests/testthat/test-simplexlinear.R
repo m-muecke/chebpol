@@ -75,17 +75,45 @@ test_that("simplex linear blends reproduce values at the knots", {
   }
 })
 
-test_that("simplex linear blends give a value between the vertex values inside the hull", {
+test_that("square blending returns the value at the vertex with the largest barycentric coordinate", {
+  knots <- cbind(c(0, 0), c(1, 0), c(0, 1))
+  sl <- ipol(c(10, 20, 40), knots = knots, method = "simplexlinear")
+  x <- cbind(c(0.1, 0.1), c(0.3, 0.25), c(0.25, 0.45), c(0.7, 0.2))
+  expect_equal(sl(x, blend = "square"), c(10, 10, 40, 20))
+})
+
+test_that("simplex linear blends are finite on the edges of a grid triangulation", {
+  f <- function(x) exp(-sum(x^2))
+  grid <- list(seq(-1, 1, length.out = 5), seq(-1, 1, length.out = 5))
+  sl <- ipol(f, grid = grid, method = "simplexlinear")
+  x <- grid_points(list(seq(-1, 1, length.out = 9), seq(-1, 1, length.out = 9)))
+  for (blend in c("cubic", "linear", "sigmoid", "parodic", "square", "mean")) {
+    expect_equal(anyNA(sl(x, blend = blend)), FALSE)
+  }
+})
+
+test_that("simplex linear blends work in three dimensions", {
+  withr::local_seed(42)
+  f <- function(x) sum(x^2)
+  corners <- grid_points(list(c(-1, 1), c(-1, 1), c(-1, 1)))
+  knots <- cbind(matrix(runif(300, -1, 1), 3L), corners)
+  sl <- ipol(f, knots = knots, method = "simplexlinear")
+  x <- matrix(runif(900, -0.9, 0.9), 3L)
+  for (blend in c("cubic", "linear", "sigmoid", "parodic", "square")) {
+    expect_equal(sl(knots, blend = blend), apply(knots, 2L, f))
+  }
+  for (blend in c("cubic", "linear", "sigmoid", "parodic", "square", "mean")) {
+    expect_equal(anyNA(sl(x, blend = blend)), FALSE)
+  }
+})
+
+test_that("simplex linear interpolation returns NA for missing input", {
   withr::local_seed(42)
   f <- function(x) exp(-sum(x^2))
   knots <- cbind(matrix(runif(200, -1, 1), 2L), c(-1, -1), c(-1, 1), c(1, -1), c(1, 1))
   sl <- ipol(f, knots = knots, method = "simplexlinear")
-  x <- matrix(runif(2000, -0.9, 0.9), 2L)
-  values <- range(apply(knots, 2L, f))
+  x <- cbind(c(NaN, 0.1), c(0.1, NA), c(0.1, 0.2))
   for (blend in c("cubic", "linear", "sigmoid", "parodic", "square", "mean")) {
-    v <- sl(x, blend = blend)
-    expect_equal(anyNA(v), FALSE)
-    expect_gte(min(v), values[1L])
-    expect_lte(max(v), values[2L])
+    expect_equal(is.na(sl(x, blend = blend)), c(TRUE, TRUE, FALSE))
   }
 })

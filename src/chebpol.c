@@ -695,6 +695,10 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
                           const double *bbox, bool epol, const double *val, const int dim, const int numsimplex,
                           int nknots, blend_type blend) {
 
+  for (int i = 0; i < dim; i++)
+    if (ISNAN(x[i]))
+      return x[i];
+
   double vec[dim + 1];
   int N = dim + 1, one = 1, info;
   for (int simplex = 0; simplex < numsimplex; simplex++) {
@@ -728,21 +732,25 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
 
     // We found it
     const int *tri = dtri + simplex * N;
+    if (blend == BLEND_SQUARE) {
+      // the value at the vertex with the largest barycentric coordinate
+      int largest = 0;
+      for (int d = 1; d < N; d++)
+        if (vec[d] > vec[largest])
+          largest = d;
+      return val[tri[largest] - 1];
+    }
     double sum = 0;
     double wsum = 0;
-    int nearest = 0;
     for (int d = 0; d < N; d++) {
       // rounding can put a barycentric coordinate slightly outside [0, 1]
       const double coord = vec[d] < 0 ? 0 : (vec[d] > 1 ? 1 : vec[d]);
-      if (vec[d] > vec[nearest])
-        nearest = d;
       const double w = blendfun(coord, blend);
+      if (w == 0)
+        continue;
       wsum += w;
       sum += w * val[tri[d] - 1];
     }
-    // square blending gives every vertex weight 0 when no coordinate reaches 0.5
-    if (wsum == 0)
-      return val[tri[nearest] - 1];
     return sum / wsum;
   }
 
