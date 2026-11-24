@@ -149,37 +149,28 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
 }
 
 SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
-
-  SEXP dim;
-  int rank;
-  const int *dims;
-  int siz;
-  SEXP resvec;
-  int sdims;
   int threads = Rf_asInteger(Sthreads);
   if (!Rf_isLogical(sdct) || LENGTH(sdct) < 1)
     Rf_error("dct must be a logical");
   bool dct = LOGICAL_RO(sdct)[0];
-  dim = Rf_getAttrib(x, R_DimSymbol);
+  SEXP dim = Rf_getAttrib(x, R_DimSymbol);
   // If no dim-attribute, assume one-dimensional
-  if (Rf_isNull(dim)) {
-    sdims = LENGTH(x);
-    dims = &sdims;
-    rank = 1;
-
-  } else {
+  const int sdims = LENGTH(x);
+  int rank = 1;
+  const int *dims = &sdims;
+  if (!Rf_isNull(dim)) {
     rank = LENGTH(dim);
     if (rank <= 0)
       Rf_error("Rank must be positive");
     dims = INTEGER_RO(dim);
   }
-  siz = 1;
+  int siz = 1;
   for (int i = 0; i < rank; i++)
     siz *= dims[i];
   if (siz == 0)
     Rf_error("array size must be positive");
 
-  PROTECT(resvec = Rf_allocVector(REALSXP, siz));
+  SEXP resvec = PROTECT(Rf_allocVector(REALSXP, siz));
   chebcoef(REAL_RO(x), dims, rank, REAL(resvec), dct, threads);
   Rf_setAttrib(resvec, R_DimSymbol, dim);
   Rf_setAttrib(resvec, R_DimNamesSymbol, Rf_getAttrib(x, R_DimNamesSymbol));
@@ -231,19 +222,15 @@ static double FH(const double *fv, const double *x, const double **knots, const 
 }
 
 SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spare) {
-  const int *dims;
   int siz = 1;
   const double *val = REAL_RO(vals);
 #ifdef _OPENMP
   int threads = Rf_asInteger(Rthreads);
 #endif
-  SEXP dim;
-  int rank;
   UNUSED(spare);
-  // Create some pointers and stuff.
-  dim = Rf_getAttrib(vals, R_DimSymbol);
-  dims = INTEGER_RO(dim);
-  rank = LENGTH(dim);
+  SEXP dim = Rf_getAttrib(vals, R_DimSymbol);
+  const int *dims = INTEGER_RO(dim);
+  const int rank = LENGTH(dim);
   if (rank <= 0)
     Rf_error("rank must be positive");
   if (Rf_isMatrix(inx)) {
@@ -363,19 +350,15 @@ double C_evalcheb(const double *cf, const double *x, const int *dims, const int 
 }
 
 SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
-  const int *dims;
   int siz = 1;
   const double *cf = REAL_RO(coef);
 #ifdef _OPENMP
   int threads = Rf_asInteger(Rthreads);
 #endif
-  SEXP dim;
-  int rank;
   UNUSED(spare);
-  // Create some pointers and stuff.
-  dim = Rf_getAttrib(coef, R_DimSymbol);
-  dims = INTEGER_RO(dim);
-  rank = LENGTH(dim);
+  SEXP dim = Rf_getAttrib(coef, R_DimSymbol);
+  const int *dims = INTEGER_RO(dim);
+  const int rank = LENGTH(dim);
   if (rank <= 0)
     Rf_error("rank must be positive");
   if (Rf_isMatrix(inx)) {
@@ -458,7 +441,6 @@ SEXP R_evalpolyh(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, SE
 #ifdef _OPENMP
   int threads = Rf_asInteger(Sthreads);
 #endif
-  int numvec;
   const int rank = Rf_nrows(Sknots);
   UNUSED(spare);
   if (LENGTH(lweights) != rank + 1)
@@ -468,12 +450,11 @@ SEXP R_evalpolyh(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, SE
   if (Rf_isMatrix(inx)) {
     if (Rf_nrows(inx) != Rf_nrows(Sknots))
       Rf_error("Dimension of input (%d) must match dimension of interpolant (%d)", Rf_nrows(inx), Rf_nrows(Sknots));
-    numvec = Rf_ncols(inx);
   } else {
     if (Rf_length(inx) != Rf_nrows(Sknots))
       Rf_error("Dimension of input (%d) must match dimension of interpolant (%d)", Rf_length(inx), Rf_nrows(Sknots));
-    numvec = 1;
   }
+  const int numvec = Rf_isMatrix(inx) ? Rf_ncols(inx) : 1;
   SEXP res = PROTECT(Rf_allocVector(REALSXP, numvec));
   double *out = REAL(res);
   const int nknots = Rf_ncols(Sknots);
@@ -511,8 +492,8 @@ static void C_call(double *x, double *y, const int valuedim, void *userdata) {
   // x is not needed: the argument vector is already part of the call in userdata
   UNUSED(x);
   PROTECT_INDEX ipx;
-  SEXP fv;
-  PROTECT_WITH_INDEX(fv = Rf_eval(*(SEXP *)userdata, R_BaseEnv), &ipx);
+  SEXP fv = Rf_eval(*(SEXP *)userdata, R_BaseEnv);
+  PROTECT_WITH_INDEX(fv, &ipx);
   if (!Rf_isNumeric(fv))
     Rf_error("fun must return a numeric value");
   if (LENGTH(fv) != valuedim)
@@ -523,20 +504,13 @@ static void C_call(double *x, double *y, const int valuedim, void *userdata) {
 }
 
 SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
-  int rank = LENGTH(sgrid);
-  const double *grid[rank];
-  int *dims;
-  R_xlen_t len = 1.0;
-  SEXP resvec;
-  SEXP R_fcall;
-  SEXP R_arg;
-  SEXP R_dim;
-  int valuedim;
-
   if (!Rf_isFunction(fun))
     Rf_error("'fun' must be a function");
-  PROTECT(R_dim = Rf_allocVector(INTSXP, rank));
-  dims = INTEGER(R_dim);
+  const int rank = LENGTH(sgrid);
+  const double *grid[rank];
+  R_xlen_t len = 1;
+  SEXP R_dim = PROTECT(Rf_allocVector(INTSXP, rank));
+  int *dims = INTEGER(R_dim);
   for (int i = 0; i < rank; i++) {
     grid[i] = REAL_RO(VECTOR_ELT(sgrid, i));
     dims[i] = LENGTH(VECTOR_ELT(sgrid, i));
@@ -544,9 +518,9 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
   }
 
   // Create a call to fun
-  PROTECT(R_fcall = Rf_lang2(fun, R_NilValue));
+  SEXP R_fcall = PROTECT(Rf_lang2(fun, R_NilValue));
   // and an argument list to it
-  PROTECT(R_arg = Rf_allocVector(REALSXP, rank));
+  SEXP R_arg = PROTECT(Rf_allocVector(REALSXP, rank));
   SETCADR(R_fcall, R_arg);
 
   // find the dimension of the result
@@ -555,21 +529,19 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
   SEXP fv = Rf_eval(R_fcall, R_BaseEnv);
   if (!Rf_isNumeric(fv))
     Rf_error("fun must return a numeric value");
-  valuedim = LENGTH(fv);
+  const int valuedim = LENGTH(fv);
 
   // Now, it's just to fill in arg, and
   // do REAL(Rf_eval(R_fcall,NULL))[0]
-  PROTECT(resvec = Rf_allocVector(REALSXP, len * valuedim));
+  SEXP resvec = PROTECT(Rf_allocVector(REALSXP, len * valuedim));
   C_evalongrid(C_call, REAL(R_arg), grid, dims, rank, valuedim, REAL(resvec), (void *)&R_fcall);
 
   // Set the dim-attribute
   if (valuedim == 1) {
     Rf_setAttrib(resvec, R_DimSymbol, R_dim);
   } else {
-    SEXP snewdim;
-    int *newdim;
-    PROTECT(snewdim = Rf_allocVector(INTSXP, rank + 1));
-    newdim = INTEGER(snewdim);
+    SEXP snewdim = PROTECT(Rf_allocVector(INTSXP, rank + 1));
+    int *newdim = INTEGER(snewdim);
     newdim[0] = valuedim;
     for (int i = 1; i < rank + 1; i++)
       newdim[i] = dims[i - 1];
@@ -587,11 +559,9 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
 // if val > arr[n-1], we return n-1
 // this is suited for our particular application
 static inline int binsearch(const int n, const double *arr, const double val) {
-  int toosmall, toolarge, test;
-  toosmall = 0;
-  toolarge = n - 1;
+  int toosmall = 0, toolarge = n - 1;
   while (toosmall + 1 < toolarge) {
-    test = (toosmall + toolarge) >> 1;
+    const int test = (toosmall + toolarge) >> 1;
     if (arr[test] >= val) {
       toolarge = test;
     } else if (arr[test] < val) {
@@ -643,7 +613,6 @@ SEXP R_mlippred(SEXP sgrid, SEXP values) {
   int gridsize = 1;
   int dims[rank];
   const double *grid[rank];
-  SEXP resvec;
   if (!Rf_isReal(values))
     Rf_error("values must be numeric");
 
@@ -657,7 +626,7 @@ SEXP R_mlippred(SEXP sgrid, SEXP values) {
   if (LENGTH(values) != gridsize)
     Rf_error("grid has size %d, you supplied %d values", gridsize, LENGTH(values));
 
-  PROTECT(resvec = Rf_allocVector(REALSXP, gridsize));
+  SEXP resvec = PROTECT(Rf_allocVector(REALSXP, gridsize));
   (void)C_predmlip(rank, grid, dims, REAL_RO(values), REAL(resvec));
   UNPROTECT(1);
   return resvec;
@@ -989,13 +958,13 @@ SEXP R_phifunc(SEXP Sx, SEXP Sk, SEXP Sthreads) {
 #ifdef _OPENMP
   int threads = Rf_asInteger(Sthreads);
 #endif
-  double *y;
-  SEXP res;
-  if (XLENGTH(Sx) == 1 && x[0] == 0.0)
+  if (n == 1 && x[0] == 0.0)
     return Rf_ScalarReal((k < 0) ? 1 : 0);
 
+  double *y;
+  SEXP res;
   if (MAYBE_REFERENCED(Sx)) {
-    res = PROTECT(Rf_allocVector(REALSXP, XLENGTH(Sx)));
+    res = PROTECT(Rf_allocVector(REALSXP, n));
     y = REAL(res);
   } else {
     res = Sx;
