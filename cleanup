@@ -1,3 +1,2 @@
 #!/bin/sh
-rm -rf src/Makevars config.* aclocal.m4 autom4te.cache
-
+rm -rf src/Makevars src/config.h config.* aclocal.m4 autom4te.cache

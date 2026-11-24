@@ -1,6 +1,4 @@
-#ifndef _WIN32
-// win taken care of by compiler flags
+// Generated into config.h by configure. Not used on Windows, see Makevars.win.
 #undef HAVE_FFTW
 #undef HAVE_ALGLIB
 #undef HAVE_GSL
-#endif

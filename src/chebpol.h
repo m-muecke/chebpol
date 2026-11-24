@@ -14,7 +14,10 @@
 #include <R_ext/Lapack.h>
 #include <R_ext/Applic.h>
 #include <R_ext/Visibility.h>
+// On Windows configure is not run; Makevars.win sets the HAVE_ macros instead.
+#ifndef _WIN32
 #include "config.h"
+#endif
 
 #ifndef FCONE
 #define FCONE
