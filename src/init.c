@@ -32,9 +32,9 @@ static const R_CallMethodDef CallEntries[] = {
 void attribute_visible R_init_chebpol(DllInfo *dll) {
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
-  R_RegisterCCallable("chebpol", "evalcheb", (DL_FUNC)C_evalcheb);
-  R_RegisterCCallable("chebpol", "evalmlip", (DL_FUNC)C_evalmlip);
-  R_RegisterCCallable("chebpol", "evalongrid", (DL_FUNC)C_evalongrid);
+  R_RegisterCCallable("chebpol", "evalcheb", (DL_FUNC)&C_evalcheb);
+  R_RegisterCCallable("chebpol", "evalmlip", (DL_FUNC)&C_evalmlip);
+  R_RegisterCCallable("chebpol", "evalongrid", (DL_FUNC)&C_evalongrid);
 }
 
 #ifdef HAVE_FFTW
