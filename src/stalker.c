@@ -399,8 +399,8 @@ static void makestalk(const int nrank, const int *dims, const double **grid, con
     stride *= dims[i];
   }
 }
-double evalstalk(const double *x, const int nrank, const int *dims, const double **grid, const double *val, int blend,
-                 const double *b, const double *c, const double *r) {
+static double evalstalk(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
+                        int blend, const double *b, const double *c, const double *r) {
   // loop over the corners of the hypercube surrounding x.
   // For each corner, evaluate the function there.
   // Make weighted sum.
@@ -571,8 +571,8 @@ static void makehyp(const int nrank, const int *dims, const double **grid, const
   }
 }
 
-double evalhyp(const double *x, const int nrank, const int *dims, const double **grid, const double *val, int blend,
-               const double *a, const double *b, const double *c, const double *d) {
+static double evalhyp(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
+                      int blend, const double *a, const double *b, const double *c, const double *d) {
   // loop over the corners of the hypercube surrounding x.
   // For each corner, evaluate the function there.
   // Make weighted sum.
@@ -650,8 +650,8 @@ double evalhyp(const double *x, const int nrank, const int *dims, const double *
   return V / sumw;
 }
 
-double evalstalker(const double *x, const int nrank, const int *dims, const double **grid, const double *val, int blend,
-                   const double *degree, precomp *pcomp) {
+static double evalstalker(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
+                          int blend, const double *degree, precomp *pcomp) {
 
   if (nrank == 0)
     return val[0];

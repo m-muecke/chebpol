@@ -392,8 +392,8 @@ SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
   return resvec;
 }
 
-double C_evalpolyh(const double *x, const double *knots, const double *weights, const double *lweights, const int rank,
-                   const int nknots, const double k) {
+static double C_evalpolyh(const double *x, const double *knots, const double *weights, const double *lweights,
+                          const int rank, const int nknots, const double k) {
   // Find squared distance to each knot
   int ki = (int)k;
   double wsum = 0.0;
