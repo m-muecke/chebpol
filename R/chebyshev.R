@@ -34,9 +34,7 @@ chebknots1 <- function(n, interval = NULL) {
 #' # Multivariate knots
 #' chebknots(c(x = 3, y = 4, z = 3))
 #' # Multivariate grid
-#' \dontrun{
-#'   expand.grid(chebknots(c(x = 3, y = 4, z = 5), list(c(1, 3), c(4, 6), c(800, 900))))
-#' }
+#' head(expand.grid(chebknots(c(x = 3, y = 4, z = 5), list(c(1, 3), c(4, 6), c(800, 900)))))
 #' @export
 chebknots <- function(dims, intervals = NULL) {
   if (is.null(intervals)) {
@@ -120,13 +118,11 @@ chebcoef <- function(val, dct = FALSE) {
 #' # make a lower degree also
 #' ch2 <- ipol(f, dims = 10, method = "chebyshev")
 #' # plot the functions
-#' \dontrun{
-#'   s <- seq(-1, 1, length.out = 400)
-#'   plot(s, ch(s), col = "red", type = "l")
-#'   lines(s, tch(s), col = "blue")
-#'   lines(s, f(s))
-#'   lines(s, ch2(s), col = "green")
-#' }
+#' s <- seq(-1, 1, length.out = 400)
+#' plot(s, ch(s), col = "red", type = "l")
+#' lines(s, tch(s), col = "blue")
+#' lines(s, f(s))
+#' lines(s, ch2(s), col = "green")
 #' @export
 chebeval <- function(x, coef, intervals = NULL, threads = getOption("chebpol.threads")) {
   if (is.integer(x) || is.logical(x)) {
