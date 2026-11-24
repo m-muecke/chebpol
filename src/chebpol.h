@@ -1,11 +1,12 @@
 #ifndef _CHEBPOL
 #define _CHEBPOL
+#ifndef R_NO_REMAP
 #define R_NO_REMAP
+#endif
 #ifndef USE_FC_LEN_T
 #define USE_FC_LEN_T
 #endif
 #include <float.h>
-#include <math.h>
 #include <Rmath.h>
 #include <R.h>
 #include <Rinternals.h>
