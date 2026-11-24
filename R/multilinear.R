@@ -2,7 +2,7 @@ mlappx.real <- function(val, grid, ...) {
   if (is.numeric(grid)) {
     grid <- list(grid)
   }
-  if (any(vapply(grid, is.unsorted, logical(1)))) {
+  if (any(vapply(grid, is.unsorted, logical(1L)))) {
     if (!is.function(val)) {
       stop("Grid points must be ordered in increasing order")
     }

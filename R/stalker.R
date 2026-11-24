@@ -14,7 +14,7 @@ oldstalkerappx <- function(val, grid, r = 2, ...) {
     grid <- list(grid)
   }
   grid <- lapply(grid, as.numeric)
-  if (any(vapply(grid, is.unsorted, logical(1)))) {
+  if (any(vapply(grid, is.unsorted, logical(1L)))) {
     if (!is.function(val)) {
       stop("Grid points must be ordered in increasing order")
     }
@@ -29,10 +29,10 @@ oldstalkerappx <- function(val, grid, r = 2, ...) {
   }
 
   r <- rep_len(as.numeric(r), length(grid))
-  uniform <- vapply(grid, \(g) all(abs(diff(g, differences = 2L)) < 1e-8), logical(1))
+  uniform <- vapply(grid, \(g) all(abs(diff(g, differences = 2L)) < 1e-8), logical(1L))
   # precompute distance between grid points
   dmin <- lapply(grid, \(gr) c(NaN, diff(gr)))
-  dplus <- lapply(dmin, \(dd) c(dd[-1], NaN))
+  dplus <- lapply(dmin, \(dd) c(dd[-1L], NaN))
   val <- as.numeric(val)
   stalker <- c(list(val = val, grid = grid), stalkercontext(dmin, dplus, r, grid), uniform = list(uniform))
 
@@ -67,7 +67,7 @@ hstalkerappx <- function(val, grid, ...) {
     grid <- list(grid)
   }
   grid <- lapply(grid, as.numeric)
-  if (any(vapply(grid, is.unsorted, logical(1)))) {
+  if (any(vapply(grid, is.unsorted, logical(1L)))) {
     if (!is.function(val)) {
       stop("Grid points must be ordered in increasing order")
     }
@@ -96,7 +96,7 @@ stalkerappx <- function(val, grid, ...) {
     grid <- list(grid)
   }
   grid <- lapply(grid, as.numeric)
-  if (any(vapply(grid, is.unsorted, logical(1)))) {
+  if (any(vapply(grid, is.unsorted, logical(1L)))) {
     if (!is.function(val)) {
       stop("Grid points must be ordered in increasing order")
     }

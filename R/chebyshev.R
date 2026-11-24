@@ -3,8 +3,8 @@
 # The Chebyshev knots of order n on an interval
 chebknots1 <- function(n, interval = NULL) {
   kn <- cos(pi * (seq_len(n) - 0.5) / n)
-  if ((n %% 2) == 1) {
-    kn[[(n + 1) / 2]] <- 0
+  if (n %% 2L == 1L) {
+    kn[[(n + 1L) %/% 2L]] <- 0
   }
   if (is.null(interval)) {
     return(kn)
@@ -42,7 +42,7 @@ chebknots <- function(dims, intervals = NULL) {
   if (is.null(intervals)) {
     res <- lapply(dims, chebknots1)
   } else {
-    if (length(dims) == 1 && is.numeric(intervals)) {
+    if (length(dims) == 1L && is.numeric(intervals)) {
       intervals <- list(intervals)
     }
     if (!is.list(intervals)) {
@@ -129,7 +129,7 @@ chebeval <- function(x, coef, intervals = NULL, threads = getOption("chebpol.thr
     return(.Call(C_evalcheb, coef, x, threads, NULL))
   }
   # map into intervals
-  .Call(C_evalcheb, coef, mapply(\(x, i) 2 * (x[[1]] - mean(i)) / diff(i), x, intervals), threads, NULL)
+  .Call(C_evalcheb, coef, mapply(\(x, i) 2 * (x[[1L]] - mean(i)) / diff(i), x, intervals), threads, NULL)
 }
 
 # return a function which is a Chebyshev interpolation
@@ -141,7 +141,7 @@ chebappx.real <- function(val, intervals = NULL) {
   }
   K <- length(dim(val))
   # allow for vector, e.g. intervals=c(0,1), put it inside list
-  if (is.numeric(intervals) && length(intervals) == 2) {
+  if (is.numeric(intervals) && length(intervals) == 2L) {
     intervals <- list(intervals)
   }
   cf <- chebcoef(val)
@@ -159,14 +159,14 @@ chebappx.real <- function(val, intervals = NULL) {
     if (!is.list(intervals)) {
       stop("intervals should be a list")
     }
-    if (any(lengths(intervals) != 2)) {
+    if (any(lengths(intervals) != 2L)) {
       stop("interval elements should have length 2")
     }
     if (length(intervals) != length(dim(val))) {
       stop("values should have the same dimension as intervals ", length(intervals), " ", length(dim(val)))
     }
-    ispan <- vapply(intervals, \(x) 2 / diff(x), numeric(1))
-    mid <- vapply(intervals, mean, numeric(1))
+    ispan <- vapply(intervals, \(x) 2 / diff(x), numeric(1L))
+    mid <- vapply(intervals, mean, numeric(1L))
     imap <- function(x) (x - mid) * ispan
 
     fun <- vectorfun(
@@ -225,7 +225,7 @@ chebappxg.real <- function(val, grid = NULL, mapdim = NULL) {
     if (!is.matrix(x)) {
       return(mapply(\(gm, x) gm(x), gridmaps, x))
     }
-    apply(x, 2, \(x) mapply(\(gm, x) gm(x), gridmaps, x))
+    apply(x, 2L, \(x) mapply(\(gm, x) gm(x), gridmaps, x))
   }
   ch <- chebappx.real(val)
   vectorfun(

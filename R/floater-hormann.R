@@ -1,6 +1,6 @@
 # General grids, Floater-Hormann
 
-fhappx.real <- function(val, grid = NULL, d = 1, ...) {
+fhappx.real <- function(val, grid = NULL, d = 1L, ...) {
   if (is.null(grid)) {
     stop("Must specify grid")
   }

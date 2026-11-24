@@ -4,22 +4,22 @@ vectorfun <- function(fun, arity, domain = NULL) {
     mc <- match.call(expand.dots = TRUE)
     mc[[1L]] <- quote(list)
     arglist <- eval.parent(mc)
-    x <- arglist[[1]]
+    x <- arglist[[1L]]
     if (is.matrix(x) || length(x) == arity) {
       return(do.call(fun, arglist))
     }
-    if (arity == 1) {
-      arglist[[1]] <- matrix(x, 1)
+    if (arity == 1L) {
+      arglist[[1L]] <- matrix(x, 1L)
       return(do.call(fun, arglist))
     }
     # try to coerce argument to matrix
-    if (length(x) %% arity == 0) {
+    if (length(x) %% arity == 0L) {
       numvec <- length(x) / arity
-      if (numvec > 1) {
+      if (numvec > 1L) {
         warning(sprintf("Coercing vector of length %d into %dx%d matrix", length(x), arity, numvec))
       }
       dim(x) <- c(arity, numvec)
-      arglist[[1]] <- x
+      arglist[[1L]] <- x
       do.call(fun, arglist)
     } else {
       stop(sprintf("Function should take %d arguments, you supplied a vector of length %d", arity, length(x)))
@@ -61,7 +61,7 @@ separgs <- function(fun, ...) {
     mc[[1L]] <- quote(list)
     arg <- eval.parent(mc)
     nn <- lengths(arg)
-    if (all(nn == 1)) {
+    if (all(nn == 1L)) {
       return(fun(as.numeric(arg)))
     }
     fun(do.call(rbind, arg))
@@ -155,7 +155,7 @@ evalongridV <- function(fun, dims, intervals = NULL, ..., grid = NULL) {
     grid <- chebknots(dims, intervals)
   }
   fun <- match.fun(fun)
-  structure(fun(t(expand.grid(grid)), ...), dim = if (length(grid) > 1) lengths(grid) else NULL)
+  structure(fun(t(expand.grid(grid)), ...), dim = if (length(grid) > 1L) lengths(grid) else NULL)
 }
 
 #' Check whether chebpol uses FFTW

@@ -1,15 +1,15 @@
 rbf.alglib <- function(val, knots, rbase = 2, layers = 5, lambda = 0, ...) {
   if (is.null(dim(knots))) {
-    dim(knots) <- c(1, length(knots))
+    dim(knots) <- c(1L, length(knots))
   }
   if (is.function(val)) {
-    val <- apply(knots, 2, val, ...)
+    val <- apply(knots, 2L, val, ...)
   }
   model <- .Call(C_makerbf, rbind(knots, val), layers, rbase, lambda)
   vectorfun(
     function(x, threads = getOption("chebpol.threads")) .Call(C_evalrbf, model, x, threads),
     arity = nrow(knots),
-    domain = data.frame(apply(knots, 1, range))
+    domain = data.frame(apply(knots, 1L, range))
   )
 }
 

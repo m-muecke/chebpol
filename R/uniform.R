@@ -20,7 +20,7 @@ ucappx.real <- function(val, intervals = NULL) {
     gridmap <- function(x) mapply(\(xi, mid, is, d) ugm(is * (xi - mid), d), x, md, ispan, dims)
   }
   gm <- function(x) {
-    if (is.matrix(x)) apply(x, 2, gridmap) else gridmap(x)
+    if (is.matrix(x)) apply(x, 2L, gridmap) else gridmap(x)
   }
   vectorfun(
     function(x, threads = getOption("chebpol.threads")) ch(gm(x), threads),
@@ -33,7 +33,7 @@ ucappxf.real <- function(fun, dims, intervals = NULL, ...) {
   if (is.null(intervals)) {
     return(ucappx.real(evalongrid(fun, ..., grid = lapply(dims, \(d) seq(-1, 1, length.out = d)))))
   }
-  if (is.numeric(intervals) && length(intervals) == 2) {
+  if (is.numeric(intervals) && length(intervals) == 2L) {
     intervals <- list(intervals)
   }
   ucappx.real(

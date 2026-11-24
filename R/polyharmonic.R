@@ -10,10 +10,10 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   # https://www-user.tu-chemnitz.de/~potts/nfft/fastsum.php
   # Likewise its interpolation applications which I don't understand yet.
   if (is.null(dim(knots))) {
-    dim(knots) <- c(1, length(knots))
+    dim(knots) <- c(1L, length(knots))
   }
   if (is.function(val)) {
-    val <- apply(knots, 2, val, ...)
+    val <- apply(knots, 2L, val, ...)
   }
   N <- ncol(knots)
   M <- nrow(knots)
@@ -31,16 +31,16 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     dim(normalize) <- 1:2
   }
   if (is.matrix(normalize)) {
-    if (M %% nrow(normalize) != 0 || ncol(normalize) != 2) {
+    if (M %% nrow(normalize) != 0L || ncol(normalize) != 2L) {
       stop("normalize must but be a n x 2 matrix with ", M, " divisible by n(", nrow(normalize), ")")
     }
-    wa <- normalize[, 1]
-    wb <- normalize[, 2]
+    wa <- normalize[, 1L]
+    wb <- normalize[, 2L]
     normfun <- function(x) wa * (x - wb)
     normalize <- TRUE
   } else if (normalize) {
-    wa <- as.vector(1 / diff(apply(knots, 1, range)))
-    wb <- apply(knots, 1, min)
+    wa <- as.vector(1 / diff(apply(knots, 1L, range)))
+    wb <- apply(knots, 1L, min)
     normfun <- function(x) wa * (x - wb)
     knots <- normfun(knots)
     normalize <- TRUE
@@ -70,10 +70,10 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   } else {
     mat <- matrix(0, nrow(A) + nrow(B), nrow(A) + nrow(B))
     mat[seq_len(nrow(A)), seq_len(ncol(A))] <- A
-    mat[(nrow(A) + 1):nrow(mat), seq_len(ncol(B))] <- B
-    mat[seq_len(ncol(B)), (ncol(A) + 1):ncol(mat)] <- t(B)
+    mat[(nrow(A) + 1L):nrow(mat), seq_len(ncol(B))] <- B
+    mat[seq_len(ncol(B)), (ncol(A) + 1L):ncol(mat)] <- t(B)
     #    mat <- cbind(rbind(A,B),rbind(t(B),matrix(0,M+1,M+1)))
-    rhs <- c(val, rep(0, M + 1))
+    rhs <- c(val, rep(0, M + 1L))
     wv <- try(solve(mat, rhs), silent = TRUE)
     if (inherits(wv, "try-error")) {
       if (!nowarn) {
@@ -86,13 +86,13 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
       wv[is.na(wv)] <- 0
     }
     w <- wv[seq_len(N)]
-    v <- wv[(N + 1):length(wv)]
+    v <- wv[(N + 1L):length(wv)]
     rm(mat, rhs, wv)
   }
   rm(A, B)
   vectorfun(
     function(x, threads = getOption("chebpol.threads")) .Call(C_evalpolyh, normfun(x), knots, w, v, k, threads, NULL),
     arity = M,
-    domain = data.frame(apply(knots, 1, range))
+    domain = data.frame(apply(knots, 1L, range))
   )
 }

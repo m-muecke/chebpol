@@ -165,7 +165,7 @@ ipol <- function(
       if (is.null(blend)) {
         return(mlappx.real(val, grid, ...))
       }
-      newarg <- args[-match("blend", names(args), nomatch = 0)]
+      newarg <- args[-match("blend", names(args), nomatch = 0L)]
       blenddef(do.call(mlappx.real, c(list(val, grid), newarg)), blend)
     },
     simplexlinear = {
@@ -180,7 +180,7 @@ ipol <- function(
       if (is.null(blend)) {
         return(slappx.real(val, knots, ...))
       }
-      newarg <- args[-match("blend", names(args), nomatch = 0)]
+      newarg <- args[-match("blend", names(args), nomatch = 0L)]
       blenddef(do.call(slappx.real, c(list(val, knots), newarg)), blend)
     },
     fh = {
@@ -195,7 +195,7 @@ ipol <- function(
       }
       grid <- lapply(grid, as.numeric)
       if (is.null(k)) {
-        k <- pmin(4, lengths(grid) - 1)
+        k <- pmin(4L, lengths(grid) - 1L)
       }
       fhappx.real(val, grid, d = k, ...)
     },
@@ -253,7 +253,7 @@ ipol <- function(
       if (is.null(nowarn)) {
         nowarn <- FALSE
       }
-      newarg <- args[-match(c("normalize", "nowarn"), names(args), nomatch = 0)]
+      newarg <- args[-match(c("normalize", "nowarn"), names(args), nomatch = 0L)]
       do.call(polyh.real, c(list(val, knots, k, normalize, nowarn), newarg))
     },
     oldstalker = {
@@ -274,7 +274,7 @@ ipol <- function(
       if (is.null(blend)) {
         return(oldstalkerappx(val, grid, r = k, ...))
       }
-      newarg <- args[-match("blend", names(args), nomatch = 0)]
+      newarg <- args[-match("blend", names(args), nomatch = 0L)]
       blenddef(do.call(oldstalkerappx, c(list(val, grid, r = k), newarg)), blend)
     },
     hstalker = {
@@ -292,7 +292,7 @@ ipol <- function(
       if (is.null(blend)) {
         return(hstalkerappx(val, grid, ...))
       }
-      newarg <- args[-match("blend", names(args), nomatch = 0)]
+      newarg <- args[-match("blend", names(args), nomatch = 0L)]
       blenddef(do.call(hstalkerappx, c(list(val, grid), newarg)), blend)
     },
     stalker = {
@@ -310,23 +310,23 @@ ipol <- function(
       if (is.null(blend)) {
         return(stalkerappx(val, grid, ...))
       }
-      newarg <- args[-match("blend", names(args), nomatch = 0)]
+      newarg <- args[-match("blend", names(args), nomatch = 0L)]
       blenddef(do.call(stalkerappx, c(list(val, grid), newarg)), blend)
     },
     crbf = {
       if (is.null(knots)) {
         stop("Must specify knots for radial basis functions.")
       }
-      if (length(args) == 0) {
+      if (length(args) == 0L) {
         # old interface
         if (is.null(k)) {
           rbase <- 2
-          layers <- 5
+          layers <- 5L
           lambda <- 0
         } else {
-          rbase <- k[1]
-          layers <- k[2]
-          lambda <- k[3]
+          rbase <- k[1L]
+          layers <- k[2L]
+          lambda <- k[3L]
         }
         return(rbf.alglib(val, knots, rbase, layers, lambda))
       }
@@ -342,7 +342,7 @@ ipol <- function(
       if (is.null(lambda)) {
         lambda <- 0
       }
-      newarg <- args[-match(c("rbase", "layers", "lambda"), names(args), nomatch = 0)]
+      newarg <- args[-match(c("rbase", "layers", "lambda"), names(args), nomatch = 0L)]
       do.call(rbf.alglib, c(list(val, knots, rbase, layers, lambda), newarg))
     },
     stop("Unknown interpolation method: ", method)
@@ -350,5 +350,5 @@ ipol <- function(
 }
 
 unsortedgrid <- function(g) {
-  any(vapply(g, \(s) is.unsorted(s, strictly = TRUE) && is.unsorted(-s, strictly = TRUE), logical(1)))
+  any(vapply(g, \(s) is.unsorted(s, strictly = TRUE) && is.unsorted(-s, strictly = TRUE), logical(1L)))
 }
