@@ -54,7 +54,6 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     eval.parent(as.call(list(quote(.Call), C_phifunc, substitute(x), k, getOption("chebpol.threads"))))
   }
 
-  #A <- phi(apply(knots,2, function(ck) colSums((ck-knots)^2)))
   # one day I will look into a faster solver,
   A <- phi(.Call(C_sqdiffs, knots, knots, getOption("chebpol.threads")))
   B <- rbind(1, knots)
@@ -62,7 +61,6 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   mat[seq_len(nrow(A)), seq_len(ncol(A))] <- A
   mat[(nrow(A) + 1L):nrow(mat), seq_len(ncol(B))] <- B
   mat[seq_len(ncol(B)), (ncol(A) + 1L):ncol(mat)] <- t(B)
-  #    mat <- cbind(rbind(A,B),rbind(t(B),matrix(0,M+1,M+1)))
   rhs <- c(val, rep(0, M + 1L))
   wv <- try(solve(mat, rhs), silent = TRUE)
   if (inherits(wv, "try-error")) {

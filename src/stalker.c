@@ -85,7 +85,6 @@ static R_INLINE double findmonor(double dmin, double dplus, double vmin, double 
       r = 1;
     if (status != GSL_SUCCESS) {
       // I need to think about what to do here. We're in openmp, so can't do R-calls.
-      //      printf("No convergence\n");
     }
     gsl_root_fsolver_free(s);
   }
@@ -143,12 +142,10 @@ static R_INLINE double solver(double kmin, double kplus, double vmin, double vpl
       r = gsl_root_fsolver_root(s);
       double lo = gsl_root_fsolver_x_lower(s);
       double hi = gsl_root_fsolver_x_upper(s);
-      //      printf("iter %d %.4f < %.4f < %.4f\n",iter,lo,r,hi);
       status = gsl_root_test_interval(lo, hi, 0, 1e-8);
     } while (status == GSL_CONTINUE && iter < 50);
     if (status != GSL_SUCCESS) {
       // I need to think about what to do here. We're in openmp, so can't do R-calls.
-      //      printf("No convergence, r=%.2f\n",r);
     }
     gsl_root_fsolver_free(s);
   }
@@ -158,9 +155,6 @@ static R_INLINE double solver(double kmin, double kplus, double vmin, double vpl
 
 // hyperbolic stalker
 static R_INLINE double stalkhyp(double x, double vmin, double vplus, double dmin, double dplus) {
-  //  double iD = 1.0/(dmin*pow(dplus,r) + pow(dmin,r)*dplus);
-  //  double b = (vplus*pow(dmin,r) - vmin*pow(dplus,r))*iD;
-  //  double c = (vplus*dmin + vmin*dplus)*iD;
   if (fabs(x - dplus) < 1e3 * DBL_EPSILON * dplus)
     return vplus;
   if (fabs(x + dmin) < 1e3 * DBL_EPSILON * dmin)
@@ -202,9 +196,6 @@ static R_INLINE double stalkhyp(double x, double vmin, double vplus, double dmin
 static R_INLINE double stalk1(double x, double vmin, double v0, double vplus, double dmin, double dplus, double r,
                               double iD, double powmin, double powplus, bool uniform) {
   double b, c;
-  //  double iD = 1.0/(dmin*pow(dplus,r) + pow(dmin,r)*dplus);
-  //  double b = (vplus*pow(dmin,r) - vmin*pow(dplus,r))*iD;
-  //  double c = (vplus*dmin + vmin*dplus)*iD;
   // Do linear end points
 
   if (isnan(vmin))
@@ -433,7 +424,6 @@ static double evalstalk(const double *x, const int nrank, const int *dims, const
     }
     if (cw == 0.0)
       continue;
-    //    cw = blendfun(cw,blend);
     // Nice. Now 'corner' is the index into our arrays
     // Find b, c, and r for the corner. These have stride 'nrank'
     const double *bb = &b[nrank * corner], *cc = &c[nrank * corner], *rr = &r[nrank * corner];
@@ -452,7 +442,6 @@ static double evalstalk(const double *x, const int nrank, const int *dims, const
       }
     }
     // That's the function value. The weight is in cw
-    //    printf("corner %d fval %.2f weight %.2f\n",corner,fval,cw);
     sumw += cw;
     V += cw * fval;
   }
@@ -605,7 +594,6 @@ static double evalhyp(const double *x, const int nrank, const int *dims, const d
     }
     if (cw == 0.0)
       continue;
-    //    cw = blendfun(cw,blend);
     // Nice. Now 'corner' is the index into our arrays
     // Find a, b, c, and d for the corner. These have stride 'nrank'
     const double *bb = &b[nrank * corner], *cc = &c[nrank * corner], *dd = &d[nrank * corner];
@@ -624,7 +612,6 @@ static double evalhyp(const double *x, const int nrank, const int *dims, const d
       }
     }
     // That's the function value. The weight is in cw
-    //    printf("corner %d fval %.2f weight %.2f\n",corner,fval,cw);
     sumw += cw;
     V += cw * fval;
   }
@@ -640,7 +627,6 @@ static double evalstalker(const double *x, const int nrank, const int *dims, con
   const double *gr = grid[newrank];
   const int N = dims[newrank];
   const double xx = x[newrank];
-  //  double *rdet = det[newrank], *rpmin = pmin[newrank], *rpplus = pplus[newrank];
   const double *rdet = pcomp[newrank].det, *rpmin = pcomp[newrank].pmin, *rpplus = pcomp[newrank].pplus;
   bool uniform = pcomp[newrank].uniform;
   int stride = 1;
@@ -690,8 +676,6 @@ static double evalstalker(const double *x, const int nrank, const int *dims, con
   // map into normalized coordinates
   const double nx = (xx - gr[imin]) / (gr[imin + 1] - gr[imin]);
   double w = 1 - nx;
-  //  if(imin == 0) w = 0;  // no basis in the end points
-  //  if(imin == N-2) w = 1;
 
   if (w == 0)
     return high;
@@ -786,7 +770,6 @@ SEXP R_makehyp(SEXP Sval, SEXP Sgrid) {
 
 SEXP R_evalstalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   const double *x = REAL_RO(Sx);
-  // const int K = Rf_nrows(Sx);
   const int N = Rf_ncols(Sx);
   int blend = INTEGER_RO(Sblend)[0];
 #ifdef _OPENMP
@@ -821,7 +804,6 @@ SEXP R_evalstalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
 
 SEXP R_evalhyp(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   const double *x = REAL_RO(Sx);
-  // const int K = Rf_nrows(Sx);
   const int N = Rf_ncols(Sx);
   int blend = INTEGER_RO(Sblend)[0];
 #ifdef _OPENMP

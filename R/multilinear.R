@@ -16,9 +16,6 @@ mlappx.real <- function(val, grid, ...) {
     stop("length of values ", length(val), " do not match size of grid ", gl)
   }
   val <- as.numeric(val)
-  #  if(adjust!=0) {
-  #    val <- val + (val - .Call(C_predmlip,grid,as.numeric(val)))*adjust
-  #  }
   vectorfun(
     function(x, threads = getOption("chebpol.threads"), blend = c("linear", "cubic", "sigmoid", "parodic", "square")) {
       blend <- switch(match.arg(blend), linear = 0L, sigmoid = 1L, parodic = 2L, cubic = 3L, square = 4L)

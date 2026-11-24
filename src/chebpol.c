@@ -125,8 +125,6 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
       dest = p;
 
       F77_CALL(dgemm)("TRANS", "TRANS", &N, &stride, &N, &alpha, mat[i], &N, src, &stride, &beta, dest, &N FCONE FCONE);
-      // Fix the first element in each vector, nah do it at the end
-      //    for(int k = 0; k < siz; k+= N) dest[k] *= 0.5;
     }
 #ifdef HAVE_FFTW
   }
@@ -582,7 +580,6 @@ static void C_predmlip(const int rank, const double **grid, const int *dims, con
       } else
         break;
     }
-    //    printf("j %d: ",j);for(int i = 0; i < rank; i++) printf("%d ",dim[i]); printf("\n");
     double pred = 0;
     int w = 0;
     for (int i = 0; i < rank; i++) {
