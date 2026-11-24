@@ -174,28 +174,9 @@ static R_INLINE double stalkhyp(double x, double vmin, double vplus, double dmin
     double a, c;
     if (fabs(vmin - vplus) < 1e3 * DBL_EPSILON)
       return 0;
-#if 1
     c = (vmin * dplus + vplus * dmin) / (dmin * dplus * (vmin - vplus));
     a = vplus + vplus / (c * dplus);
     return a - a / (1 + c * x);
-#else
-    // Alternatively, make one of the end points have zero derivative
-    double b;
-    double D = vplus * dmin + vmin * dplus;
-    double D2hi = dplus * dplus * vmin + dmin * dmin * vplus + 2 * dplus * dmin * vplus;
-    double D2lo = dplus * dplus * vmin + dmin * dmin * vplus + 2 * dplus * dmin * vmin;
-    if (sign(D * vplus) < 0) {
-      // choose zero derivative in dplus:
-      a = vplus * (dplus + dmin) * (dplus + dmin) * D * D / (D2hi * D2hi);
-      b = vplus * dmin * (vplus - vmin) / D2hi;
-      c = -D2hi / (dmin * dplus * dplus * (vplus - vmin));
-    } else {
-      a = vmin * (dplus + dmin) * (dplus + dmin) * D * D / (D2lo * D2lo);
-      b = vmin * dplus * (vplus - vmin) / D2lo;
-      c = -D2lo / (dmin * dmin * dplus * (vplus - vmin));
-    }
-    return a + b * x - a / (1 + c * x);
-#endif
   } else {
     // non-monotonic
     double D = dplus * dplus * vmin - dmin * dmin * vplus;

@@ -200,7 +200,6 @@ static double FH(const double *fv, const double *x, const double **knots, const 
       return FH(&fv[i * siz], x, knots, dims, newrank, weights);
   }
 
-#if 1
   // save a recursion step
   if (newrank == 0) {
     for (int i = 0; i < N; i++) {
@@ -211,7 +210,6 @@ static double FH(const double *fv, const double *x, const double **knots, const 
     }
     return num / denom;
   }
-#endif
   for (int i = 0, j = 0; i < N; i++, j += siz) {
     const double val = FH(&fv[j], x, knots, dims, newrank, weights);
     double pole = w[i] / (xx - kn[i]);
@@ -328,7 +326,6 @@ double C_evalcheb(const double *cf, const double *x, const int *dims, const int 
   const int N = dims[newrank];
   double x2 = 2.0 * x[newrank], bn1 = 0, bn2 = 0, bn = 0;
 
-#if 1
   // semantically unnecessary, just save a recursion level, it speeds up things.
   if (newrank == 0) {
     for (int i = N - 1; i > 0; i--) {
@@ -338,7 +335,6 @@ double C_evalcheb(const double *cf, const double *x, const int *dims, const int 
     }
     return x[0] * bn - bn1 + cf[0];
   }
-#endif
   for (int i = 0; i < newrank; i++)
     siz *= dims[i];
   for (int i = N - 1, j = siz * (N - 1); i >= 0; i--, j -= siz) {
@@ -376,11 +372,7 @@ SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
 
   const double *xp = REAL_RO(inx);
   const int numvec = Rf_isMatrix(inx) ? Rf_ncols(inx) : 1;
-#ifdef RETMAT
-  SEXP resvec = PROTECT(Rf_allocMatrix(REALSXP, numvec, 1));
-#else
   SEXP resvec = PROTECT(Rf_allocVector(REALSXP, numvec));
-#endif
   double *out = REAL(resvec);
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
@@ -714,11 +706,7 @@ SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
     blend = Rf_asInteger(Sblend);
   const int numvec = Rf_isMatrix(x) ? Rf_ncols(x) : 1;
   const double *xp = REAL_RO(x);
-#ifdef RETMAT
-  SEXP resvec = PROTECT(Rf_allocMatrix(REALSXP, numvec, 1));
-#else
   SEXP resvec = PROTECT(Rf_allocVector(REALSXP, numvec));
-#endif
   double *out = REAL(resvec);
   const double *val = REAL_RO(values);
 #ifdef _OPENMP
