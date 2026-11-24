@@ -3,6 +3,11 @@
 
 # chebpol
 
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/m-muecke/chebpol/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/m-muecke/chebpol/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 ## Overview
 
 chebpol creates interpolating functions for multivariate functions, from
