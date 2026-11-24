@@ -26,13 +26,13 @@ produced.  If \code{dims} is of length 1, \code{intervals} may be a vector
 of length 2 rather than a list with a vector of length 2.
 }
 \examples{
-## Standard knots for degree 3
+# Standard knots for degree 3
 chebknots(4)
-## Knots in the interval [2,3] for degree 3
+# Knots in the interval [2,3] for degree 3
 chebknots(4, interval = c(2, 3))
-## Multivariate knots
+# Multivariate knots
 chebknots(c(x = 3, y = 4, z = 3))
-## Multivariate grid
+# Multivariate grid
 \dontrun{
   expand.grid(chebknots(c(x = 3, y = 4, z = 5), list(c(1, 3), c(4, 6), c(800, 900))))
 }

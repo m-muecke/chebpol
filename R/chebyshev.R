@@ -27,13 +27,13 @@ chebknots1 <- function(n, interval = NULL) {
 #' of the hypercube.
 #' @return A array of dimension `dims`.  The Chebyshev grid-points.
 #' @examples
-#' ## Standard knots for degree 3
+#' # Standard knots for degree 3
 #' chebknots(4)
-#' ## Knots in the interval [2,3] for degree 3
+#' # Knots in the interval [2,3] for degree 3
 #' chebknots(4, interval = c(2, 3))
-#' ## Multivariate knots
+#' # Multivariate knots
 #' chebknots(c(x = 3, y = 4, z = 3))
-#' ## Multivariate grid
+#' # Multivariate grid
 #' \dontrun{
 #'   expand.grid(chebknots(c(x = 3, y = 4, z = 5), list(c(1, 3), c(4, 6), c(800, 900))))
 #' }
@@ -77,7 +77,7 @@ chebknots <- function(dims, intervals = NULL) {
 #' Chebyshev-polynomial.
 #' @seealso [havefftw()]
 #' @examples
-#' ## Coefficients for a 2x3x4 grid
+#' # Coefficients for a 2x3x4 grid
 #' a <- array(rnorm(24), dim = c(2, 3, 4))
 #' chebcoef(a)
 #' @export

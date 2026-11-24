@@ -99,19 +99,19 @@ compile time. It takes the extra arguments \code{"rbase"}, \code{"layers"}, and
 There are also some usage examples and more in \code{vignette("chebpol")} and \code{vignette("chebusage")}.
 }
 \examples{
-## evenly spaced grid-points
+# evenly spaced grid-points
 su <- seq(0, 1, length.out = 10)
-## irregularly spaced grid-points
+# irregularly spaced grid-points
 s <- su^3
-## create approximation on the irregularly spaced grid
+# create approximation on the irregularly spaced grid
 ml1 <- ipol(exp, grid = list(s), method = "multilin")
 fh1 <- ipol(exp, grid = list(s), method = "fh")
-## test it, since exp is convex, the linear approximation lies above
-## the exp between the grid points
+# test it, since exp is convex, the linear approximation lies above
+# the exp between the grid points
 ml1(su) - exp(su)
 fh1(su) - exp(su)
 
-## multi dimensional approximation
+# multi dimensional approximation
 f <- function(x) 10 / (1 + 25 * mean(x^2))
 # a 3-dimensional 10x10x10 grid, first and third coordinate are non-uniform
 grid <- list(s, su, sort(1 - s))

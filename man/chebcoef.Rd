@@ -33,7 +33,7 @@ If \pkg{chebpol} was compiled without \acronym{FFTW}, running
 \code{chebcoef} on large grids may be slow and memory-demanding.
 }
 \examples{
-## Coefficients for a 2x3x4 grid
+# Coefficients for a 2x3x4 grid
 a <- array(rnorm(24), dim = c(2, 3, 4))
 chebcoef(a)
 }
