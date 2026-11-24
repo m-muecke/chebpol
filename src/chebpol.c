@@ -561,66 +561,6 @@ static inline int binsearch(const int n, const double *arr, const double val) {
   return toolarge;
 }
 
-static void C_predmlip(const int rank, const double **grid, const int *dims, const double *values, double *output) {
-  int stride[rank + 1];
-  stride[0] = 1;
-  for (int i = 1; i <= rank; ++i)
-    stride[i] = dims[i - 1] * stride[i - 1];
-  int N = stride[rank];
-  int dim[rank];
-  for (int i = 0; i < rank; ++i) {
-    dim[i] = 0;
-  }
-  /* Loop over entire grid. For each point, predict it as the mean of all its immediate neighbours. */
-  for (int j = 0; j < N; j++, dim[0]++) {
-    for (int i = 0; i < rank - 1; i++) {
-      if (dim[i] >= dims[i]) {
-        dim[i] -= dims[i];
-        dim[i + 1]++;
-      } else
-        break;
-    }
-    double pred = 0;
-    int w = 0;
-    for (int i = 0; i < rank; i++) {
-      if (dim[i] <= 0 || dim[i] + 1 >= dims[i])
-        continue;
-      const double *gr = grid[i];
-      double r = (gr[dim[i]] - gr[dim[i] - 1]) / (gr[dim[i] + 1] - gr[dim[i] - 1]);
-      w++;
-      pred += r * values[j + stride[i]] + (1 - r) * values[j - stride[i]];
-    }
-    if (w == 0)
-      output[j] = values[j];
-    else
-      output[j] = pred / w;
-  }
-}
-
-SEXP R_mlippred(SEXP sgrid, SEXP values) {
-  int rank = LENGTH(sgrid);
-  int gridsize = 1;
-  int dims[rank];
-  const double *grid[rank];
-  if (!Rf_isReal(values))
-    Rf_error("values must be numeric");
-
-  /* Make some pointers into the grid data */
-  for (int i = 0; i < rank; i++) {
-    dims[i] = LENGTH(VECTOR_ELT(sgrid, i));
-    grid[i] = REAL_RO(VECTOR_ELT(sgrid, i));
-    gridsize *= dims[i];
-  }
-
-  if (LENGTH(values) != gridsize)
-    Rf_error("grid has size %d, you supplied %d values", gridsize, LENGTH(values));
-
-  SEXP resvec = PROTECT(Rf_allocVector(REALSXP, gridsize));
-  (void)C_predmlip(rank, grid, dims, REAL_RO(values), REAL(resvec));
-  UNPROTECT(1);
-  return resvec;
-}
-
 double C_evalmlip(const int rank, const double *x, const double **grid, const int *dims, const double *values,
                   int blend) {
 

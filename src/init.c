@@ -10,7 +10,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"FH", (DL_FUNC)&R_FH, 6},
     {"FHweights", (DL_FUNC)&R_fhweights, 3},
     {"evalmlip", (DL_FUNC)&R_evalmlip, 5},
-    {"predmlip", (DL_FUNC)&R_mlippred, 2},
     {"evalongrid", (DL_FUNC)&R_evalongrid, 2},
     {"havefftw", (DL_FUNC)&R_havefftw, 0},
     {"sqdiffs", (DL_FUNC)&R_sqdiffs, 3},

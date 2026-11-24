@@ -31,7 +31,6 @@ SEXP R_chebcoef(SEXP, SEXP, SEXP);
 SEXP R_FH(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP R_fhweights(SEXP, SEXP, SEXP);
 SEXP R_evalmlip(SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP R_mlippred(SEXP, SEXP);
 SEXP R_evalongrid(SEXP, SEXP);
 SEXP R_havefftw(void);
 SEXP R_sqdiffs(SEXP, SEXP, SEXP);
