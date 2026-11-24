@@ -1,9 +1,12 @@
 Package: chebpol
 Title: Multivariate Interpolation
 Version: 2.1-2.9000
-Authors@R: 
-    person("Simen", "Gaure", , "Simen.Gaure@frisch.uio.no", role = c("aut", "cre"),
+Authors@R: c(
+    person("Maximilian", "Mücke", , "muecke.maximilian@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0000-9432-9795")),
+    person("Simen", "Gaure", , "Simen.Gaure@frisch.uio.no", role = c("aut", "cph"),
            comment = c(ORCID = "https://orcid.org/0000-0001-7251-8747"))
+  )
 Description: Contains methods for creating multivariate/multidimensional
     interpolations of functions on a hypercube. If available through
     fftw3, the DCT-II/FFT is used to compute coefficients for a Chebyshev
@@ -16,12 +19,12 @@ Description: Contains methods for creating multivariate/multidimensional
 License: Artistic-2.0
 URL: https://github.com/sgaure/chebpol
 BugReports: https://github.com/sgaure/chebpol/issues
-Depends: 
+Depends:
     R (>= 4.1.0)
-Imports: 
+Imports:
     geometry,
     stats
-Suggests: 
+Suggests:
     cubature,
     knitr,
     lattice,

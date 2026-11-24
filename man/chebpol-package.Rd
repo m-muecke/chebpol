@@ -95,11 +95,12 @@ rbind(true = apply(m, 2, f), cheb = ch(m), fh = fh(m))
 \link{ipol}, \link{interpolant}
 }
 \author{
-\strong{Maintainer}: Simen Gaure \email{Simen.Gaure@frisch.uio.no} (\href{https://orcid.org/0000-0001-7251-8747}{ORCID})
+\strong{Maintainer}: Maximilian Mücke \email{muecke.maximilian@gmail.com} (\href{https://orcid.org/0009-0000-9432-9795}{ORCID})
 
 Authors:
 \itemize{
-  \item Simen Gaure \email{Simen.Gaure@frisch.uio.no} (\href{https://orcid.org/0000-0001-7251-8747}{ORCID})
+  \item Maximilian Mücke \email{muecke.maximilian@gmail.com} (\href{https://orcid.org/0009-0000-9432-9795}{ORCID})
+  \item Simen Gaure \email{Simen.Gaure@frisch.uio.no} (\href{https://orcid.org/0000-0001-7251-8747}{ORCID}) [copyright holder]
 }
 
 }
