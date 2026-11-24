@@ -48,7 +48,7 @@ chebknots <- function(dims, intervals = NULL) {
     if (!is.list(intervals)) {
       stop("intervals should be a list")
     }
-    res <- mapply(chebknots1, dims, intervals, SIMPLIFY = FALSE)
+    res <- Map(chebknots1, dims, intervals)
   }
 
   res
@@ -151,7 +151,7 @@ chebappx.real <- function(val, intervals = NULL) {
     fun <- vectorfun(
       function(x, threads = getOption("chebpol.threads")) .Call(C_evalcheb, cf, x, threads, NULL),
       arity = K,
-      domain = lapply(rep(-1, K), c, 1)
+      domain = rep(list(c(-1, 1)), K)
     )
     rm(val)
   } else {

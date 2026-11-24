@@ -1,11 +1,8 @@
 # Precompute some values used in the stalker evaluation
-stalkercontext <- function(dmin, dplus, r, grid) {
-  rank <- seq_along(dmin)
-  powmin <- lapply(rank, \(i) dmin[[i]]^r[[i]])
-  powplus <- lapply(rank, \(i) dplus[[i]]^r[[i]])
-  det <- lapply(rank, function(i) {
-    1 / (dmin[[i]] * powplus[[i]] + dplus[[i]] * powmin[[i]])
-  })
+stalkercontext <- function(dmin, dplus, r) {
+  powmin <- Map(`^`, dmin, r)
+  powplus <- Map(`^`, dplus, r)
+  det <- Map(\(dm, dp, pm, pp) 1 / (dm * pp + dp * pm), dmin, dplus, powmin, powplus)
   list(det = det, pmin = powmin, pplus = powplus)
 }
 
@@ -34,7 +31,7 @@ oldstalkerappx <- function(val, grid, r = 2, ...) {
   dmin <- lapply(grid, \(gr) c(NaN, diff(gr)))
   dplus <- lapply(dmin, \(dd) c(dd[-1L], NaN))
   val <- as.numeric(val)
-  stalker <- c(list(val = val, grid = grid), stalkercontext(dmin, dplus, r, grid), uniform = list(uniform))
+  stalker <- c(list(val = val, grid = grid), stalkercontext(dmin, dplus, r), uniform = list(uniform))
 
   if (!havegsl() && any(is.na(r) & !uniform)) {
     stop("Non-uniform grid and varying degree needs GSL. Recompile with GSL.")
@@ -53,7 +50,7 @@ oldstalkerappx <- function(val, grid, r = 2, ...) {
         if (!havegsl() && any(is.na(degree) & !uniform)) {
           stop("Non-uniform grid and varying degree needs GSL. Recompile with GSL.")
         }
-        stalker <- c(list(val = val, grid = grid), stalkercontext(dmin, dplus, degree, grid), uniform = list(uniform))
+        stalker <- c(list(val = val, grid = grid), stalkercontext(dmin, dplus, degree), uniform = list(uniform))
       }
       .Call(C_evalstalker, x, stalker, degree, as.integer(blend), as.integer(threads))
     },

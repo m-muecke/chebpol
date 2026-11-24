@@ -194,9 +194,7 @@ ipol <- function(
         stop("grid must be distinct ordered values")
       }
       grid <- lapply(grid, as.numeric)
-      if (is.null(k)) {
-        k <- pmin(4L, lengths(grid) - 1L)
-      }
+      k <- k %||% pmin(4L, lengths(grid) - 1L)
       fhappx.real(val, grid, d = k, ...)
     },
     uniform = {
@@ -239,20 +237,12 @@ ipol <- function(
           stop("Must specify knots for polyharmonic splines.")
         }
       }
-      if (is.null(k)) {
-        k <- 3
-      }
+      k <- k %||% 3
       # Now, ... may contain normalize and nowarn in addition to
       # arguments to val if it is a function
       # peel off normalize and nowarn
-      normalize <- args[["normalize"]]
-      if (is.null(normalize)) {
-        normalize <- NA
-      }
-      nowarn <- args[["nowarn"]]
-      if (is.null(nowarn)) {
-        nowarn <- FALSE
-      }
+      normalize <- args[["normalize"]] %||% NA
+      nowarn <- args[["nowarn"]] %||% FALSE
       newarg <- args[!names(args) %in% c("normalize", "nowarn")]
       do.call(polyh.real, c(list(val, knots, k, normalize, nowarn), newarg))
     },
@@ -267,9 +257,7 @@ ipol <- function(
         stop("grid must be distinct ordered values")
       }
       grid <- lapply(grid, as.numeric)
-      if (is.null(k)) {
-        k <- 2
-      }
+      k <- k %||% 2
       blend <- args[["blend"]]
       if (is.null(blend)) {
         return(oldstalkerappx(val, grid, r = k, ...))
@@ -330,18 +318,9 @@ ipol <- function(
         }
         return(rbf.alglib(val, knots, rbase, layers, lambda))
       }
-      rbase <- args[["rbase"]]
-      if (is.null(rbase)) {
-        rbase <- 2
-      }
-      layers <- args[["layers"]]
-      if (is.null(layers)) {
-        layers <- 5L
-      }
-      lambda <- args[["lambda"]]
-      if (is.null(lambda)) {
-        lambda <- 0
-      }
+      rbase <- args[["rbase"]] %||% 2
+      layers <- args[["layers"]] %||% 5L
+      lambda <- args[["lambda"]] %||% 0
       newarg <- args[!names(args) %in% c("rbase", "layers", "lambda")]
       do.call(rbf.alglib, c(list(val, knots, rbase, layers, lambda), newarg))
     },

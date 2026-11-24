@@ -28,7 +28,7 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   if (is.na(normalize)) {
     normalize <- (min(knots) < 0) || (max(knots) > 1)
   } else if (length(normalize) == 2L) {
-    dim(normalize) <- 1:2
+    dim(normalize) <- c(1L, 2L)
   }
   if (is.matrix(normalize)) {
     if (M %% nrow(normalize) != 0L || ncol(normalize) != 2L) {
@@ -58,37 +58,26 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   # one day I will look into a faster solver,
   A <- phi(.Call(C_sqdiffs, knots, knots, getOption("chebpol.threads")))
   B <- rbind(1, knots)
-  if (FALSE) {
-    # Outta https://mathematica.stackexchange.com/questions/65763/understanding-polyharmonic-splines
-    B <- t(B)
-    Ai <- solve(A)
-    v <- solve(crossprod(B, Ai %*% B), crossprod(B, Ai %*% val))
-    w <- Ai %*% (val - B %*% v)
-    #
-    #    v <- solve(crossprod(B,solve(A,B)), crossprod(B,solve(A, val)))
-    #    w <- solve(A,val - B %*% v)
-  } else {
-    mat <- matrix(0, nrow(A) + nrow(B), nrow(A) + nrow(B))
-    mat[seq_len(nrow(A)), seq_len(ncol(A))] <- A
-    mat[(nrow(A) + 1L):nrow(mat), seq_len(ncol(B))] <- B
-    mat[seq_len(ncol(B)), (ncol(A) + 1L):ncol(mat)] <- t(B)
-    #    mat <- cbind(rbind(A,B),rbind(t(B),matrix(0,M+1,M+1)))
-    rhs <- c(val, rep(0, M + 1L))
-    wv <- try(solve(mat, rhs), silent = TRUE)
-    if (inherits(wv, "try-error")) {
-      if (!nowarn) {
-        warning(
-          "Failed to fit exactly, fallback to least squares fit.",
-          if (!normalize) " You could try normalize=TRUE." else ""
-        )
-      }
-      wv <- stats::lm.fit(mat, rhs)$coefficients
-      wv[is.na(wv)] <- 0
+  mat <- matrix(0, nrow(A) + nrow(B), nrow(A) + nrow(B))
+  mat[seq_len(nrow(A)), seq_len(ncol(A))] <- A
+  mat[(nrow(A) + 1L):nrow(mat), seq_len(ncol(B))] <- B
+  mat[seq_len(ncol(B)), (ncol(A) + 1L):ncol(mat)] <- t(B)
+  #    mat <- cbind(rbind(A,B),rbind(t(B),matrix(0,M+1,M+1)))
+  rhs <- c(val, rep(0, M + 1L))
+  wv <- try(solve(mat, rhs), silent = TRUE)
+  if (inherits(wv, "try-error")) {
+    if (!nowarn) {
+      warning(
+        "Failed to fit exactly, fallback to least squares fit.",
+        if (!normalize) " You could try normalize=TRUE." else ""
+      )
     }
-    w <- wv[seq_len(N)]
-    v <- wv[(N + 1L):length(wv)]
-    rm(mat, rhs, wv)
+    wv <- stats::lm.fit(mat, rhs)$coefficients
+    wv[is.na(wv)] <- 0
   }
+  w <- wv[seq_len(N)]
+  v <- wv[(N + 1L):length(wv)]
+  rm(mat, rhs, wv)
   rm(A, B)
   vectorfun(
     function(x, threads = getOption("chebpol.threads")) .Call(C_evalpolyh, normfun(x), knots, w, v, k, threads, NULL),

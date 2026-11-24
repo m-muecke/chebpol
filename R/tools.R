@@ -29,6 +29,8 @@ vectorfun <- function(fun, arity, domain = NULL) {
   structure(f, arity = arity, domain = as.data.frame(domain), chebpol.version = utils::packageVersion("chebpol"))
 }
 
+`%||%` <- function(x, y) if (is.null(x)) y else x
+
 defaultblend <- c("linear", "cubic", "sigmoid", "parodic", "square", "mean")
 
 blenddef <- function(fun, blend = defaultblend) {

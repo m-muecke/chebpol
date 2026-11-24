@@ -25,7 +25,7 @@ ucappx.real <- function(val, intervals = NULL) {
   vectorfun(
     function(x, threads = getOption("chebpol.threads")) ch(gm(x), threads),
     arity = length(dims),
-    domain = if (is.null(intervals)) lapply(rep(-1, length(dim(val))), c, 1) else intervals
+    domain = if (is.null(intervals)) rep(list(c(-1, 1)), length(dim(val))) else intervals
   )
 }
 
@@ -40,7 +40,7 @@ ucappxf.real <- function(fun, dims, intervals = NULL, ...) {
     evalongrid(
       fun,
       ...,
-      grid = mapply(\(d, i) seq(min(i), max(i), length.out = d), dims, intervals, SIMPLIFY = FALSE)
+      grid = Map(\(d, i) seq(min(i), max(i), length.out = d), dims, intervals)
     ),
     intervals
   )
