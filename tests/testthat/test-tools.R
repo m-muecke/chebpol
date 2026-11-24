@@ -27,3 +27,8 @@ test_that("evalongrid() errors when the function value is not usable", {
     evalongrid(growing, 4)
   })
 })
+
+test_that("evalongrid() accepts an integer grid", {
+  f <- function(x) sum(x^2)
+  expect_equal(evalongrid(f, grid = list(0:4, 0:3)), evalongrid(f, grid = list(seq(0, 4), seq(0, 3))))
+})

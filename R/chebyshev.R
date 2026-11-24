@@ -82,8 +82,12 @@ chebknots <- function(dims, intervals = NULL) {
 #' chebcoef(a)
 #' @export
 chebcoef <- function(val, dct = FALSE) {
+  val <- as.array(val)
+  if (is.integer(val) || is.logical(val)) {
+    storage.mode(val) <- "double"
+  }
   structure(
-    .Call(C_chebcoef, as.array(val), dct, getOption("chebpol.threads")),
+    .Call(C_chebcoef, val, dct, getOption("chebpol.threads")),
     dimnames = dimnames(val)
   )
 }
@@ -125,6 +129,12 @@ chebcoef <- function(val, dct = FALSE) {
 #' }
 #' @export
 chebeval <- function(x, coef, intervals = NULL, threads = getOption("chebpol.threads")) {
+  if (is.integer(x) || is.logical(x)) {
+    storage.mode(x) <- "double"
+  }
+  if (is.integer(coef) || is.logical(coef)) {
+    storage.mode(coef) <- "double"
+  }
   if (is.null(intervals)) {
     return(.Call(C_evalcheb, coef, x, threads, NULL))
   }

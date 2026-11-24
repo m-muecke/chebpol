@@ -138,6 +138,12 @@ ipol <- function(
 ) {
   method <- match.arg(method)
   args <- list(...)
+  if (is.integer(val)) {
+    storage.mode(val) <- "double"
+  }
+  if (is.integer(knots)) {
+    storage.mode(knots) <- "double"
+  }
   switch(
     method,
     chebyshev = {
@@ -176,7 +182,7 @@ ipol <- function(
     simplexlinear = {
       if (is.null(knots)) {
         if (!is.null(grid)) {
-          knots <- t(expand.grid(grid))
+          knots <- t(expand.grid(lapply(grid, as.numeric)))
         } else {
           stop("knots must be specified for simplex linear interpolation")
         }
@@ -237,7 +243,7 @@ ipol <- function(
     polyharmonic = {
       if (is.null(knots)) {
         if (!is.null(grid)) {
-          knots <- t(expand.grid(grid))
+          knots <- t(expand.grid(lapply(grid, as.numeric)))
         } else {
           stop("Must specify knots for polyharmonic splines.")
         }

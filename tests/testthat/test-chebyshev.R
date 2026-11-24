@@ -58,3 +58,11 @@ test_that("general grid interpolation approximates a smooth function", {
   r <- runif(50)
   expect_equal(ch(r), exp(r), tolerance = 0.05)
 })
+
+test_that("chebcoef() and chebeval() accept integer input", {
+  values <- array(seq_len(20), c(5L, 4L))
+  coef <- chebcoef(values + 0)
+  expect_equal(chebcoef(values), coef)
+  expect_equal(chebeval(c(0L, 1L), coef), chebeval(c(0, 1), coef))
+  expect_equal(chebeval(c(0.1, 0.2), values), chebeval(c(0.1, 0.2), values + 0))
+})

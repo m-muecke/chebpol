@@ -5,6 +5,10 @@ vectorfun <- function(fun, arity, domain = NULL) {
     mc[[1L]] <- quote(list)
     arglist <- eval.parent(mc)
     x <- arglist[[1L]]
+    if (is.integer(x) || is.logical(x)) {
+      storage.mode(x) <- "double"
+      arglist[[1L]] <- x
+    }
     if (is.matrix(x) || length(x) == arity) {
       return(do.call(fun, arglist))
     }
@@ -141,7 +145,7 @@ evalongrid <- function(fun, dims, intervals = NULL, ..., grid = NULL) {
     grid <- chebknots(dims, intervals)
   }
   mf <- match.fun(fun)
-  .Call(C_evalongrid, \(x) mf(x, ...), grid)
+  .Call(C_evalongrid, \(x) mf(x, ...), lapply(grid, as.numeric))
 }
 
 #' @rdname evalongrid
