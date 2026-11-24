@@ -7,6 +7,7 @@
 #define USE_FC_LEN_T
 #endif
 #include <float.h>
+#include <stdbool.h>
 #include <Rmath.h>
 #include <R.h>
 #include <Rinternals.h>

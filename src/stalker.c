@@ -15,7 +15,7 @@ typedef struct {
 } sblock;
 typedef struct {
   const double *det, *pmin, *pplus;
-  int uniform;
+  bool uniform;
 } precomp;
 
 // Index i of the grid interval [xt[i], xt[i + 1]) that holds x, clamped to 0 .. n - 2.
@@ -219,7 +219,7 @@ static R_INLINE double stalkhyp(double x, double vmin, double vplus, double dmin
 
 // Variable degree stalker spline
 static R_INLINE double stalk1(double x, double vmin, double v0, double vplus, double dmin, double dplus, double r,
-                              double iD, double powmin, double powplus, int uniform) {
+                              double iD, double powmin, double powplus, bool uniform) {
   double b, c;
   //  double iD = 1.0/(dmin*pow(dplus,r) + pow(dmin,r)*dplus);
   //  double b = (vplus*pow(dmin,r) - vmin*pow(dplus,r))*iD;
@@ -352,7 +352,7 @@ static void makestalk(const int nrank, const int *dims, const double **grid, con
       double vmin = val[index - stride] - v0;
       double kplus = gr[idx + 1] - gr[idx];
       double kmin = gr[idx - 1] - gr[idx];
-      int uniform = fabs(kplus + kmin) < MYEPS * kplus;
+      bool uniform = fabs(kplus + kmin) < MYEPS * kplus;
       double r;
 
       // If non-monotonic, simulate monotonic by changing sign on vmin when computing r
@@ -661,7 +661,7 @@ double evalstalker(const double *x, const int nrank, const int *dims, const doub
   const double xx = x[newrank];
   //  double *rdet = det[newrank], *rpmin = pmin[newrank], *rpplus = pplus[newrank];
   const double *rdet = pcomp[newrank].det, *rpmin = pcomp[newrank].pmin, *rpplus = pcomp[newrank].pplus;
-  int uniform = pcomp[newrank].uniform;
+  bool uniform = pcomp[newrank].uniform;
   int stride = 1;
   for (int r = 0; r < newrank; r++)
     stride *= dims[r];

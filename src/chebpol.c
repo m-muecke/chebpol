@@ -4,13 +4,13 @@
 #include <fftw3.h>
 #endif
 
-static void chebcoef(const double *x, const int *dims, const int rank, double *F, int dct, int threads) {
+static void chebcoef(const double *x, const int *dims, const int rank, double *F, bool dct, int threads) {
   R_xlen_t siz = 1;
   for (int i = 0; i < rank; i++)
     siz *= dims[i];
 
 #ifdef HAVE_FFTW
-  int brokenfftw = 0;
+  bool brokenfftw = false;
   double isiz = 1.0 / siz;
   int rdims[rank];
   /* Create a plan */
@@ -46,7 +46,7 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
       if (plan == NULL) {
         if (tlen > 10000)
           Rf_warning("FFTW fails on strided long (%d) vector, is it MKL?", tlen);
-        brokenfftw = 1;
+        brokenfftw = true;
         break;
       }
       // Do them
@@ -156,11 +156,10 @@ SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
   int siz;
   SEXP resvec;
   int sdims;
-  int dct;
   int threads = Rf_asInteger(Sthreads);
   if (!Rf_isLogical(sdct) || LENGTH(sdct) < 1)
     Rf_error("dct must be a logical");
-  dct = LOGICAL_RO(sdct)[0];
+  bool dct = LOGICAL_RO(sdct)[0];
   dim = Rf_getAttrib(x, R_DimSymbol);
   // If no dim-attribute, assume one-dimensional
   if (Rf_isNull(dim)) {
@@ -798,7 +797,7 @@ SEXP R_sqdiffs(SEXP x1, SEXP x2, SEXP Sthreads) {
 }
 
 static double findsimplex(const double *x, const double *knots, const int *dtri, const double *lumats, const int *ipivs,
-                          const double *bbox, int epol, const double *val, const int dim, const int numsimplex,
+                          const double *bbox, bool epol, const double *val, const int dim, const int numsimplex,
                           int nknots, int blend) {
 
   double vec[dim + 1];
@@ -806,10 +805,10 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
   for (int simplex = 0; simplex < numsimplex; simplex++) {
     // x must be in the bounding box. Perhaps we should do binary search, or organize them hierarchically?
     const double *box = bbox + simplex * 2 * dim;
-    int bad = 0;
+    bool bad = false;
     for (int i = 0; i < dim; i++) {
       if (x[i] < box[0] || x[i] > box[1]) {
-        bad = 1;
+        bad = true;
         break;
       }
       box += 2;
@@ -826,7 +825,7 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
     F77_CALL(dgetrs)("N", &N, &one, lumat, &N, ipiv, vec, &N, &info FCONE);
     for (int d = 0; d < N; d++)
       if (vec[d] < -1e-10) {
-        bad = 1;
+        bad = true;
         break;
       }
     if (bad)
@@ -904,7 +903,7 @@ SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extr
 #endif
   SEXP ret = PROTECT(Rf_allocVector(REALSXP, Rf_ncols(Sx)));
   double *resvec = REAL(ret);
-  int epol = Rf_asLogical(extrapolate);
+  bool epol = Rf_asLogical(extrapolate);
   int blend = 0;
   if (!Rf_isNull(Sblend))
     blend = Rf_asInteger(Sblend);
