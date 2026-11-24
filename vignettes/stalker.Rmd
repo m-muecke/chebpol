@@ -12,10 +12,6 @@ vignette: >
 knitr::opts_chunk$set(fig.width = 7, fig.height = 7)
 ```
 
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({ TeX: { equationNumbers: { autoNumber: "AMS" } } });
-</script>
-
 The idea behind the stalker spline in package **chebpol** is
 outlined. It was originally designed as a one-dimensional interpolation to be
 almost shape preserving in the sense that it attempts to honour
@@ -196,7 +192,7 @@ and must figure out the four parameters $a,b,c$, and $r$.
 Inserting our three points, we obtain three equations with three unknowns (the
 $r$ disappears because we have cleverly chosen our grid points to be $-1$ and $1$):
 
-\begin{equation}\label{cdef}
+\begin{equation}\tag{1}
 \begin{aligned}
 &a - b + c &= v_-,\\
 &a &= v_0,\\
@@ -206,7 +202,7 @@ $r$ disappears because we have cleverly chosen our grid points to be $-1$ and $1
 
 The solution is
 
-\begin{equation}\label{cvals}
+\begin{equation}\tag{2}
 \begin{aligned}
 a &= v_0,\\
 b &= \frac12 (v_+-v_-),\\
@@ -217,14 +213,14 @@ c &= \frac12 (v_+ + v_-) - v_0.\\
 These coefficients will work with any $r$. Typically we would like to pick
 $r = 2$, but this may destroy monotonicity.
 The three knots are monotonic (either increasing or decreasing)
-whenever $|c| < |b|$. This can be seen from equation $\eqref{cdef}$.
+whenever $|c| < |b|$. This can be seen from equation (1).
 Monotonicity occurs when $v_+ - v_0 = b+c$ has the same sign
 as $v_0 - v_- = b-c$, which is precisely when $|c| < |b|$.
 
 If this is the case we will use monotonicity
 to find a suitable $r$. To be specific, we have
 
-\begin{equation}\label{deriv}
+\begin{equation}\tag{3}
 f'(x) = b + cr|x|^{r-1}\operatorname{sgn}(x),
 \end{equation}
 
@@ -362,10 +358,10 @@ $(1,v_+)$ is
 f(x) = a + bx + c|x|^r.
   \end{equation*}
 
-The coefficients $a$, $b$, and $c$ are as in $\eqref{cvals}$. For $c\neq 0$ the exponent $r$ is
+The coefficients $a$, $b$, and $c$ are as in (2). For $c\neq 0$ the exponent $r$ is
 chosen as follows:
 
-\begin{equation}\label{onedimstalker}
+\begin{equation}\tag{4}
 r = \begin{cases}
  |b/c| &\text{for \(|c| \leq |b| < 2|c|\)},\\
  |c/b| & \text{for \(|b| < |c| < 2|b|\)},\\
@@ -380,7 +376,7 @@ the graph may turn arbitrarily abruptly in the knots.
 
 We define the overshoot as 0 for monotonic knots, and as $|v_0 - f(x_0)|$ where
 $x_0$ is the critical point of the function: $f'(x_0) = 0$.
-From equation $\eqref{deriv}$ we have by elementary calculus $x_0 = -\operatorname{sgn}(bc)|b/(rc)|^{1/(r-1)}$.
+From equation (3) we have by elementary calculus $x_0 = -\operatorname{sgn}(bc)|b/(rc)|^{1/(r-1)}$.
 If $|b| \geq r|c|$ then $x_0 \notin (-1,1)$, hence the min/max
 occurs in an end point, in which case it is not an overshoot.
 We look at the case $|b| < r|c|$.
@@ -476,14 +472,14 @@ if $v_i^+ k_i^- - v_i^- k_i^+ < 0$.
 
 The function form we choose as a “basis” (with $x=(x_1,x_2,\ldots,x_n)$) is,
 
-\begin{equation}\label{funcform1}
+\begin{equation}\tag{5}
 f(x) = \sum_{i=1}^n b_i x_i + \sum_{i=1}^n c_i |x_i|^{r_i}
 \end{equation}
 
 The relation $f(0) = 0$ is satisfied with this function form.
 For each $i$ we also have equations for the two other grid points $k_i^-$ and $k_i^+$,
 
-\begin{equation}\label{ptbase}
+\begin{equation}\tag{6}
   \begin{aligned}
     v_i^+ &=b_i k_i^+ + c_i|k_i^+|^{r_i},\\
     v_i^- &=b_i k_i^- + c_i|k_i^-|^{r_i}
@@ -493,7 +489,7 @@ For each $i$ we also have equations for the two other grid points $k_i^-$ and $k
 These can be solved for $b_i$ and $c_i$, with the determinant
 $D = k_i^+ |k_i^-|^{r_i} - k_i^- |k_i^+|^{r_i}$:
 
-\begin{equation}\label{pteqs}
+\begin{equation}\tag{7}
   \begin{aligned}
     b_i &= \frac{v_i^+ |k_i^-|^{r_i}  - v_i^- |k_i^+|^{r_i}}{D},\\
     c_i &= \frac{k_i^+ v_i^- - k_i^- v_i^+}{D}\\
@@ -512,12 +508,12 @@ We ensure that it is not zero by letting $1\leq r_i \leq 2$ be the largest numbe
 which keeps $f_i'(x_i) \neq 0$ for $k_i^- < x_i < k_i^+$. To be specific, the equation
 $f_i'(x_i) = 0$ is
 
-\begin{equation}\label{deriv0}
+\begin{equation}\tag{8}
   |x_i|^{r_i-1} \operatorname{sgn}(x_i) = -\frac{b_i}{c_i r_i}.
 \end{equation}
 
 We first check if $r_i=2$ avoids a solution.
-In this case, equation $\eqref{deriv0}$ becomes
+In this case, equation (8) becomes
 
 \begin{equation*}
   x_i = -\frac{b_i}{2c_i}.
@@ -537,7 +533,7 @@ much that the critical point is in one of the end points. I.e. we lower $r_i$ un
  b_i + c_i r_i |k_i^+|^{r_i-1} = 0 \quad\text{or}\quad b_i - c_i r_i |k_i^-|^{r_i-1} = 0.
 \end{equation*}
 
-Using equations $\eqref{pteqs}$, we obtain,
+Using equations (7), we obtain,
 
 \begin{equation*}
   \begin{aligned}
@@ -550,7 +546,7 @@ Using equations $\eqref{pteqs}$, we obtain,
 
 Dividing by $|k_i^+|^{r_i}$ and $|k_i^-|^{r_i}$, they become,
 
-\begin{equation}\label{eqrmono}
+\begin{equation}\tag{9}
   \begin{aligned}
     v_i^+ \left|\frac{k_i^-}{k_i^+}\right|^{r_i} - v_i^- &=
     \left(v_i^+ \frac{k_i^-}{k_i^+} - v_i^-\right) r_i, \\
@@ -572,14 +568,14 @@ For a uniform grid, i.e. with $k_i^+ = -k_i^-$, these simplify to
 
 We can then choose,
 
-\begin{equation}\label{unireq}
+\begin{equation}\tag{10}
   r_i = \left|\frac{v_i^+ - v_i^-}{v_i^+ + v_i^-}\right|.
 \end{equation}
 
-This is the $|b/c|$ of equation $\eqref{onedimstalker}$.
+This is the $|b/c|$ of equation (4).
 
 For a non-uniform grid, we take a closer look. We have not found a closed form
-solution, but we can at least figure out which of the equations $\eqref{eqrmono}$ to solve.
+solution, but we can at least figure out which of the equations (9) to solve.
 We can either do some algebra, or use our geometric intuition.
 If the triple is increasing and concave, or decreasing and convex,
 we should have the critical point in $k_i^+$, otherwise in $k_i^-$. I.e.,
@@ -597,8 +593,8 @@ solve the first equation if either
 For non-monotonic triples we have adopted the following strategy. We
 change the sign of $v_i^-$. This gives us a monotonic triple. We
 find the $r$ suitable for that, then we use the original $v_i^-$
-to compute $b_i$ and $c_i$ from equations $\eqref{pteqs}$. This is
-the $|c/b|$ of equation $\eqref{onedimstalker}$.
+to compute $b_i$ and $c_i$ from equations (7). This is
+the $|c/b|$ of equation (4).
 
 ### Special cases
 
@@ -610,11 +606,11 @@ k_i^+ |k_i^-|^{r_i} = k_i^- |k_i^+|^{r_i},
 
 but the left side is positive, the right side negative, so this can’t happen.
 
-For uniform grids, we can have $v_i^+ + v_i^- = 0$ in equation $\eqref{unireq}$. In
+For uniform grids, we can have $v_i^+ + v_i^- = 0$ in equation (10). In
 this case our three points are on a straight line, we can let $c_i=0$, and then
 $r_i$ is irrelevant.
 
-Then, it might happen that the equations in $\eqref{eqrmono}$ do not have a solution.
+Then, it might happen that the equations in (9) do not have a solution.
 This can happen if $k_i^+ v_i^- = k_i^- v_i^+$, but again this is the linear case,
 we have $c_i=0$, and $r_i$ is irrelevant. We can also have either $v_i^+$ or $v_i^-$
 equal to zero, this yields $r_i=1$.
@@ -627,13 +623,13 @@ with a hyperbola. We have the same grid and notation as before.
 
 The function form we choose as a “basis” (with $x=(x_1,x_2,\ldots,x_n)$)
 
-\begin{equation}\label{funcform}
+\begin{equation}\tag{11}
 f(x) = a + \sum_{i=1}^n b_i x_i + \sum_{i=1}^n \frac{d_i}{1+c_ix_i}
 \end{equation}
 
 The function value $f(0) = 0$ gives us an equation
 
-\begin{equation}\label{zeroval}
+\begin{equation}\tag{12}
 a + \sum_i d_i = 0.
 \end{equation}
 
@@ -646,10 +642,10 @@ For each $i$ we also have equations for the two other grid points $k_i^-$ and $k
   \end{aligned}
 \end{equation*}
 
-We first use equation $\eqref{zeroval}$ to replace $a+\sum_{j\neq i}^n d_j$ with $-d_i$, then
+We first use equation (12) to replace $a+\sum_{j\neq i}^n d_j$ with $-d_i$, then
 we multiply each equation with the denominator occurring in them, to obtain:
 
-\begin{equation}\label{dimequations}
+\begin{equation}\tag{13}
   \begin{aligned}
     v_i^++ v_i^+ c_i k_i^+ &= b_i k_i^+ + b_i k_i^+ c_i k_i^+  -c_i k_i^+ d_i,\\
     v_i^-+ v_i^- c_i k_i^- &= b_i k_i^- + b_i k_i^- c_i k_i^-  -c_i k_i^- d_i.\\
@@ -662,7 +658,7 @@ of each other), so the equations can be solved separately for each
 $i$. That is, we do not have to solve a large simultaneous system of
 non linear equations for all the $i$s, only a system of two equations for each $i$.
 An intuitive reason why this happens is that we did not include any cross terms of the
-type $x_i x_j$ in our function form $\eqref{funcform}$, nor do we have constraints where
+type $x_i x_j$ in our function form (11), nor do we have constraints where
 more than one of the coordinates are non-zero.
 To find these three parameters from two equations we need an additional equation.
 We use a monotonicity or overshoot constraint.
@@ -683,7 +679,7 @@ One way to ensure it is nonzero is to choose $b_i=0$. The only way
 $f_i'(x)$ can vanish is then if $c_i d_i=0$, but this would mean that our
 function is constant, this is a special case we handle below.
 So for a monotonic triplet, we set $b_i = 0$.
-The equations $\eqref{dimequations}$ then simplify to:
+The equations (13) then simplify to:
 
 \begin{equation*}
   \begin{aligned}
@@ -694,7 +690,7 @@ The equations $\eqref{dimequations}$ then simplify to:
 
 These can be solved for $c_i$ and $d_i$ to yield,
 
-\begin{equation}\label{monopars}
+\begin{equation}\tag{14}
   \begin{aligned}
     b_i &= 0,\\
     c_i &= -\frac{k_i^- v_i^+ - k_i^+ v_i^-}{k_i^-  k_i^+ (v_i^+ - v_i^-)},\\
@@ -711,7 +707,7 @@ $f_i'(0) = 0$. This yields the equation,
   b_i = c_i d_i.
 \end{equation*}
 
-Inserting this in equations $\eqref{dimequations}$ yields,
+Inserting this in equations (13) yields,
 
 \begin{equation*}
   \begin{aligned}
@@ -731,7 +727,7 @@ These immediately simplify to,
 
 According to Maple, the solution is,
 
-\begin{equation}\label{nmonopars}
+\begin{equation}\tag{15}
   \begin{aligned}
     b_i &= \frac{v_i^+ v_i^- (k_i^--k_i^+)}{(k_i^-)^2 v_i^+-(k_i^+)^2 v_i^-},\\
     c_i &= -\frac{(k_i^-)^2 v_i^+-(k_i^+)^2 v_i^-}{k_i^- k_i^+ (k_i^- v_i^+-k_i^+ v_i^-)},\\
@@ -740,9 +736,9 @@ According to Maple, the solution is,
 \end{equation}
 
 So, both for monotonic and non-monotonic triples we can for every $i$ find the constants
-$b_i,c_i$ and $d_i$ from equations $\eqref{monopars}$ and $\eqref{nmonopars}$.
-From equation $\eqref{zeroval}$ we can then find $a$,
-and we have all the parameters in the definition of the function $f$ in equation $\eqref{funcform}$.
+$b_i,c_i$ and $d_i$ from equations (14) and (15).
+From equation (12) we can then find $a$,
+and we have all the parameters in the definition of the function $f$ in equation (11).
 
 We can try this out on a simple example, on a grid $(-1,0,1)$ in two dimensions,
 i.e. $k_i^- = -1$ and $k_i^+ = 1$.
@@ -788,8 +784,8 @@ plot3D::points3D(
 ### Special cases
 
 There are some special cases, corresponding to data which can not be fitted with
-the function form in equation $\eqref{funcform}$. More specifically, some of the
-denominators in equations $\eqref{monopars}$ and $\eqref{nmonopars}$ can vanish. We take the
+the function form in equation (11). More specifically, some of the
+denominators in equations (14) and (15) can vanish. We take the
 monotonic case first. Monotonicity means that $v_i^-$ and $v_i^+$ have opposite
 signs, but what if they are equal? The formula for $c_i$ breaks down.
 But this is trivial, in this case we have a completely flat function with
@@ -806,7 +802,7 @@ The case where $b_i$ and $d_i$ are ill-defined is more complicated, it happens
 when $(k_i^-)^2 v_i^+ = (k_i^+)^2 v_i^-$. The three points lie on a parabola with
 its vertex in 0. We are unable to fit our function to these points, instead we
 choose a parabola, i.e. $\frac{v_i^+}{(k_i^+)^2} x_i^2$. For the purpose of computing
-$a$ from equation $\eqref{zeroval}$, we use $d_i = 0$.
+$a$ from equation (12), we use $d_i = 0$.
 
 The last problem could be that the pole $x^*=-1/c_i$ is in the
 interior, i.e. that $k_i^- < x^* < k_i^+$. This would be
