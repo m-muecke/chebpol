@@ -21,8 +21,8 @@
 
 ### Package
 
-- [`chebpol-package`](https://m-muecke.github.io/chebpol/reference/chebpol-package.md)
-  [`chebpol`](https://m-muecke.github.io/chebpol/reference/chebpol-package.md)
+- [`chebpol`](https://m-muecke.github.io/chebpol/reference/chebpol-package.md)
+  [`chebpol-package`](https://m-muecke.github.io/chebpol/reference/chebpol-package.md)
   : Methods for creating multivariate interpolations on hypercubes
 - [`havefftw()`](https://m-muecke.github.io/chebpol/reference/havefftw.md)
   : Check whether chebpol uses FFTW
