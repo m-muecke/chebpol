@@ -5,7 +5,7 @@
 #include <gsl/gsl_roots.h>
 #endif
 
-#define MYEPS (1e3 * sqrt(DBL_EPSILON))
+static const double MYEPS = 1e3 * 0x1p-26; // 1e3 * sqrt(DBL_EPSILON)
 typedef struct {
   double dmin, dplus, vmin, vplus;
   int pos;
