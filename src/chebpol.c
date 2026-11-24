@@ -581,7 +581,7 @@ double C_evalmlip(const int rank, const double *x, const double **grid, const in
 
   int stride = 1;
   for (int i = 0; i < rank; i++) {
-    if (isnan(x[i]))
+    if (ISNAN(x[i]))
       return x[i];
     const double *gdvec = grid[i];
     int gp = binsearch(dims[i], gdvec, x[i]);

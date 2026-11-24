@@ -110,7 +110,7 @@ static R_INLINE double solver(double kmin, double kplus, double vmin, double vpl
     r = fabs((vplus - vmin) / (vplus + vmin));
     if (r < 1)
       r = 1;
-    else if (isnan(r) || r > 2)
+    else if (ISNAN(r) || r > 2)
       r = 2;
   } else {
     // Find the largest r which keeps it monotonic, i.e. derivative 0 in one
@@ -198,15 +198,15 @@ static R_INLINE double stalk1(double x, double vmin, double v0, double vplus, do
   double b, c;
   // Do linear end points
 
-  if (isnan(vmin))
+  if (ISNAN(vmin))
     return v0 + x / dplus * (vplus - v0);
-  if (isnan(vplus))
+  if (ISNAN(vplus))
     return v0 + x / dmin * (v0 - vmin);
   vmin -= v0;
   vplus -= v0;
   if (r == 0)
     return v0 + stalkhyp(x, vmin, vplus, dmin, dplus);
-  if (!isnan(r)) {
+  if (!ISNAN(r)) {
     // use precomputed degree
     b = (vplus * powmin - vmin * powplus) * iD;
     c = (vplus * dmin + vmin * dplus) * iD;
@@ -260,7 +260,7 @@ static R_INLINE double stalk1(double x, double vmin, double v0, double vplus, do
         // fits these monotonic points.
         r = findmonor(dmin, dplus, -vmin, vplus);
       }
-      if (isnan(r)) {
+      if (ISNAN(r)) {
         c = 0;
         b = vplus / dplus;
       } else {
@@ -343,7 +343,7 @@ static void makestalk(const int nrank, const int *dims, const double **grid, con
             r = fabs((vplus - vmin) / (vplus + vmin));
             if (r < 1)
               r = 1;
-            if (isnan(r) || r > 2.0)
+            if (ISNAN(r) || r > 2.0)
               r = 2.0;
           } else {
 #ifdef HAVE_GSL
@@ -605,7 +605,7 @@ static double evalhyp(const double *x, const int nrank, const int *dims, const d
     double fval = val[corner] + a[corner];
     for (int j = 0; j < nrank; j++) {
       // It might be a parabola, but typically a hyperbola
-      if (!isnan(cc[j])) {
+      if (!ISNAN(cc[j])) {
         fval += bb[j] * zx[j] + dd[j] / (1.0 + cc[j] * zx[j]);
       } else {
         fval += bb[j] * zx[j] * zx[j];
@@ -882,7 +882,7 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
     pcomp[i].pplus = REAL_RO(VECTOR_ELT(Spplus, i));
     pcomp[i].uniform = LOGICAL_RO(Suniform)[i];
 #ifndef HAVE_GSL
-    if (!pcomp[i].uniform && isnan(degree[i]))
+    if (!pcomp[i].uniform && ISNAN(degree[i]))
       Rf_error("Non-uniform grid in dimension %d not supported without GSL. Recompile with GSL.", i + 1);
 #endif
   }
