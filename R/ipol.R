@@ -32,6 +32,8 @@
 #' uses normalization if any of the knots are outside the unit hypercube. Also, a logical
 #' `nowarn` is accepted, it is used to suppress a warning in case the system can't
 #' be solved exactly and a least squares fallback method is used.
+#' Fitting solves a dense linear system with one row and column per knot, so it
+#' becomes slow beyond a few thousand knots.
 #'
 #' The method `"simplexlinear"` needs the argument `knots`. It creates a
 #' Delaunay triangulation from the knots, and does linear interpolation in each simplex

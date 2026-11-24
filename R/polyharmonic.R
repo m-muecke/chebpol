@@ -4,8 +4,6 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   # There exist faster evaluation methods for dimensions <= 4
   # k < 0 yields Gaussian kernel splines, with sigma^2 = -1/k
   # we compute r^2, so powers etc. are adjusted for that case
-  # Hmm, I should take a look at http://dx.doi.org/10.1016/j.jat.2012.11.008 for the unit ball
-  # perhaps some normalization should be added?
   # I also need to look at fast summation with NFFT
   # https://www-user.tu-chemnitz.de/~potts/nfft/fastsum.php
   # Likewise its interpolation applications which I don't understand yet.

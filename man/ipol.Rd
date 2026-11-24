@@ -82,6 +82,8 @@ for normalizing the knots to the unit hypercube. The default is \code{NA}, which
 uses normalization if any of the knots are outside the unit hypercube. Also, a logical
 \code{nowarn} is accepted, it is used to suppress a warning in case the system can't
 be solved exactly and a least squares fallback method is used.
+Fitting solves a dense linear system with one row and column per knot, so it
+becomes slow beyond a few thousand knots.
 
 The method \code{"simplexlinear"} needs the argument \code{knots}. It creates a
 Delaunay triangulation from the knots, and does linear interpolation in each simplex

@@ -42,8 +42,6 @@ static double rfun(double r, void *P) {
 }
 
 static R_INLINE double findmonor(double dmin, double dplus, double vmin, double vplus) {
-  // We should really cache results here, it could save time when computing r for the same interval
-  // We can use std::unordered_map for that. We also need some parallel sync, std::mutex. Later.
   double D2 = (vmin * dplus * dplus - vplus * dmin * dmin) / (vplus * dmin + dplus * vmin);
   double r;
   if (D2 > 2 * dplus || D2 < -2 * dmin) {
@@ -98,8 +96,6 @@ static double rfunnew(double r, void *P) {
 }
 
 static R_INLINE double solver(double kmin, double kplus, double vmin, double vplus) {
-  // We should really cache results here, it could save time when computing r for the same interval
-  // We can use std::unordered_map for that. We also need some parallel sync, std::mutex. Later.
   double bn = (vplus * kmin * kmin - vmin * kplus * kplus);
   double ncn = vplus * kmin - vmin * kplus;
   double r;
