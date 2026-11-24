@@ -51,11 +51,9 @@ tch <- Vectorize(function(x) chebeval(x, coef))
 # make a lower degree also
 ch2 <- ipol(f, dims = 10, method = "chebyshev")
 # plot the functions
-if (FALSE) { # \dontrun{
-  s <- seq(-1, 1, length.out = 400)
-  plot(s, ch(s), col = "red", type = "l")
-  lines(s, tch(s), col = "blue")
-  lines(s, f(s))
-  lines(s, ch2(s), col = "green")
-} # }
+s <- seq(-1, 1, length.out = 400)
+plot(s, ch(s), col = "red", type = "l")
+lines(s, tch(s), col = "blue")
+lines(s, f(s))
+lines(s, ch2(s), col = "green")
 ```

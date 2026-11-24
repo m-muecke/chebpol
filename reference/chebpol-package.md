@@ -99,14 +99,17 @@ value <- evalongrid(f, dims)
 # fit a Chebyshev approximation to it. Note that the value-array contains the
 # grid-structure.
 ch <- ipol(value, method = "cheb")
-# To see the full grid, use the chebknots function and expand.grid
-if (FALSE) { # \dontrun{
-  head(cbind(
-    expand.grid(chebknots(dims)),
-    value = as.numeric(value),
-    appx = as.numeric(evalongrid(ch, dims))
-  ))
-} # }
+# To see the grid, use the chebknots function and expand.grid. Compare the
+# values with the approximation in the first few grid points.
+knots <- head(expand.grid(chebknots(dims)))
+cbind(knots, value = head(as.numeric(value)), appx = ch(t(as.matrix(knots))))
+#>           x         y         z    value     appx
+#> 1 0.9995066 0.9995066 0.9995066 3.537865 3.537865
+#> 2 0.9955620 0.9995066 0.9995066 3.534374 3.534374
+#> 3 0.9876883 0.9995066 0.9995066 3.527394 3.527394
+#> 4 0.9759168 0.9995066 0.9995066 3.516934 3.516934
+#> 5 0.9602937 0.9995066 0.9995066 3.503002 3.503002
+#> 6 0.9408808 0.9995066 0.9995066 3.485614 3.485614
 # Make a Floater-Hormann approximation on a uniform grid as well
 fh <- ipol(f, grid = lapply(dims, function(n) seq(-1, 1, length.out = n)), method = "fh", k = 5)
 # evaluate in some random points in R3
