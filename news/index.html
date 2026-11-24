@@ -64,6 +64,7 @@
 <li>Integer input is now accepted everywhere a number is expected: the points passed to an interpolant, the values, grids and knots passed to <code><a href="../reference/ipol.html">ipol()</a></code>, the grid in <code><a href="../reference/evalongrid.html">evalongrid()</a></code>, and the arguments of <code><a href="../reference/chebcoef.html">chebcoef()</a></code> and <code><a href="../reference/chebeval.html">chebeval()</a></code>. Previously most of these failed with “REAL() can only be applied to a ‘numeric’”.</li>
 <li>
 <code><a href="../reference/chebeval.html">chebeval()</a></code> now works with <code>intervals</code> for a matrix of points, and for a single interval given as a vector <code>c(a, b)</code>. Before, only a single point in two or more dimensions was mapped correctly.</li>
+<li>Loading chebpol no longer overwrites the <code>chebpol.threads</code> option when it is already set, for example in <code>.Rprofile</code>. The <code>CHEBPOL_THREADS</code> environment variable is only used when the option is unset.</li>
 <li>
 <code><a href="../reference/evalongrid.html">evalongrid()</a></code> and <code><a href="../reference/ipol.html">ipol()</a></code> now accept functions that return integer or logical values, and stop with an error when the length of the returned value changes between grid points.</li>
 <li>

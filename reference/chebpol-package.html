@@ -75,8 +75,8 @@ dispatches to some other method.  All the generated
 <a href="interpolant.html">interpolant</a>s accept as an argument a matrix of column
 vectors. The generated functions also accept an argument
 <code>threads = getOption("chebpol.threads")</code> to utilize more than
-one CPU if a matrix of column vectors is evaluated.  The option
-<code>chebpol.threads</code> is initialized from the environment variable
+one CPU if a matrix of column vectors is evaluated.  Unless the option
+<code>chebpol.threads</code> is already set, it is initialized from the environment variable
 <code>CHEBPOL_THREADS</code> upon loading of the package. It defaults to <code>1</code>.</p>
 <p>The interpolants are ordinary R-objects and can be saved with <code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> and loaded
 later with <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> or serialized/unserialized with other tools, just like any R-object.

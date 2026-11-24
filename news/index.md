@@ -30,6 +30,9 @@
   now works with `intervals` for a matrix of points, and for a single
   interval given as a vector `c(a, b)`. Before, only a single point in
   two or more dimensions was mapped correctly.
+- Loading chebpol no longer overwrites the `chebpol.threads` option when
+  it is already set, for example in `.Rprofile`. The `CHEBPOL_THREADS`
+  environment variable is only used when the option is unset.
 - [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
   and [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   now accept functions that return integer or logical values, and stop
