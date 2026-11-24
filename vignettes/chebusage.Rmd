@@ -272,7 +272,7 @@ for (f in list(ph, fh, sl)) {
 
 ## Radial basis functions with compact support (ALGLIB)
 
-The ALGLIB library (<http://www.alglib.net/interpolation/fastrbf.php>) contains an implementation
+The ALGLIB library (<https://www.alglib.net/interpolation/fastrbf.php>) contains an implementation
 of compact support radial basis function interpolation on scattered data. It is available with
 `ipol(..., method = "crbf")` if ALGLIB was available at build time.
 

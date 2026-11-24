@@ -48,10 +48,11 @@
 #' function on a grid ([evalongrid()]), and a function for finding
 #' the Chebyshev coefficients ([chebcoef()]).
 #'
-#' @name chebpol-package
-#' @aliases chebpol-package chebpol
-#' @concept DCT Floater-Hormann
-#' @keywords DCT Chebyshev interpolation Floater-Hormann
+#' @concept DCT
+#' @concept Chebyshev
+#' @concept interpolation
+#' @concept Floater-Hormann
+#' @keywords internal
 #' @seealso [ipol], [interpolant]
 #' @examples
 #' # make some function values on a 50x50x50 grid

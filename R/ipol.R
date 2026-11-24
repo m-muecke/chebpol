@@ -46,7 +46,7 @@
 #' `t(expand.grid(grid))`
 #'
 #' The `"crbf"` is the multilayer compact radial basis function
-#' interpolation in ALGLIB (<http://www.alglib.net/interpolation/fastrbf.php>).
+#' interpolation in ALGLIB (<https://www.alglib.net/interpolation/fastrbf.php>).
 #' It is only available if ALGLIB was available at
 #' compile time. It takes the extra arguments `"rbase"`, `"layers"`, and
 #' `"lambda"`. These are discussed in the ALGLIB documentation.

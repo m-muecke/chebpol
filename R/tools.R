@@ -171,5 +171,5 @@ evalongridV <- function(fun, dims, intervals = NULL, ..., grid = NULL) {
 #'
 #' @return Returns TRUE if chebpol uses FFTW. Otherwise FALSE.
 #'
-#' @export havefftw
+#' @export
 havefftw <- function() .Call(C_havefftw)

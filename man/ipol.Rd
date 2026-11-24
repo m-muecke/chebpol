@@ -96,7 +96,7 @@ If knots are required, but the grid argument is given, knots are constructed as
 \code{t(expand.grid(grid))}
 
 The \code{"crbf"} is the multilayer compact radial basis function
-interpolation in ALGLIB (\url{http://www.alglib.net/interpolation/fastrbf.php}).
+interpolation in ALGLIB (\url{https://www.alglib.net/interpolation/fastrbf.php}).
 It is only available if ALGLIB was available at
 compile time. It takes the extra arguments \code{"rbase"}, \code{"layers"}, and
 \code{"lambda"}. These are discussed in the ALGLIB documentation.

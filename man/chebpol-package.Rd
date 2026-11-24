@@ -2,8 +2,8 @@
 % Please edit documentation in R/chebpol-package.R
 \docType{package}
 \name{chebpol-package}
-\alias{chebpol-package}
 \alias{chebpol}
+\alias{chebpol-package}
 \title{Methods for creating multivariate interpolations on hypercubes}
 \description{
 The package contains methods for creating multivariate/multidimensional
@@ -104,8 +104,8 @@ Authors:
 }
 
 }
-\concept{DCT Floater-Hormann}
-\keyword{Chebyshev}
-\keyword{DCT}
-\keyword{Floater-Hormann}
-\keyword{interpolation}
+\concept{Chebyshev}
+\concept{DCT}
+\concept{Floater-Hormann}
+\concept{interpolation}
+\keyword{internal}
