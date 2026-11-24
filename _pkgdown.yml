@@ -1,0 +1,31 @@
+url: https://m-muecke.github.io/chebpol
+
+template:
+  bootstrap: 5
+  light-switch: true
+  math-rendering: mathjax
+
+reference:
+  - subtitle: Interpolation
+    contents:
+      - ipol
+      - interpolant
+  - subtitle: Chebyshev tools
+    contents:
+      - chebknots
+      - chebcoef
+      - chebeval
+      - evalongrid
+  - subtitle: Package
+    contents:
+      - chebpol-package
+      - havefftw
+      - havealglib
+
+articles:
+  - title: Vignettes
+    navbar: ~
+    contents:
+      - chebusage
+      - chebpol
+      - stalker
