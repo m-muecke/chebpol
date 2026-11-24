@@ -32,3 +32,17 @@ test_that("ipol() rejects a blend that multilinear interpolation does not suppor
   grid <- list(seq(-1, 1, length.out = 9), seq(-1, 1, length.out = 7))
   expect_snapshot(ipol(f, grid = grid, method = "multilinear", blend = "mean"), error = TRUE)
 })
+
+test_that("multilinear interpolation returns NA for missing input", {
+  f <- function(x) exp(-sum(x^2))
+  grid <- list(seq(-1, 1, length.out = 9), seq(-1, 1, length.out = 7))
+  lip <- ipol(f, grid = grid, method = "multilinear")
+  x <- cbind(c(NaN, 0.1), c(0.1, NA), c(0.1, 0.2))
+  for (blend in c("linear", "cubic", "sigmoid", "parodic", "square")) {
+    expect_equal(is.na(lip(x, blend = blend)), c(TRUE, TRUE, FALSE))
+  }
+})
+
+test_that("ipol() rejects a multilinear grid dimension with a single point", {
+  expect_snapshot(ipol(c(1, 2, 3), grid = list(5, c(1, 2, 3)), method = "multilinear"), error = TRUE)
+})

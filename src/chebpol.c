@@ -554,7 +554,7 @@ static inline int binsearch(const int n, const double *arr, const double val) {
     const int test = (toosmall + toolarge) >> 1;
     if (arr[test] >= val) {
       toolarge = test;
-    } else if (arr[test] < val) {
+    } else {
       toosmall = test;
     }
   }
@@ -581,8 +581,9 @@ double C_evalmlip(const int rank, const double *x, const double **grid, const in
 
   int stride = 1;
   for (int i = 0; i < rank; i++) {
+    if (isnan(x[i]))
+      return x[i];
     const double *gdvec = grid[i];
-    // We could use Rs findInterval, but how many ways are there to do this?
     int gp = binsearch(dims[i], gdvec, x[i]);
     weight[i] = (x[i] - gdvec[gp - 1]) / (gdvec[gp] - gdvec[gp - 1]);
     valpos += stride * gp;

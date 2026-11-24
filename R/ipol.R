@@ -157,6 +157,9 @@ ipol <- function(
       if (!is.list(grid)) {
         grid <- list(grid)
       }
+      if (any(lengths(grid) < 2L)) {
+        stop("each grid dimension must have at least two points for multi linear interpolation")
+      }
       grid <- lapply(grid, as.numeric)
       if (unsortedgrid(grid)) {
         stop("grid must be distinct ordered values")
