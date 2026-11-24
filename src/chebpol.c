@@ -743,8 +743,8 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
     double sum = 0;
     double wsum = 0;
     for (int d = 0; d < N; d++) {
-      // rounding can put a barycentric coordinate slightly outside [0, 1]
-      const double coord = vec[d] < 0 ? 0 : (vec[d] > 1 ? 1 : vec[d]);
+      // rounding can put a barycentric coordinate slightly outside [0, 1]; <= also turns -0.0 into 0
+      const double coord = vec[d] <= 0 ? 0 : (vec[d] >= 1 ? 1 : vec[d]);
       const double w = blendfun(coord, blend);
       if (w == 0)
         continue;
