@@ -15,6 +15,7 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   }
   N <- ncol(knots)
   M <- nrow(knots)
+  domain <- data.frame(apply(knots, 1L, range))
   if (k > 0) {
     if (abs(round(k) - k) > sqrt(.Machine$double.eps)) {
       stop(sprintf("k is positive, but not an integer: %.17f", k))
@@ -82,6 +83,6 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   vectorfun(
     function(x, threads = getOption("chebpol.threads")) .Call(C_evalpolyh, normfun(x), knots, w, v, k, threads, NULL),
     arity = M,
-    domain = data.frame(apply(knots, 1L, range))
+    domain = domain
   )
 }

@@ -16,6 +16,7 @@
 * `ipol()` with `method = "fh"` now forwards extra arguments in `...` to the function being interpolated.
 * `ipol()` with `method = "simplexlinear"` now forwards extra arguments in `...` to the function being interpolated.
 * `ipol()` with `method = "polyharmonic"` accepts `normalize` as a vector `c(a, b)` or a two-column matrix again. Both forms failed with "the condition has length > 1" on R >= 4.2, and the knots were never transformed, so the fit did not match the evaluation.
+* `ipol()` interpolants created with `method = "polyharmonic"` now report the range of the knots in their `domain` attribute. With normalization it was the range after scaling, `[0, 1]`.
 * `ipol()` with `method = "polyharmonic"` no longer drops extra arguments in `...` for the function being interpolated when neither `normalize` nor `nowarn` is given.
 * `ipol()` interpolants created with `method = "stalker"`, `"hstalker"` or `"simplexlinear"` now stop with an error when given a matrix with the wrong number of rows. Previously they returned values silently, and could read past the end of the input.
 * `ipol()` interpolants created with `method = "oldstalker"` now report both ranks when given input of the wrong dimension.

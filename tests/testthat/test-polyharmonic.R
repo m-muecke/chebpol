@@ -55,3 +55,12 @@ test_that("ipol() errors on a malformed normalize", {
     ipol(f, knots = knots, method = "polyharmonic", normalize = matrix(1, 3L, 2L))
   })
 })
+
+test_that("the domain of a polyharmonic spline is the range of the knots", {
+  withr::local_seed(42)
+  knots <- matrix(runif(60, 5, 9), 2L)
+  for (normalize in c(TRUE, FALSE)) {
+    phs <- ipol(sum, knots = knots, method = "polyharmonic", normalize = normalize)
+    expect_equal(as.matrix(attr(phs, "domain")), apply(knots, 1L, range), ignore_attr = TRUE)
+  }
+})
