@@ -14,3 +14,12 @@ test_that("uniform grid interpolation is the same from values and from a functio
   expect_equal(uc_fun(a), uc_val(a))
   expect_equal(uc_fun(a), f(a), tolerance = 0.05)
 })
+
+test_that("uniform grid interpolation from values accepts a single interval as a vector", {
+  f <- function(x) exp(-x^2)
+  values <- f(seq(0, 2, length.out = 15))
+  uc <- ipol(values, intervals = c(0, 2), method = "uniform")
+  expect_equal(uc(0.7), f(0.7), tolerance = 1e-4)
+  expect_equal(uc(0.7), ipol(values, intervals = list(c(0, 2)), method = "uniform")(0.7))
+  expect_equal(attr(uc, "domain"), attr(ipol(values, intervals = list(c(0, 2)), method = "uniform"), "domain"))
+})

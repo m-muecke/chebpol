@@ -9,6 +9,9 @@ ucappx.real <- function(val, intervals = NULL) {
   if (is.null(dim(val))) {
     dim(val) <- length(val)
   }
+  if (is.numeric(intervals) && length(intervals) == 2L) {
+    intervals <- list(intervals)
+  }
   dims <- dim(val)
   ch <- chebappx.real(val)
   if (is.null(intervals)) {
