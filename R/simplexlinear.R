@@ -1,6 +1,6 @@
 slappx.real <- function(val, knots, ...) {
   if (is.function(val)) {
-    val <- apply(knots, 2L, val)
+    val <- apply(knots, 2L, val, ...)
   }
   dtri <- t(geometry::delaunayn(t(knots), options = "Qt Pp"))
   # For fast evaluation: For each simplex, we precompute the LU-factorization

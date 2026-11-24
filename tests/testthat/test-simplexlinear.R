@@ -56,3 +56,11 @@ test_that("simplex linear interpolants error on input of the wrong dimension", {
     sl(matrix(0, 3, 2))
   })
 })
+
+test_that("simplex linear interpolation forwards extra arguments to the function", {
+  withr::local_seed(42)
+  f <- function(x, a) a * sum(x^2)
+  knots <- matrix(runif(200, -1, 1), 2L)
+  sl <- ipol(f, knots = knots, method = "simplexlinear", a = 3)
+  expect_equal(sl(knots), apply(knots, 2L, f, a = 3))
+})
