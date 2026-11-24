@@ -10,7 +10,7 @@
 #' dispatches to some other method.  All the generated
 #' [interpolant]s accept as an argument a matrix of column
 #' vectors. The generated functions also accept an argument
-#' `threads=getOption("chebpol.threads")` to utilize more than
+#' `threads = getOption("chebpol.threads")` to utilize more than
 #' one CPU if a matrix of column vectors is evaluated.  The option
 #' `chebpol.threads` is initialized from the environment variable
 #' `CHEBPOL_THREADS` upon loading of the package. It defaults to `1`.
@@ -24,24 +24,24 @@
 #' @section Chebyshev:
 #' If we are free to evaluate the function to interpolate in arbitrary points, we can use
 #' a Chebyshev interpolation. The classical one is available with
-#' [`ipol(...,method="chebyshev")`][ipol].
+#' `ipol(..., method = "chebyshev")`.
 #' @section Uniform grids:
 #' There are several options if your function must be evaluated in a uniform grid.
-#' There is the Floater-Hormann rational interpolation available with [`ipol(...,method="fh")`][ipol].
-#' There is a transformed Chebyshev variant [`ipol(..., method="uniform")`][ipol].
+#' There is the Floater-Hormann rational interpolation available with `ipol(..., method = "fh")`.
+#' There is a transformed Chebyshev variant `ipol(..., method = "uniform")`.
 #' @section Arbitrary grids:
 #' For grids which are not uniform, but still Cartesian products of one-dimensional grids,
-#' there is the Floater-Hormann interpolation [`ipol(...,method="fh")`][ipol], and a transformed
-#' Chebyshev variant [`ipol(...,method="general")`][ipol], as well as a multilinear
-#' [`ipol(...,method="multilinear")`][ipol]. These methods work on uniform grids as well.
-#' There is also a `method="stalker"` which is a shape preserving spline, and a variant
-#' `method="hstalker"`. Both are described in a vignette. These splines in one dimension
+#' there is the Floater-Hormann interpolation `ipol(..., method = "fh")`, and a transformed
+#' Chebyshev variant `ipol(..., method = "general")`, as well as a multilinear
+#' `ipol(..., method = "multilinear")`. These methods work on uniform grids as well.
+#' There is also a `method = "stalker"` which is a shape preserving spline, and a variant
+#' `method = "hstalker"`. Both are described in a vignette. These splines in one dimension
 #' attempts to honour monotonicity and local extrema, in particular the `"hstalker"` is
 #' positivity-preserving in the sense that it will preserve maxima and minima.
 #' @section Scattered data:
 #' For scattered data, not necessarily organised as a Cartesian product grid, there is
-#' a simplex linear interpolation available with [`ipol(...,method="simplexlinear")`][ipol],
-#' and a polyharmonic spline with [`ipol(...,method="polyharmonic")`][ipol].
+#' a simplex linear interpolation available with `ipol(..., method = "simplexlinear")`,
+#' and a polyharmonic spline with `ipol(..., method = "polyharmonic")`.
 #' @section Support functions:
 #' There are also functions for producing Chebyshev grids
 #' ([chebknots()]) as well as a function for evaluating a

@@ -103,9 +103,9 @@ any vector argument is treated as a matrix with one row, i.e. a series of points
 ordinary R-functions like `exp` or `sin`.
 
 The second argument to `ch` is called `threads`, it defaults
-to `getOption('chebpol.threads')`, and is the number of parallel
+to `getOption("chebpol.threads")`, and is the number of parallel
 threads which should be used to compute the interpolations. Thus,
-above we could have written `lines(s, ch(s,8))` to compute the
+above we could have written `lines(s, ch(s, 8))` to compute the
 401 points in `s` in 8 threads. There is nothing to gain from
 specifying more threads than there are CPUs in your computer, nor more
 than there are input vectors. The interpolants produced by
@@ -186,7 +186,7 @@ cat("arg:", tp, "true:", f(tp), "ch:", ch(tp), "uc:", uc(tp), "\n")
 In some applications not even uniformly spaced grids are feasible. In this case
 we do something similar as in the uniformly spaced case.
 We have grid-points $\{y_i\}_{i=1..n}$ in ascending or descending order.
-We then use `splinefun` in package **stats** with `method='hyman'`
+We then use `splinefun` in package **stats** with `method = "hyman"`
 to create a monotone function $g$ from the grid-points
 $\{y_i\}_{i=1..n}$ to the Chebyshev knots $\{x_i^n\}_{i=1..n}$. Otherwise, the same
 method as for uniform grids are used.
@@ -325,7 +325,7 @@ hand when $d$ grows.
 
 By default, the interpolant will return `NA` for inputs which are
 outside the convex hull of the knots, but an extrapolation from the
-nearest simplex will be done if the argument `epol=TRUE` is
+nearest simplex will be done if the argument `epol = TRUE` is
 specified.
 
 ### Polyharmonic splines

@@ -76,7 +76,7 @@ separgs <- function(fun, ...) {
 #'
 #' Evaluate a function on a Chebyshev grid, or on a user-specified grid.
 #'
-#' The function `fun` should be a `function(x,...)`, where
+#' The function `fun` should be a `function(x, ...)`, where
 #' `length(x)` equals `length(dims)` (or `length(grid)`).
 #'
 #' If `grid` is provided, `fun` is evaluated on each point in the
@@ -93,7 +93,7 @@ separgs <- function(fun, ...) {
 #' `expand.grid(chebknots(dims, intervals))`, or
 #' `expand.grid(grid)`.
 #'
-#' This function does the same as `apply(expand.grid(grid),1,fun)`, but
+#' This function does the same as `apply(expand.grid(grid), 1, fun)`, but
 #' it's faster and more memory-efficient for large grids because it does not
 #' actually expand the grid.
 #'

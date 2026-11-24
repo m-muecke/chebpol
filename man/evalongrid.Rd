@@ -34,7 +34,7 @@ returns a vector, this will be the first dimension of the returned array.
 Evaluate a function on a Chebyshev grid, or on a user-specified grid.
 }
 \details{
-The function \code{fun} should be a \verb{function(x,...)}, where
+The function \code{fun} should be a \verb{function(x, ...)}, where
 \code{length(x)} equals \code{length(dims)} (or \code{length(grid)}).
 
 If \code{grid} is provided, \code{fun} is evaluated on each point in the
@@ -51,7 +51,7 @@ The grid itself may be produced by
 \code{expand.grid(chebknots(dims, intervals))}, or
 \code{expand.grid(grid)}.
 
-This function does the same as \code{apply(expand.grid(grid),1,fun)}, but
+This function does the same as \code{apply(expand.grid(grid), 1, fun)}, but
 it's faster and more memory-efficient for large grids because it does not
 actually expand the grid.
 

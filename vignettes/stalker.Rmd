@@ -123,7 +123,7 @@ The idea behind the stalker spline is to reduce the overshoot, this is
 achieved by ensuring that if the knots $i-1, i$ and $i+1$ are
 monotonic (either increasing or decreasing), then the function
 $f_i(x)$ will also be monotonic. Other splines, like the Fritsch-Carlson spline in
-`splinefun(...,method='monoH.FC')` also does something similar, though with proper
+`splinefun(..., method = "monoH.FC")` also does something similar, though with proper
 polynomial splines.
 We achieve this by non-traditionally using a
 fractional degree, i.e. a function of the form $a + bx + c|x|^r$,
@@ -430,8 +430,8 @@ end up with a sum of fractional degree functions.
 We can also modify the $t$ with a sigmoid blender like
 $t\in [0,1/2] \mapsto \exp(2-1/t)/2$ and $t\in (1/2,1] \mapsto 1-\exp(2-1/(1-t))/2.$
 A cubic blender is also available.
-These can be selected by the argument `blend="linear"`, `blend="sigmoid"`, or
-`blend="cubic"` to the
+These can be selected by the argument `blend = "linear"`, `blend = "sigmoid"`, or
+`blend = "cubic"` to the
 stalker interpolant.
 The blending functions are shown in Figure 3.
 
@@ -1139,8 +1139,8 @@ Ordinarily, basis functions are combined with a cubic function. I.e. when we ap
 more of the basis function living there is weighted in. This can be changed at evaluation
 time, it can be done “faster” with
 a sigmoid map, i.e. so that near a grid point, the neighbouring basis functions are not used at all.
-Use `blend="sigmoid"` or `blend="cubic"` to choose between two such sigmoid maps,
-`blend="linear"` uses a linear map, but this can create blocking artefacts in higher dimensions.
-It is also possible to specify `blend='square'`, this is a discontinuous blender which near
+Use `blend = "sigmoid"` or `blend = "cubic"` to choose between two such sigmoid maps,
+`blend = "linear"` uses a linear map, but this can create blocking artefacts in higher dimensions.
+It is also possible to specify `blend = "square"`, this is a discontinuous blender which near
 a knot will use the basis living there without blending with the nearby bases. I see no use
 for this other than educational.

@@ -40,7 +40,7 @@ dimension.  These need not be Chebyshev-knots, nor evenly spaced.}
 extra arguments for interpolant creation described in section Details.}
 }
 \value{
-A \verb{function(x, threads=getOption("chebpol.threads"))} defined on a hypercube, an \link{interpolant}
+A \verb{function(x, threads = getOption("chebpol.threads"))} defined on a hypercube, an \link{interpolant}
 for the given function. The argument \code{x} can be a matrix of column
 vectors which are evaluated in parallel in a number of threads.  The
 function yields values for arguments outside the hypercube as well, though
@@ -55,7 +55,7 @@ supported.
 \details{
 \code{ipol} is a wrapper around various interpolation methods in package \pkg{chebpol}.
 Which arguments to specify depends on the method. The interpolation methods are described
-in \code{vignette("chebpol",package="chebpol")}.
+in \code{vignette("chebpol", package = "chebpol")}.
 
 The method \code{"chebyshev"} needs only the number of Chebyshev knots in
 each dimension. This is either the \code{"dim"} attribute of the array
@@ -72,7 +72,7 @@ The methods \code{"multilinear"}, \code{"fh"} (Floater-Hormann), \code{"stalker"
 \code{"general"} needs the argument \code{grid}.  These are the methods
 which can use arbitrary Cartesian grids.
 The stalker spline
-is described in \code{vignette("stalker",package="chebpol")}. The Floater-Hormann
+is described in \code{vignette("stalker", package = "chebpol")}. The Floater-Hormann
 method (\code{"fh"}) also needs the \code{k} argument, the degree of the blending
 polynomials. It defaults to 4.
 

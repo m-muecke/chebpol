@@ -11,7 +11,7 @@
 #' be evaluated in parallel.
 #' @param ... Other parameters. Currently used for simplex linear interpolants with the logical argument
 #' `epol` which makes the interpolant extrapolate to points outside the domain.
-#' The stalker spline has the argument `blend=c("linear","cubic","sigmoid")` where a
+#' The stalker spline has the argument `blend = c("linear", "cubic", "sigmoid")` where a
 #' blending function can be chosen as described in a vignette. The `"multilinear"` interpolant also
 #' has such a blending function.
 #' @return A numeric. If more than one point was evaluated, a vector.

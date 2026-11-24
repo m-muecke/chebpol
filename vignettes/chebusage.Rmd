@@ -274,7 +274,7 @@ for (f in list(ph, fh, sl)) {
 
 The ALGLIB library (<http://www.alglib.net/interpolation/fastrbf.php>) contains an implementation
 of compact support radial basis function interpolation on scattered data. It is available with
-`ipol(..., method='crbf')` if ALGLIB was available at build time.
+`ipol(..., method = "crbf")` if ALGLIB was available at build time.
 
 By default, this is not true for Windows. However if ALGLIB is available,
 **chebpol** can be built with it from source by editing the file
@@ -301,7 +301,7 @@ The author has put ALGLIB in `/usr/local`, and `alglib.pc` contains:
     Libs: -L${libdir} -lalglib
     Cflags: -I${includedir}
 
-When this works, **chebpol** will be built with ALGLIB when you do an `install.packages('chebpol')`.
+When this works, **chebpol** will be built with ALGLIB when you do an `install.packages("chebpol")`.
 
 As of version 2.1, ALGLIB support has been removed from **chebpol** because CRAN
 does not support OpenMP in both C and C++, and alglib requires C++.
@@ -359,7 +359,7 @@ the point are in $[0,1]$. It works reasonably fast for a few thousand knots
 and dimension below 4-5. With more knots, or higher dimensions, both creation and
 evaluation is markedly slower due to exceedingly high numbers of simplices.
 
-The compact radial basis functions approach of ALGLIB in `method='crbf'` *requires*
+The compact radial basis functions approach of ALGLIB in `method = "crbf"` *requires*
 tuning. The three parameters is the base radius (`rbase`), the number of layers (`layers`), and
 a smoothing parameter (`lambda`). The ALGLIB docs says that the base radius should be
 larger than the typical Euclidean distance between the knots. Each layer halves
@@ -390,7 +390,7 @@ use an interpolant since it’s automatically parallelized.
 Even if one does not have more than one CPU, it is worthwhile to use
 the matrix interface if more than one point is to be evaluated (such
 as in the vector interface of package **cubature**), it is a lot
-faster with `ph2(m)` than with `apply(m,2,ph2)`.
+faster with `ph2(m)` than with `apply(m, 2, ph2)`.
 
 ```{r fast}
 f <- ipol(sin, grid = seq(-pi, pi, length.out = 1000), method = "hstalker")

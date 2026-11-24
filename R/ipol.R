@@ -5,7 +5,7 @@
 #'
 #' `ipol` is a wrapper around various interpolation methods in package \pkg{chebpol}.
 #' Which arguments to specify depends on the method. The interpolation methods are described
-#' in `vignette("chebpol",package="chebpol")`.
+#' in `vignette("chebpol", package = "chebpol")`.
 #'
 #' The method `"chebyshev"` needs only the number of Chebyshev knots in
 #' each dimension. This is either the `"dim"` attribute of the array
@@ -22,7 +22,7 @@
 #' `"general"` needs the argument `grid`.  These are the methods
 #' which can use arbitrary Cartesian grids.
 #' The stalker spline
-#' is described in `vignette("stalker",package="chebpol")`. The Floater-Hormann
+#' is described in `vignette("stalker", package = "chebpol")`. The Floater-Hormann
 #' method (`"fh"`) also needs the `k` argument, the degree of the blending
 #' polynomials. It defaults to 4.
 #'
@@ -62,7 +62,7 @@
 #' @param method character. The interpolation method to use.
 #' @param ... Further arguments to the function, if `is.function(val)`. And some
 #' extra arguments for interpolant creation described in section Details.
-#' @return A `function(x, threads=getOption("chebpol.threads"))` defined on a hypercube, an [interpolant]
+#' @return A `function(x, threads = getOption("chebpol.threads"))` defined on a hypercube, an [interpolant]
 #' for the given function. The argument `x` can be a matrix of column
 #' vectors which are evaluated in parallel in a number of threads.  The
 #' function yields values for arguments outside the hypercube as well, though
