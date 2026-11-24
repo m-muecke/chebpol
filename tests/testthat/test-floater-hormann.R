@@ -23,3 +23,24 @@ test_that("Floater-Hormann interpolation forwards extra arguments to the functio
   fh <- ipol(f, grid = grid, k = 2, method = "fh", a = 3)
   expect_equal(fh(c(0.2, 0.4)), f(c(0.2, 0.4), a = 3))
 })
+
+test_that("Floater-Hormann interpolation works at the smallest and largest degree", {
+  f <- function(x) exp(sum(x))
+  grid <- list(seq(0, 1, length.out = 6), seq(0, 1, length.out = 4))
+  pts <- grid_points(grid)
+  for (k in list(0, c(5, 3))) {
+    fh <- ipol(f, grid = grid, method = "fh", k = k)
+    expect_equal(fh(pts), apply(pts, 2L, f))
+    expect_equal(anyNA(fh(c(0.3, 0.6))), FALSE)
+  }
+})
+
+test_that("ipol() rejects a Floater-Hormann degree outside the valid range", {
+  f <- function(x) exp(sum(x))
+  grid <- list(seq(0, 1, length.out = 6), seq(0, 1, length.out = 4))
+  expect_snapshot(error = TRUE, {
+    ipol(f, grid = grid, method = "fh", k = -1)
+    ipol(f, grid = grid, method = "fh", k = 4)
+    ipol(f, grid = grid, method = "fh", k = c(6, 3))
+  })
+})
