@@ -781,6 +781,8 @@ SEXP R_evalstalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   const double *val = REAL_RO(VECTOR_ELT(stalker, 3));
   SEXP Sgrid = VECTOR_ELT(stalker, 4);
   const int nrank = LENGTH(Sgrid);
+  if (Rf_nrows(Sx) != nrank)
+    Rf_error("Rank of input (%d) does not match rank of spline (%d)", Rf_nrows(Sx), nrank);
   const double *grid[nrank];
   for (int i = 0; i < nrank; i++)
     grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
@@ -816,6 +818,8 @@ SEXP R_evalhyp(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   const double *val = REAL_RO(VECTOR_ELT(stalker, 4));
   SEXP Sgrid = VECTOR_ELT(stalker, 5);
   const int nrank = LENGTH(Sgrid);
+  if (Rf_nrows(Sx) != nrank)
+    Rf_error("Rank of input (%d) does not match rank of spline (%d)", Rf_nrows(Sx), nrank);
   const double *grid[nrank];
   for (int i = 0; i < nrank; i++)
     grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));

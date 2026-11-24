@@ -850,6 +850,8 @@ SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extr
   const double *x = REAL_RO(Sx);
   const int dim = Rf_nrows(Sknots);
   const int numvec = Rf_ncols(Sx);
+  if (Rf_nrows(Sx) != dim)
+    Rf_error("Dimension of input (%d) must match dimension of interpolant (%d)", Rf_nrows(Sx), dim);
   const double *knots = REAL_RO(Sknots);
   const double *val = REAL_RO(Sval);
 #ifdef _OPENMP

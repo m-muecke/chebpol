@@ -24,3 +24,26 @@
       Error in `match.arg()`:
       ! 'arg' should be one of "linear", "cubic", "sigmoid", "parodic", "square", "mean"
 
+# stalker interpolants error on input of the wrong dimension
+
+    Code
+      st(matrix(0, 1, 5))
+    Condition
+      Error:
+      ! Rank of input (1) does not match rank of spline (2)
+    Code
+      st(matrix(0, 3, 2))
+    Condition
+      Error:
+      ! Rank of input (3) does not match rank of spline (2)
+    Code
+      hst(matrix(0, 1, 5))
+    Condition
+      Error:
+      ! Rank of input (1) does not match rank of spline (2)
+    Code
+      hst(matrix(0, 3, 2))
+    Condition
+      Error:
+      ! Rank of input (3) does not match rank of spline (2)
+

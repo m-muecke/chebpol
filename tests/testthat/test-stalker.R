@@ -86,3 +86,16 @@ test_that("ipol() errors on invalid stalker input", {
     ipol(f, grid = grid, method = "stalker", blend = "nope")
   })
 })
+
+test_that("stalker interpolants error on input of the wrong dimension", {
+  f <- function(x) exp(-sum(x^2))
+  grid <- list(seq(-1, 1, length.out = 9), seq(-1, 1, length.out = 7))
+  st <- ipol(f, grid = grid, method = "stalker")
+  hst <- ipol(f, grid = grid, method = "hstalker")
+  expect_snapshot(error = TRUE, {
+    st(matrix(0, 1, 5))
+    st(matrix(0, 3, 2))
+    hst(matrix(0, 1, 5))
+    hst(matrix(0, 3, 2))
+  })
+})

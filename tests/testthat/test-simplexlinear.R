@@ -46,3 +46,13 @@ test_that("ipol() errors without knots for simplex linear interpolation", {
   f <- function(x) exp(-sum(x^2))
   expect_snapshot(ipol(f, method = "simplexlinear"), error = TRUE)
 })
+
+test_that("simplex linear interpolants error on input of the wrong dimension", {
+  withr::local_seed(42)
+  f <- function(x) exp(-sum(x^2))
+  sl <- ipol(f, knots = matrix(runif(200, -1, 1), 2L), method = "simplexlinear")
+  expect_snapshot(error = TRUE, {
+    sl(matrix(0, 1, 5))
+    sl(matrix(0, 3, 2))
+  })
+})
