@@ -64,3 +64,28 @@ test_that("simplex linear interpolation forwards extra arguments to the function
   sl <- ipol(f, knots = knots, method = "simplexlinear", a = 3)
   expect_equal(sl(knots), apply(knots, 2L, f, a = 3))
 })
+
+test_that("simplex linear blends reproduce values at the knots", {
+  withr::local_seed(42)
+  f <- function(x) exp(-sum(x^2))
+  knots <- cbind(matrix(runif(200, -1, 1), 2L), c(-1, -1), c(-1, 1), c(1, -1), c(1, 1))
+  sl <- ipol(f, knots = knots, method = "simplexlinear")
+  for (blend in c("cubic", "linear", "sigmoid", "parodic", "square")) {
+    expect_equal(sl(knots, blend = blend), apply(knots, 2L, f))
+  }
+})
+
+test_that("simplex linear blends give a value between the vertex values inside the hull", {
+  withr::local_seed(42)
+  f <- function(x) exp(-sum(x^2))
+  knots <- cbind(matrix(runif(200, -1, 1), 2L), c(-1, -1), c(-1, 1), c(1, -1), c(1, 1))
+  sl <- ipol(f, knots = knots, method = "simplexlinear")
+  x <- matrix(runif(2000, -0.9, 0.9), 2L)
+  values <- range(apply(knots, 2L, f))
+  for (blend in c("cubic", "linear", "sigmoid", "parodic", "square", "mean")) {
+    v <- sl(x, blend = blend)
+    expect_equal(anyNA(v), FALSE)
+    expect_gte(min(v), values[1L])
+    expect_lte(max(v), values[2L])
+  }
+})

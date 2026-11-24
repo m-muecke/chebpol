@@ -730,11 +730,19 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
     const int *tri = dtri + simplex * N;
     double sum = 0;
     double wsum = 0;
+    int nearest = 0;
     for (int d = 0; d < N; d++) {
-      const double w = blendfun(vec[d], blend);
+      // rounding can put a barycentric coordinate slightly outside [0, 1]
+      const double coord = vec[d] < 0 ? 0 : (vec[d] > 1 ? 1 : vec[d]);
+      if (vec[d] > vec[nearest])
+        nearest = d;
+      const double w = blendfun(coord, blend);
       wsum += w;
       sum += w * val[tri[d] - 1];
     }
+    // square blending gives every vertex weight 0 when no coordinate reaches 0.5
+    if (wsum == 0)
+      return val[tri[nearest] - 1];
     return sum / wsum;
   }
 
