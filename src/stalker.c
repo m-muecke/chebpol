@@ -70,8 +70,7 @@ static R_INLINE double findmonor(double dmin, double dplus, double vmin, double 
     double lo, hi;
     do {
       iter++;
-      status = gsl_root_fsolver_iterate(s);
-      r = gsl_root_fsolver_root(s);
+      gsl_root_fsolver_iterate(s);
       lo = gsl_root_fsolver_x_lower(s);
       hi = gsl_root_fsolver_x_upper(s);
       status = gsl_root_test_interval(lo, hi, 0, 1e-8);
@@ -134,7 +133,7 @@ static R_INLINE double solver(double kmin, double kplus, double vmin, double vpl
     int iter = 0;
     do {
       iter++;
-      status = gsl_root_fsolver_iterate(s);
+      gsl_root_fsolver_iterate(s);
       r = gsl_root_fsolver_root(s);
       double lo = gsl_root_fsolver_x_lower(s);
       double hi = gsl_root_fsolver_x_upper(s);
@@ -653,20 +652,19 @@ static double evalstalker(const double *x, const int nrank, const int *dims, con
     if (imin < N - 2)
       v4 = val[(imin + 2) * stride];
   }
-  double low = NA_REAL;
   double dmin = NA_REAL;
   if (imin > 0)
     dmin = gr[imin] - gr[imin - 1];
   double dplus = gr[imin + 1] - gr[imin];
-  low = stalk1(xx - gr[imin], v1, v2, v3, dmin, dplus, degree[newrank], rdet[imin], rpmin[imin], rpplus[imin], uniform);
-  double high = NA_REAL;
+  const double low =
+      stalk1(xx - gr[imin], v1, v2, v3, dmin, dplus, degree[newrank], rdet[imin], rpmin[imin], rpplus[imin], uniform);
   dmin = dplus;
   if (imin < N - 2)
     dplus = gr[imin + 2] - gr[imin + 1];
   else
     dplus = NA_REAL;
-  high = stalk1(xx - gr[imin + 1], v2, v3, v4, dmin, dplus, degree[newrank], rdet[imin + 1], rpmin[imin + 1],
-                rpplus[imin + 1], uniform);
+  const double high = stalk1(xx - gr[imin + 1], v2, v3, v4, dmin, dplus, degree[newrank], rdet[imin + 1],
+                             rpmin[imin + 1], rpplus[imin + 1], uniform);
 
   // combine the basis functions
   // map into normalized coordinates
