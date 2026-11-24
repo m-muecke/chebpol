@@ -9,11 +9,6 @@
 }
 
 .onLoad <- function(libname, pkgname) {
-  thr <- as.integer(Sys.getenv("CHEBPOL_THREADS"))
-  if (is.na(thr)) {
-    thr <- 1L
-  }
-  if (is.null(getOption("chebpol.threads"))) {
-    options(chebpol.threads = thr)
-  }
+  threads <- as.integer(Sys.getenv("CHEBPOL_THREADS", unset = "1"))
+  options(chebpol.threads = getOption("chebpol.threads", if (is.na(threads)) 1L else threads))
 }
