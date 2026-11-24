@@ -22,7 +22,7 @@
       ipol(f, grid = grid, method = "stalker", blend = "nope")
     Condition
       Error in `match.arg()`:
-      ! 'arg' should be one of "linear", "cubic", "sigmoid", "parodic", "square", "mean"
+      ! 'arg' should be one of "cubic", "linear", "sigmoid", "parodic", "square", "mean"
 
 # stalker interpolants error on input of the wrong dimension
 

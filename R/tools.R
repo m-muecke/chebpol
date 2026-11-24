@@ -31,19 +31,14 @@ vectorfun <- function(fun, arity, domain = NULL) {
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
-defaultblend <- c("linear", "cubic", "sigmoid", "parodic", "square", "mean")
-
-blenddef <- function(fun, blend = defaultblend) {
-  if (is.null(blend)) {
+blenddef <- function(fun, blend) {
+  f <- formals(fun)
+  if (is.null(blend) || !"blend" %in% names(f)) {
     return(fun)
   }
-  blend <- match.arg(blend)
-  pos <- match(blend, defaultblend)
-  f <- formals(fun)
-  if (!"blend" %in% names(f)) {
-    return(f)
-  }
-  f[["blend"]] <- as.call(c(list(as.name("c")), c(defaultblend[pos], defaultblend[-pos])))
+  choices <- eval(f[["blend"]])
+  blend <- match.arg(blend, choices)
+  f[["blend"]] <- as.call(c(list(as.name("c")), c(blend, setdiff(choices, blend))))
   formals(fun) <- f
   ffun <- get("fun", environment(fun))
   ff <- formals(ffun)

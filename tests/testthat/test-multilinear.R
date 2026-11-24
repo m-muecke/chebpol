@@ -26,3 +26,9 @@ test_that("multilinear blends reproduce values at the grid points", {
     expect_equal(lip(pts, blend = blend), apply(pts, 2, f))
   }
 })
+
+test_that("ipol() rejects a blend that multilinear interpolation does not support", {
+  f <- function(x) exp(-sum(x^2))
+  grid <- list(seq(-1, 1, length.out = 9), seq(-1, 1, length.out = 7))
+  expect_snapshot(ipol(f, grid = grid, method = "multilinear", blend = "mean"), error = TRUE)
+})
