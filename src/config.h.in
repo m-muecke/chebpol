@@ -1,4 +1,0 @@
-// Generated into config.h by configure. Not used on Windows, see Makevars.win.
-#undef HAVE_FFTW
-#undef HAVE_ALGLIB
-#undef HAVE_GSL
