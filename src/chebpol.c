@@ -31,8 +31,7 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
   } else {
     // That's funny, perhaps we've been given MKL with its amputated FFTW?
     // Let's try a series of strided 1d-transforms
-    for (R_xlen_t i = 0; i < siz; i++)
-      F[i] = x[i];
+    memcpy(F, x, siz * sizeof(double));
     int stride = 1;
     for (int i = 0; i < rank; i++) {
       fftw_iodim dim;
