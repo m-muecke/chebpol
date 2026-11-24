@@ -66,3 +66,20 @@ test_that("chebcoef() and chebeval() accept integer input", {
   expect_equal(chebeval(c(0L, 1L), coef), chebeval(c(0, 1), coef))
   expect_equal(chebeval(c(0.1, 0.2), values), chebeval(c(0.1, 0.2), values + 0))
 })
+
+test_that("chebeval() maps points into the given intervals", {
+  f <- function(x) exp(-sum(x^2))
+  intervals <- list(c(0, 2), c(1, 3))
+  coef <- chebcoef(evalongrid(f, c(8, 8), intervals))
+  ch <- ipol(f, dims = c(8, 8), intervals = intervals, method = "chebyshev")
+  x <- cbind(c(0.5, 1.5), c(1.2, 2.2), c(1.9, 1.1))
+  expect_equal(chebeval(x, coef, intervals), ch(x))
+  expect_equal(chebeval(x[, 1L], coef, intervals), ch(x[, 1L]))
+})
+
+test_that("chebeval() accepts a single interval as a vector", {
+  f <- function(x) exp(-x^2)
+  coef <- chebcoef(evalongrid(f, 12, c(0, 2)))
+  expect_equal(chebeval(0.7, coef, c(0, 2)), f(0.7), tolerance = 1e-6)
+  expect_equal(chebeval(0.7, coef, list(c(0, 2))), chebeval(0.7, coef, c(0, 2)))
+})

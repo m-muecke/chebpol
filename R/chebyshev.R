@@ -138,8 +138,12 @@ chebeval <- function(x, coef, intervals = NULL, threads = getOption("chebpol.thr
   if (is.null(intervals)) {
     return(.Call(C_evalcheb, coef, x, threads, NULL))
   }
-  # map into intervals
-  .Call(C_evalcheb, coef, mapply(\(x, i) 2 * (x[[1L]] - mean(i)) / diff(i), x, intervals), threads, NULL)
+  if (is.numeric(intervals) && length(intervals) == 2L) {
+    intervals <- list(intervals)
+  }
+  ispan <- vapply(intervals, \(i) 2 / diff(i), numeric(1L))
+  mid <- vapply(intervals, mean, numeric(1L))
+  .Call(C_evalcheb, coef, (x - mid) * ispan, threads, NULL)
 }
 
 # return a function which is a Chebyshev interpolation
