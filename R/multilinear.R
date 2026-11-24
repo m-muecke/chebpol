@@ -18,7 +18,7 @@ mlappx.real <- function(val, grid, ...) {
   val <- as.numeric(val)
   vectorfun(
     function(x, threads = getOption("chebpol.threads"), blend = c("linear", "cubic", "sigmoid", "parodic", "square")) {
-      blend <- switch(match.arg(blend), linear = 0L, sigmoid = 1L, parodic = 2L, cubic = 3L, square = 4L)
+      blend <- blend_types[[match.arg(blend)]]
       .Call(C_evalmlip, grid, val, x, threads, blend)
     },
     arity = length(grid),

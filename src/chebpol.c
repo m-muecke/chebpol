@@ -622,7 +622,7 @@ SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   int threads = Rf_asInteger(Rthreads);
 #endif
   const double *grid[rank];
-  int blend = 0;
+  blend_type blend = BLEND_LINEAR;
   if (!Rf_isReal(values))
     Rf_error("values must be numeric");
   if (!Rf_isReal(x))
@@ -640,7 +640,7 @@ SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   if (LENGTH(values) != gridsize)
     Rf_error("grid has size %d, you supplied %d values", gridsize, LENGTH(values));
   if (!Rf_isNull(Sblend))
-    blend = Rf_asInteger(Sblend);
+    blend = (blend_type)Rf_asInteger(Sblend);
   const int numvec = Rf_isMatrix(x) ? Rf_ncols(x) : 1;
   const double *xp = REAL_RO(x);
   SEXP resvec = PROTECT(Rf_allocVector(REALSXP, numvec));
@@ -692,7 +692,7 @@ SEXP R_sqdiffs(SEXP x1, SEXP x2, SEXP Sthreads) {
 
 static double findsimplex(const double *x, const double *knots, const int *dtri, const double *lumats, const int *ipivs,
                           const double *bbox, bool epol, const double *val, const int dim, const int numsimplex,
-                          int nknots, int blend) {
+                          int nknots, blend_type blend) {
 
   double vec[dim + 1];
   int N = dim + 1, one = 1, info;
@@ -800,9 +800,9 @@ SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extr
   SEXP ret = PROTECT(Rf_allocVector(REALSXP, Rf_ncols(Sx)));
   double *resvec = REAL(ret);
   bool epol = Rf_asLogical(extrapolate);
-  int blend = 0;
+  blend_type blend = BLEND_LINEAR;
   if (!Rf_isNull(Sblend))
-    blend = Rf_asInteger(Sblend);
+    blend = (blend_type)Rf_asInteger(Sblend);
   const int nknots = Rf_ncols(Sknots);
 
 #ifdef _OPENMP

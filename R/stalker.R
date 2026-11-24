@@ -44,7 +44,7 @@ oldstalkerappx <- function(val, grid, r = 2, ...) {
       degree = r,
       blend = c("linear", "cubic", "sigmoid", "parodic", "square")
     ) {
-      blend <- switch(match.arg(blend), linear = 0L, sigmoid = 1L, parodic = 2L, cubic = 3L, square = 4L)
+      blend <- blend_types[[match.arg(blend)]]
       if (!identical(degree, r)) {
         degree <- rep_len(as.numeric(degree), length(grid))
         if (!havegsl() && any(is.na(degree) & !uniform)) {
@@ -52,7 +52,7 @@ oldstalkerappx <- function(val, grid, r = 2, ...) {
         }
         stalker <- c(list(val = val, grid = grid), stalkercontext(dmin, dplus, degree), uniform = list(uniform))
       }
-      .Call(C_evalstalker, x, stalker, degree, as.integer(blend), as.integer(threads))
+      .Call(C_evalstalker, x, stalker, degree, blend, as.integer(threads))
     },
     arity = length(grid),
     domain = lapply(grid, range)
@@ -80,8 +80,8 @@ hstalkerappx <- function(val, grid, ...) {
       threads = getOption("chebpol.threads"),
       blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
     ) {
-      blend <- switch(match.arg(blend), linear = 0L, sigmoid = 1L, parodic = 2L, cubic = 3L, square = 4L, mean = 5L)
-      .Call(C_evalhyp, x, stalker, as.integer(blend), as.integer(threads))
+      blend <- blend_types[[match.arg(blend)]]
+      .Call(C_evalhyp, x, stalker, blend, as.integer(threads))
     },
     arity = length(grid),
     domain = lapply(grid, range)
@@ -109,8 +109,8 @@ stalkerappx <- function(val, grid, ...) {
       threads = getOption("chebpol.threads"),
       blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
     ) {
-      blend <- switch(match.arg(blend), linear = 0L, sigmoid = 1L, parodic = 2L, cubic = 3L, square = 4L, mean = 5L)
-      .Call(C_evalstalk, x, stalker, as.integer(blend), as.integer(threads))
+      blend <- blend_types[[match.arg(blend)]]
+      .Call(C_evalstalk, x, stalker, blend, as.integer(threads))
     },
     arity = length(grid),
     domain = lapply(grid, range)

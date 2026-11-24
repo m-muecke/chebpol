@@ -55,24 +55,32 @@ double C_evalmlip(const int rank, const double *x, const double **grid, const in
 void C_evalongrid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, const double **grid,
                   const int *dims, const int rank, const int valuedim, double *result, void *userdata);
 
-static R_INLINE double blendfun(double w, int blend) {
+typedef enum {
+  BLEND_LINEAR = 0,
+  BLEND_SIGMOID = 1,
+  BLEND_PARODIC = 2,
+  BLEND_CUBIC = 3,
+  BLEND_SQUARE = 4,
+  BLEND_MEAN = 5
+} blend_type;
+
+static R_INLINE double blendfun(double w, blend_type blend) {
   switch (blend) {
-  case 0:
-    // Linear, nothing to do here
+  case BLEND_LINEAR:
     break;
-  case 1:
+  case BLEND_SIGMOID:
     w = w < 0.5 ? 0.5 * exp(2 - 1 / w) : 1 - 0.5 * exp(2 - 1 / (1 - w)); // smooth sigmoid blending
     break;
-  case 2:
+  case BLEND_PARODIC:
     w = w < 0.5 ? 0.5 * exp(4 - 1 / (w * w)) : 1 - 0.5 * exp(4 - 1 / ((1 - w) * (1 - w))); // parodic sigmoid blending
     break;
-  case 3:
+  case BLEND_CUBIC:
     w = (-2 * w + 3) * w * w; // cubic blending
     break;
-  case 4:
+  case BLEND_SQUARE:
     w = (w < 0.5) ? 0 : 1; // discontinuous blending
     break;
-  case 5:
+  case BLEND_MEAN:
     w = 0.5; // mean blending
   }
   return w;

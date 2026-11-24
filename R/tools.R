@@ -31,6 +31,8 @@ vectorfun <- function(fun, arity, domain = NULL) {
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
+blend_types <- c(linear = 0L, sigmoid = 1L, parodic = 2L, cubic = 3L, square = 4L, mean = 5L)
+
 blenddef <- function(fun, blend) {
   f <- formals(fun)
   if (is.null(blend) || !"blend" %in% names(f)) {

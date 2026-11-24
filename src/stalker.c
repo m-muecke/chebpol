@@ -372,7 +372,7 @@ static void makestalk(const int nrank, const int *dims, const double **grid, con
   }
 }
 static double evalstalk(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
-                        int blend, const double *b, const double *c, const double *r) {
+                        blend_type blend, const double *b, const double *c, const double *r) {
   // loop over the corners of the hypercube surrounding x.
   // For each corner, evaluate the function there.
   // Make weighted sum.
@@ -542,7 +542,7 @@ static void makehyp(const int nrank, const int *dims, const double **grid, const
 }
 
 static double evalhyp(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
-                      int blend, const double *a, const double *b, const double *c, const double *d) {
+                      blend_type blend, const double *a, const double *b, const double *c, const double *d) {
   // loop over the corners of the hypercube surrounding x.
   // For each corner, evaluate the function there.
   // Make weighted sum.
@@ -619,7 +619,7 @@ static double evalhyp(const double *x, const int nrank, const int *dims, const d
 }
 
 static double evalstalker(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
-                          int blend, const double *degree, precomp *pcomp) {
+                          blend_type blend, const double *degree, precomp *pcomp) {
 
   if (nrank == 0)
     return val[0];
@@ -771,7 +771,7 @@ SEXP R_makehyp(SEXP Sval, SEXP Sgrid) {
 SEXP R_evalstalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   const double *x = REAL_RO(Sx);
   const int N = Rf_ncols(Sx);
-  int blend = INTEGER_RO(Sblend)[0];
+  blend_type blend = (blend_type)Rf_asInteger(Sblend);
 #ifdef _OPENMP
   int threads = Rf_asInteger(Sthreads);
 #endif
@@ -807,7 +807,7 @@ SEXP R_evalstalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
 SEXP R_evalhyp(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   const double *x = REAL_RO(Sx);
   const int N = Rf_ncols(Sx);
-  int blend = INTEGER_RO(Sblend)[0];
+  blend_type blend = (blend_type)Rf_asInteger(Sblend);
 #ifdef _OPENMP
   int threads = Rf_asInteger(Sthreads);
 #endif
@@ -853,7 +853,7 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
   SEXP Spmin = VECTOR_ELT(stalker, 3);
   SEXP Spplus = VECTOR_ELT(stalker, 4);
   SEXP Suniform = VECTOR_ELT(stalker, 5);
-  int blend = Rf_asInteger(Sblend);
+  blend_type blend = (blend_type)Rf_asInteger(Sblend);
   const int nrank = LENGTH(Sgrid);
   if (K != nrank)
     Rf_error("Rank of input (%d) does not match rank of spline (%d)", K, nrank);

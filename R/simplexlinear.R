@@ -13,8 +13,8 @@ slappx.real <- function(val, knots, ...) {
       epol = FALSE,
       blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
     ) {
-      blend <- switch(match.arg(blend), linear = 0L, sigmoid = 1L, parodic = 2L, cubic = 3L, square = 4L, mean = 5L)
-      .Call(C_evalsl, x, knots, dtri, adata, val, epol, threads, as.integer(blend))
+      blend <- blend_types[[match.arg(blend)]]
+      .Call(C_evalsl, x, knots, dtri, adata, val, epol, threads, blend)
     },
     arity = nrow(knots)
   )
