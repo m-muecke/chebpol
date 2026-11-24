@@ -688,7 +688,7 @@ SEXP R_makestalk(SEXP Sval, SEXP Sgrid) {
     len *= dims[r];
   }
   if (len != LENGTH(Sval)) {
-    Rf_error("number of values (%d) does not match grid size (%d)\n", LENGTH(Sval), len);
+    Rf_error("number of values (%d) does not match grid size (%d)", LENGTH(Sval), len);
   }
   const double *val = REAL_RO(Sval);
   const double *grid[nrank];
@@ -737,7 +737,7 @@ SEXP R_makehyp(SEXP Sval, SEXP Sgrid) {
     len *= dims[r];
   }
   if (len != LENGTH(Sval)) {
-    Rf_error("number of values (%d) does not match grid size (%d)\n", LENGTH(Sval), len);
+    Rf_error("number of values (%d) does not match grid size (%d)", LENGTH(Sval), len);
   }
   const double *val = REAL_RO(Sval);
   const double *grid[nrank];
@@ -859,7 +859,7 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
     len *= dims[r];
   }
   if (len != LENGTH(VECTOR_ELT(stalker, 0))) {
-    Rf_error("number of values (%d) does not match grid size (%d)\n", LENGTH(VECTOR_ELT(stalker, 0)), len);
+    Rf_error("number of values (%d) does not match grid size (%d)", LENGTH(VECTOR_ELT(stalker, 0)), len);
   }
   if (LENGTH(Sdegree) != nrank) {
     Rf_error("degree length must match dimension (%d)", nrank);
