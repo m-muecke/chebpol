@@ -51,7 +51,9 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
         break;
       }
       // Do them
+#ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (threads > 1)
+#endif
       for (R_xlen_t j = 0; j < ntrans; j++) {
         div_t dv = div(j, stride);
         int offset = dv.rem + stride * tlen * dv.quot;
@@ -234,7 +236,9 @@ SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spa
   const int *dims;
   int siz = 1;
   const double *val = REAL_RO(vals);
+#ifdef _OPENMP
   int threads = Rf_asInteger(Rthreads);
+#endif
   SEXP dim;
   int rank;
   UNUSED(spare);
@@ -269,7 +273,9 @@ SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spa
   const int numvec = Rf_isMatrix(inx) ? Rf_ncols(inx) : 1;
   SEXP resvec = PROTECT(Rf_allocVector(REALSXP, numvec));
   double *out = REAL(resvec);
+#ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
+#endif
   for (int i = 0; i < numvec; i++) {
     out[i] = FH(val, xp + i * rank, knots, dims, rank, weights);
   }
@@ -278,7 +284,9 @@ SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spa
 }
 
 R_INLINE static void fhweights(const int n, const double *grid, const int d, double *w, int threads) {
+#ifdef _OPENMP
 #pragma omp parallel for schedule(static) num_threads(threads) if (threads > 1)
+#endif
   for (int k = 0; k <= n; k++) {
     const int start = (k < d) ? 0 : k - d, end = (k < n - d) ? k : n - d;
     double sum = 0.0;
@@ -360,7 +368,9 @@ SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
   const int *dims;
   int siz = 1;
   const double *cf = REAL_RO(coef);
+#ifdef _OPENMP
   int threads = Rf_asInteger(Rthreads);
+#endif
   SEXP dim;
   int rank;
   UNUSED(spare);
@@ -391,7 +401,9 @@ SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
   SEXP resvec = PROTECT(Rf_allocVector(REALSXP, numvec));
 #endif
   double *out = REAL(resvec);
+#ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
+#endif
   for (int i = 0; i < numvec; i++) {
     out[i] = C_evalcheb(cf, xp + i * rank, dims, rank);
   }
@@ -445,7 +457,9 @@ SEXP R_evalpolyh(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, SE
   const double *w = REAL_RO(weights);
   const double *lw = REAL_RO(lweights);
   double k = Rf_asReal(Sk);
+#ifdef _OPENMP
   int threads = Rf_asInteger(Sthreads);
+#endif
   int numvec;
   const int rank = Rf_nrows(Sknots);
   UNUSED(spare);
@@ -464,10 +478,13 @@ SEXP R_evalpolyh(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, SE
   }
   SEXP res = PROTECT(Rf_allocVector(REALSXP, numvec));
   double *out = REAL(res);
+  const int nknots = Rf_ncols(Sknots);
 
+#ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
+#endif
   for (int i = 0; i < numvec; i++) {
-    out[i] = C_evalpolyh(x + i * rank, knots, w, lw, rank, Rf_ncols(Sknots), k);
+    out[i] = C_evalpolyh(x + i * rank, knots, w, lw, rank, nknots, k);
   }
   UNPROTECT(1);
   return res;
@@ -493,13 +510,18 @@ void C_evalongrid(void (*fun)(double *x, double *y, int valuedim, void *ud), dou
 }
 
 static void C_call(double *x, double *y, const int valuedim, void *userdata) {
-  // don't need x, because the arg-pointer which is used is set in the
-  // R_fcall structure
-  if (x == NULL) {
-  }; // avoid warning
-  const double *fv = REAL_RO(Rf_eval(*(SEXP *)userdata, R_BaseEnv));
-  for (int i = 0; i < valuedim; i++)
-    y[i] = fv[i];
+  // x is not needed: the argument vector is already part of the call in userdata
+  UNUSED(x);
+  PROTECT_INDEX ipx;
+  SEXP fv;
+  PROTECT_WITH_INDEX(fv = Rf_eval(*(SEXP *)userdata, R_BaseEnv), &ipx);
+  if (!Rf_isNumeric(fv))
+    Rf_error("fun must return a numeric value");
+  if (LENGTH(fv) != valuedim)
+    Rf_error("fun must return a value of length %d, not %d", valuedim, LENGTH(fv));
+  REPROTECT(fv = Rf_coerceVector(fv, REALSXP), ipx);
+  memcpy(y, REAL_RO(fv), valuedim * sizeof(double));
+  UNPROTECT(1);
 }
 
 SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
@@ -533,8 +555,8 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
   for (int i = 0; i < rank; i++)
     REAL(R_arg)[i] = grid[i][0];
   SEXP fv = Rf_eval(R_fcall, R_BaseEnv);
-  if (!Rf_isReal(fv))
-    Rf_error("fun must return a real value");
+  if (!Rf_isNumeric(fv))
+    Rf_error("fun must return a numeric value");
   valuedim = LENGTH(fv);
 
   // Now, it's just to fill in arg, and
@@ -700,7 +722,9 @@ SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   const int rank = LENGTH(sgrid);
   int gridsize = 1;
   int dims[rank];
+#ifdef _OPENMP
   int threads = Rf_asInteger(Rthreads);
+#endif
   const double *grid[rank];
   int blend = 0;
   if (!Rf_isReal(values))
@@ -729,9 +753,12 @@ SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   SEXP resvec = PROTECT(Rf_allocVector(REALSXP, numvec));
 #endif
   double *out = REAL(resvec);
+  const double *val = REAL_RO(values);
+#ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
+#endif
   for (int i = 0; i < numvec; i++) {
-    out[i] = C_evalmlip(rank, xp + i * rank, grid, dims, REAL_RO(values), blend);
+    out[i] = C_evalmlip(rank, xp + i * rank, grid, dims, val, blend);
   }
   UNPROTECT(1);
   return resvec;
@@ -742,15 +769,20 @@ SEXP R_sqdiffs(SEXP x1, SEXP x2, SEXP Sthreads) {
   // the squared column sums should be returned.
   const int r1 = Rf_nrows(x1), c1 = Rf_ncols(x1), r2 = Rf_nrows(x2), c2 = Rf_ncols(x2);
   int N = c1 * c2;
+#ifdef _OPENMP
   int threads = Rf_asInteger(Sthreads);
+#endif
   SEXP res = PROTECT(Rf_allocVector(REALSXP, N));
   double *dres = REAL(res);
   double *np = dres;
+  const double *x1v = REAL_RO(x1), *x2v = REAL_RO(x2);
+#ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (c1 > 1)
+#endif
   for (int i = 0; i < c1; i++) {
-    const double *x1p = REAL_RO(x1) + i * r1;
+    const double *x1p = x1v + i * r1;
     for (int j = 0; j < c2; j++) {
-      const double *x2p = REAL_RO(x2) + j * r2;
+      const double *x2p = x2v + j * r2;
       double csum = 0.0;
       for (int k = 0; k < r1; k++) {
         csum += (x1p[k] - x2p[k]) * (x1p[k] - x2p[k]);
@@ -868,25 +900,32 @@ SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extr
   const int numvec = Rf_ncols(Sx);
   const double *knots = REAL_RO(Sknots);
   const double *val = REAL_RO(Sval);
+#ifdef _OPENMP
   int threads = Rf_asInteger(Sthreads);
+#endif
   SEXP ret = PROTECT(Rf_allocVector(REALSXP, Rf_ncols(Sx)));
   double *resvec = REAL(ret);
   int epol = Rf_asLogical(extrapolate);
   int blend = 0;
   if (!Rf_isNull(Sblend))
     blend = Rf_asInteger(Sblend);
+  const int nknots = Rf_ncols(Sknots);
 
+#ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(guided) if (threads > 1 && numvec > 1)
+#endif
   for (int i = 0; i < numvec; i++) {
-    resvec[i] = findsimplex(x + i * dim, knots, dtri, lumats, pivots, bboxmat, epol, val, dim, numsimplex,
-                            Rf_ncols(Sknots), blend);
+    resvec[i] =
+        findsimplex(x + i * dim, knots, dtri, lumats, pivots, bboxmat, epol, val, dim, numsimplex, nknots, blend);
   }
   UNPROTECT(1);
   return ret;
 }
 
 SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
+#ifdef _OPENMP
   int threads = Rf_asInteger(Sthreads);
+#endif
   const int *dtri = INTEGER_RO(Sdtri);
   const double *knots = REAL_RO(Sknots);
   const int dim = Rf_nrows(Sknots);
@@ -901,7 +940,9 @@ SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
   int *pivots = INTEGER(VECTOR_ELT(retlist, 1));
   double *bboxmat = REAL(VECTOR_ELT(retlist, 2));
 
+#ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (threads > 1 && numsimplex > 1)
+#endif
   for (int simplex = 0; simplex < numsimplex; simplex++) {
     const int *tri = dtri + simplex * (dim + 1);
     int *ipiv = pivots + simplex * N;
@@ -946,7 +987,10 @@ SEXP R_havefftw(void) {
 SEXP R_phifunc(SEXP Sx, SEXP Sk, SEXP Sthreads) {
   double k = Rf_asReal(Sk);
   double *x = REAL(Sx);
+  const R_xlen_t n = XLENGTH(Sx);
+#ifdef _OPENMP
   int threads = Rf_asInteger(Sthreads);
+#endif
   double *y;
   SEXP res;
   if (XLENGTH(Sx) == 1 && x[0] == 0.0)
@@ -961,14 +1005,18 @@ SEXP R_phifunc(SEXP Sx, SEXP Sk, SEXP Sthreads) {
   }
 
   if (k < 0) {
+#ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (threads > 1)
-    for (R_xlen_t i = 0; i < XLENGTH(Sx); i++)
+#endif
+    for (R_xlen_t i = 0; i < n; i++)
       y[i] = exp(k * x[i]);
   } else {
     int ki = Rf_asInteger(Sk);
     if (ki % 2 == 1) {
+#ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (threads > 1)
-      for (R_xlen_t i = 0; i < XLENGTH(Sx); i++) {
+#endif
+      for (R_xlen_t i = 0; i < n; i++) {
         // it's the sqrt(x) to ki'th power
         if (x[i] <= 0.0) {
           y[i] = 0.0;
@@ -977,8 +1025,10 @@ SEXP R_phifunc(SEXP Sx, SEXP Sk, SEXP Sthreads) {
         y[i] = R_pow_di(sqrt(x[i]), ki);
       }
     } else {
+#ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (threads > 1)
-      for (R_xlen_t i = 0; i < XLENGTH(Sx); i++) {
+#endif
+      for (R_xlen_t i = 0; i < n; i++) {
         // it's sqrt(x) to ki'th power, multiplied by 0.5 log(x)
         if (x[i] <= 0.0) {
           y[i] = 0.0;

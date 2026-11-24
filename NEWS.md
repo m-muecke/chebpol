@@ -8,6 +8,7 @@
 ## Bug fixes
 
 * chebpol compiles again with current versions of R. FFTW is now found when it is installed outside the default include path.
+* `evalongrid()` and `ipol()` now accept functions that return integer or logical values, and stop with an error when the length of the returned value changes between grid points.
 * `ipol()` with `method = "fh"` now forwards extra arguments in `...` to the function being interpolated.
 * `ipol()` with `method = "polyharmonic"` no longer drops extra arguments in `...` for the function being interpolated when neither `normalize` nor `nowarn` is given.
 * `ipol()` interpolants created with `method = "oldstalker"` now report both ranks when given input of the wrong dimension.

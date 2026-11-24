@@ -10,3 +10,20 @@ test_that("evalongrid() evaluates on a supplied grid", {
   grid <- list(c(0, 1), c(0, 2, 4))
   expect_equal(evalongrid(sum, grid = grid), outer(grid[[1]], grid[[2]], `+`), ignore_attr = TRUE)
 })
+
+test_that("evalongrid() accepts functions returning integer or logical values", {
+  expect_equal(evalongrid(\(x) 1L, 4), array(1, 4))
+  expect_equal(evalongrid(\(x) x > 0, 3), array(c(1, 0, 0), 3))
+})
+
+test_that("evalongrid() errors when the function value is not usable", {
+  calls <- 0
+  growing <- function(x) {
+    calls <<- calls + 1
+    if (calls > 2) c(1, 2) else 1
+  }
+  expect_snapshot(error = TRUE, {
+    evalongrid(\(x) "a", 3)
+    evalongrid(growing, 4)
+  })
+})

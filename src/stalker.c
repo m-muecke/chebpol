@@ -17,6 +17,19 @@ typedef struct {
   const double *det, *pmin, *pplus;
   int uniform;
 } precomp;
+
+// Index i of the grid interval [xt[i], xt[i + 1]) that holds x, clamped to 0 .. n - 2.
+static inline int find_interval(const double *xt, const int n, const double x) {
+  int lo = 0, hi = n - 1;
+  while (hi - lo > 1) {
+    const int mid = (lo + hi) / 2;
+    if (x >= xt[mid])
+      lo = mid;
+    else
+      hi = mid;
+  }
+  return lo;
+}
 #ifdef HAVE_GSL
 static double rfun(double r, void *P) {
   rblock *p = (rblock *)P;
@@ -399,9 +412,8 @@ double evalstalk(const double *x, const int nrank, const int *dims, const double
   // Find the lower left corner for each dimension.
   // Store in gpos
   for (int g = 0; g < nrank; g++) {
-    int mflag;
     const double *gr = grid[g];
-    int gp = findInterval((double *)gr, dims[g], x[g], TRUE, TRUE, 1, &mflag) - 1;
+    int gp = find_interval(gr, dims[g], x[g]);
     // gp is below x
     gbase[g] = gp;
     weight[g] = 1 - (x[g] - gr[gbase[g]]) / (gr[gbase[g] + 1] - gr[gbase[g]]);
@@ -572,9 +584,8 @@ double evalhyp(const double *x, const int nrank, const int *dims, const double *
   // Find the lower left corner for each dimension.
   // Store in gpos
   for (int g = 0; g < nrank; g++) {
-    int mflag;
     const double *gr = grid[g];
-    int gp = findInterval((double *)gr, dims[g], x[g], TRUE, TRUE, 1, &mflag) - 1;
+    int gp = find_interval(gr, dims[g], x[g]);
     // gp is below x
     gbase[g] = gp;
     weight[g] = 1 - (x[g] - gr[gbase[g]]) / (gr[gbase[g] + 1] - gr[gbase[g]]);
@@ -651,12 +662,11 @@ double evalstalker(const double *x, const int nrank, const int *dims, const doub
   //  double *rdet = det[newrank], *rpmin = pmin[newrank], *rpplus = pplus[newrank];
   const double *rdet = pcomp[newrank].det, *rpmin = pcomp[newrank].pmin, *rpplus = pcomp[newrank].pplus;
   int uniform = pcomp[newrank].uniform;
-  int mflag;
   int stride = 1;
   for (int r = 0; r < newrank; r++)
     stride *= dims[r];
   // Find the interval of the last coordinate, convert to zero-based
-  const int imin = findInterval((double *)gr, N, xx, TRUE, TRUE, 1, &mflag) - 1;
+  const int imin = find_interval(gr, N, xx);
 
   // Now, find the function values on the two grid points on each side.
   // i.e. imin, imin-1, and imin+1 and imin+2
@@ -798,7 +808,9 @@ SEXP R_evalstalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   // const int K = Rf_nrows(Sx);
   const int N = Rf_ncols(Sx);
   int blend = INTEGER_RO(Sblend)[0];
+#ifdef _OPENMP
   int threads = Rf_asInteger(Sthreads);
+#endif
   const double *b = REAL_RO(VECTOR_ELT(stalker, 0));
   const double *c = REAL_RO(VECTOR_ELT(stalker, 1));
   const double *r = REAL_RO(VECTOR_ELT(stalker, 2));
@@ -809,16 +821,15 @@ SEXP R_evalstalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   for (int i = 0; i < nrank; i++)
     grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
   int dims[nrank];
-  int len = 1;
-  for (int r = 0; r < nrank; r++) {
+  for (int r = 0; r < nrank; r++)
     dims[r] = LENGTH(VECTOR_ELT(Sgrid, r));
-    len *= dims[r];
-  }
 
   SEXP ret = PROTECT(Rf_allocVector(REALSXP, N));
   double *out = REAL(ret);
 
+#ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(guided) if (N > 1 && threads > 1)
+#endif
   for (int i = 0; i < N; i++) {
     out[i] = evalstalk(x + i * nrank, nrank, dims, grid, val, blend, b, c, r);
   }
@@ -832,7 +843,9 @@ SEXP R_evalhyp(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   // const int K = Rf_nrows(Sx);
   const int N = Rf_ncols(Sx);
   int blend = INTEGER_RO(Sblend)[0];
+#ifdef _OPENMP
   int threads = Rf_asInteger(Sthreads);
+#endif
   const double *a = REAL_RO(VECTOR_ELT(stalker, 0));
   const double *b = REAL_RO(VECTOR_ELT(stalker, 1));
   const double *c = REAL_RO(VECTOR_ELT(stalker, 2));
@@ -844,15 +857,14 @@ SEXP R_evalhyp(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   for (int i = 0; i < nrank; i++)
     grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
   int dims[nrank];
-  int len = 1;
-  for (int r = 0; r < nrank; r++) {
+  for (int r = 0; r < nrank; r++)
     dims[r] = LENGTH(VECTOR_ELT(Sgrid, r));
-    len *= dims[r];
-  }
 
   SEXP ret = PROTECT(Rf_allocVector(REALSXP, N));
   double *out = REAL(ret);
+#ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(guided) if (N > 1 && threads > 1)
+#endif
   for (int i = 0; i < N; i++) {
     out[i] = evalhyp(x + i * nrank, nrank, dims, grid, val, blend, a, b, c, d);
   }
@@ -865,7 +877,9 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
   const double *x = REAL_RO(Sx);
   const int K = Rf_nrows(Sx);
   const int N = Rf_ncols(Sx);
+#ifdef _OPENMP
   int threads = Rf_asInteger(Sthreads);
+#endif
   const double *val = REAL_RO(VECTOR_ELT(stalker, 0));
   SEXP Sgrid = VECTOR_ELT(stalker, 1);
   SEXP Sdet = VECTOR_ELT(stalker, 2);
@@ -910,7 +924,9 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
 #endif
   SEXP ret = PROTECT(Rf_allocVector(REALSXP, N));
   double *out = REAL(ret);
+#ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(guided) if (N > 1 && threads > 1)
+#endif
   for (int i = 0; i < N; i++) {
     out[i] = evalstalker(x + i * nrank, nrank, dims, grid, val, blend, degree, pcomp);
   }
