@@ -17,8 +17,8 @@ Description: Contains methods for creating multivariate/multidimensional
     written in C for speed. All interpolants are parallelized if used to
     evaluate more than one point.
 License: Artistic-2.0
-URL: https://github.com/sgaure/chebpol
-BugReports: https://github.com/sgaure/chebpol/issues
+URL: https://github.com/m-muecke/chebpol
+BugReports: https://github.com/m-muecke/chebpol/issues
 Depends:
     R (>= 4.1.0)
 Imports:
