@@ -1,2 +1,2 @@
 #!/bin/sh
-rm -rf src/Makevars configure.log conftest conftest.c conftest.dSYM
+rm -rf src/Makevars config.log conftest conftest.c conftest.dSYM
