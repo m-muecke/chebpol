@@ -14,7 +14,7 @@ rbf.alglib <- function(val, knots, rbase = 2, layers = 5, lambda = 0, ...) {
       .Call(C_evalrbf, model, x, threads)
     },
     arity = arity,
-    domain = data.frame(apply(knots, 1L, range))
+    domain = knots_domain(knots)
   )
 }
 

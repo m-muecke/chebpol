@@ -150,6 +150,7 @@ chebappx.real <- function(val, intervals = NULL) {
     intervals <- list(intervals)
   }
   cf <- chebcoef(val)
+  varnames <- names(intervals) %||% names(dim(val))
 
   if (is.null(intervals)) {
     # it's [-1, 1] intervals, so drop transformation
@@ -160,7 +161,7 @@ chebappx.real <- function(val, intervals = NULL) {
         .Call(C_evalcheb, cf, x, threads, NULL)
       },
       arity = K,
-      domain = rep(list(c(-1, 1)), K)
+      domain = stats::setNames(rep(list(c(-1, 1)), K), varnames)
     )
   } else {
     # it's intervals, create mapping into [-1, 1]
@@ -178,7 +179,7 @@ chebappx.real <- function(val, intervals = NULL) {
         .Call(C_evalcheb, cf, imap(x), threads, NULL)
       },
       arity = K,
-      domain = intervals
+      domain = stats::setNames(intervals, varnames)
     )
   }
   rm(val)
@@ -186,7 +187,11 @@ chebappx.real <- function(val, intervals = NULL) {
 }
 
 chebappxf.real <- function(fun, dims, intervals = NULL, ...) {
-  chebappx.real(evalongrid(fun, dims, intervals, ...), intervals)
+  val <- evalongrid(fun, dims, intervals, ...)
+  if (length(dim(val)) == length(dims)) {
+    names(dim(val)) <- names(dims)
+  }
+  chebappx.real(val, intervals)
 }
 
 # Interpolate on a Cartesian grid that is not a Chebyshev grid. `val` holds the function values in the

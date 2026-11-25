@@ -14,7 +14,7 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   if (length(val) != N) {
     stop(sprintf("`val` must have one value per knot (%d), not %d.", N, length(val)))
   }
-  domain <- data.frame(apply(knots, 1L, range))
+  domain <- knots_domain(knots)
   if (k > 0) {
     if (abs(round(k) - k) > sqrt(.Machine$double.eps)) {
       stop(sprintf("A positive `k` must be a whole number, not %s.", format(k)))

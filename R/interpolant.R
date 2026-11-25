@@ -4,8 +4,10 @@
 #' points, and which fills in between with some reasonable values.
 #'
 #' Interpolants have class `chebpol_interpolant` and the attributes `method`, the interpolation method, `arity`,
-#' the number of variables, and `domain`, a data frame with the lower and upper bound of each variable. Printing an
-#' interpolant shows these together with the defaults of its extra arguments, such as `blend`.
+#' the number of variables, and `domain`, a data frame with the lower and upper bound of each variable. The columns
+#' of `domain` take their names from `grid`, `dims`, `intervals` or the row names of `knots`, and are named `X1`,
+#' `X2`, ... otherwise. Printing an interpolant shows these together with the defaults of its extra arguments, such
+#' as `blend`.
 #'
 #' @name interpolant
 #' @param x The argument of the function. A function of more than one variable takes a

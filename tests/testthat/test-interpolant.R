@@ -28,6 +28,35 @@ test_that("an interpolant created with a blend keeps its class and attributes", 
   expect_equal(nrow(attr(ml, "domain")), 2)
 })
 
+test_that("domain columns are named after the variables, or X1, X2, ... without names", {
+  f <- function(x) sum(x)
+  grid <- list(seq(0, 1, length.out = 4), seq(0, 2, length.out = 3))
+  knots <- grid_points(grid)
+  domain_names <- function(ip) names(attr(ip, "domain"))
+  expect_equal(domain_names(ipol(f, grid = grid, method = "fh")), c("X1", "X2"))
+  expect_equal(domain_names(ipol(f, grid = list(a = grid[[1]], grid[[2]]), method = "multilinear")), c("a", "X2"))
+  expect_equal(domain_names(ipol(f, grid = grid[[1]], method = "stalker")), "X1")
+  expect_equal(domain_names(ipol(f, dims = c(4, 3), method = "chebyshev")), c("X1", "X2"))
+  expect_equal(domain_names(ipol(f, dims = c(a = 4, b = 3), method = "chebyshev")), c("a", "b"))
+  expect_equal(domain_names(ipol(1:12, dims = c(a = 4, b = 3), method = "chebyshev")), c("a", "b"))
+  iv <- list(a = c(0, 1), b = c(0, 2))
+  expect_equal(domain_names(ipol(f, dims = c(4, 3), intervals = iv, method = "chebyshev")), c("a", "b"))
+  expect_equal(domain_names(ipol(f, dims = c(a = 4, b = 3), method = "uniform")), c("a", "b"))
+  expect_equal(domain_names(ipol(f, dims = c(a = 4, b = 3), intervals = unname(iv), method = "uniform")), c("a", "b"))
+  expect_equal(domain_names(ipol(f, knots = unname(knots), method = "polyharmonic")), c("X1", "X2"))
+  expect_equal(domain_names(ipol(f, grid = grid, method = "polyharmonic")), c("X1", "X2"))
+  expect_equal(domain_names(ipol(f, grid = list(a = grid[[1]], b = grid[[2]]), method = "polyharmonic")), c("a", "b"))
+  expect_equal(domain_names(ipol(\(x) x, knots = matrix(c(0, 0.5, 1), 1), method = "polyharmonic")), "X1")
+  rownames(knots) <- c("a", "b")
+  expect_equal(domain_names(ipol(f, knots = knots, method = "polyharmonic")), c("a", "b"))
+})
+
+test_that("a simplex linear interpolant records the range of its knots", {
+  skip_if_not_installed("geometry")
+  sl <- ipol(function(x) sum(x), grid = list(c(0, 1, 2), c(0, 3)), method = "simplexlinear")
+  expect_equal(attr(sl, "domain"), data.frame(X1 = c(0, 2), X2 = c(0, 3)))
+})
+
 test_that("printing an interpolant summarizes it", {
   grid <- list(seq(0, 1, length.out = 5), seq(0, 2, length.out = 4))
   expect_snapshot({
@@ -37,7 +66,7 @@ test_that("printing an interpolant summarizes it", {
   })
 })
 
-test_that("printing a simplex linear interpolant omits the domain", {
+test_that("printing a simplex linear interpolant shows the range of the knots", {
   skip_if_not_installed("geometry")
   knots <- grid_points(list(c(0, 1, 2), c(0, 1)))
   expect_snapshot(ipol(function(x) sum(x), knots = knots, method = "simplexlinear"))

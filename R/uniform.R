@@ -31,23 +31,22 @@ ucappx.real <- function(val, intervals = NULL) {
       .Call(C_evalcheb, cf, gm(x), threads, NULL)
     },
     arity = arity,
-    domain = if (is.null(intervals)) rep(list(c(-1, 1)), arity) else intervals
+    domain = stats::setNames(intervals %||% rep(list(c(-1, 1)), arity), names(intervals) %||% names(dims))
   )
 }
 
 ucappxf.real <- function(fun, dims, intervals = NULL, ...) {
-  if (is.null(intervals)) {
-    return(ucappx.real(evalongrid(fun, ..., grid = lapply(dims, \(d) seq(-1, 1, length.out = d)))))
-  }
   if (is.numeric(intervals) && length(intervals) == 2L) {
     intervals <- list(intervals)
   }
-  ucappx.real(
-    evalongrid(
-      fun,
-      ...,
-      grid = Map(\(d, i) seq(i[1L], i[2L], length.out = d), dims, intervals)
-    ),
-    intervals
-  )
+  grid <- if (is.null(intervals)) {
+    lapply(dims, \(d) seq(-1, 1, length.out = d))
+  } else {
+    Map(\(d, i) seq(i[1L], i[2L], length.out = d), dims, intervals)
+  }
+  val <- evalongrid(fun, ..., grid = grid)
+  if (length(dim(val)) == length(dims)) {
+    names(dim(val)) <- names(dims)
+  }
+  ucappx.real(val, intervals)
 }

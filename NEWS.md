@@ -8,12 +8,14 @@
 
 ## Minor improvements
 
+* `ipol()` interpolants created with `method = "simplexlinear"` now record the range of their knots in the `domain` attribute, as polyharmonic interpolants do.
 * `ipol()` interpolants now have class `chebpol_interpolant` and a `method` attribute. Printing one shows the method, the number of variables, the domain and the defaults of extra arguments such as `blend`, instead of the source code of the function.
 * `ipol()` interpolants created with `method = "general"` or `"uniform"` evaluate a matrix of points about three times faster. The points are now mapped onto the Chebyshev grid one dimension at a time instead of one point at a time.
 * `ipol()` interpolants take about half the time per call, which matters when they are called one point at a time. Errors about their input now name the interpolant, e.g. "Error in `ip()`" instead of "Error".
 
 ## Bug fixes
 
+* `ipol()` interpolants now name the columns of their `domain` attribute after the variables, taken from `grid`, `dims`, `intervals` or the row names of `knots`, and `X1`, `X2`, ... otherwise. Previously unnamed variables got names made from their bounds, such as `c.0..1.`, and names given in `dims` were dropped.
 * chebpol compiles again with current versions of R. FFTW is now found when it is installed outside the default include path.
 * Error messages are now consistent across interpolation methods and report the value that was given, e.g. "`x` must have 2 rows, not 3." instead of four differently worded messages for the same mistake.
 * Integer input is now accepted everywhere a number is expected: the points passed to an interpolant, the values, grids and knots passed to `ipol()`, the grid in `evalongrid()`, and the arguments of `chebcoef()` and `chebeval()`. Previously most of these failed with "REAL() can only be applied to a 'numeric'".

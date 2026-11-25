@@ -4,10 +4,28 @@ new_interpolant <- function(fun, method, arity, domain = NULL) {
     fun,
     method = method,
     arity = arity,
-    domain = as.data.frame(domain),
+    domain = as_domain(domain),
     chebpol.version = utils::packageVersion("chebpol"),
     class = c("chebpol_interpolant", "function")
   )
+}
+
+# The ranges of the variables as a data frame, with the columns named X1, X2, ... where no name was given
+as_domain <- function(domain) {
+  if (length(domain) == 0L) {
+    return(data.frame())
+  }
+  varnames <- names(domain) %||% character(length(domain))
+  unnamed <- is.na(varnames) | varnames == ""
+  varnames[unnamed] <- paste0("X", which(unnamed))
+  names(domain) <- varnames
+  as.data.frame(domain)
+}
+
+knots_domain <- function(knots) {
+  domain <- lapply(seq_len(nrow(knots)), \(i) range(knots[i, ]))
+  names(domain) <- rownames(knots)
+  domain
 }
 
 # `sys.call(-1L)` would name a helper when `as_points()` is forced lazily inside it

@@ -184,6 +184,7 @@ ipol <- function(
       if (is.null(knots)) {
         if (!is.null(grid)) {
           knots <- t(expand.grid(lapply(grid, as.numeric)))
+          rownames(knots) <- names(grid)
         } else {
           stop("`knots` or `grid` must be given for method = \"simplexlinear\".")
         }
@@ -241,6 +242,7 @@ ipol <- function(
       if (is.null(knots)) {
         if (!is.null(grid)) {
           knots <- t(expand.grid(lapply(grid, as.numeric)))
+          rownames(knots) <- names(grid)
         } else {
           stop("`knots` or `grid` must be given for method = \"polyharmonic\".")
         }
