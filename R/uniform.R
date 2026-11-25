@@ -3,7 +3,7 @@
 # map into the n grid points. These have distance 2 / (n - 1), starting in -1, ending in 1
 # so they are -1 + 2 * j / (n - 1). After some manipulation, the function is:
 
-ugm <- function(x, n) sin(0.5 * pi * x * (1 - n) / n)
+ugm <- function(x, n) sinpi(0.5 * x * (1 - n) / n)
 
 ucappx.real <- function(val, intervals = NULL) {
   if (is.null(dim(val))) {

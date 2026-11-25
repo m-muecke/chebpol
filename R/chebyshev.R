@@ -2,10 +2,7 @@
 
 # The Chebyshev knots of order n on an interval
 chebknots1 <- function(n, interval = NULL) {
-  kn <- cos(pi * (seq_len(n) - 0.5) / n)
-  if (n %% 2L == 1L) {
-    kn[[(n + 1L) %/% 2L]] <- 0
-  }
+  kn <- cospi((seq_len(n) - 0.5) / n)
   if (is.null(interval)) {
     return(kn)
   }
