@@ -60,6 +60,11 @@
 <li>geometry is now a suggested package instead of a required one, so installing chebpol no longer pulls in geometry and its dependencies. <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "simplexlinear"</code> needs it to build the triangulation and stops with an error when it is missing. Saved simplex linear interpolants can be evaluated without it.</li>
 </ul></div>
 <div class="section level3">
+<h3 id="minor-improvements-development-version">Minor improvements<a class="anchor" aria-label="anchor" href="#minor-improvements-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "general"</code> or <code>"uniform"</code> evaluate a matrix of points about three times faster. The points are now mapped onto the Chebyshev grid one dimension at a time instead of one point at a time.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li>chebpol compiles again with current versions of R. FFTW is now found when it is installed outside the default include path.</li>
 <li>Error messages are now consistent across interpolation methods and report the value that was given, e.g. “<code>x</code> must have 2 rows, not 3.” instead of four differently worded messages for the same mistake.</li>

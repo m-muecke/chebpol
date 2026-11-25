@@ -17,6 +17,14 @@
   stops with an error when it is missing. Saved simplex linear
   interpolants can be evaluated without it.
 
+### Minor improvements
+
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  interpolants created with `method = "general"` or `"uniform"` evaluate
+  a matrix of points about three times faster. The points are now mapped
+  onto the Chebyshev grid one dimension at a time instead of one point
+  at a time.
+
 ### Bug fixes
 
 - chebpol compiles again with current versions of R. FFTW is now found
