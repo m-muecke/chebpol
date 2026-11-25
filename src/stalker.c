@@ -52,21 +52,13 @@ static inline double findmonor(double dmin, double dplus, double vmin, double vp
   } else {
     // Find the largest r which keeps it monotonic, i.e. derivative 0 in one
     // of the end points
-    rblock rb = {dmin, dplus, vmin, vplus, 0};
-    const gsl_root_fsolver_type *T;
-    gsl_root_fsolver *s;
-    gsl_function F;
-    int status;
-    F.function = &rfun;
-    F.params = &rb;
-    T = gsl_root_fsolver_brent;
-    s = gsl_root_fsolver_alloc(T);
-    gsl_root_fsolver_set(s, &F, 1, 2);
-    rb.pos = 1;
-    double t1 = rfun(1, &rb), t2 = rfun(2, &rb);
-    if (sign(t1 * t2) > 0)
+    rblock rb = {dmin, dplus, vmin, vplus, 1};
+    if (rfun(1, &rb) * rfun(2, &rb) > 0)
       rb.pos = 0;
-    int iter = 0;
+    gsl_function F = {.function = &rfun, .params = &rb};
+    gsl_root_fsolver *s = gsl_root_fsolver_alloc(gsl_root_fsolver_brent);
+    gsl_root_fsolver_set(s, &F, 1, 2);
+    int status, iter = 0;
     double lo, hi;
     do {
       iter++;
@@ -80,9 +72,8 @@ static inline double findmonor(double dmin, double dplus, double vmin, double vp
     r = lo;
     if (r < 1)
       r = 1;
-    if (status != GSL_SUCCESS) {
-      // I need to think about what to do here. We're in openmp, so can't do R-calls.
-    }
+    // If the solver did not converge we keep the current bracket: we may be inside an
+    // OpenMP region, so we cannot signal an R error from here.
     gsl_root_fsolver_free(s);
   }
   return r;
@@ -121,16 +112,10 @@ static inline double solver(double kmin, double kplus, double vmin, double vplus
       rb.vmin = vplus;
       rb.vplus = vmin;
     }
-    const gsl_root_fsolver_type *T;
-    gsl_root_fsolver *s;
-    gsl_function F;
-    int status;
-    F.function = &rfunnew;
-    F.params = &rb;
-    T = gsl_root_fsolver_brent;
-    s = gsl_root_fsolver_alloc(T);
+    gsl_function F = {.function = &rfunnew, .params = &rb};
+    gsl_root_fsolver *s = gsl_root_fsolver_alloc(gsl_root_fsolver_brent);
     gsl_root_fsolver_set(s, &F, 1, 2);
-    int iter = 0;
+    int status, iter = 0;
     do {
       iter++;
       gsl_root_fsolver_iterate(s);
@@ -139,9 +124,8 @@ static inline double solver(double kmin, double kplus, double vmin, double vplus
       double hi = gsl_root_fsolver_x_upper(s);
       status = gsl_root_test_interval(lo, hi, 0, 1e-8);
     } while (status == GSL_CONTINUE && iter < 50);
-    if (status != GSL_SUCCESS) {
-      // I need to think about what to do here. We're in openmp, so can't do R-calls.
-    }
+    // If the solver did not converge we keep the current bracket: we may be inside an
+    // OpenMP region, so we cannot signal an R error from here.
     gsl_root_fsolver_free(s);
   }
   return r;
