@@ -15,9 +15,7 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     stop(sprintf("`val` must have one value per knot (%d), not %d.", N, length(val)))
   }
   domain <- knots_domain(knots)
-  # in a dimension where all knots coincide there is no linear term to fit
   spans <- vapply(domain, diff, numeric(1L), USE.NAMES = FALSE)
-  active <- spans > 0
   if (k > 0) {
     if (abs(round(k) - k) > sqrt(.Machine$double.eps)) {
       stop(sprintf("A positive `k` must be a whole number, not %s.", format(k)))
@@ -51,7 +49,7 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     knots <- normfun(knots)
     normalize <- TRUE
   } else if (normalize) {
-    wa <- 1 / ifelse(active, spans, 1)
+    wa <- 1 / ifelse(spans > 0, spans, 1)
     wb <- apply(knots, 1L, min)
     normfun <- crate(function(x) wa * (x - wb), wa, wb)
     knots <- normfun(knots)
@@ -64,7 +62,11 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   threads <- getOption("chebpol.threads")
   # The distance matrix is unreferenced, so C_phifunc transforms it in place
   A <- .Call(C_phifunc, .Call(C_sqdiffs, knots, knots, threads), k, threads)
-  B <- rbind(1, knots[active, , drop = FALSE])
+  # drop linearly dependent rows of the linear term, e.g. when the knots lie on a line or a plane
+  B <- rbind(1, knots)
+  q <- qr(t(B))
+  keep <- sort(q$pivot[seq_len(q$rank)])
+  B <- B[keep, , drop = FALSE]
   L <- nrow(B)
   n <- N + L
   mat <- matrix(0, n, n)
@@ -88,7 +90,7 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   }
   w <- wv[seq_len(N)]
   v <- numeric(M + 1L)
-  v[c(TRUE, active)] <- wv[N + seq_len(L)]
+  v[keep] <- wv[N + seq_len(L)]
   fun <- function(x, threads = getOption("chebpol.threads")) {
     x <- as_points(x, M)
     .Call(C_evalpolyh, normfun(x), knots, w, v, k, threads, NULL)
