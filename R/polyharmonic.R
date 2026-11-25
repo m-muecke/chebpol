@@ -62,12 +62,14 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   threads <- getOption("chebpol.threads")
   # The distance matrix is unreferenced, so C_phifunc transforms it in place
   A <- .Call(C_phifunc, .Call(C_sqdiffs, knots, knots, threads), k, threads)
-  # drop linearly dependent rows of the linear term, e.g. when the knots lie on a line or a plane
-  B <- rbind(1, knots)
-  # the default tolerance treats a small spread around a large offset as constant
-  q <- qr(t(B), tol = 1e-10)
-  keep <- sort(q$pivot[seq_len(q$rank)])
-  B <- B[keep, , drop = FALSE]
+  # fit the linear term in the directions the centered knots span, so that knots on a line or plane and large
+  # offsets give a regular, well-conditioned system
+  mu <- rowMeans(knots)
+  centered <- knots - mu
+  s <- svd(centered, nv = 0L)
+  flat <- max(1e-10 * s$d[1L], max(dim(knots)) * .Machine$double.eps * sqrt(N) * max(abs(knots)))
+  U <- s$u[, s$d > flat, drop = FALSE]
+  B <- rbind(1, crossprod(U, centered))
   L <- nrow(B)
   n <- N + L
   mat <- matrix(0, n, n)
@@ -90,8 +92,9 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     wv[is.na(wv)] <- 0
   }
   w <- wv[seq_len(N)]
-  v <- numeric(M + 1L)
-  v[keep] <- wv[N + seq_len(L)]
+  coef <- wv[N + seq_len(L)]
+  lin <- drop(U %*% coef[-1L])
+  v <- c(coef[1L] - sum(lin * mu), lin)
   fun <- function(x, threads = getOption("chebpol.threads")) {
     x <- as_points(x, M)
     .Call(C_evalpolyh, normfun(x), knots, w, v, k, threads, NULL)

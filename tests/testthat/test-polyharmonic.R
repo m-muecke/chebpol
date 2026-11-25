@@ -117,3 +117,22 @@ test_that("polyharmonic interpolation keeps a dimension with a small spread arou
   between <- rbind(runif(20), 0.5 + 1e-8 * runif(20))
   expect_equal(ph(between), apply(between, 2L, f), tolerance = 1e-4)
 })
+
+test_that("polyharmonic interpolation handles a large offset without normalization", {
+  withr::local_seed(1)
+  knots <- rbind(runif(40), 1e7 + runif(40))
+  f <- function(x) x[1] + x[2] - 1e7
+  expect_no_warning(ph <- ipol(f, knots = knots, normalize = FALSE, method = "polyharmonic"))
+  between <- rbind(runif(20), 1e7 + runif(20))
+  expect_equal(ph(between), apply(between, 2L, f), tolerance = 1e-6)
+})
+
+test_that("polyharmonic interpolation off a line of knots does not depend on the order of the coordinates", {
+  withr::local_seed(1)
+  t <- runif(20)
+  knots <- rbind(t, 2 * t + 1)
+  points <- cbind(c(0.3, 0), c(0.5, 3), c(0.1, 2))
+  ph <- ipol(function(x) x[1]^2, knots = knots, normalize = FALSE, method = "polyharmonic")
+  swapped <- ipol(function(x) x[2]^2, knots = knots[2:1, ], normalize = FALSE, method = "polyharmonic")
+  expect_equal(swapped(points[2:1, ]), ph(points))
+})
