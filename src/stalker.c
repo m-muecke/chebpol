@@ -682,22 +682,25 @@ static double evalstalker(const double *x, const int nrank, const int *dims, con
 SEXP R_makestalk(SEXP Sval, SEXP Sgrid) {
   const int nrank = LENGTH(Sgrid);
   int dims[nrank];
-  int len = 1;
+  R_xlen_t len = 1;
   for (int r = 0; r < nrank; r++) {
     dims[r] = LENGTH(VECTOR_ELT(Sgrid, r));
     len *= dims[r];
   }
-  if (len != LENGTH(Sval)) {
-    Rf_error("number of values (%d) does not match grid size (%d)", LENGTH(Sval), len);
+  if (len != XLENGTH(Sval)) {
+    Rf_error("number of values (%lld) does not match grid size (%lld)", (long long)XLENGTH(Sval), (long long)len);
+  }
+  if (len > INT_MAX) {
+    Rf_error("grid size (%lld) is too large", (long long)len);
   }
   const double *val = REAL_RO(Sval);
   const double *grid[nrank];
   for (int i = 0; i < nrank; i++)
     grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
   int point[nrank];
-  SEXP Sb = PROTECT(Rf_allocMatrix(REALSXP, nrank, len));
-  SEXP Sc = PROTECT(Rf_allocMatrix(REALSXP, nrank, len));
-  SEXP Sr = PROTECT(Rf_allocMatrix(REALSXP, nrank, len));
+  SEXP Sb = PROTECT(Rf_allocMatrix(REALSXP, nrank, (int)len));
+  SEXP Sc = PROTECT(Rf_allocMatrix(REALSXP, nrank, (int)len));
+  SEXP Sr = PROTECT(Rf_allocMatrix(REALSXP, nrank, (int)len));
   const char *names[] = {"b", "c", "r", "val", "grid", ""};
   SEXP ret = PROTECT(Rf_mkNamed(VECSXP, names));
   SET_VECTOR_ELT(ret, 0, Sb);
@@ -731,13 +734,16 @@ SEXP R_makestalk(SEXP Sval, SEXP Sgrid) {
 SEXP R_makehyp(SEXP Sval, SEXP Sgrid) {
   const int nrank = LENGTH(Sgrid);
   int dims[nrank];
-  int len = 1;
+  R_xlen_t len = 1;
   for (int r = 0; r < nrank; r++) {
     dims[r] = LENGTH(VECTOR_ELT(Sgrid, r));
     len *= dims[r];
   }
-  if (len != LENGTH(Sval)) {
-    Rf_error("number of values (%d) does not match grid size (%d)", LENGTH(Sval), len);
+  if (len != XLENGTH(Sval)) {
+    Rf_error("number of values (%lld) does not match grid size (%lld)", (long long)XLENGTH(Sval), (long long)len);
+  }
+  if (len > INT_MAX) {
+    Rf_error("grid size (%lld) is too large", (long long)len);
   }
   const double *val = REAL_RO(Sval);
   const double *grid[nrank];
@@ -745,9 +751,9 @@ SEXP R_makehyp(SEXP Sval, SEXP Sgrid) {
     grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
   int point[nrank];
   SEXP Sa = PROTECT(Rf_allocVector(REALSXP, len));
-  SEXP Sb = PROTECT(Rf_allocMatrix(REALSXP, nrank, len));
-  SEXP Sc = PROTECT(Rf_allocMatrix(REALSXP, nrank, len));
-  SEXP Sd = PROTECT(Rf_allocMatrix(REALSXP, nrank, len));
+  SEXP Sb = PROTECT(Rf_allocMatrix(REALSXP, nrank, (int)len));
+  SEXP Sc = PROTECT(Rf_allocMatrix(REALSXP, nrank, (int)len));
+  SEXP Sd = PROTECT(Rf_allocMatrix(REALSXP, nrank, (int)len));
   const char *names[] = {"a", "b", "c", "d", "val", "grid", ""};
   SEXP ret = PROTECT(Rf_mkNamed(VECSXP, names));
   SET_VECTOR_ELT(ret, 0, Sa);
@@ -790,7 +796,7 @@ SEXP R_evalstalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(guided) if (N > 1 && threads > 1)
 #endif
-  for (int i = 0; i < N; i++) {
+  for (R_xlen_t i = 0; i < N; i++) {
     out[i] = evalstalk(x + i * nrank, nrank, dims, grid, val, blend, b, c, r);
   }
 
@@ -826,7 +832,7 @@ SEXP R_evalhyp(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(guided) if (N > 1 && threads > 1)
 #endif
-  for (int i = 0; i < N; i++) {
+  for (R_xlen_t i = 0; i < N; i++) {
     out[i] = evalhyp(x + i * nrank, nrank, dims, grid, val, blend, a, b, c, d);
   }
 
@@ -853,13 +859,14 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
     Rf_error("Rank of input (%d) does not match rank of spline (%d)", K, nrank);
 
   int dims[nrank];
-  int len = 1;
+  R_xlen_t len = 1;
   for (int r = 0; r < nrank; r++) {
     dims[r] = LENGTH(VECTOR_ELT(Sgrid, r));
     len *= dims[r];
   }
-  if (len != LENGTH(VECTOR_ELT(stalker, 0))) {
-    Rf_error("number of values (%d) does not match grid size (%d)", LENGTH(VECTOR_ELT(stalker, 0)), len);
+  if (len != XLENGTH(VECTOR_ELT(stalker, 0))) {
+    Rf_error("number of values (%lld) does not match grid size (%lld)", (long long)XLENGTH(VECTOR_ELT(stalker, 0)),
+             (long long)len);
   }
   if (LENGTH(Sdegree) != nrank) {
     Rf_error("degree length must match dimension (%d)", nrank);
@@ -888,7 +895,7 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(guided) if (N > 1 && threads > 1)
 #endif
-  for (int i = 0; i < N; i++) {
+  for (R_xlen_t i = 0; i < N; i++) {
     out[i] = evalstalker(x + i * nrank, nrank, dims, grid, val, blend, degree, pcomp);
   }
 #ifdef HAVE_GSL

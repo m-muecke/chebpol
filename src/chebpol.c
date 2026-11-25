@@ -94,9 +94,9 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
         mat[j] = jmat;
         continue;
       }
-      jmat = mat[j] = (double *)R_alloc(N * N, sizeof(double));
+      jmat = mat[j] = (double *)R_alloc((size_t)N * N, sizeof(double));
       for (int k = 0; k < N; k++) {
-        double *jkvec = &jmat[k * N];
+        double *jkvec = &jmat[(R_xlen_t)k * N];
         for (int i = 0; i < N; i++) {
           jkvec[i] = cospi(k * (i + 0.5) / N);
         }
@@ -256,7 +256,7 @@ SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spa
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
 #endif
-  for (int i = 0; i < numvec; i++) {
+  for (R_xlen_t i = 0; i < numvec; i++) {
     out[i] = FH(val, xp + i * rank, knots, dims, rank, weights);
   }
   UNPROTECT(1);
@@ -374,7 +374,7 @@ SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
 #endif
-  for (int i = 0; i < numvec; i++) {
+  for (R_xlen_t i = 0; i < numvec; i++) {
     out[i] = C_evalcheb(cf, xp + i * rank, dims, rank);
   }
   UNPROTECT(1);
@@ -387,7 +387,7 @@ static double C_evalpolyh(const double *x, const double *knots, const double *we
   int ki = (int)k;
   double wsum = 0.0;
   if (k < 0) {
-    for (int i = 0; i < nknots; i++) {
+    for (R_xlen_t i = 0; i < nknots; i++) {
       const double *kn = &knots[i * rank];
       double sqdist = 0.0;
       for (int j = 0; j < rank; j++)
@@ -395,7 +395,7 @@ static double C_evalpolyh(const double *x, const double *knots, const double *we
       wsum += weights[i] * exp(k * sqdist);
     }
   } else if (ki % 2 == 1) {
-    for (int i = 0; i < nknots; i++) {
+    for (R_xlen_t i = 0; i < nknots; i++) {
       const double *kn = &knots[i * rank];
       double sqdist = 0.0;
       for (int j = 0; j < rank; j++)
@@ -405,7 +405,7 @@ static double C_evalpolyh(const double *x, const double *knots, const double *we
       wsum += weights[i] * R_pow_di(sqrt(sqdist), ki);
     }
   } else {
-    for (int i = 0; i < nknots; i++) {
+    for (R_xlen_t i = 0; i < nknots; i++) {
       const double *kn = &knots[i * rank];
       double sqdist = 0.0;
       for (int j = 0; j < rank; j++)
@@ -451,7 +451,7 @@ SEXP R_evalpolyh(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, SE
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
 #endif
-  for (int i = 0; i < numvec; i++) {
+  for (R_xlen_t i = 0; i < numvec; i++) {
     out[i] = C_evalpolyh(x + i * rank, knots, w, lw, rank, nknots, k);
   }
   UNPROTECT(1);
@@ -648,7 +648,7 @@ SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
 #endif
-  for (int i = 0; i < numvec; i++) {
+  for (R_xlen_t i = 0; i < numvec; i++) {
     out[i] = C_evalmlip(rank, xp + i * rank, grid, dims, val, blend);
   }
   UNPROTECT(1);
@@ -659,7 +659,7 @@ SEXP R_sqdiffs(SEXP x1, SEXP x2, SEXP Sthreads) {
   // each column in x1 should be subtracted from each column in x2,
   // the squared column sums should be returned.
   const int r1 = Rf_nrows(x1), c1 = Rf_ncols(x1), r2 = Rf_nrows(x2), c2 = Rf_ncols(x2);
-  int N = c1 * c2;
+  const R_xlen_t N = (R_xlen_t)c1 * c2;
 #ifdef _OPENMP
   int threads = Rf_asInteger(Sthreads);
 #endif
@@ -670,9 +670,9 @@ SEXP R_sqdiffs(SEXP x1, SEXP x2, SEXP Sthreads) {
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (c1 > 1)
 #endif
-  for (int i = 0; i < c1; i++) {
+  for (R_xlen_t i = 0; i < c1; i++) {
     const double *x1p = x1v + i * r1;
-    for (int j = 0; j < c2; j++) {
+    for (R_xlen_t j = 0; j < c2; j++) {
       const double *x2p = x2v + j * r2;
       double csum = 0.0;
       for (int k = 0; k < r1; k++) {
@@ -699,7 +699,7 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
 
   double vec[dim + 1];
   int N = dim + 1, one = 1, info;
-  for (int simplex = 0; simplex < numsimplex; simplex++) {
+  for (R_xlen_t simplex = 0; simplex < numsimplex; simplex++) {
     // x must be in the bounding box. Perhaps we should do binary search, or organize them hierarchically?
     const double *box = bbox + simplex * 2 * dim;
     bool bad = false;
@@ -758,7 +758,7 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
     for (int k = 0; k < nknots; k++) {
       double dist = 0.0;
       for (int i = 0; i < dim; i++)
-        dist += (x[i] - knots[k * dim + i]) * (x[i] - knots[k * dim + i]);
+        dist += (x[i] - knots[(R_xlen_t)k * dim + i]) * (x[i] - knots[(R_xlen_t)k * dim + i]);
       if (dist < mindist) {
         mindist = dist;
         nearknot = k;
@@ -766,8 +766,8 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
     }
 
     // Now, find a simplex with this knot
-    int nearest = -1;
-    for (int simplex = 0; simplex < numsimplex; simplex++) {
+    R_xlen_t nearest = -1;
+    for (R_xlen_t simplex = 0; simplex < numsimplex; simplex++) {
       for (int j = 0; j < N; j++)
         if (dtri[simplex * N + j] == nearknot + 1) {
           nearest = simplex;
@@ -821,7 +821,7 @@ SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extr
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(guided) if (threads > 1 && numvec > 1)
 #endif
-  for (int i = 0; i < numvec; i++) {
+  for (R_xlen_t i = 0; i < numvec; i++) {
     resvec[i] =
         findsimplex(x + i * dim, knots, dtri, lumats, pivots, bboxmat, epol, val, dim, numsimplex, nknots, blend);
   }
@@ -840,8 +840,8 @@ SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
   int N = dim + 1;
   SEXP retlist = PROTECT(Rf_allocVector(VECSXP, 3));
   // Allocate everything before parallel for
-  SET_VECTOR_ELT(retlist, 0, Rf_allocVector(REALSXP, numsimplex * N * N));
-  SET_VECTOR_ELT(retlist, 1, Rf_allocVector(INTSXP, numsimplex * N));
+  SET_VECTOR_ELT(retlist, 0, Rf_allocVector(REALSXP, (R_xlen_t)numsimplex * N * N));
+  SET_VECTOR_ELT(retlist, 1, Rf_allocVector(INTSXP, (R_xlen_t)numsimplex * N));
   SET_VECTOR_ELT(retlist, 2, Rf_allocMatrix(REALSXP, 2 * dim, numsimplex));
   double *lumats = REAL(VECTOR_ELT(retlist, 0));
   int *pivots = INTEGER(VECTOR_ELT(retlist, 1));
@@ -850,7 +850,7 @@ SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (threads > 1 && numsimplex > 1)
 #endif
-  for (int simplex = 0; simplex < numsimplex; simplex++) {
+  for (R_xlen_t simplex = 0; simplex < numsimplex; simplex++) {
     const int *tri = dtri + simplex * (dim + 1);
     int *ipiv = pivots + simplex * N;
     for (int j = 0; j < N; j++)

@@ -22,6 +22,7 @@
 * `ipol()` with `method = "polyharmonic"` accepts `normalize` as a vector `c(a, b)` or a two-column matrix again. Both forms failed with "the condition has length > 1" on R >= 4.2, and the knots were never transformed, so the fit did not match the evaluation.
 * `ipol()` interpolants created with `method = "polyharmonic"` now report the range of the knots in their `domain` attribute. With normalization it was the range after scaling, `[0, 1]`.
 * `ipol()` with `method = "polyharmonic"` no longer drops extra arguments in `...` for the function being interpolated when neither `normalize` nor `nowarn` is given.
+* `ipol()` with `method = "polyharmonic"` now fails with an out-of-memory error when there are too many knots for the knots-by-knots distance matrix. Previously 46,341 or more knots overflowed the size computation, giving "negative length vectors are not allowed" or, from 65,536 knots, possibly writing outside the allocated memory.
 * `ipol()` interpolants created with `method = "stalker"`, `"hstalker"` or `"simplexlinear"` now stop with an error when given a matrix with the wrong number of rows. Previously they returned values silently, and could read past the end of the input.
 * `ipol()` interpolants created with `method = "oldstalker"` now report both ranks when given input of the wrong dimension.
 
