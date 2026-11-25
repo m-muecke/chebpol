@@ -20,10 +20,19 @@
 ### Minor improvements
 
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  interpolants now have class `chebpol_interpolant` and a `method`
+  attribute. Printing one shows the method, the number of variables, the
+  domain and the defaults of extra arguments such as `blend`, instead of
+  the source code of the function.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   interpolants created with `method = "general"` or `"uniform"` evaluate
   a matrix of points about three times faster. The points are now mapped
   onto the Chebyshev grid one dimension at a time instead of one point
   at a time.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  interpolants take about half the time per call, which matters when
+  they are called one point at a time. Errors about their input now name
+  the interpolant, e.g. “Error in `ip()`” instead of “Error”.
 
 ### Bug fixes
 
@@ -72,6 +81,10 @@
   now accept functions that return integer or logical values, and stop
   with an error when the length of the returned value changes between
   grid points.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  interpolants created with an explicit `blend` now keep their `arity`,
+  `domain` and `chebpol.version` attributes. Previously setting the
+  default blend dropped them.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) now
   stops with an error when `blend` is not supported by the chosen
   method. Previously `blend = "mean"` was accepted for

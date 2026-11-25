@@ -62,7 +62,11 @@
 <div class="section level3">
 <h3 id="minor-improvements-development-version">Minor improvements<a class="anchor" aria-label="anchor" href="#minor-improvements-development-version"></a></h3>
 <ul><li>
+<code><a href="../reference/ipol.html">ipol()</a></code> interpolants now have class <code>chebpol_interpolant</code> and a <code>method</code> attribute. Printing one shows the method, the number of variables, the domain and the defaults of extra arguments such as <code>blend</code>, instead of the source code of the function.</li>
+<li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "general"</code> or <code>"uniform"</code> evaluate a matrix of points about three times faster. The points are now mapped onto the Chebyshev grid one dimension at a time instead of one point at a time.</li>
+<li>
+<code><a href="../reference/ipol.html">ipol()</a></code> interpolants take about half the time per call, which matters when they are called one point at a time. Errors about their input now name the interpolant, e.g. “Error in <code>ip()</code>” instead of “Error”.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
@@ -82,6 +86,8 @@
 <code><a href="../reference/evalongrid.html">evalongrid()</a></code> now stops with an error when a grid dimension has no points. Previously it crashed R.</li>
 <li>
 <code><a href="../reference/evalongrid.html">evalongrid()</a></code> and <code><a href="../reference/ipol.html">ipol()</a></code> now accept functions that return integer or logical values, and stop with an error when the length of the returned value changes between grid points.</li>
+<li>
+<code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with an explicit <code>blend</code> now keep their <code>arity</code>, <code>domain</code> and <code>chebpol.version</code> attributes. Previously setting the default blend dropped them.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> now stops with an error when <code>blend</code> is not supported by the chosen method. Previously <code>blend = "mean"</code> was accepted for <code>method = "multilinear"</code> and <code>"oldstalker"</code> and silently treated as linear blending.</li>
 <li>

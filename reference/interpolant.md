@@ -31,6 +31,14 @@ some reasonable values.
 
 A numeric. If more than one point was evaluated, a vector.
 
+## Details
+
+Interpolants have class `chebpol_interpolant` and the attributes
+`method`, the interpolation method, `arity`, the number of variables,
+and `domain`, a data frame with the lower and upper bound of each
+variable. Printing an interpolant shows these together with the defaults
+of its extra arguments, such as `blend`.
+
 ## Examples
 
 ``` r
@@ -38,6 +46,9 @@ grid <- list(x = seq(0, 1, length.out = 10), y = seq(0, 1, length.out = 10))
 val <- runif(100)
 dim(val) <- c(10, 10)
 ip <- ipol(val, grid = grid, method = "fh")
+ip
+#> <chebpol_interpolant> fh, 2 variables
+#> Domain: [0, 1] x [0, 1]
 ip(c(0.3, 0.8))
 #> [1] 0.6969905
 ip(matrix(runif(12), 2), threads = 2)
