@@ -91,6 +91,9 @@
   allowed” or, from 65,536 knots, possibly writing outside the allocated
   memory. Fitting that many knots still needs enough memory for the
   matrix, about 17 GB at 46,341 knots.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "polyharmonic"` now fits a spline with a single knot.
+  Previously it failed with “invalid ‘nrow’ value”.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   interpolants created with `method = "stalker"`, `"hstalker"` or
   `"simplexlinear"` now stop with an error when given a matrix with the
