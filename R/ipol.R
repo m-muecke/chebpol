@@ -149,6 +149,10 @@ ipol <- function(
   if (is.integer(knots)) {
     storage.mode(knots) <- "double"
   }
+  # a single dimension may be given as a bare vector
+  if (!is.null(grid) && !is.list(grid)) {
+    grid <- list(grid)
+  }
   switch(
     method,
     chebyshev = {
@@ -166,9 +170,6 @@ ipol <- function(
     multilinear = {
       if (is.null(grid)) {
         stop("`grid` must be given for method = \"multilinear\".")
-      }
-      if (!is.list(grid)) {
-        grid <- list(grid)
       }
       if (any(lengths(grid) < 2L)) {
         stop("Each `grid` dimension must have at least two points for method = \"multilinear\".")
@@ -202,9 +203,6 @@ ipol <- function(
     fh = {
       if (is.null(grid)) {
         stop("`grid` must be given for method = \"fh\".")
-      }
-      if (!is.list(grid)) {
-        grid <- list(grid)
       }
       if (unsortedgrid(grid)) {
         stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
@@ -240,9 +238,6 @@ ipol <- function(
       if (is.null(grid)) {
         stop("`grid` must be given for method = \"general\".")
       }
-      if (!is.list(grid)) {
-        grid <- list(grid)
-      }
       if (unsortedgrid(grid)) {
         stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
       }
@@ -273,9 +268,6 @@ ipol <- function(
       if (is.null(grid)) {
         stop("`grid` must be given for method = \"oldstalker\".")
       }
-      if (!is.list(grid)) {
-        grid <- list(grid)
-      }
       if (any(lengths(grid) < 2L)) {
         stop("Each `grid` dimension must have at least two points for method = \"oldstalker\".")
       }
@@ -295,9 +287,6 @@ ipol <- function(
       if (is.null(grid)) {
         stop("`grid` must be given for method = \"hstalker\".")
       }
-      if (!is.list(grid)) {
-        grid <- list(grid)
-      }
       if (any(lengths(grid) < 2L)) {
         stop("Each `grid` dimension must have at least two points for method = \"hstalker\".")
       }
@@ -315,9 +304,6 @@ ipol <- function(
     stalker = {
       if (is.null(grid)) {
         stop("`grid` must be given for method = \"stalker\".")
-      }
-      if (!is.list(grid)) {
-        grid <- list(grid)
       }
       if (any(lengths(grid) < 2L)) {
         stop("Each `grid` dimension must have at least two points for method = \"stalker\".")

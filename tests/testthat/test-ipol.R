@@ -62,3 +62,16 @@ test_that("ipol() accepts integer grids and knots", {
     expect_equal(ipol(f, knots = knots, method = method)(x), ipol(f, knots = knots + 0, method = method)(x))
   }
 })
+
+test_that("ipol() accepts a one-dimensional grid as a bare vector", {
+  grid <- seq(0, 1, length.out = 10)
+  x <- c(0.13, 0.5, 0.87)
+  for (method in c("general", "multilinear", "fh", "stalker", "hstalker", "oldstalker", "polyharmonic")) {
+    expect_equal(ipol(exp, grid = grid, method = method)(x), ipol(exp, grid = list(grid), method = method)(x))
+  }
+  suppressWarnings({
+    uc <- ipol(exp(grid), grid = grid, method = "uniform")
+    uc_list <- ipol(exp(grid), grid = list(grid), method = "uniform")
+  })
+  expect_equal(uc(x), uc_list(x))
+})
