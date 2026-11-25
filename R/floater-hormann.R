@@ -11,8 +11,15 @@ fhappx.real <- function(val, grid = NULL, d = 1L, ...) {
   if (is.function(val)) {
     val <- evalongrid(val, grid = grid, ...)
   }
+  grid_dims <- lengths(grid, use.names = FALSE)
   if (!is.array(val)) {
-    dim(val) <- lengths(grid)
+    dim(val) <- grid_dims
+  } else if (!identical(unname(dim(val)), grid_dims)) {
+    stop(sprintf(
+      "dimensions of values (%s) must match the grid lengths (%s)",
+      paste(dim(val), collapse = " x "),
+      paste(grid_dims, collapse = " x ")
+    ))
   }
   dd <- as.integer(d)
   dd <- rep(dd, length(grid) %/% length(d))

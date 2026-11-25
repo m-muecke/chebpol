@@ -243,13 +243,16 @@ SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spa
   if (XLENGTH(vals) != siz)
     Rf_error("coefficient length(%lld) does not match data length(%lld)", (long long)XLENGTH(vals), (long long)siz);
 
-  if (LENGTH(grid) != rank)
+  if (LENGTH(grid) != rank || LENGTH(Sweights) != rank)
     Rf_error("There must be one value for each knot");
   const double **knots = (const double **)R_alloc(rank, sizeof(double *));
   const double **weights = (const double **)R_alloc(rank, sizeof(double *));
   for (int i = 0; i < rank; i++) {
-    knots[i] = REAL_RO(VECTOR_ELT(grid, i));
-    weights[i] = REAL_RO(VECTOR_ELT(Sweights, i));
+    SEXP axis = VECTOR_ELT(grid, i), w = VECTOR_ELT(Sweights, i);
+    if (XLENGTH(axis) != dims[i] || XLENGTH(w) != dims[i])
+      Rf_error("grid dimension %d has %lld points, values have %d", i + 1, (long long)XLENGTH(axis), dims[i]);
+    knots[i] = REAL_RO(axis);
+    weights[i] = REAL_RO(w);
   }
   const double *xp = REAL_RO(inx);
   const int numvec = Rf_isMatrix(inx) ? Rf_ncols(inx) : 1;

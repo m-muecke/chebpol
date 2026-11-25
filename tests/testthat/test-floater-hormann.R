@@ -44,3 +44,10 @@ test_that("ipol() rejects a Floater-Hormann degree outside the valid range", {
     ipol(f, grid = grid, method = "fh", k = c(6, 3))
   })
 })
+
+test_that("ipol() errors when the values do not match the Floater-Hormann grid", {
+  grid <- list(seq(0, 1, length.out = 4), seq(0, 1, length.out = 3))
+  expect_snapshot(error = TRUE, {
+    ipol(array(0, c(3, 4)), grid = grid, method = "fh")
+  })
+})
