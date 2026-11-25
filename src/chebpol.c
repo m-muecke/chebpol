@@ -898,13 +898,11 @@ SEXP R_phifunc(SEXP Sx, SEXP Sk, SEXP Sthreads) {
 #ifdef _OPENMP
   int threads = Rf_asInteger(Sthreads);
 #endif
-  if (n == 1 && x[0] == 0.0)
-    return Rf_ScalarReal((k < 0) ? 1 : 0);
-
   double *y;
   SEXP res;
   if (MAYBE_REFERENCED(Sx)) {
     res = PROTECT(Rf_allocVector(REALSXP, n));
+    Rf_setAttrib(res, R_DimSymbol, Rf_getAttrib(Sx, R_DimSymbol));
     y = REAL(res);
   } else {
     res = Sx;

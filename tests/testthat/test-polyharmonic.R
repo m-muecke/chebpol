@@ -17,6 +17,13 @@ test_that("polyharmonic splines approximate a smooth function", {
   }
 })
 
+test_that("polyharmonic splines fit a single knot", {
+  for (k in c(3, 2, -1)) {
+    phs <- ipol(5, knots = matrix(0.5), k = k, method = "polyharmonic", nowarn = TRUE)
+    expect_equal(phs(c(0.5, 0.2)), c(5, 5))
+  }
+})
+
 test_that("polyharmonic splines forward extra arguments to the function", {
   withr::local_seed(42)
   f <- function(x, a) a * sum(x^2)
