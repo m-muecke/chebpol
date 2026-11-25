@@ -98,7 +98,7 @@ test_that("simplex linear blends are finite on the edges of a grid triangulation
   sl <- ipol(f, grid = grid, method = "simplexlinear")
   x <- grid_points(list(seq(-1, 1, length.out = 9), seq(-1, 1, length.out = 9)))
   for (blend in c("cubic", "linear", "sigmoid", "parodic", "square", "mean")) {
-    expect_equal(anyNA(sl(x, blend = blend)), FALSE)
+    expect_false(anyNA(sl(x, blend = blend)))
   }
 })
 
@@ -114,7 +114,7 @@ test_that("simplex linear blends work in three dimensions", {
     expect_equal(sl(knots, blend = blend), apply(knots, 2L, f))
   }
   for (blend in c("cubic", "linear", "sigmoid", "parodic", "square", "mean")) {
-    expect_equal(anyNA(sl(x, blend = blend)), FALSE)
+    expect_false(anyNA(sl(x, blend = blend)))
   }
 })
 

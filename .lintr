@@ -9,6 +9,8 @@ linters: all_linters(
     object_overwrite_linter = NULL,
     object_name_linter = NULL,
     condition_call_linter = NULL,
+    expect_identical_linter = NULL,
+    implicit_assignment_linter = NULL,
     undesirable_function_linter(fun = modify_defaults(
       defaults = default_undesirable_functions,
       structure = NULL,
@@ -17,5 +19,11 @@ linters: all_linters(
     ))
   )
 exclusions: list(
-    "tests/testthat.R"
+    "tests/testthat.R",
+    "tests" = list(undesirable_operator_linter = Inf),
+    "vignettes" = list(
+      library_call_linter = Inf,
+      redundant_ifelse_linter = Inf,
+      undesirable_function_linter = Inf
+    )
   )

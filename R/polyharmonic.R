@@ -19,9 +19,8 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   if (k > 0) {
     if (abs(round(k) - k) > sqrt(.Machine$double.eps)) {
       stop(sprintf("A positive `k` must be a whole number, not %s.", format(k)))
-    } else {
-      k <- as.integer(round(k))
     }
+    k <- as.integer(round(k))
   }
 
   if (length(normalize) == 1L && is.na(normalize)) {
@@ -93,7 +92,7 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     if (!nowarn) {
       msg <- paste0(
         "Can't fit the spline exactly, falling back to a least squares fit.",
-        if (!normalize) " Try `normalize = TRUE`." else ""
+        if (normalize) "" else " Try `normalize = TRUE`."
       )
       warning(warningCondition(msg, call = sys.call(sys.parent())))
     }

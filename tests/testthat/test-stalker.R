@@ -136,7 +136,7 @@ test_that("the hyperbolic stalker is finite at the grid points when neighboring 
   for (blend in c("cubic", "linear", "sigmoid", "parodic", "square")) {
     expect_equal(hst(x, blend = blend), c(values))
   }
-  expect_equal(anyNA(hst(x, blend = "mean")), FALSE)
+  expect_false(anyNA(hst(x, blend = "mean")))
   hst1 <- ipol(c(1, 0, 0, 1), grid = list(1:4), method = "hstalker")
   expect_equal(hst1(1:4, blend = "mean"), c(0.5, 0, 0, 0.5))
 })

@@ -99,7 +99,8 @@ test_that("polyharmonic interpolation handles knots on a line or in a plane", {
   expect_equal(ph(line), apply(line, 2L, f))
   g <- function(x) 3 * x[1] - x[2] + 2
   ph <- ipol(g, knots = line, method = "polyharmonic")
-  between <- rbind(t <- runif(10), 2 * t + 1)
+  t <- runif(10)
+  between <- rbind(t, 2 * t + 1)
   expect_equal(ph(between), apply(between, 2L, g))
   plane <- rbind(runif(30), runif(30))
   plane <- rbind(plane, plane[1L, ] - plane[2L, ])

@@ -839,7 +839,6 @@ living in each corner, the black dots. The weight for the function in $(1,1)$ is
 area of the lower blue rectangle $0.3 \times 0.4 = 0.12$.
 
 ```{r 2dblending, fig.dim=c(3, 3), echo=FALSE, fig.cap='Figure 5: Blending'}
-#  par(mar=rep(0,4))
 plot(c(0, 1, 1, 0), c(0, 0, 1, 1), pch = 20, xlab = "", ylab = "")
 points(0.3, 0.4, col = "blue")
 abline(v = 0.3, h = 0.4, col = "blue", lty = 2)

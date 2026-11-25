@@ -3,7 +3,9 @@
     packageStartupMessage(
       "*** ",
       pkgname,
-      ": FFTW not used.\n*** You should install it from https://fftw.org\n*** or check if your OS-distribution provides it, and recompile."
+      ": FFTW not used.\n",
+      "*** You should install it from https://fftw.org\n",
+      "*** or check if your OS-distribution provides it, and recompile."
     )
   }
 }

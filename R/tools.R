@@ -72,7 +72,7 @@ grid_knots <- function(grid) {
 }
 
 `%||%` <- function(lhs, rhs) {
-  if (is.null(lhs)) rhs else lhs
+  if (is.null(lhs)) rhs else lhs # nolint
 }
 
 blend_types <- c(linear = 0L, sigmoid = 1L, parodic = 2L, cubic = 3L, square = 4L, mean = 5L)

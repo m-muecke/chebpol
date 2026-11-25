@@ -73,7 +73,6 @@ Given a function $f$ we may compute its Chebyshev approximation and plot it:
 
 ```{r, echo=FALSE}
 library(chebpol)
-#opts_chunk$set(fig.width=4, fig.height=4)
 ```
 
 ```{r, fig.dim=c(4, 4)}

@@ -31,7 +31,7 @@ test_that("Floater-Hormann interpolation works at the smallest and largest degre
   for (k in list(0, c(5, 3))) {
     fh <- ipol(f, grid = grid, method = "fh", k = k)
     expect_equal(fh(pts), apply(pts, 2L, f))
-    expect_equal(anyNA(fh(c(0.3, 0.6))), FALSE)
+    expect_false(anyNA(fh(c(0.3, 0.6))))
   }
 })
 
