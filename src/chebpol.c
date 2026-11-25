@@ -13,7 +13,6 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
   bool brokenfftw = false;
   double isiz = 1.0 / siz;
   int rdims[rank];
-  // Create a plan
   fftw_r2r_kind kind[rank];
   for (int i = 0; i < rank; i++)
     kind[i] = FFTW_REDFT10; // type II DCT
@@ -22,15 +21,12 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
   for (int i = 0; i < rank; i++)
     rdims[i] = dims[rank - i - 1];
 
-  // Plan and execute
-
   fftw_plan plan = fftw_plan_r2r(rank, rdims, (double *)x, F, kind, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
   if (plan != NULL) {
     fftw_execute(plan);
     fftw_destroy_plan(plan);
   } else {
-    // That's funny, perhaps we've been given MKL with its amputated FFTW?
-    // Let's try a series of strided 1d-transforms
+    // The multi-dimensional plan can fail, e.g. with the FFTW interface of MKL. Fall back to strided 1-D transforms.
     memcpy(F, x, siz * sizeof(double));
     int stride = 1;
     for (int i = 0; i < rank; i++) {
@@ -49,7 +45,6 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
         brokenfftw = true;
         break;
       }
-      // Do them
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (threads > 1)
 #endif
@@ -72,13 +67,11 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
     double **mat;
     double beta = 0;
 
-    // Some work space
     buf = (double *)R_alloc(siz, sizeof(double));
     mat = (double **)R_alloc(rank, sizeof(double *));
     // Create the needed transform matrices
     // reuse same dimension matrices
     for (int j = 0; j < rank; j++) {
-      // Is it there already?
       int N = dims[j];
       if (N > 10000)
         Rf_warning("Long vector (%d), no FFTW. This may go wrong.", N);
@@ -117,7 +110,6 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
       int N = dims[i]; // length of transform
       int stride = (int)(siz / N);
       double alpha = dct ? 2.0 : 2.0 / N; // Constant for transform
-      // swap src and dest
       double *p = src;
       src = dest;
       dest = p;
@@ -179,7 +171,6 @@ SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
 
 static double FH(const double *fv, const double *x, const double **knots, const int *dims, const int rank,
                  const double **weights) {
-  // Use Floater-Hormann method
   if (rank == 0)
     return fv[0];
   R_xlen_t siz = 1;
@@ -192,7 +183,7 @@ static double FH(const double *fv, const double *x, const double **knots, const 
     siz *= dims[i];
   double num = 0, denom = 0;
 
-  // Special case:
+  // x lies on a knot
   for (int i = 0; i < N; i++) {
     if (fabs(xx - kn[i]) < 10.0 * DBL_EPSILON)
       return FH(&fv[i * siz], x, knots, dims, newrank, weights);
@@ -327,7 +318,7 @@ double C_evalcheb(const double *cf, const double *x, const int *dims, const int 
   const int N = dims[newrank];
   double x2 = 2.0 * x[newrank], bn1 = 0, bn2 = 0, bn = 0;
 
-  // semantically unnecessary, just save a recursion level, it speeds up things.
+  // not needed for correctness, it saves a recursion level
   if (newrank == 0) {
     for (int i = N - 1; i > 0; i--) {
       bn2 = bn1;
@@ -620,7 +611,6 @@ SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   if (!Rf_isMatrix(x) && LENGTH(x) != rank)
     Rf_error("`x` must have length %d, one per dimension, not %d.", rank, LENGTH(x));
 
-  // Make some pointers into the grid data
   for (int i = 0; i < rank; i++) {
     dims[i] = LENGTH(VECTOR_ELT(sgrid, i));
     grid[i] = REAL_RO(VECTOR_ELT(sgrid, i));
@@ -756,7 +746,6 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
       }
     }
 
-    // Now, find a simplex with this knot
     R_xlen_t nearest = -1;
     for (R_xlen_t simplex = 0; simplex < numsimplex; simplex++) {
       for (int j = 0; j < N; j++)

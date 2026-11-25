@@ -241,9 +241,7 @@ static void makestalk(const int nrank, const int *dims, const double **grid, con
                       double *r, int depth, int *point) {
   // Loop over every grid point
   // In each grid point, find the function living there, i.e. b, c and r for each dimension.
-  // how many grid points are there? prod(dims)
-  // We need nested loops to nrank depth. I.e. recursion.
-  // record point
+  // Recurse over the dimensions to visit every grid point
   if (depth < nrank) {
     for (int i = 0; i < dims[depth]; i++) {
       point[depth] = i;
@@ -280,7 +278,7 @@ static void makestalk(const int nrank, const int *dims, const double **grid, con
       bb[i] = (val[index - stride] - val[index]) / (gr[idx - 1] - gr[idx]);
       cc[i] = rr[i] = 0.0;
     } else {
-      // inside somewhere
+      // interior grid point
       double v0 = val[index];
       double vplus = val[index + stride] - v0;
       double vmin = val[index - stride] - v0;
@@ -358,7 +356,6 @@ static double evalstalk(const double *x, const int nrank, const int *dims, const
     stride *= dims[g];
   }
 
-  // Loop over the corners
   double V = 0.0;
   double zx[nrank];
   double sumw = 0.0;
@@ -384,7 +381,6 @@ static double evalstalk(const double *x, const int nrank, const int *dims, const
     }
     if (cw == 0.0)
       continue;
-    // Nice. Now 'corner' is the index into our arrays
     // Find b, c, and r for the corner. These have stride 'nrank'
     const double *bb = &b[nrank * corner], *cc = &c[nrank * corner], *rr = &r[nrank * corner];
     // These are for a zero-based function, i.e. based on the corner being 0,
@@ -393,14 +389,12 @@ static double evalstalk(const double *x, const int nrank, const int *dims, const
     // The zero-based x is in zx
     double fval = val[corner];
     for (int j = 0; j < nrank; j++) {
-      // It might be linear
       if (cc[j] == 0) {
         fval += bb[j] * zx[j];
       } else {
         fval += bb[j] * zx[j] + cc[j] * pow(fabs(zx[j]), rr[j]);
       }
     }
-    // That's the function value. The weight is in cw
     sumw += cw;
     V += cw * fval;
   }
@@ -414,9 +408,7 @@ static void makehyp(const int nrank, const int *dims, const double **grid, const
   // Loop over every grid point
   // In each grid point, find the function living there, i.e. an a,
   // and b,c,d for each dimension.
-  // how many grid points are there? prod(dims)
-  // We need nested loops to nrank depth. I.e. recursion.
-  // record point
+  // Recurse over the dimensions to visit every grid point
   if (depth < nrank) {
     for (int i = 0; i < dims[depth]; i++) {
       point[depth] = i;
@@ -436,10 +428,9 @@ static void makehyp(const int nrank, const int *dims, const double **grid, const
   // Inner loop, we have a grid point in 'point'
   // loop over the dimensions, collecting b, c, and d
 
-  // Where to store them.
   double *bb = &b[nrank * index], *cc = &c[nrank * index], *dd = &d[nrank * index];
   a[index] = 0.0;
-  stride = 1; // Redo this for each dimension
+  stride = 1;
   for (int i = 0; i < nrank; i++) {
     const double *gr = grid[i];
     int idx = point[i];
@@ -456,7 +447,7 @@ static void makehyp(const int nrank, const int *dims, const double **grid, const
       cc[i] = dd[i] = 0.0;
 
     } else {
-      // inside somewhere
+      // interior grid point
       double v0 = val[index];
       double vplus = val[index + stride] - v0;
       double vmin = val[index - stride] - v0;
@@ -538,7 +529,6 @@ static double evalhyp(const double *x, const int nrank, const int *dims, const d
     stride *= dims[g];
   }
 
-  // Loop over the corners
   double V = 0.0;
   double zx[nrank];
   double sumw = 0.0;
@@ -564,7 +554,6 @@ static double evalhyp(const double *x, const int nrank, const int *dims, const d
     }
     if (cw == 0.0)
       continue;
-    // Nice. Now 'corner' is the index into our arrays
     // Find a, b, c, and d for the corner. These have stride 'nrank'
     const double *bb = &b[nrank * corner], *cc = &c[nrank * corner], *dd = &d[nrank * corner];
     // These are for a zero-based function, i.e. based on the corner being 0,
@@ -580,7 +569,6 @@ static double evalhyp(const double *x, const int nrank, const int *dims, const d
         fval += bb[j] * zx[j] * zx[j];
       }
     }
-    // That's the function value. The weight is in cw
     sumw += cw;
     V += cw * fval;
   }
