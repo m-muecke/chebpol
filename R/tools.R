@@ -15,7 +15,14 @@ as_points <- function(x, arity, call = sys.call(sys.parent())) {
   if (is.integer(x) || is.logical(x)) {
     storage.mode(x) <- "double"
   }
-  if (is.matrix(x) || length(x) == arity) {
+  if (is.matrix(x)) {
+    if (nrow(x) != arity) {
+      msg <- sprintf("`x` must have %d rows, one per dimension, not %d.", arity, nrow(x))
+      stop(errorCondition(msg, call = call))
+    }
+    return(x)
+  }
+  if (length(x) == arity) {
     return(x)
   }
   if (arity == 1L) {

@@ -18,6 +18,16 @@
     Condition
       Error in `gen()`:
       ! `x` must have length 3 or be a matrix with 3 rows, not length 2.
+    Code
+      gen(matrix(0, 2, 4))
+    Condition
+      Error in `gen()`:
+      ! `x` must have 3 rows, one per dimension, not 2.
+    Code
+      uni(matrix(0, 2, 4))
+    Condition
+      Error in `uni()`:
+      ! `x` must have 3 rows, one per dimension, not 2.
 
 # evalongrid() errors when the function value is not usable
 

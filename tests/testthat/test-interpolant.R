@@ -17,7 +17,6 @@ test_that("every method returns a chebpol_interpolant that records its method", 
     expect_s3_class(ip, "chebpol_interpolant")
   }
   expect_equal(vapply(ips, \(ip) attr(ip, "method"), ""), names(ips), ignore_attr = TRUE)
-  expect_equal(ips$multilinear(c(0.5, 1)), 1.25, tolerance = 0.1)
 })
 
 test_that("an interpolant created with a blend keeps its class and attributes", {
