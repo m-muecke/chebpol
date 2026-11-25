@@ -14,7 +14,7 @@
 #'
 #' The method `"uniform"` is similar to the `"chebyshev"`, but
 #' uniformly spaced knots are created. The argument
-#' `intervals` generally goes with `dims` when something else than
+#' `intervals` generally goes with `dims` when other than
 #' standard intervals `[-1, 1]` are used.
 #'
 #' The methods `"multilinear"`, `"fh"` (Floater-Hormann), `"stalker"`,
@@ -33,7 +33,7 @@
 #' uses normalization if any of the knots are outside the unit hypercube. `normalize` can also
 #' be a vector `c(a, b)`, or a matrix with columns `a` and `b` and one row per dimension, in which
 #' case each coordinate is transformed as `a * (x - b)`. Also, a logical
-#' `nowarn` is accepted, it is used to suppress a warning in case the system can't
+#' `nowarn` is accepted. It is used to suppress a warning in case the system can't
 #' be solved exactly and a least squares fallback method is used.
 #' Fitting solves a dense linear system with one row and column per knot, so it
 #' becomes slow beyond a few thousand knots.
@@ -43,7 +43,7 @@
 #' by weighting the vertex values with the barycentric coordinates.
 #'
 #' If knots are required, but the grid argument is given, knots are constructed as
-#' `t(expand.grid(grid))`
+#' `t(expand.grid(grid))`.
 #'
 #' The `"crbf"` is the multilayer compact radial basis function
 #' interpolation in ALGLIB (<https://www.alglib.net/interpolation/fastrbf.php>).

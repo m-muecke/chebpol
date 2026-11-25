@@ -64,7 +64,7 @@ the intervals can be specified if different from \verb{[-1, 1]}.
 
 The method \code{"uniform"} is similar to the \code{"chebyshev"}, but
 uniformly spaced knots are created. The argument
-\code{intervals} generally goes with \code{dims} when something else than
+\code{intervals} generally goes with \code{dims} when other than
 standard intervals \verb{[-1, 1]} are used.
 
 The methods \code{"multilinear"}, \code{"fh"} (Floater-Hormann), \code{"stalker"},
@@ -83,7 +83,7 @@ for normalizing the knots to the unit hypercube. The default is \code{NA}, which
 uses normalization if any of the knots are outside the unit hypercube. \code{normalize} can also
 be a vector \code{c(a, b)}, or a matrix with columns \code{a} and \code{b} and one row per dimension, in which
 case each coordinate is transformed as \code{a * (x - b)}. Also, a logical
-\code{nowarn} is accepted, it is used to suppress a warning in case the system can't
+\code{nowarn} is accepted. It is used to suppress a warning in case the system can't
 be solved exactly and a least squares fallback method is used.
 Fitting solves a dense linear system with one row and column per knot, so it
 becomes slow beyond a few thousand knots.
@@ -93,7 +93,7 @@ Delaunay triangulation from the knots, and does linear interpolation in each sim
 by weighting the vertex values with the barycentric coordinates.
 
 If knots are required, but the grid argument is given, knots are constructed as
-\code{t(expand.grid(grid))}
+\code{t(expand.grid(grid))}.
 
 The \code{"crbf"} is the multilayer compact radial basis function
 interpolation in ALGLIB (\url{https://www.alglib.net/interpolation/fastrbf.php}).

@@ -26,7 +26,7 @@ The interpolants are ordinary R-objects and can be saved with \code{save()} and 
 later with \code{load()} or serialized/unserialized with other tools, just like any R-object.
 However, they contain calls to functions in the package, and while the author will make efforts
 to ensure that generated interpolants are compatible with future versions of chebpol,
-I can issue no such absolute guarantee.
+no absolute guarantee can be given.
 }
 \section{Chebyshev}{
 
@@ -50,7 +50,7 @@ Chebyshev variant \code{ipol(..., method = "general")}, as well as a multilinear
 \code{ipol(..., method = "multilinear")}. These methods work on uniform grids as well.
 There is also a \code{method = "stalker"} which is a shape preserving spline, and a variant
 \code{method = "hstalker"}. Both are described in a vignette. These splines in one dimension
-attempts to honour monotonicity and local extrema, in particular the \code{"hstalker"} is
+attempt to honour monotonicity and local extrema, in particular the \code{"hstalker"} is
 positivity-preserving in the sense that it will preserve maxima and minima.
 }
 

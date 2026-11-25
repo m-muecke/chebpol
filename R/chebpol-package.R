@@ -19,7 +19,7 @@
 #' later with `load()` or serialized/unserialized with other tools, just like any R-object.
 #' However, they contain calls to functions in the package, and while the author will make efforts
 #' to ensure that generated interpolants are compatible with future versions of chebpol,
-#' I can issue no such absolute guarantee.
+#' no absolute guarantee can be given.
 #'
 #' @section Chebyshev:
 #' If we are free to evaluate the function to interpolate in arbitrary points, we can use
@@ -36,7 +36,7 @@
 #' `ipol(..., method = "multilinear")`. These methods work on uniform grids as well.
 #' There is also a `method = "stalker"` which is a shape preserving spline, and a variant
 #' `method = "hstalker"`. Both are described in a vignette. These splines in one dimension
-#' attempts to honour monotonicity and local extrema, in particular the `"hstalker"` is
+#' attempt to honour monotonicity and local extrema, in particular the `"hstalker"` is
 #' positivity-preserving in the sense that it will preserve maxima and minima.
 #' @section Scattered data:
 #' For scattered data, not necessarily organised as a Cartesian product grid, there is

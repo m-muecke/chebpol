@@ -55,7 +55,7 @@ chebknots <- function(dims, intervals = NULL) {
 #' grid.
 #'
 #' If `val` has no `dim`-attribute, it is assumed to be
-#' one-dimensional of length the length of `val`.
+#' one-dimensional with length `length(val)`.
 #'
 #' If chebpol was compiled without FFTW, running
 #' `chebcoef` on large grids may be slow and memory-demanding.
