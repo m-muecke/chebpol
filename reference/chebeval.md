@@ -18,7 +18,8 @@ chebeval(x, coef, intervals = NULL, threads = getOption("chebpol.threads"))
 
   The Chebyshev coefficients. Typically from a call to
   [`chebcoef()`](https://m-muecke.github.io/chebpol/reference/chebcoef.md),
-  possibly modified.
+  possibly modified. A vector without a `dim` attribute is treated as
+  one-dimensional.
 
 - intervals:
 

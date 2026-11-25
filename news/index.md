@@ -30,6 +30,11 @@
   now works with `intervals` for a matrix of points, and for a single
   interval given as a vector `c(a, b)`. Before, only a single point in
   two or more dimensions was mapped correctly.
+- [`chebeval()`](https://m-muecke.github.io/chebpol/reference/chebeval.md)
+  now treats coefficients without a `dim` attribute, such as
+  `c(1, 0.5, 0.25)` or `as.numeric(chebcoef(val))`, as one-dimensional.
+  Previously it failed with “INTEGER() can only be applied to a
+  ‘integer’, not a ‘NULL’”.
 - Loading chebpol no longer overwrites the `chebpol.threads` option when
   it is already set, for example in `.Rprofile`. The `CHEBPOL_THREADS`
   environment variable is only used when the option is unset.
@@ -66,11 +71,20 @@
   `method = "fh"` now forwards extra arguments in `...` to the function
   being interpolated.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "fh"` now stops with an error when the dimensions of the
+  values do not match the grid lengths. Previously the interpolant read
+  past the end of the grid and returned meaningless values.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "uniform"` now accepts a single interval given as a vector
   `c(a, b)` together with values. It already did when given a function.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "simplexlinear"` now forwards extra arguments in `...` to
   the function being interpolated.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "simplexlinear"` now stops with an error when the number of
+  values differs from the number of knots. Previously the interpolant
+  read past the end of the values and returned meaningless values or
+  `NA`.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "polyharmonic"` accepts `normalize` as a vector `c(a, b)` or
   a two-column matrix again. Both forms failed with “the condition has
@@ -98,6 +112,10 @@
   `method = "polyharmonic"` now stops with an error when the number of
   values differs from the number of knots. Previously it warned about
   falling back to a least squares fit and suggested `normalize = TRUE`.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "stalker"`, `"hstalker"` or `"oldstalker"` now stops with an
+  error when a grid dimension has a single point. Previously the spline
+  read past the end of the values and the grid.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   interpolants created with `method = "stalker"`, `"hstalker"` or
   `"simplexlinear"` now stop with an error when given a matrix with the

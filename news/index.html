@@ -64,6 +64,8 @@
 <li>Integer input is now accepted everywhere a number is expected: the points passed to an interpolant, the values, grids and knots passed to <code><a href="../reference/ipol.html">ipol()</a></code>, the grid in <code><a href="../reference/evalongrid.html">evalongrid()</a></code>, and the arguments of <code><a href="../reference/chebcoef.html">chebcoef()</a></code> and <code><a href="../reference/chebeval.html">chebeval()</a></code>. Previously most of these failed with “REAL() can only be applied to a ‘numeric’”.</li>
 <li>
 <code><a href="../reference/chebeval.html">chebeval()</a></code> now works with <code>intervals</code> for a matrix of points, and for a single interval given as a vector <code>c(a, b)</code>. Before, only a single point in two or more dimensions was mapped correctly.</li>
+<li>
+<code><a href="../reference/chebeval.html">chebeval()</a></code> now treats coefficients without a <code>dim</code> attribute, such as <code>c(1, 0.5, 0.25)</code> or <code>as.numeric(chebcoef(val))</code>, as one-dimensional. Previously it failed with “INTEGER() can only be applied to a ‘integer’, not a ‘NULL’”.</li>
 <li>Loading chebpol no longer overwrites the <code>chebpol.threads</code> option when it is already set, for example in <code>.Rprofile</code>. The <code>CHEBPOL_THREADS</code> environment variable is only used when the option is unset.</li>
 <li>
 <code><a href="../reference/evalongrid.html">evalongrid()</a></code> now stops with an error when a grid dimension has no points. Previously it crashed R.</li>
@@ -80,9 +82,13 @@
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "fh"</code> now forwards extra arguments in <code>...</code> to the function being interpolated.</li>
 <li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "fh"</code> now stops with an error when the dimensions of the values do not match the grid lengths. Previously the interpolant read past the end of the grid and returned meaningless values.</li>
+<li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "uniform"</code> now accepts a single interval given as a vector <code>c(a, b)</code> together with values. It already did when given a function.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "simplexlinear"</code> now forwards extra arguments in <code>...</code> to the function being interpolated.</li>
+<li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "simplexlinear"</code> now stops with an error when the number of values differs from the number of knots. Previously the interpolant read past the end of the values and returned meaningless values or <code>NA</code>.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> accepts <code>normalize</code> as a vector <code>c(a, b)</code> or a two-column matrix again. Both forms failed with “the condition has length &gt; 1” on R &gt;= 4.2, and the knots were never transformed, so the fit did not match the evaluation.</li>
 <li>
@@ -95,6 +101,8 @@
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now fits a spline with a single knot. Previously it failed with “invalid ‘nrow’ value”.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now stops with an error when the number of values differs from the number of knots. Previously it warned about falling back to a least squares fit and suggested <code>normalize = TRUE</code>.</li>
+<li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "stalker"</code>, <code>"hstalker"</code> or <code>"oldstalker"</code> now stops with an error when a grid dimension has a single point. Previously the spline read past the end of the values and the grid.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "stalker"</code>, <code>"hstalker"</code> or <code>"simplexlinear"</code> now stop with an error when given a matrix with the wrong number of rows. Previously they returned values silently, and could read past the end of the input.</li>
 <li>
