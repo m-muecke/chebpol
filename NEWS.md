@@ -29,6 +29,7 @@
 * `ipol()` with `method = "polyharmonic"` now computes the size of the knots-by-knots distance matrix correctly for 46,341 or more knots. Previously the size computation overflowed, giving "negative length vectors are not allowed" or, from 65,536 knots, possibly writing outside the allocated memory. Fitting that many knots still needs enough memory for the matrix, about 17 GB at 46,341 knots.
 * `ipol()` with `method = "polyharmonic"` now fits a spline with a single knot. Previously it failed with "invalid 'nrow' value".
 * `ipol()` with `method = "polyharmonic"` now stops with an error when the number of values differs from the number of knots. Previously it warned about falling back to a least squares fit and suggested `normalize = TRUE`.
+* `ipol()` with `method = "stalker"`, `"hstalker"` or `"oldstalker"` now stops with an error when a grid dimension has a single point. Previously the spline read past the end of the values and the grid.
 * `ipol()` interpolants created with `method = "stalker"`, `"hstalker"` or `"simplexlinear"` now stop with an error when given a matrix with the wrong number of rows. Previously they returned values silently, and could read past the end of the input.
 * `ipol()` interpolants created with `method = "oldstalker"` now report both ranks when given input of the wrong dimension.
 

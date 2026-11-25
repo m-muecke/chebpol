@@ -24,6 +24,24 @@
       Error in `match.arg()`:
       ! 'arg' should be one of "cubic", "linear", "sigmoid", "parodic", "square", "mean"
 
+# ipol() errors on a stalker grid dimension with a single point
+
+    Code
+      ipol(sum, grid = grid, method = "stalker")
+    Condition
+      Error in `ipol()`:
+      ! each grid dimension must have at least two points for stalker interpolation
+    Code
+      ipol(sum, grid = grid, method = "hstalker")
+    Condition
+      Error in `ipol()`:
+      ! each grid dimension must have at least two points for stalker interpolation
+    Code
+      ipol(sum, grid = grid, method = "oldstalker")
+    Condition
+      Error in `ipol()`:
+      ! each grid dimension must have at least two points for stalker interpolation
+
 # stalker interpolants error on input of the wrong dimension
 
     Code

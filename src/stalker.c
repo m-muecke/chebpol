@@ -653,6 +653,8 @@ SEXP R_makestalk(SEXP Sval, SEXP Sgrid) {
   R_xlen_t len = 1;
   for (int r = 0; r < nrank; r++) {
     dims[r] = LENGTH(VECTOR_ELT(Sgrid, r));
+    if (dims[r] < 2)
+      Rf_error("grid dimension %d must have at least two points", r + 1);
     len *= dims[r];
   }
   if (len != XLENGTH(Sval)) {
@@ -705,6 +707,8 @@ SEXP R_makehyp(SEXP Sval, SEXP Sgrid) {
   R_xlen_t len = 1;
   for (int r = 0; r < nrank; r++) {
     dims[r] = LENGTH(VECTOR_ELT(Sgrid, r));
+    if (dims[r] < 2)
+      Rf_error("grid dimension %d must have at least two points", r + 1);
     len *= dims[r];
   }
   if (len != XLENGTH(Sval)) {
@@ -830,6 +834,8 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
   R_xlen_t len = 1;
   for (int r = 0; r < nrank; r++) {
     dims[r] = LENGTH(VECTOR_ELT(Sgrid, r));
+    if (dims[r] < 2)
+      Rf_error("grid dimension %d must have at least two points", r + 1);
     len *= dims[r];
   }
   if (len != XLENGTH(VECTOR_ELT(stalker, 0))) {

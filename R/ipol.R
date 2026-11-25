@@ -270,6 +270,9 @@ ipol <- function(
       if (!is.list(grid)) {
         grid <- list(grid)
       }
+      if (any(lengths(grid) < 2L)) {
+        stop("each grid dimension must have at least two points for stalker interpolation")
+      }
       if (unsortedgrid(grid)) {
         stop("grid must be distinct ordered values")
       }
@@ -289,6 +292,9 @@ ipol <- function(
       if (!is.list(grid)) {
         grid <- list(grid)
       }
+      if (any(lengths(grid) < 2L)) {
+        stop("each grid dimension must have at least two points for stalker interpolation")
+      }
       if (unsortedgrid(grid)) {
         stop("grid must be distinct ordered values")
       }
@@ -306,6 +312,9 @@ ipol <- function(
       }
       if (!is.list(grid)) {
         grid <- list(grid)
+      }
+      if (any(lengths(grid) < 2L)) {
+        stop("each grid dimension must have at least two points for stalker interpolation")
       }
       if (unsortedgrid(grid)) {
         stop("grid must be distinct ordered values")
