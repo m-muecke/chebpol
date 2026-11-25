@@ -16,7 +16,7 @@ treated as one-dimensional.}
 \item{intervals}{A list of minimum and maximum values. One for each
 dimension of the hypercube.}
 
-\item{threads}{And integer. In case \code{x} is a matrix of column vectors,
+\item{threads}{An integer. In case \code{x} is a matrix of column vectors,
 use this number of threads in parallel to evaluate.}
 }
 \value{

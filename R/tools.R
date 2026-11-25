@@ -123,6 +123,7 @@ separgs <- function(fun, ...) {
 #' @return An array with the value of `fun` on each grid point. The
 #' `dim` attribute has been appropriately set for the grid.  If `fun`
 #' returns a vector, this will be the first dimension of the returned array.
+#' @export
 #' @examples
 #' f <- function(x) {
 #'   a <- sum(x^2)
@@ -140,7 +141,6 @@ separgs <- function(fun, ...) {
 #' # vector valued function
 #' f <- function(x) c(prod(x), sum(x^2))
 #' evalongrid(f, grid = grid)
-#' @export
 evalongrid <- function(fun, dims, intervals = NULL, ..., grid = NULL) {
   # do a call to stuff which doesn't really expand the grid
   if (is.numeric(grid)) {
@@ -173,8 +173,6 @@ evalongridV <- function(fun, dims, intervals = NULL, ..., grid = NULL) {
 #' approximation will be possible, but not a one-dimensional 1000000.  This
 #' function checks whether chebpol uses FFTW.
 #'
-#'
 #' @return Returns TRUE if chebpol uses FFTW. Otherwise FALSE.
-#'
 #' @export
 havefftw <- function() .Call(C_havefftw)

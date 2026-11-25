@@ -2,7 +2,7 @@
 % Please edit documentation in R/ipol.R
 \name{ipol}
 \alias{ipol}
-\title{Create interpolating function.}
+\title{Create an interpolating function}
 \usage{
 ipol(
   val,
@@ -53,7 +53,7 @@ Create an interpolating function from given values. Several interpolation method
 supported.
 }
 \details{
-\code{ipol} is a wrapper around various interpolation methods in package \pkg{chebpol}.
+\code{ipol} is a wrapper around various interpolation methods in package chebpol.
 Which arguments to specify depends on the method. The interpolation methods are described
 in \code{vignette("chebpol", package = "chebpol")}.
 
@@ -69,7 +69,7 @@ standard intervals \verb{[-1, 1]} are used.
 
 The methods \code{"multilinear"}, \code{"fh"} (Floater-Hormann), \code{"stalker"},
 \code{"hstalker"}, and
-\code{"general"} needs the argument \code{grid}.  These are the methods
+\code{"general"} need the argument \code{grid}.  These are the methods
 which can use arbitrary Cartesian grids.
 The stalker spline
 is described in \code{vignette("stalker", package = "chebpol")}. The Floater-Hormann
@@ -109,7 +109,7 @@ su <- seq(0, 1, length.out = 10)
 # irregularly spaced grid-points
 s <- su^3
 # create approximation on the irregularly spaced grid
-ml1 <- ipol(exp, grid = list(s), method = "multilin")
+ml1 <- ipol(exp, grid = list(s), method = "multilinear")
 fh1 <- ipol(exp, grid = list(s), method = "fh")
 # test it, since exp is convex, the linear approximation lies above
 # the exp between the grid points
@@ -122,12 +122,12 @@ f <- function(x) 10 / (1 + 25 * mean(x^2))
 grid <- list(s, su, sort(1 - s))
 
 # make multilinear, Floater-Hormann, Chebyshev and polyharmonic spline.
-ml2 <- ipol(f, grid = grid, method = "multilin")
+ml2 <- ipol(f, grid = grid, method = "multilinear")
 fh2 <- ipol(f, grid = grid, method = "fh")
 hst <- ipol(f, grid = grid, method = "hstalker")
-ch2 <- ipol(f, dims = c(10, 10, 10), intervals = list(0:1, 0:1, 0:1), method = "cheb")
+ch2 <- ipol(f, dims = c(10, 10, 10), intervals = list(0:1, 0:1, 0:1), method = "chebyshev")
 knots <- matrix(runif(3 * 1000), 3)
-ph2 <- ipol(f, knots = knots, k = 2, method = "poly")
+ph2 <- ipol(f, knots = knots, k = 2, method = "polyharmonic")
 # my alglib is a bit slow, so stick to 100 knots
 if (havealglib()) {
   crb <- ipol(f, knots = knots[, 1:100], method = "crbf", rbase = 2, layers = 5, lambda = 0)

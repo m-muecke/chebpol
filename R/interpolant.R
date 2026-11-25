@@ -4,10 +4,10 @@
 #' points, and which fills in between with some reasonable values.
 #'
 #' @name interpolant
-#' @param x The argument of the function. A function of more then one variable takes a
+#' @param x The argument of the function. A function of more than one variable takes a
 #' vector. `x` can also be a matrix of column vectors.
 #' @param threads The number of threads to use for evaluation. All  interpolants created by
-#' \pkg{chebpol} are parallelized. If given a matrix argument `x`, the vectors can
+#' chebpol are parallelized. If given a matrix argument `x`, the vectors can
 #' be evaluated in parallel.
 #' @param ... Other parameters. Currently used for simplex linear interpolants with the logical argument
 #' `epol` which makes the interpolant extrapolate to points outside the domain.

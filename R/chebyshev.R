@@ -22,17 +22,17 @@ chebknots1 <- function(n, interval = NULL) {
 #' Chebyshev-polynomial of degree `dims-1`.
 #' @param intervals A list of vectors of length 2.  The lower and upper bounds
 #' of the hypercube.
-#' @return A array of dimension `dims`.  The Chebyshev grid-points.
+#' @return An array of dimension `dims`.  The Chebyshev grid-points.
+#' @export
 #' @examples
 #' # Standard knots for degree 3
 #' chebknots(4)
 #' # Knots in the interval [2,3] for degree 3
-#' chebknots(4, interval = c(2, 3))
+#' chebknots(4, intervals = c(2, 3))
 #' # Multivariate knots
 #' chebknots(c(x = 3, y = 4, z = 3))
 #' # Multivariate grid
 #' head(expand.grid(chebknots(c(x = 3, y = 4, z = 5), list(c(1, 3), c(4, 6), c(800, 900)))))
-#' @export
 chebknots <- function(dims, intervals = NULL) {
   if (is.null(intervals)) {
     res <- lapply(dims, chebknots1)
@@ -57,7 +57,7 @@ chebknots <- function(dims, intervals = NULL) {
 #' If `val` has no `dim`-attribute, it is assumed to be
 #' one-dimensional of length the length of `val`.
 #'
-#' If \pkg{chebpol} was compiled without \acronym{FFTW}, running
+#' If chebpol was compiled without FFTW, running
 #' `chebcoef` on large grids may be slow and memory-demanding.
 #'
 #' @param val An `array` of function values on a Chebyshev grid.  The
@@ -71,11 +71,11 @@ chebknots <- function(dims, intervals = NULL) {
 #' @return An array of Chebyshev-coefficients for an interpolating
 #' Chebyshev-polynomial.
 #' @seealso [havefftw()]
+#' @export
 #' @examples
 #' # Coefficients for a 2x3x4 grid
 #' a <- array(rnorm(24), dim = c(2, 3, 4))
 #' chebcoef(a)
-#' @export
 chebcoef <- function(val, dct = FALSE) {
   val <- as.array(val)
   if (is.integer(val) || is.logical(val)) {
@@ -88,16 +88,16 @@ chebcoef <- function(val, dct = FALSE) {
 #'
 #' Given Chebyshev coefficients, evaluate the interpolation in a point.
 #'
-#'
 #' @param x The point to evaluate.
 #' @param coef The Chebyshev coefficients. Typically from a call to
 #' [chebcoef()], possibly modified. A vector without a `dim` attribute is
 #' treated as one-dimensional.
 #' @param intervals A list of minimum and maximum values. One for each
 #' dimension of the hypercube.
-#' @param threads And integer. In case `x` is a matrix of column vectors,
+#' @param threads An integer. In case `x` is a matrix of column vectors,
 #' use this number of threads in parallel to evaluate.
 #' @return A numeric. The interpolated value.
+#' @export
 #' @examples
 #' # make a function which is known to be unsuitable for Chebyshev approximation
 #' f <- function(x) sign(x)
@@ -118,7 +118,6 @@ chebcoef <- function(val, dct = FALSE) {
 #' lines(s, tch(s), col = "blue")
 #' lines(s, f(s))
 #' lines(s, ch2(s), col = "green")
-#' @export
 chebeval <- function(x, coef, intervals = NULL, threads = getOption("chebpol.threads")) {
   if (is.integer(x) || is.logical(x)) {
     storage.mode(x) <- "double"

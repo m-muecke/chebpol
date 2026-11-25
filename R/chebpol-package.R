@@ -18,7 +18,7 @@
 #' The interpolants are ordinary R-objects and can be saved with `save()` and loaded
 #' later with `load()` or serialized/unserialized with other tools, just like any R-object.
 #' However, they contain calls to functions in the package, and while the author will make efforts
-#' to ensure that generated interpolants are compatible with future versions of \pkg{chebpol},
+#' to ensure that generated interpolants are compatible with future versions of chebpol,
 #' I can issue no such absolute guarantee.
 #'
 #' @section Chebyshev:
@@ -53,7 +53,7 @@
 #' @concept interpolation
 #' @concept Floater-Hormann
 #' @keywords internal
-#' @seealso [ipol], [interpolant]
+#' @seealso [ipol()], [interpolant]
 #' @examples
 #' # make some function values on a 50x50x50 grid
 #' dims <- c(x = 50, y = 50, z = 50)
@@ -61,7 +61,7 @@
 #' value <- evalongrid(f, dims)
 #' # fit a Chebyshev approximation to it. Note that the value-array contains the
 #' # grid-structure.
-#' ch <- ipol(value, method = "cheb")
+#' ch <- ipol(value, method = "chebyshev")
 #' # To see the grid, use the chebknots function and expand.grid. Compare the
 #' # values with the approximation in the first few grid points.
 #' knots <- head(expand.grid(chebknots(dims)))

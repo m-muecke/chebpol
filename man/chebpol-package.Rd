@@ -25,7 +25,7 @@ one CPU if a matrix of column vectors is evaluated.  Unless the option
 The interpolants are ordinary R-objects and can be saved with \code{save()} and loaded
 later with \code{load()} or serialized/unserialized with other tools, just like any R-object.
 However, they contain calls to functions in the package, and while the author will make efforts
-to ensure that generated interpolants are compatible with future versions of \pkg{chebpol},
+to ensure that generated interpolants are compatible with future versions of chebpol,
 I can issue no such absolute guarantee.
 }
 \section{Chebyshev}{
@@ -76,7 +76,7 @@ f <- function(x) sqrt(1 + x[1]) * exp(x[2]) * sin(5 * x[3])^2
 value <- evalongrid(f, dims)
 # fit a Chebyshev approximation to it. Note that the value-array contains the
 # grid-structure.
-ch <- ipol(value, method = "cheb")
+ch <- ipol(value, method = "chebyshev")
 # To see the grid, use the chebknots function and expand.grid. Compare the
 # values with the approximation in the first few grid points.
 knots <- head(expand.grid(chebknots(dims)))
@@ -88,7 +88,7 @@ m <- matrix(runif(15, -1, 1), 3)
 rbind(true = apply(m, 2, f), cheb = ch(m), fh = fh(m))
 }
 \seealso{
-\link{ipol}, \link{interpolant}
+\code{\link[=ipol]{ipol()}}, \link{interpolant}
 }
 \author{
 \strong{Maintainer}: Maximilian Mücke \email{muecke.maximilian@gmail.com} (\href{https://orcid.org/0009-0000-9432-9795}{ORCID})

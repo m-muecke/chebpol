@@ -29,7 +29,7 @@ grid.
 If \code{val} has no \code{dim}-attribute, it is assumed to be
 one-dimensional of length the length of \code{val}.
 
-If \pkg{chebpol} was compiled without \acronym{FFTW}, running
+If chebpol was compiled without FFTW, running
 \code{chebcoef} on large grids may be slow and memory-demanding.
 }
 \examples{

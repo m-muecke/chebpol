@@ -14,7 +14,7 @@ Chebyshev-polynomial of degree \code{dims-1}.}
 of the hypercube.}
 }
 \value{
-A array of dimension \code{dims}.  The Chebyshev grid-points.
+An array of dimension \code{dims}.  The Chebyshev grid-points.
 }
 \description{
 Create a Chebyshev grid on a hypercube.
@@ -29,7 +29,7 @@ of length 2 rather than a list with a vector of length 2.
 # Standard knots for degree 3
 chebknots(4)
 # Knots in the interval [2,3] for degree 3
-chebknots(4, interval = c(2, 3))
+chebknots(4, intervals = c(2, 3))
 # Multivariate knots
 chebknots(c(x = 3, y = 4, z = 3))
 # Multivariate grid

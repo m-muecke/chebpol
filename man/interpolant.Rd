@@ -4,11 +4,11 @@
 \alias{interpolant}
 \title{Evaluate an interpolant in a point}
 \arguments{
-\item{x}{The argument of the function. A function of more then one variable takes a
+\item{x}{The argument of the function. A function of more than one variable takes a
 vector. \code{x} can also be a matrix of column vectors.}
 
 \item{threads}{The number of threads to use for evaluation. All  interpolants created by
-\pkg{chebpol} are parallelized. If given a matrix argument \code{x}, the vectors can
+chebpol are parallelized. If given a matrix argument \code{x}, the vectors can
 be evaluated in parallel.}
 
 \item{...}{Other parameters. Currently used for simplex linear interpolants with the logical argument
