@@ -10,6 +10,8 @@ vignette: >
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(fig.width = 7, fig.height = 7)
+# plot3D loads tcltk, which warns on a machine without a display
+invisible(suppressWarnings(requireNamespace("plot3D", quietly = TRUE)))
 ```
 
 The idea behind the stalker spline in package **chebpol** is
