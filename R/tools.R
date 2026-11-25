@@ -22,7 +22,7 @@ as_domain <- function(domain) {
     return(data.frame())
   }
   varnames <- names(domain) %||% character(length(domain))
-  unnamed <- is.na(varnames) | varnames == ""
+  unnamed <- is.na(varnames) | !nzchar(varnames)
   varnames[unnamed] <- paste0("X", which(unnamed))
   names(domain) <- varnames
   as.data.frame(domain)
