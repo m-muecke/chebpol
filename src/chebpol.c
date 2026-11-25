@@ -657,7 +657,7 @@ SEXP R_sqdiffs(SEXP x1, SEXP x2, SEXP Sthreads) {
   double *np = dres;
   const double *x1v = REAL_RO(x1), *x2v = REAL_RO(x2);
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(threads) schedule(static) if (c1 > 1)
+#pragma omp parallel for num_threads(threads) schedule(static) if (threads > 1 && c1 > 1)
 #endif
   for (R_xlen_t i = 0; i < c1; i++) {
     const double *x1p = x1v + i * r1;
