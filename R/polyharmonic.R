@@ -52,10 +52,13 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   # The distance matrix is unreferenced, so C_phifunc transforms it in place
   A <- .Call(C_phifunc, .Call(C_sqdiffs, knots, knots, threads), k, threads)
   B <- rbind(1, knots)
-  mat <- matrix(0, nrow(A) + nrow(B), nrow(A) + nrow(B))
-  mat[seq_len(nrow(A)), seq_len(ncol(A))] <- A
-  mat[(nrow(A) + 1L):nrow(mat), seq_len(ncol(B))] <- B
-  mat[seq_len(ncol(B)), (ncol(A) + 1L):ncol(mat)] <- t(B)
+  n <- N + M + 1L
+  mat <- matrix(0, n, n)
+  mat[seq_len(N), seq_len(N)] <- A
+  mat[N + seq_len(M + 1L), seq_len(N)] <- B
+  mat[seq_len(N), N + seq_len(M + 1L)] <- t(B)
+  # free the distance matrix before solve() makes its own copy of mat
+  rm(A, B)
   rhs <- c(val, rep(0, M + 1L))
   wv <- try(solve(mat, rhs), silent = TRUE)
   if (inherits(wv, "try-error")) {
@@ -71,7 +74,6 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   w <- wv[seq_len(N)]
   v <- wv[(N + 1L):length(wv)]
   rm(mat, rhs, wv)
-  rm(A, B)
   vectorfun(
     function(x, threads = getOption("chebpol.threads")) .Call(C_evalpolyh, normfun(x), knots, w, v, k, threads, NULL),
     arity = M,
