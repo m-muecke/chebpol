@@ -28,6 +28,13 @@ test_that("evalongrid() errors when the function value is not usable", {
   })
 })
 
+test_that("evalongrid() errors on an empty grid dimension", {
+  expect_snapshot(error = TRUE, {
+    evalongrid(sum, grid = list(numeric(0), 1:3))
+    evalongrid(sum, dims = c(2, 0))
+  })
+})
+
 test_that("evalongrid() accepts an integer grid", {
   f <- function(x) sum(x^2)
   expect_equal(evalongrid(f, grid = list(0:4, 0:3)), evalongrid(f, grid = list(seq(0, 4), seq(0, 3))))

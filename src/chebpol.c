@@ -503,6 +503,8 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
   for (int i = 0; i < rank; i++) {
     grid[i] = REAL_RO(VECTOR_ELT(sgrid, i));
     dims[i] = LENGTH(VECTOR_ELT(sgrid, i));
+    if (dims[i] == 0)
+      Rf_error("grid dimension %d has no points", i + 1);
     len *= dims[i];
   }
 
