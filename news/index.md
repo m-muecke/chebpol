@@ -81,6 +81,13 @@
   `method = "polyharmonic"` no longer drops extra arguments in `...` for
   the function being interpolated when neither `normalize` nor `nowarn`
   is given.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "polyharmonic"` now computes the size of the knots-by-knots
+  distance matrix correctly for 46,341 or more knots. Previously the
+  size computation overflowed, giving “negative length vectors are not
+  allowed” or, from 65,536 knots, possibly writing outside the allocated
+  memory. Fitting that many knots still needs enough memory for the
+  matrix, about 17 GB at 46,341 knots.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   interpolants created with `method = "stalker"`, `"hstalker"` or
   `"simplexlinear"` now stop with an error when given a matrix with the
