@@ -533,8 +533,7 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
     SEXP snewdim = PROTECT(Rf_allocVector(INTSXP, rank + 1));
     int *newdim = INTEGER(snewdim);
     newdim[0] = valuedim;
-    for (int i = 1; i < rank + 1; i++)
-      newdim[i] = dims[i - 1];
+    memcpy(newdim + 1, dims, rank * sizeof(int));
     Rf_setAttrib(resvec, R_DimSymbol, snewdim);
     UNPROTECT(1);
   }
@@ -718,8 +717,7 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
     // bounding box matches. Transform to barycentric coordinates, check that they are positive.
     const double *lumat = lumats + simplex * N * N;
     const int *ipiv = ipivs + simplex * N;
-    for (int d = 0; d < dim; d++)
-      vec[d] = x[d];
+    memcpy(vec, x, dim * sizeof(double));
     vec[dim] = 1.0;
     F77_CALL(dgetrs)("N", &N, &one, lumat, &N, ipiv, vec, &N, &info FCONE);
     for (int d = 0; d < N; d++)
@@ -785,8 +783,7 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
     const double *lumat = lumats + nearest * N * N;
     const int *ipiv = ipivs + nearest * N;
     const int *tri = dtri + nearest * (dim + 1);
-    for (int d = 0; d < dim; d++)
-      vec[d] = x[d];
+    memcpy(vec, x, dim * sizeof(double));
     vec[dim] = 1.0;
     F77_CALL(dgetrs)("N", &N, &one, lumat, &N, ipiv, vec, &N, &info FCONE);
     double sum = 0;
