@@ -62,6 +62,8 @@
 <div class="section level3">
 <h3 id="minor-improvements-development-version">Minor improvements<a class="anchor" aria-label="anchor" href="#minor-improvements-development-version"></a></h3>
 <ul><li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now reports the warning about falling back to a least squares fit for the <code><a href="../reference/ipol.html">ipol()</a></code> call. Previously it showed the source of an internal function, e.g. “In (function (val, knots, k = 2, …”.</li>
+<li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "simplexlinear"</code> now record the range of their knots in the <code>domain</code> attribute, as polyharmonic interpolants do.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants now have class <code>chebpol_interpolant</code> and a <code>method</code> attribute. Printing one shows the method, the number of variables, the domain and the defaults of extra arguments such as <code>blend</code>, instead of the source code of the function.</li>
@@ -90,6 +92,8 @@
 <code><a href="../reference/evalongrid.html">evalongrid()</a></code> and <code><a href="../reference/ipol.html">ipol()</a></code> no longer overwrite an argument vector that the function has kept. Previously one vector was reused for every grid point, so a function that kept its argument, for example to record the points it was called with, saw every copy change to the last grid point.</li>
 <li>
 <code><a href="../reference/evalongrid.html">evalongrid()</a></code> now stops with an error when a grid dimension has no points. Previously it crashed R.</li>
+<li>
+<code><a href="../reference/evalongrid.html">evalongrid()</a></code> and <code><a href="../reference/ipol.html">ipol()</a></code> now stop with an error when <code>grid</code> has no dimensions, e.g. <code>grid = list()</code>. Previously <code><a href="../reference/ipol.html">ipol()</a></code> returned an interpolant without variables for several methods, and other methods failed with “‘dim’ cannot be of length 0”.</li>
 <li>
 <code><a href="../reference/evalongrid.html">evalongrid()</a></code> and <code><a href="../reference/ipol.html">ipol()</a></code> now accept functions that return integer or logical values, and stop with an error when the length of the returned value changes between grid points.</li>
 <li>

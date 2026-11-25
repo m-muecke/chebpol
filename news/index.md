@@ -19,6 +19,12 @@
 
 ### Minor improvements
 
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "polyharmonic"` now reports the warning about falling back
+  to a least squares fit for the
+  [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) call.
+  Previously it showed the source of an internal function, e.g. “In
+  (function (val, knots, k = 2, …”.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   interpolants created with `method = "simplexlinear"` now record the
   range of their knots in the `domain` attribute, as polyharmonic
@@ -93,6 +99,13 @@
 - [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
   now stops with an error when a grid dimension has no points.
   Previously it crashed R.
+- [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
+  and [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  now stop with an error when `grid` has no dimensions,
+  e.g. `grid = list()`. Previously
+  [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  returned an interpolant without variables for several methods, and
+  other methods failed with “‘dim’ cannot be of length 0”.
 - [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
   and [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   now accept functions that return integer or logical values, and stop
