@@ -103,6 +103,16 @@ test_that("evalongrid() accepts an integer grid", {
   expect_equal(evalongrid(f, grid = list(0:4, 0:3)), evalongrid(f, grid = list(seq(0, 4), seq(0, 3))))
 })
 
+test_that("evalongrid() calls the function once at each grid point", {
+  calls <- 0
+  f <- function(x) {
+    calls <<- calls + 1
+    calls
+  }
+  expect_equal(evalongrid(f, grid = list(1:3, 1:2)), matrix(1:6, 3L))
+  expect_equal(calls, 6)
+})
+
 test_that("evalongrid() does not overwrite an argument that the function kept", {
   seen <- list()
   f <- function(x) {
@@ -110,5 +120,5 @@ test_that("evalongrid() does not overwrite an argument that the function kept", 
     sum(x)
   }
   evalongrid(f, grid = list(1:3, 1:2))
-  expect_equal(unique(seen), list(c(1, 1), c(2, 1), c(3, 1), c(1, 2), c(2, 2), c(3, 2)))
+  expect_equal(seen, list(c(1, 1), c(2, 1), c(3, 1), c(1, 2), c(2, 2), c(3, 2)))
 })

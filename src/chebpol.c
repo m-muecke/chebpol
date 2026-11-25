@@ -474,8 +474,21 @@ void C_evalongrid(void (*fun)(double *x, double *y, int valuedim, void *ud), dou
   }
 }
 
+// The call to the R function, and its value at the first grid point until the traversal has used it
+typedef struct {
+  SEXP call;
+  SEXP first;
+} gridcall;
+
 static void C_call(double *x, double *y, const int valuedim, void *userdata) {
-  SEXP call = (SEXP)userdata;
+  gridcall *gc = (gridcall *)userdata;
+  // The first grid point was evaluated to find the length of the value, don't call the function there again
+  if (gc->first != NULL) {
+    memcpy(y, REAL_RO(gc->first), valuedim * sizeof(double));
+    gc->first = NULL;
+    return;
+  }
+  SEXP call = gc->call;
   // Reuse the argument vector of the previous call, unless the function kept a reference to it.
   // The call holds one reference itself, so the vector is shared only if something else does too.
   SEXP arg = CADR(call);
@@ -524,20 +537,21 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
   SEXP R_arg = PROTECT(Rf_allocVector(REALSXP, rank));
   SETCADR(R_fcall, R_arg);
 
-  // find the dimension of the result
+  // find the dimension of the result from the value at the first grid point
   for (int i = 0; i < rank; i++)
     REAL(R_arg)[i] = grid[i][0];
-  SEXP fv = Rf_eval(R_fcall, R_BaseEnv);
+  SEXP fv = PROTECT(Rf_eval(R_fcall, R_BaseEnv));
   if (!Rf_isNumeric(fv))
     Rf_error("`fun` must return a numeric value.");
   const int valuedim = LENGTH(fv);
+  gridcall gc = {R_fcall, PROTECT(Rf_coerceVector(fv, REALSXP))};
   if (valuedim > 0 && len > R_XLEN_T_MAX / valuedim)
     Rf_error("`fun` returns too many values on `grid` to store them.");
 
   // Now, fill in the grid points one by one in a buffer, C_call copies it into the call
   SEXP resvec = PROTECT(Rf_allocVector(REALSXP, len * valuedim));
   double *arg = (double *)R_alloc(rank, sizeof(double));
-  C_evalongrid(C_call, arg, grid, dims, rank, valuedim, REAL(resvec), (void *)R_fcall);
+  C_evalongrid(C_call, arg, grid, dims, rank, valuedim, REAL(resvec), (void *)&gc);
 
   // Set the dim-attribute
   if (valuedim == 1) {
@@ -550,7 +564,7 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
     Rf_setAttrib(resvec, R_DimSymbol, snewdim);
     UNPROTECT(1);
   }
-  UNPROTECT(4);
+  UNPROTECT(6);
   return resvec;
 }
 
