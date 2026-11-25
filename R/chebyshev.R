@@ -150,14 +150,14 @@ chebappx.real <- function(val, intervals = NULL) {
     dim(val) <- length(val)
   }
   K <- length(dim(val))
-  # allow for vector, e.g. intervals=c(0,1), put it inside list
+  # allow for vector, e.g. intervals = c(0, 1), put it inside list
   if (is.numeric(intervals) && length(intervals) == 2L) {
     intervals <- list(intervals)
   }
   cf <- chebcoef(val)
 
   if (is.null(intervals)) {
-    # it's [-1,1] intervals, so drop transformation
+    # it's [-1, 1] intervals, so drop transformation
     fun <- vectorfun(
       function(x, threads = getOption("chebpol.threads")) .Call(C_evalcheb, cf, x, threads, NULL),
       arity = K,
@@ -165,7 +165,7 @@ chebappx.real <- function(val, intervals = NULL) {
     )
     rm(val)
   } else {
-    # it's intervals, create mapping into [-1,1]
+    # it's intervals, create mapping into [-1, 1]
     if (!is.list(intervals)) {
       stop("intervals should be a list")
     }
@@ -200,11 +200,11 @@ chebappxf.real <- function(fun, dims, intervals = NULL, ...) {
 # val are the function values on a grid, an array of appropriate dimension
 # in the order of expand.grid()
 
-# if grid is unspecified, it is assumed that it is on a Chebyshev grid in [-1,1]
+# if grid is unspecified, it is assumed that it is on a Chebyshev grid in [-1, 1]
 # If grid is specified, it is a list of vectors. The length of the list
 # is the dimension of the grid. Each vector contains grid-points in increasing or decreasing order.
 # val is assumed to be the function values on expand.grid(grid)
-# The user-grid is mapped to Chebshev knots in [-1,1] by splinefun in pkg stats
+# The user-grid is mapped to Chebyshev knots in [-1, 1] by splinefun in pkg stats
 
 chebappxg.real <- function(val, grid = NULL, mapdim = NULL) {
   # grid is a list of grid points. val is the values as in expand.grid(grid)
@@ -224,7 +224,7 @@ chebappxg.real <- function(val, grid = NULL, mapdim = NULL) {
   }
   dim(val) <- lengths(grid)
 
-  # ok, grid is something like list(c(...),c(...),c(...))
+  # ok, grid is something like list(c(...), c(...), c(...))
   # create piecewise linear functions which maps grid-points to chebyshev grids
 
   intervals <- lapply(grid, range)

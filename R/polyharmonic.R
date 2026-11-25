@@ -1,12 +1,8 @@
 polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   # Linear polyharmonic splines. Centres are columns in matrix knots. Function values in val.
-  # Quite slow for ncol(knots) > 3000 or so.  k=2 yields thin-plate splines.
-  # There exist faster evaluation methods for dimensions <= 4
-  # k < 0 yields Gaussian kernel splines, with sigma^2 = -1/k
+  # k = 2 yields thin-plate splines.
+  # k < 0 yields Gaussian kernel splines, with sigma^2 = -1 / k
   # we compute r^2, so powers etc. are adjusted for that case
-  # I also need to look at fast summation with NFFT
-  # https://www-user.tu-chemnitz.de/~potts/nfft/fastsum.php
-  # Likewise its interpolation applications which I don't understand yet.
   if (is.null(dim(knots))) {
     dim(knots) <- c(1L, length(knots))
   }
@@ -57,7 +53,6 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     eval.parent(as.call(list(quote(.Call), C_phifunc, substitute(x), k, getOption("chebpol.threads"))))
   }
 
-  # one day I will look into a faster solver,
   A <- phi(.Call(C_sqdiffs, knots, knots, getOption("chebpol.threads")))
   B <- rbind(1, knots)
   mat <- matrix(0, nrow(A) + nrow(B), nrow(A) + nrow(B))
