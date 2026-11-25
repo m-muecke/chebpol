@@ -34,6 +34,9 @@
   it is already set, for example in `.Rprofile`. The `CHEBPOL_THREADS`
   environment variable is only used when the option is unset.
 - [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
+  now stops with an error when a grid dimension has no points.
+  Previously it crashed R.
+- [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
   and [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   now accept functions that return integer or logical values, and stop
   with an error when the length of the returned value changes between
