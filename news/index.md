@@ -21,6 +21,9 @@
 
 - chebpol compiles again with current versions of R. FFTW is now found
   when it is installed outside the default include path.
+- Error messages are now consistent across interpolation methods and
+  report the value that was given, e.g. “`x` must have 2 rows, not 3.”
+  instead of four differently worded messages for the same mistake.
 - Integer input is now accepted everywhere a number is expected: the
   points passed to an interpolant, the values, grids and knots passed to
   [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md), the
@@ -36,6 +39,9 @@
   now works with `intervals` for a matrix of points, and for a single
   interval given as a vector `c(a, b)`. Before, only a single point in
   two or more dimensions was mapped correctly.
+- [`chebcoef()`](https://m-muecke.github.io/chebpol/reference/chebcoef.md)
+  now stops with an error when `dct` is `NA` or not a single logical.
+  Previously `dct = NA` was treated as `TRUE`.
 - [`chebeval()`](https://m-muecke.github.io/chebpol/reference/chebeval.md)
   now treats coefficients without a `dim` attribute, such as
   `c(1, 0.5, 0.25)` or `as.numeric(chebcoef(val))`, as one-dimensional.
@@ -73,6 +79,11 @@
   `method = "fh"` now stops with an error when the degree `k` is
   negative or not smaller than the number of grid points in a dimension.
   Before, the interpolant returned `NaN` between the grid points.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "fh"` now stops with an error when `k` has neither length 1
+  nor one value per grid dimension. Previously a shorter `k` was
+  silently repeated, or failed with “Length of grid (3) should equal
+  length of d (2)”.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "fh"` now forwards extra arguments in `...` to the function
   being interpolated.

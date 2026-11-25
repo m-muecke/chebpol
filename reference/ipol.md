@@ -94,7 +94,8 @@ described in
 [`vignette("stalker", package = "chebpol")`](https://m-muecke.github.io/chebpol/articles/stalker.md).
 The Floater-Hormann method (`"fh"`) also needs the `k` argument, the
 degree of the blending polynomials. It defaults to 4. It must be between
-0 and one less than the number of grid points in each dimension.
+0 and one less than the number of grid points in each dimension. Give
+either one value for all dimensions or one value per dimension.
 
 The method `"polyharmonic"` needs the arguments `knots` and `k`. In
 addition it can take the logical argument `normalize` for normalizing
