@@ -82,3 +82,12 @@ test_that("ipol() errors on a grid without dimensions", {
     ipol(sum, grid = list(), method = "fh")
   })
 })
+
+test_that("ipol() errors when val is neither values nor a function", {
+  grid <- list(1:3, 1:2)
+  expect_snapshot(error = TRUE, {
+    ipol("sum", grid = grid, method = "fh")
+    ipol(as.list(1:6), grid = grid, method = "multilinear")
+    ipol(data.frame(a = 1:6), dims = 6, method = "chebyshev")
+  })
+})
