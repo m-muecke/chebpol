@@ -792,6 +792,9 @@ SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extr
   const int numvec = Rf_ncols(Sx);
   if (Rf_nrows(Sx) != dim)
     Rf_error("Dimension of input (%d) must match dimension of interpolant (%d)", Rf_nrows(Sx), dim);
+  const int nknots = Rf_ncols(Sknots);
+  if (XLENGTH(Sval) != nknots)
+    Rf_error("length of values (%lld) must equal the number of knots (%d)", (long long)XLENGTH(Sval), nknots);
   const double *knots = REAL_RO(Sknots);
   const double *val = REAL_RO(Sval);
 #ifdef _OPENMP
@@ -803,7 +806,6 @@ SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extr
   blend_type blend = BLEND_LINEAR;
   if (!Rf_isNull(Sblend))
     blend = (blend_type)Rf_asInteger(Sblend);
-  const int nknots = Rf_ncols(Sknots);
 
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(guided) if (threads > 1 && numvec > 1)

@@ -117,3 +117,10 @@ test_that("simplex linear interpolation returns NA for missing input", {
     expect_equal(is.na(sl(x, blend = blend)), c(TRUE, TRUE, FALSE))
   }
 })
+
+test_that("ipol() errors when values and knots differ in number for simplex linear interpolation", {
+  knots <- matrix(seq(0, 1, length.out = 20), 2L)
+  expect_snapshot(error = TRUE, {
+    ipol(1:3, knots = knots, method = "simplexlinear")
+  })
+})

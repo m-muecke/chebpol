@@ -19,3 +19,11 @@
       Error:
       ! Dimension of input (3) must match dimension of interpolant (2)
 
+# ipol() errors when values and knots differ in number for simplex linear interpolation
+
+    Code
+      ipol(1:3, knots = knots, method = "simplexlinear")
+    Condition
+      Error in `slappx.real()`:
+      ! length of values (3) must equal the number of knots (10)
+

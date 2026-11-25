@@ -2,6 +2,9 @@ slappx.real <- function(val, knots, ...) {
   if (is.function(val)) {
     val <- apply(knots, 2L, val, ...)
   }
+  if (length(val) != ncol(knots)) {
+    stop(sprintf("length of values (%d) must equal the number of knots (%d)", length(val), ncol(knots)))
+  }
   dtri <- t(geometry::delaunayn(t(knots), options = "Qt Pp"))
   # For fast evaluation: For each simplex, we precompute the LU-factorization
   # needed for transforming to barycentric coordinates. These are used for finding the right simplex.
