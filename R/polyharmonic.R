@@ -48,12 +48,9 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     normalize <- FALSE
   }
 
-  # trickery to get it in place
-  phi <- function(x) {
-    eval.parent(as.call(list(quote(.Call), C_phifunc, substitute(x), k, getOption("chebpol.threads"))))
-  }
-
-  A <- phi(.Call(C_sqdiffs, knots, knots, getOption("chebpol.threads")))
+  threads <- getOption("chebpol.threads")
+  # The distance matrix is unreferenced, so C_phifunc transforms it in place
+  A <- .Call(C_phifunc, .Call(C_sqdiffs, knots, knots, threads), k, threads)
   B <- rbind(1, knots)
   mat <- matrix(0, nrow(A) + nrow(B), nrow(A) + nrow(B))
   mat[seq_len(nrow(A)), seq_len(ncol(A))] <- A
