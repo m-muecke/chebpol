@@ -16,7 +16,6 @@ test_that("every method returns a chebpol_interpolant that records its method", 
   for (ip in ips) {
     expect_s3_class(ip, "chebpol_interpolant")
   }
-  # nolint next: unnecessary_lambda_linter.
   expect_equal(vapply(ips, \(ip) attr(ip, "method"), ""), names(ips), ignore_attr = TRUE)
 })
 
