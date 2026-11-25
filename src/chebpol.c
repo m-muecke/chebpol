@@ -513,6 +513,8 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
     dims[i] = LENGTH(VECTOR_ELT(sgrid, i));
     if (dims[i] == 0)
       Rf_error("`grid` dimension %d must have at least one point.", i + 1);
+    if (len > R_XLEN_T_MAX / dims[i])
+      Rf_error("`grid` has too many points.");
     len *= dims[i];
   }
 
@@ -529,6 +531,8 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
   if (!Rf_isNumeric(fv))
     Rf_error("`fun` must return a numeric value.");
   const int valuedim = LENGTH(fv);
+  if (valuedim > 0 && len > R_XLEN_T_MAX / valuedim)
+    Rf_error("`fun` returns too many values on `grid` to store them.");
 
   // Now, fill in the grid points one by one in a buffer, C_call copies it into the call
   SEXP resvec = PROTECT(Rf_allocVector(REALSXP, len * valuedim));

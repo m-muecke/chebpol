@@ -28,6 +28,7 @@
 * Loading chebpol no longer overwrites the `chebpol.threads` option when it is already set, for example in `.Rprofile`. The `CHEBPOL_THREADS` environment variable is only used when the option is unset.
 * `evalongrid()` and `ipol()` no longer overwrite an argument vector that the function has kept. Previously one vector was reused for every grid point, so a function that kept its argument, for example to record the points it was called with, saw every copy change to the last grid point.
 * `evalongrid()` now stops with an error when a grid dimension has no points. Previously it crashed R.
+* `evalongrid()` and `ipol()` now stop with an error when `grid` has more points than R can store, e.g. four dimensions of 65,536 points each. Previously the number of points overflowed and R could crash.
 * `evalongrid()` and `ipol()` now stop with an error when `grid` has no dimensions, e.g. `grid = list()`. Previously `ipol()` returned an interpolant without variables for several methods, and other methods failed with "'dim' cannot be of length 0".
 * `evalongrid()` and `ipol()` now accept functions that return integer or logical values, and stop with an error when the length of the returned value changes between grid points.
 * `ipol()` interpolants created with an explicit `blend` now keep their `arity`, `domain` and `chebpol.version` attributes. Previously setting the default blend dropped them.

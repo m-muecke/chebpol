@@ -65,3 +65,16 @@
       Error in `evalongrid()`:
       ! `grid` must have at least one dimension.
 
+# evalongrid() errors on a grid with too many points
+
+    Code
+      evalongrid(sum, grid = list(axis, axis, axis, axis))
+    Condition
+      Error in `evalongrid()`:
+      ! `grid` has too many points.
+    Code
+      evalongrid(function(x) numeric(8), grid = rep(list(axis[1:1024]), 5))
+    Condition
+      Error in `evalongrid()`:
+      ! `fun` returns too many values on `grid` to store them.
+

@@ -90,6 +90,14 @@ test_that("evalongrid() errors on an empty grid dimension", {
   })
 })
 
+test_that("evalongrid() errors on a grid with too many points", {
+  axis <- seq_len(65536)
+  expect_snapshot(error = TRUE, {
+    evalongrid(sum, grid = list(axis, axis, axis, axis))
+    evalongrid(\(x) numeric(8), grid = rep(list(axis[1:1024]), 5))
+  })
+})
+
 test_that("evalongrid() accepts an integer grid", {
   f <- function(x) sum(x^2)
   expect_equal(evalongrid(f, grid = list(0:4, 0:3)), evalongrid(f, grid = list(seq(0, 4), seq(0, 3))))
