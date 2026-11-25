@@ -46,7 +46,7 @@ At every point we have a value, and we just draw straight lines between the “k
 library(chebpol)
 set.seed(42)
 N <- 10
-pts <- as.numeric(seq(1, N))
+pts <- seq(1, N)
 val <- runif(N)
 val[5] <- val[4]
 val[6] <- val[6] - 0.3
@@ -875,7 +875,7 @@ the surface jumps to the other basis function.
 ```{r meanblend, fig.dim=c(4, 4), echo=FALSE, out.width='48%', fig.show='hold', fig.cap='Figure 6: 2d blending (top left: square, top right: mean, bottom left: linear, bottom right: cubic)'}
 set.seed(49)
 NN <- 3
-grid <- list(x = as.numeric(seq(0, NN)), y = as.numeric(seq(0, NN)))
+grid <- list(x = seq(0, NN), y = seq(0, NN))
 value <- runif((NN + 1)^2)
 ip <- ipol(value, grid = grid, method = "hstalker")
 g <- list(x = seq(0, NN, len = 50), y = seq(0, NN, len = 50))
@@ -1029,7 +1029,7 @@ exaggerated height in Figure 7. It is quite nice with the stalker interpolation.
 ```{r volcano, fig.dim=c(4, 4), fig.align='center', out.width='48%', fig.show='hold', fig.cap='Figure 7: Maungawhau (top left: low resolution, top right: multilinear, bottom left: stalker, bottom right: thin plate spline)'}
 data(volcano)
 volc <- volcano[seq(1, nrow(volcano), 3), seq(1, ncol(volcano), 3)] / 10 #low res volcano
-grid <- list(x = as.numeric(seq_len(nrow(volc))), y = as.numeric(seq_len(ncol(volc))))
+grid <- list(x = seq_len(nrow(volc)), y = seq_len(ncol(volc)))
 ph <- ipol(volc, grid = grid, method = "polyharmonic", k = 2)
 st <- ipol(volc, grid = grid, method = "stalker")
 ml <- ipol(volc, grid = grid, method = "multilinear")

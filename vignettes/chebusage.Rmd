@@ -229,7 +229,7 @@ it is piecewise linear on triangles (more generally on simplices).
 ```{r volcano, fig.align='center', out.width='48%', fig.show='hold', fig.cap='Figure 1: Volcanoes (top left: low resolution, top right: polyharmonic, bottom left: Floater-Hormann, bottom right: simplex)'}
 data(volcano)
 volc <- volcano[seq(1, nrow(volcano), 3), seq(1, ncol(volcano), 3)] / 10 #low res volcano
-grid <- list(x = as.numeric(seq_len(nrow(volc))), y = as.numeric(seq_len(ncol(volc))))
+grid <- list(x = seq_len(nrow(volc)), y = seq_len(ncol(volc)))
 fh <- ipol(volc, grid = grid, method = "fh", k = 0)
 knots <- t(expand.grid(grid))
 sl <- ipol(volc, knots = knots, method = "simplex")
