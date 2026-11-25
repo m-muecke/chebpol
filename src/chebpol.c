@@ -232,10 +232,10 @@ SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spa
     Rf_error("rank must be positive");
   if (Rf_isMatrix(inx)) {
     if (rank != Rf_nrows(inx))
-      Rf_error("`x` must have %d rows, not %d.", rank, Rf_nrows(inx));
+      Rf_error("`x` must have %d rows, one per dimension, not %d.", rank, Rf_nrows(inx));
   } else {
     if (rank != LENGTH(inx))
-      Rf_error("`x` must have length %d, not %d.", rank, LENGTH(inx));
+      Rf_error("`x` must have length %d, one per dimension, not %d.", rank, LENGTH(inx));
   }
   // This shouldn't happen, but we check it anyway since we'll bomb if it's wrong
   for (int i = 0; i < rank; i++)
@@ -361,10 +361,10 @@ SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
     Rf_error("rank must be positive");
   if (Rf_isMatrix(inx)) {
     if (rank != Rf_nrows(inx))
-      Rf_error("`x` must have %d rows, not %d.", rank, Rf_nrows(inx));
+      Rf_error("`x` must have %d rows, one per dimension, not %d.", rank, Rf_nrows(inx));
   } else {
     if (rank != LENGTH(inx))
-      Rf_error("`x` must have length %d, not %d.", rank, LENGTH(inx));
+      Rf_error("`x` must have length %d, one per dimension, not %d.", rank, LENGTH(inx));
   }
   // This shouldn't happen, but we check it anyway since we'll bomb if it's wrong
   for (int i = 0; i < rank; i++)
@@ -443,10 +443,10 @@ SEXP R_evalpolyh(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, SE
     Rf_error("number of weights (%d) should equal number of knots (%d)", LENGTH(weights), Rf_ncols(Sknots));
   if (Rf_isMatrix(inx)) {
     if (Rf_nrows(inx) != Rf_nrows(Sknots))
-      Rf_error("`x` must have %d rows, not %d.", Rf_nrows(Sknots), Rf_nrows(inx));
+      Rf_error("`x` must have %d rows, one per dimension, not %d.", Rf_nrows(Sknots), Rf_nrows(inx));
   } else {
     if (Rf_length(inx) != Rf_nrows(Sknots))
-      Rf_error("`x` must have length %d, not %d.", Rf_nrows(Sknots), Rf_length(inx));
+      Rf_error("`x` must have length %d, one per dimension, not %d.", Rf_nrows(Sknots), Rf_length(inx));
   }
   const int numvec = Rf_isMatrix(inx) ? Rf_ncols(inx) : 1;
   SEXP res = PROTECT(Rf_allocVector(REALSXP, numvec));
@@ -614,9 +614,9 @@ SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   if (!Rf_isReal(x))
     Rf_error("`x` must be numeric.");
   if (Rf_isMatrix(x) && Rf_nrows(x) != rank)
-    Rf_error("`x` must have %d rows, not %d.", rank, Rf_nrows(x));
+    Rf_error("`x` must have %d rows, one per dimension, not %d.", rank, Rf_nrows(x));
   if (!Rf_isMatrix(x) && LENGTH(x) != rank)
-    Rf_error("`x` must have length %d, not %d.", rank, LENGTH(x));
+    Rf_error("`x` must have length %d, one per dimension, not %d.", rank, LENGTH(x));
 
   // Make some pointers into the grid data
   for (int i = 0; i < rank; i++) {
@@ -793,7 +793,7 @@ SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extr
   const int dim = Rf_nrows(Sknots);
   const int numvec = Rf_ncols(Sx);
   if (Rf_nrows(Sx) != dim)
-    Rf_error("`x` must have %d rows, not %d.", dim, Rf_nrows(Sx));
+    Rf_error("`x` must have %d rows, one per dimension, not %d.", dim, Rf_nrows(Sx));
   const int nknots = Rf_ncols(Sknots);
   if (XLENGTH(Sval) != nknots)
     Rf_error("`val` must have one value per knot (%d), not %lld.", nknots, (long long)XLENGTH(Sval));
@@ -944,14 +944,14 @@ SEXP R_makerbf(SEXP a, SEXP b, SEXP c, SEXP d) {
   UNUSED(b);
   UNUSED(c);
   UNUSED(d);
-  Rf_error("method = \"crbf\" requires chebpol built with ALGLIB.");
+  Rf_error("method = \"crbf\" is not available because chebpol has no ALGLIB support.");
   return R_NilValue;
 }
 SEXP R_evalrbf(SEXP a, SEXP b, SEXP c) {
   UNUSED(a);
   UNUSED(b);
   UNUSED(c);
-  Rf_error("method = \"crbf\" requires chebpol built with ALGLIB.");
+  Rf_error("method = \"crbf\" is not available because chebpol has no ALGLIB support.");
   return R_NilValue;
 }
 SEXP R_havealglib(void) { return Rf_ScalarLogical(FALSE); }

@@ -9,7 +9,7 @@
       ipol(f, knots = knots, method = "polyharmonic", normalize = matrix(1, 3L, 2L))
     Condition
       Error:
-      ! The number of rows of `normalize` must divide the number of dimensions (2), not 3.
+      ! The number of rows of `normalize` (3) must divide the number of dimensions (2).
 
 # ipol() errors when values and knots differ in number
 

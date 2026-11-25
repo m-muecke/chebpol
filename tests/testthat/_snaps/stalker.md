@@ -4,7 +4,7 @@
       st(matrix(0, 3, 4))
     Condition
       Error:
-      ! `x` must have 2 rows, not 3.
+      ! `x` must have 2 rows, one per dimension, not 3.
 
 # ipol() errors on invalid stalker input
 
@@ -48,20 +48,20 @@
       st(matrix(0, 1, 5))
     Condition
       Error:
-      ! `x` must have 2 rows, not 1.
+      ! `x` must have 2 rows, one per dimension, not 1.
     Code
       st(matrix(0, 3, 2))
     Condition
       Error:
-      ! `x` must have 2 rows, not 3.
+      ! `x` must have 2 rows, one per dimension, not 3.
     Code
       hst(matrix(0, 1, 5))
     Condition
       Error:
-      ! `x` must have 2 rows, not 1.
+      ! `x` must have 2 rows, one per dimension, not 1.
     Code
       hst(matrix(0, 3, 2))
     Condition
       Error:
-      ! `x` must have 2 rows, not 3.
+      ! `x` must have 2 rows, one per dimension, not 3.
 

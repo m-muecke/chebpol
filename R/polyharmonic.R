@@ -37,9 +37,9 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     }
     if (M %% nrow(normalize) != 0L) {
       stop(sprintf(
-        "The number of rows of `normalize` must divide the number of dimensions (%d), not %d.",
-        M,
-        nrow(normalize)
+        "The number of rows of `normalize` (%d) must divide the number of dimensions (%d).",
+        nrow(normalize),
+        M
       ))
     }
     wa <- normalize[, 1L]
