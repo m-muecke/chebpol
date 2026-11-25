@@ -78,3 +78,9 @@ test_that("the domain of a polyharmonic spline is the range of the knots", {
     expect_equal(as.matrix(attr(phs, "domain")), apply(knots, 1L, range), ignore_attr = TRUE)
   }
 })
+
+test_that("polyharmonic interpolation warns for the ipol() call when it falls back to least squares", {
+  knots <- cbind(c(0, 0), c(1, 0), c(0, 1), c(0, 0))
+  expect_snapshot(ph <- ipol(c(1, 2, 3, 4), knots = knots, method = "polyharmonic"))
+  expect_no_warning(ipol(c(1, 2, 3, 4), knots = knots, method = "polyharmonic", nowarn = TRUE))
+})

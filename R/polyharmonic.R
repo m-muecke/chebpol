@@ -73,10 +73,11 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   wv <- try(solve(mat, rhs), silent = TRUE)
   if (inherits(wv, "try-error")) {
     if (!nowarn) {
-      warning(
+      msg <- paste0(
         "Can't fit the spline exactly, falling back to a least squares fit.",
         if (!normalize) " Try `normalize = TRUE`." else ""
       )
+      warning(warningCondition(msg, call = sys.call(sys.parent())))
     }
     wv <- stats::lm.fit(mat, rhs)$coefficients
     wv[is.na(wv)] <- 0

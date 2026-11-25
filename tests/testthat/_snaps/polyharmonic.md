@@ -19,3 +19,11 @@
       Error:
       ! `val` must have one value per knot (10), not 3.
 
+# polyharmonic interpolation warns for the ipol() call when it falls back to least squares
+
+    Code
+      ph <- ipol(c(1, 2, 3, 4), knots = knots, method = "polyharmonic")
+    Condition
+      Warning in `ipol()`:
+      Can't fit the spline exactly, falling back to a least squares fit. Try `normalize = TRUE`.
+

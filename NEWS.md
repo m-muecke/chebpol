@@ -8,6 +8,7 @@
 
 ## Minor improvements
 
+* `ipol()` with `method = "polyharmonic"` now reports the warning about falling back to a least squares fit for the `ipol()` call. Previously it showed the source of an internal function, e.g. "In (function (val, knots, k = 2, ...".
 * `ipol()` interpolants created with `method = "simplexlinear"` now record the range of their knots in the `domain` attribute, as polyharmonic interpolants do.
 * `ipol()` interpolants now have class `chebpol_interpolant` and a `method` attribute. Printing one shows the method, the number of variables, the domain and the defaults of extra arguments such as `blend`, instead of the source code of the function.
 * `ipol()` interpolants created with `method = "general"` or `"uniform"` evaluate a matrix of points about three times faster. The points are now mapped onto the Chebyshev grid one dimension at a time instead of one point at a time.
