@@ -1,9 +1,6 @@
 # General grids, Floater-Hormann
 
 fhappx.real <- function(val, grid = NULL, d = 1L, ...) {
-  if (is.null(grid)) {
-    stop("Must specify grid")
-  }
   if (!is.list(grid)) {
     grid <- list(grid)
   }
@@ -16,9 +13,9 @@ fhappx.real <- function(val, grid = NULL, d = 1L, ...) {
     dim(val) <- grid_dims
   } else if (!identical(unname(dim(val)), grid_dims)) {
     stop(sprintf(
-      "dimensions of values (%s) must match the grid lengths (%s)",
-      paste(dim(val), collapse = " x "),
-      paste(grid_dims, collapse = " x ")
+      "`val` must have dimensions %s to match `grid`, not %s.",
+      paste(grid_dims, collapse = " x "),
+      paste(dim(val), collapse = " x ")
     ))
   }
   dd <- rep_len(as.integer(d), length(grid))

@@ -153,7 +153,7 @@ ipol <- function(
     method,
     chebyshev = {
       if (is.function(val) && is.null(dims)) {
-        stop("dims must be specified")
+        stop("`dims` must be given when `val` is a function.")
       }
       if (is.function(val)) {
         return(chebappxf.real(val, dims, intervals, ...))
@@ -165,17 +165,17 @@ ipol <- function(
     },
     multilinear = {
       if (is.null(grid)) {
-        stop("grid must be specified for multi linear interpolation")
+        stop("`grid` must be given for method = \"multilinear\".")
       }
       if (!is.list(grid)) {
         grid <- list(grid)
       }
       if (any(lengths(grid) < 2L)) {
-        stop("each grid dimension must have at least two points for multi linear interpolation")
+        stop("Each `grid` dimension must have at least two points for method = \"multilinear\".")
       }
       grid <- lapply(grid, as.numeric)
       if (unsortedgrid(grid)) {
-        stop("grid must be distinct ordered values")
+        stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
       }
       blend <- args[["blend"]]
       if (is.null(blend)) {
@@ -189,7 +189,7 @@ ipol <- function(
         if (!is.null(grid)) {
           knots <- t(expand.grid(lapply(grid, as.numeric)))
         } else {
-          stop("knots must be specified for simplex linear interpolation")
+          stop("`knots` or `grid` must be given for method = \"simplexlinear\".")
         }
       }
       blend <- args[["blend"]]
@@ -201,13 +201,13 @@ ipol <- function(
     },
     fh = {
       if (is.null(grid)) {
-        stop("grid must be specified for Floater-Hormann interpolation")
+        stop("`grid` must be given for method = \"fh\".")
       }
       if (!is.list(grid)) {
         grid <- list(grid)
       }
       if (unsortedgrid(grid)) {
-        stop("grid must be distinct ordered values")
+        stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
       }
       grid <- lapply(grid, as.numeric)
       k <- k %||% pmin(4L, lengths(grid) - 1L)
@@ -216,17 +216,17 @@ ipol <- function(
       }
       k <- rep_len(k, length(grid))
       if (anyNA(k) || any(k < 0 | k > lengths(grid) - 1L)) {
-        stop("k must be between 0 and one less than the number of grid points in each dimension")
+        stop("`k` must be between 0 and one less than the number of grid points in each dimension.")
       }
       fhappx.real(val, grid, d = k, ...)
     },
     uniform = {
       if (is.function(val) && is.null(dims)) {
-        stop("Must specify dims for uniform intervals")
+        stop("`dims` must be given when `val` is a function.")
       }
       if (is.null(intervals) && !is.null(grid)) {
         intervals <- lapply(grid, range)
-        warning("intervals constructed from ranges of grid-argument")
+        warning("`intervals` not given, using the range of `grid`.")
       }
       if (is.function(val)) {
         return(ucappxf.real(val, dims, intervals, ...))
@@ -238,13 +238,13 @@ ipol <- function(
     },
     general = {
       if (is.null(grid)) {
-        stop("grid must be specified for general interpolation")
+        stop("`grid` must be given for method = \"general\".")
       }
       if (!is.list(grid)) {
         grid <- list(grid)
       }
       if (unsortedgrid(grid)) {
-        stop("grid must be distinct ordered values")
+        stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
       }
       grid <- lapply(grid, as.numeric)
       if (is.function(val)) {
@@ -257,7 +257,7 @@ ipol <- function(
         if (!is.null(grid)) {
           knots <- t(expand.grid(lapply(grid, as.numeric)))
         } else {
-          stop("Must specify knots for polyharmonic splines.")
+          stop("`knots` or `grid` must be given for method = \"polyharmonic\".")
         }
       }
       k <- k %||% 3
@@ -271,16 +271,16 @@ ipol <- function(
     },
     oldstalker = {
       if (is.null(grid)) {
-        stop("grid must be specified for stalker interpolation")
+        stop("`grid` must be given for method = \"oldstalker\".")
       }
       if (!is.list(grid)) {
         grid <- list(grid)
       }
       if (any(lengths(grid) < 2L)) {
-        stop("each grid dimension must have at least two points for stalker interpolation")
+        stop("Each `grid` dimension must have at least two points for method = \"oldstalker\".")
       }
       if (unsortedgrid(grid)) {
-        stop("grid must be distinct ordered values")
+        stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
       }
       grid <- lapply(grid, as.numeric)
       k <- k %||% 2
@@ -293,16 +293,16 @@ ipol <- function(
     },
     hstalker = {
       if (is.null(grid)) {
-        stop("grid must be specified for stalker interpolation")
+        stop("`grid` must be given for method = \"hstalker\".")
       }
       if (!is.list(grid)) {
         grid <- list(grid)
       }
       if (any(lengths(grid) < 2L)) {
-        stop("each grid dimension must have at least two points for stalker interpolation")
+        stop("Each `grid` dimension must have at least two points for method = \"hstalker\".")
       }
       if (unsortedgrid(grid)) {
-        stop("grid must be distinct ordered values")
+        stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
       }
       grid <- lapply(grid, as.numeric)
       blend <- args[["blend"]]
@@ -314,16 +314,16 @@ ipol <- function(
     },
     stalker = {
       if (is.null(grid)) {
-        stop("grid must be specified for stalker interpolation")
+        stop("`grid` must be given for method = \"stalker\".")
       }
       if (!is.list(grid)) {
         grid <- list(grid)
       }
       if (any(lengths(grid) < 2L)) {
-        stop("each grid dimension must have at least two points for stalker interpolation")
+        stop("Each `grid` dimension must have at least two points for method = \"stalker\".")
       }
       if (unsortedgrid(grid)) {
-        stop("grid must be distinct ordered values")
+        stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
       }
       grid <- lapply(grid, as.numeric)
       blend <- args[["blend"]]
@@ -335,7 +335,7 @@ ipol <- function(
     },
     crbf = {
       if (is.null(knots)) {
-        stop("Must specify knots for radial basis functions.")
+        stop("`knots` must be given for method = \"crbf\".")
       }
       if (length(args) == 0L) {
         # old interface
@@ -355,8 +355,7 @@ ipol <- function(
       lambda <- args[["lambda"]] %||% 0
       newarg <- args[!names(args) %in% c("rbase", "layers", "lambda")]
       do.call(rbf.alglib, c(list(val, knots, rbase, layers, lambda), newarg))
-    },
-    stop("Unknown interpolation method: ", method)
+    }
   )
 }
 

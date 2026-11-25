@@ -41,7 +41,7 @@ chebknots <- function(dims, intervals = NULL) {
       intervals <- list(intervals)
     }
     if (!is.list(intervals)) {
-      stop("intervals should be a list")
+      stop("`intervals` must be a list with one length-2 vector per dimension.")
     }
     res <- Map(chebknots1, dims, intervals)
   }
@@ -81,10 +81,7 @@ chebcoef <- function(val, dct = FALSE) {
   if (is.integer(val) || is.logical(val)) {
     storage.mode(val) <- "double"
   }
-  structure(
-    .Call(C_chebcoef, val, dct, getOption("chebpol.threads")),
-    dimnames = dimnames(val)
-  )
+  .Call(C_chebcoef, val, dct, getOption("chebpol.threads"))
 }
 
 #' Evaluate a Chebyshev interpolation in a point
@@ -167,13 +164,17 @@ chebappx.real <- function(val, intervals = NULL) {
   } else {
     # it's intervals, create mapping into [-1, 1]
     if (!is.list(intervals)) {
-      stop("intervals should be a list")
+      stop("`intervals` must be a list with one length-2 vector per dimension.")
     }
     if (any(lengths(intervals) != 2L)) {
-      stop("interval elements should have length 2")
+      stop("Each element of `intervals` must have length 2.")
     }
     if (length(intervals) != length(dim(val))) {
-      stop("values should have the same dimension as intervals ", length(intervals), " ", length(dim(val)))
+      stop(sprintf(
+        "`intervals` must have one element per dimension of `val` (%d), not %d.",
+        length(dim(val)),
+        length(intervals)
+      ))
     }
     ispan <- vapply(intervals, \(x) 2 / diff(x), numeric(1L))
     mid <- vapply(intervals, mean, numeric(1L))
@@ -220,7 +221,7 @@ chebappxg.real <- function(val, grid = NULL, mapdim = NULL) {
     grid <- list(grid)
   }
   if (prod(lengths(grid)) != length(val)) {
-    stop("grid size must match data length")
+    stop(sprintf("`val` must have one value per grid point (%d), not %d.", prod(lengths(grid)), length(val)))
   }
   dim(val) <- lengths(grid)
 

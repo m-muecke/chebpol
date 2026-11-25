@@ -12,12 +12,12 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   N <- ncol(knots)
   M <- nrow(knots)
   if (length(val) != N) {
-    stop(sprintf("length of values (%d) must equal the number of knots (%d)", length(val), N))
+    stop(sprintf("`val` must have one value per knot (%d), not %d.", N, length(val)))
   }
   domain <- data.frame(apply(knots, 1L, range))
   if (k > 0) {
     if (abs(round(k) - k) > sqrt(.Machine$double.eps)) {
-      stop(sprintf("k is positive, but not an integer: %.17f", k))
+      stop(sprintf("A positive `k` must be a whole number, not %s.", format(k)))
     } else {
       k <- as.integer(round(k))
     }
@@ -29,11 +29,18 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     dim(normalize) <- c(1L, 2L)
   }
   if (!is.matrix(normalize) && length(normalize) != 1L) {
-    stop("normalize must be a logical, a vector c(a, b), or a matrix with two columns")
+    stop("`normalize` must be a logical, a vector `c(a, b)`, or a two-column matrix.")
   }
   if (is.matrix(normalize)) {
-    if (M %% nrow(normalize) != 0L || ncol(normalize) != 2L) {
-      stop("normalize must be a n x 2 matrix with ", M, " divisible by n (", nrow(normalize), ")")
+    if (ncol(normalize) != 2L) {
+      stop("`normalize` must be a logical, a vector `c(a, b)`, or a two-column matrix.")
+    }
+    if (M %% nrow(normalize) != 0L) {
+      stop(sprintf(
+        "The number of rows of `normalize` must divide the number of dimensions (%d), not %d.",
+        M,
+        nrow(normalize)
+      ))
     }
     wa <- normalize[, 1L]
     wb <- normalize[, 2L]
@@ -67,8 +74,8 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   if (inherits(wv, "try-error")) {
     if (!nowarn) {
       warning(
-        "Failed to fit exactly, fallback to least squares fit.",
-        if (!normalize) " You could try normalize=TRUE." else ""
+        "Can't fit the spline exactly, falling back to a least squares fit.",
+        if (!normalize) " Try `normalize = TRUE`." else ""
       )
     }
     wv <- stats::lm.fit(mat, rhs)$coefficients

@@ -13,6 +13,13 @@ test_that("chebcoef() keeps dimensions and scales the constant term", {
   expect_equal(chebcoef(a, dct = TRUE)[1], 8 * sum(a))
 })
 
+test_that("chebcoef() errors when dct is not TRUE or FALSE", {
+  expect_snapshot(error = TRUE, {
+    chebcoef(1:3, dct = NA)
+    chebcoef(1:3, dct = c(TRUE, FALSE))
+  })
+})
+
 test_that("Chebyshev interpolation reproduces values at the knots", {
   f <- function(x) exp(-sum(x^2))
   dims <- c(8, 7, 6)

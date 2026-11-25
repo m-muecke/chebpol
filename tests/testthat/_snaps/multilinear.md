@@ -12,5 +12,5 @@
       ipol(c(1, 2, 3), grid = list(5, c(1, 2, 3)), method = "multilinear")
     Condition
       Error in `ipol()`:
-      ! each grid dimension must have at least two points for multi linear interpolation
+      ! Each `grid` dimension must have at least two points for method = "multilinear".
 

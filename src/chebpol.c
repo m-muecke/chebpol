@@ -147,8 +147,8 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
 
 SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
   int threads = Rf_asInteger(Sthreads);
-  if (!Rf_isLogical(sdct) || LENGTH(sdct) < 1)
-    Rf_error("dct must be a logical");
+  if (!Rf_isLogical(sdct) || LENGTH(sdct) != 1 || LOGICAL_RO(sdct)[0] == NA_LOGICAL)
+    Rf_error("`dct` must be `TRUE` or `FALSE`.");
   bool dct = LOGICAL_RO(sdct)[0];
   SEXP dim = Rf_getAttrib(x, R_DimSymbol);
   if (XLENGTH(x) > INT_MAX)
@@ -167,7 +167,7 @@ SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
   for (int i = 0; i < rank; i++)
     siz *= dims[i];
   if (siz == 0)
-    Rf_error("array size must be positive");
+    Rf_error("`val` must have at least one element.");
 
   SEXP resvec = PROTECT(Rf_allocVector(REALSXP, siz));
   chebcoef(REAL_RO(x), dims, rank, REAL(resvec), dct, threads);
@@ -232,10 +232,10 @@ SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spa
     Rf_error("rank must be positive");
   if (Rf_isMatrix(inx)) {
     if (rank != Rf_nrows(inx))
-      Rf_error("coefficient rank(%d) must match number of rows(%d)", LENGTH(dim), Rf_nrows(inx));
+      Rf_error("`x` must have %d rows, not %d.", rank, Rf_nrows(inx));
   } else {
     if (rank != LENGTH(inx))
-      Rf_error("coefficient rank(%d) does not match argument length(%d)", LENGTH(dim), LENGTH(inx));
+      Rf_error("`x` must have length %d, not %d.", rank, LENGTH(inx));
   }
   // This shouldn't happen, but we check it anyway since we'll bomb if it's wrong
   for (int i = 0; i < rank; i++)
@@ -361,10 +361,10 @@ SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
     Rf_error("rank must be positive");
   if (Rf_isMatrix(inx)) {
     if (rank != Rf_nrows(inx))
-      Rf_error("coefficient rank(%d) must match number of rows(%d)", LENGTH(dim), Rf_nrows(inx));
+      Rf_error("`x` must have %d rows, not %d.", rank, Rf_nrows(inx));
   } else {
     if (rank != LENGTH(inx))
-      Rf_error("coefficient rank(%d) does not match argument length(%d)", LENGTH(dim), LENGTH(inx));
+      Rf_error("`x` must have length %d, not %d.", rank, LENGTH(inx));
   }
   // This shouldn't happen, but we check it anyway since we'll bomb if it's wrong
   for (int i = 0; i < rank; i++)
@@ -443,10 +443,10 @@ SEXP R_evalpolyh(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, SE
     Rf_error("number of weights (%d) should equal number of knots (%d)", LENGTH(weights), Rf_ncols(Sknots));
   if (Rf_isMatrix(inx)) {
     if (Rf_nrows(inx) != Rf_nrows(Sknots))
-      Rf_error("Dimension of input (%d) must match dimension of interpolant (%d)", Rf_nrows(inx), Rf_nrows(Sknots));
+      Rf_error("`x` must have %d rows, not %d.", Rf_nrows(Sknots), Rf_nrows(inx));
   } else {
     if (Rf_length(inx) != Rf_nrows(Sknots))
-      Rf_error("Dimension of input (%d) must match dimension of interpolant (%d)", Rf_length(inx), Rf_nrows(Sknots));
+      Rf_error("`x` must have length %d, not %d.", Rf_nrows(Sknots), Rf_length(inx));
   }
   const int numvec = Rf_isMatrix(inx) ? Rf_ncols(inx) : 1;
   SEXP res = PROTECT(Rf_allocVector(REALSXP, numvec));
@@ -489,9 +489,9 @@ static void C_call(double *x, double *y, const int valuedim, void *userdata) {
   SEXP fv = Rf_eval(*(SEXP *)userdata, R_BaseEnv);
   PROTECT_WITH_INDEX(fv, &ipx);
   if (!Rf_isNumeric(fv))
-    Rf_error("fun must return a numeric value");
+    Rf_error("`fun` must return a numeric value.");
   if (LENGTH(fv) != valuedim)
-    Rf_error("fun must return a value of length %d, not %d", valuedim, LENGTH(fv));
+    Rf_error("`fun` must return a value of length %d at every grid point, not %d.", valuedim, LENGTH(fv));
   REPROTECT(fv = Rf_coerceVector(fv, REALSXP), ipx);
   memcpy(y, REAL_RO(fv), valuedim * sizeof(double));
   UNPROTECT(1);
@@ -499,7 +499,7 @@ static void C_call(double *x, double *y, const int valuedim, void *userdata) {
 
 SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
   if (!Rf_isFunction(fun))
-    Rf_error("'fun' must be a function");
+    Rf_error("`fun` must be a function.");
   const int rank = LENGTH(sgrid);
   const double *grid[rank];
   R_xlen_t len = 1;
@@ -509,7 +509,7 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
     grid[i] = REAL_RO(VECTOR_ELT(sgrid, i));
     dims[i] = LENGTH(VECTOR_ELT(sgrid, i));
     if (dims[i] == 0)
-      Rf_error("grid dimension %d has no points", i + 1);
+      Rf_error("`grid` dimension %d must have at least one point.", i + 1);
     len *= dims[i];
   }
 
@@ -524,7 +524,7 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
     REAL(R_arg)[i] = grid[i][0];
   SEXP fv = Rf_eval(R_fcall, R_BaseEnv);
   if (!Rf_isNumeric(fv))
-    Rf_error("fun must return a numeric value");
+    Rf_error("`fun` must return a numeric value.");
   const int valuedim = LENGTH(fv);
 
   // Now, it's just to fill in arg, and
@@ -612,9 +612,11 @@ SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   if (!Rf_isReal(values))
     Rf_error("values must be numeric");
   if (!Rf_isReal(x))
-    Rf_error("argument x must be numeric");
-  if (Rf_isMatrix(x) ? (Rf_nrows(x) != rank) : (LENGTH(x) != rank))
-    Rf_error("grid has dimension %d, you supplied a length %d vector", rank, Rf_isMatrix(x) ? Rf_nrows(x) : LENGTH(x));
+    Rf_error("`x` must be numeric.");
+  if (Rf_isMatrix(x) && Rf_nrows(x) != rank)
+    Rf_error("`x` must have %d rows, not %d.", rank, Rf_nrows(x));
+  if (!Rf_isMatrix(x) && LENGTH(x) != rank)
+    Rf_error("`x` must have length %d, not %d.", rank, LENGTH(x));
 
   // Make some pointers into the grid data
   for (int i = 0; i < rank; i++) {
@@ -791,10 +793,10 @@ SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extr
   const int dim = Rf_nrows(Sknots);
   const int numvec = Rf_ncols(Sx);
   if (Rf_nrows(Sx) != dim)
-    Rf_error("Dimension of input (%d) must match dimension of interpolant (%d)", Rf_nrows(Sx), dim);
+    Rf_error("`x` must have %d rows, not %d.", dim, Rf_nrows(Sx));
   const int nknots = Rf_ncols(Sknots);
   if (XLENGTH(Sval) != nknots)
-    Rf_error("length of values (%lld) must equal the number of knots (%d)", (long long)XLENGTH(Sval), nknots);
+    Rf_error("`val` must have one value per knot (%d), not %lld.", nknots, (long long)XLENGTH(Sval));
   const double *knots = REAL_RO(Sknots);
   const double *val = REAL_RO(Sval);
 #ifdef _OPENMP
@@ -942,14 +944,14 @@ SEXP R_makerbf(SEXP a, SEXP b, SEXP c, SEXP d) {
   UNUSED(b);
   UNUSED(c);
   UNUSED(d);
-  Rf_error("ALGLIB not available");
+  Rf_error("method = \"crbf\" requires chebpol built with ALGLIB.");
   return R_NilValue;
 }
 SEXP R_evalrbf(SEXP a, SEXP b, SEXP c) {
   UNUSED(a);
   UNUSED(b);
   UNUSED(c);
-  Rf_error("ALGLIB not available");
+  Rf_error("method = \"crbf\" requires chebpol built with ALGLIB.");
   return R_NilValue;
 }
 SEXP R_havealglib(void) { return Rf_ScalarLogical(FALSE); }

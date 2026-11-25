@@ -20,13 +20,18 @@ vectorfun <- function(fun, arity, domain = NULL) {
     if (length(x) %% arity == 0L) {
       numvec <- length(x) / arity
       if (numvec > 1L) {
-        warning(sprintf("Coercing vector of length %d into %dx%d matrix", length(x), arity, numvec))
+        warning(sprintf(
+          "Treating `x` of length %d as a %d x %d matrix, one point per column.",
+          length(x),
+          arity,
+          numvec
+        ))
       }
       dim(x) <- c(arity, numvec)
       arglist[[1L]] <- x
       do.call(fun, arglist)
     } else {
-      stop(sprintf("Function should take %d arguments, you supplied a vector of length %d", arity, length(x)))
+      stop(sprintf("`x` must have length %d or be a matrix with %d rows, not length %d.", arity, arity, length(x)))
     }
   }
   formals(f) <- formals(fun)

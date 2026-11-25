@@ -13,7 +13,7 @@ oldstalkerappx <- function(val, grid, r = 2, ...) {
   grid <- lapply(grid, as.numeric)
   if (any(vapply(grid, is.unsorted, logical(1L)))) {
     if (!is.function(val)) {
-      stop("Grid points must be ordered in increasing order")
+      stop("`grid` must be increasing for method = \"oldstalker\".")
     }
     grid <- lapply(grid, sort)
   }
@@ -22,7 +22,7 @@ oldstalkerappx <- function(val, grid, r = 2, ...) {
   }
   gl <- prod(lengths(grid))
   if (length(val) != gl) {
-    stop("length of values ", length(val), " do not match size of grid ", gl)
+    stop(sprintf("`val` must have one value per grid point (%d), not %d.", gl, length(val)))
   }
 
   r <- rep_len(as.numeric(r), length(grid))
@@ -34,7 +34,7 @@ oldstalkerappx <- function(val, grid, r = 2, ...) {
   stalker <- c(list(val = val, grid = grid), stalkercontext(dmin, dplus, r), uniform = list(uniform))
 
   if (!havegsl() && any(is.na(r) & !uniform)) {
-    stop("Non-uniform grid and varying degree needs GSL. Recompile with GSL.")
+    stop("`k = NA` on a non-uniform grid requires chebpol built with GSL.")
   }
 
   vectorfun(
@@ -48,7 +48,7 @@ oldstalkerappx <- function(val, grid, r = 2, ...) {
       if (!identical(degree, r)) {
         degree <- rep_len(as.numeric(degree), length(grid))
         if (!havegsl() && any(is.na(degree) & !uniform)) {
-          stop("Non-uniform grid and varying degree needs GSL. Recompile with GSL.")
+          stop("`degree = NA` on a non-uniform grid requires chebpol built with GSL.")
         }
         stalker <- c(list(val = val, grid = grid), stalkercontext(dmin, dplus, degree), uniform = list(uniform))
       }
@@ -66,7 +66,7 @@ hstalkerappx <- function(val, grid, ...) {
   grid <- lapply(grid, as.numeric)
   if (any(vapply(grid, is.unsorted, logical(1L)))) {
     if (!is.function(val)) {
-      stop("Grid points must be ordered in increasing order")
+      stop("`grid` must be increasing for method = \"hstalker\".")
     }
     grid <- lapply(grid, sort)
   }
@@ -95,7 +95,7 @@ stalkerappx <- function(val, grid, ...) {
   grid <- lapply(grid, as.numeric)
   if (any(vapply(grid, is.unsorted, logical(1L)))) {
     if (!is.function(val)) {
-      stop("Grid points must be ordered in increasing order")
+      stop("`grid` must be increasing for method = \"stalker\".")
     }
     grid <- lapply(grid, sort)
   }

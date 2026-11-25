@@ -4,7 +4,7 @@ mlappx.real <- function(val, grid, ...) {
   }
   if (any(vapply(grid, is.unsorted, logical(1L)))) {
     if (!is.function(val)) {
-      stop("Grid points must be ordered in increasing order")
+      stop("`grid` must be increasing for method = \"multilinear\".")
     }
     grid <- lapply(grid, sort)
   }
@@ -13,7 +13,7 @@ mlappx.real <- function(val, grid, ...) {
   }
   gl <- prod(lengths(grid))
   if (length(val) != gl) {
-    stop("length of values ", length(val), " do not match size of grid ", gl)
+    stop(sprintf("`val` must have one value per grid point (%d), not %d.", gl, length(val)))
   }
   val <- as.numeric(val)
   vectorfun(

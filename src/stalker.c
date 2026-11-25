@@ -158,7 +158,7 @@ static inline double stalkhyp(double x, double vmin, double vplus, double dmin, 
 
 // Variable degree stalker spline
 static inline double stalk1(double x, double vmin, double v0, double vplus, double dmin, double dplus, double r,
-                              double iD, double powmin, double powplus, bool uniform) {
+                            double iD, double powmin, double powplus, bool uniform) {
   // Do linear end points
 
   if (ISNAN(vmin))
@@ -654,11 +654,11 @@ SEXP R_makestalk(SEXP Sval, SEXP Sgrid) {
   for (int r = 0; r < nrank; r++) {
     dims[r] = LENGTH(VECTOR_ELT(Sgrid, r));
     if (dims[r] < 2)
-      Rf_error("grid dimension %d must have at least two points", r + 1);
+      Rf_error("Each `grid` dimension must have at least two points, not %d in dimension %d.", dims[r], r + 1);
     len *= dims[r];
   }
   if (len != XLENGTH(Sval)) {
-    Rf_error("number of values (%lld) does not match grid size (%lld)", (long long)XLENGTH(Sval), (long long)len);
+    Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)len, (long long)XLENGTH(Sval));
   }
   if (len > INT_MAX) {
     Rf_error("grid size (%lld) is too large", (long long)len);
@@ -708,11 +708,11 @@ SEXP R_makehyp(SEXP Sval, SEXP Sgrid) {
   for (int r = 0; r < nrank; r++) {
     dims[r] = LENGTH(VECTOR_ELT(Sgrid, r));
     if (dims[r] < 2)
-      Rf_error("grid dimension %d must have at least two points", r + 1);
+      Rf_error("Each `grid` dimension must have at least two points, not %d in dimension %d.", dims[r], r + 1);
     len *= dims[r];
   }
   if (len != XLENGTH(Sval)) {
-    Rf_error("number of values (%lld) does not match grid size (%lld)", (long long)XLENGTH(Sval), (long long)len);
+    Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)len, (long long)XLENGTH(Sval));
   }
   if (len > INT_MAX) {
     Rf_error("grid size (%lld) is too large", (long long)len);
@@ -754,7 +754,7 @@ SEXP R_evalstalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   SEXP Sgrid = VECTOR_ELT(stalker, 4);
   const int nrank = LENGTH(Sgrid);
   if (Rf_nrows(Sx) != nrank)
-    Rf_error("Rank of input (%d) does not match rank of spline (%d)", Rf_nrows(Sx), nrank);
+    Rf_error("`x` must have %d rows, not %d.", nrank, Rf_nrows(Sx));
   const double *grid[nrank];
   for (int i = 0; i < nrank; i++)
     grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
@@ -791,7 +791,7 @@ SEXP R_evalhyp(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   SEXP Sgrid = VECTOR_ELT(stalker, 5);
   const int nrank = LENGTH(Sgrid);
   if (Rf_nrows(Sx) != nrank)
-    Rf_error("Rank of input (%d) does not match rank of spline (%d)", Rf_nrows(Sx), nrank);
+    Rf_error("`x` must have %d rows, not %d.", nrank, Rf_nrows(Sx));
   const double *grid[nrank];
   for (int i = 0; i < nrank; i++)
     grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
@@ -828,14 +828,14 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
   blend_type blend = (blend_type)Rf_asInteger(Sblend);
   const int nrank = LENGTH(Sgrid);
   if (K != nrank)
-    Rf_error("Rank of input (%d) does not match rank of spline (%d)", K, nrank);
+    Rf_error("`x` must have %d rows, not %d.", nrank, K);
 
   int dims[nrank];
   R_xlen_t len = 1;
   for (int r = 0; r < nrank; r++) {
     dims[r] = LENGTH(VECTOR_ELT(Sgrid, r));
     if (dims[r] < 2)
-      Rf_error("grid dimension %d must have at least two points", r + 1);
+      Rf_error("Each `grid` dimension must have at least two points, not %d in dimension %d.", dims[r], r + 1);
     len *= dims[r];
   }
   if (len != XLENGTH(VECTOR_ELT(stalker, 0))) {
@@ -858,7 +858,7 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
     pcomp[i].uniform = LOGICAL_RO(Suniform)[i];
 #ifndef HAVE_GSL
     if (!pcomp[i].uniform && ISNAN(degree[i]))
-      Rf_error("Non-uniform grid in dimension %d not supported without GSL. Recompile with GSL.", i + 1);
+      Rf_error("`degree = NA` on a non-uniform grid requires chebpol built with GSL (dimension %d).", i + 1);
 #endif
   }
 #ifdef HAVE_GSL
