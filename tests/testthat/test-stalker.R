@@ -127,3 +127,16 @@ test_that("the hyperbolic stalker has no pole next to a nearly flat neighbor", {
   x <- c(0.999997, 0.999998, 0.999999)
   expect_equal(hst(x, blend = "linear"), x, tolerance = 1e-5)
 })
+
+test_that("the hyperbolic stalker is finite at the grid points when neighboring values tie", {
+  values <- cbind(c(1, 0, 0, 1), c(2, 2, 0, 3), c(0, 0, 0.1 + 0.2, 0.3))
+  grid <- list(1:4, 1:3)
+  hst <- ipol(values, grid = grid, method = "hstalker")
+  x <- grid_points(grid)
+  for (blend in c("cubic", "linear", "sigmoid", "parodic", "square")) {
+    expect_equal(hst(x, blend = blend), c(values))
+  }
+  expect_equal(anyNA(hst(x, blend = "mean")), FALSE)
+  hst1 <- ipol(c(1, 0, 0, 1), grid = list(1:4), method = "hstalker")
+  expect_equal(hst1(1:4, blend = "mean"), c(0.5, 0, 0, 0.5))
+})

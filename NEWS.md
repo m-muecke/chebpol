@@ -37,6 +37,7 @@
 * `ipol()` with `method = "polyharmonic"` now fits a spline with a single knot. Previously it failed with "invalid 'nrow' value".
 * `ipol()` with `method = "polyharmonic"` now stops with an error when the number of values differs from the number of knots. Previously it warned about falling back to a least squares fit and suggested `normalize = TRUE`.
 * `ipol()` with `method = "stalker"`, `"hstalker"` or `"oldstalker"` now stops with an error when a grid dimension has a single point. Previously the spline read past the end of the values and the grid.
+* `ipol()` interpolants created with `method = "hstalker"` no longer return `NaN` at a grid point with `blend = "mean"` when two neighboring values are equal.
 * `ipol()` with `method = "hstalker"` no longer depends on the scale of the values or of the grid. Previously small differences between neighboring values were treated as constant or linear, and could produce a narrow spike between grid points.
 * `ipol()` interpolants created with `method = "stalker"`, `"hstalker"` or `"simplexlinear"` now stop with an error when given a matrix with the wrong number of rows. Previously they returned values silently, and could read past the end of the input.
 * `ipol()` interpolants created with `method = "oldstalker"` now report both ranks when given input of the wrong dimension.

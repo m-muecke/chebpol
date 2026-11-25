@@ -479,7 +479,11 @@ static void makehyp(const int nrank, const int *dims, const double **grid, const
         const double D = k * p - m;
         const double D2 = k * k * p - m;
         // The special cases are detected relative to the size of the terms that cancel
-        if (p * m <= 0) {
+        if (fabs(p) <= 4 * DBL_EPSILON || fabs(m) <= 4 * DBL_EPSILON) {
+          // Flat towards one neighbor. The hyperbola degenerates to zero with its pole on the
+          // other neighbor, where evaluating it would give 0 / 0.
+          bb[i] = cc[i] = dd[i] = 0.0;
+        } else if (p * m <= 0) {
           // Monotonic
           if (fabs(D) <= MYEPS * (fabs(k * p) + fabs(m))) {
             // Linear
