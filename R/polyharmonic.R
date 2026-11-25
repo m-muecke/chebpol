@@ -15,6 +15,9 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     stop(sprintf("`val` must have one value per knot (%d), not %d.", N, length(val)))
   }
   domain <- knots_domain(knots)
+  # in a dimension where all knots coincide there is no linear term to fit
+  spans <- vapply(domain, diff, numeric(1L), USE.NAMES = FALSE)
+  active <- spans > 0
   if (k > 0) {
     if (abs(round(k) - k) > sqrt(.Machine$double.eps)) {
       stop(sprintf("A positive `k` must be a whole number, not %s.", format(k)))
@@ -48,7 +51,7 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     knots <- normfun(knots)
     normalize <- TRUE
   } else if (normalize) {
-    wa <- as.vector(1 / diff(apply(knots, 1L, range)))
+    wa <- 1 / ifelse(active, spans, 1)
     wb <- apply(knots, 1L, min)
     normfun <- crate(function(x) wa * (x - wb), wa, wb)
     knots <- normfun(knots)
@@ -61,15 +64,16 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   threads <- getOption("chebpol.threads")
   # The distance matrix is unreferenced, so C_phifunc transforms it in place
   A <- .Call(C_phifunc, .Call(C_sqdiffs, knots, knots, threads), k, threads)
-  B <- rbind(1, knots)
-  n <- N + M + 1L
+  B <- rbind(1, knots[active, , drop = FALSE])
+  L <- nrow(B)
+  n <- N + L
   mat <- matrix(0, n, n)
   mat[seq_len(N), seq_len(N)] <- A
-  mat[N + seq_len(M + 1L), seq_len(N)] <- B
-  mat[seq_len(N), N + seq_len(M + 1L)] <- t(B)
+  mat[N + seq_len(L), seq_len(N)] <- B
+  mat[seq_len(N), N + seq_len(L)] <- t(B)
   # free the distance matrix before solve() makes its own copy of mat
   rm(A, B)
-  rhs <- c(val, rep(0, M + 1L))
+  rhs <- c(val, rep(0, L))
   wv <- try(solve(mat, rhs), silent = TRUE)
   if (inherits(wv, "try-error")) {
     if (!nowarn) {
@@ -83,7 +87,8 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     wv[is.na(wv)] <- 0
   }
   w <- wv[seq_len(N)]
-  v <- wv[(N + 1L):length(wv)]
+  v <- numeric(M + 1L)
+  v[c(TRUE, active)] <- wv[N + seq_len(L)]
   fun <- function(x, threads = getOption("chebpol.threads")) {
     x <- as_points(x, M)
     .Call(C_evalpolyh, normfun(x), knots, w, v, k, threads, NULL)

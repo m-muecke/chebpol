@@ -84,3 +84,15 @@ test_that("polyharmonic interpolation warns for the ipol() call when it falls ba
   expect_snapshot(ph <- ipol(c(1, 2, 3, 4), knots = knots, method = "polyharmonic"))
   expect_no_warning(ipol(c(1, 2, 3, 4), knots = knots, method = "polyharmonic", nowarn = TRUE))
 })
+
+test_that("polyharmonic interpolation handles a dimension in which all knots coincide", {
+  withr::local_seed(1)
+  f <- function(x) x[1]^2
+  knots <- rbind(runif(20, 0, 5), rep(2, 20))
+  for (normalize in list(NA, FALSE)) {
+    expect_no_warning(ph <- ipol(f, knots = knots, normalize = normalize, method = "polyharmonic"))
+    expect_equal(ph(knots), apply(knots, 2L, f))
+  }
+  single <- ipol(25, knots = matrix(c(5, 2), 2), method = "polyharmonic")
+  expect_equal(single(c(1, 1)), 25)
+})
