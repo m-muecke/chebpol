@@ -116,7 +116,7 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
     for (int i = rank - 1; i >= 0; i--) {
       // transformation of dimension i, put in front
       int N = dims[i]; // length of transform
-      int stride = siz / N;
+      int stride = (int)(siz / N);
       double alpha = dct ? 2.0 : 2.0 / N; // Constant for transform
       // swap src and dest
       double *p = src;
@@ -151,8 +151,10 @@ SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
     Rf_error("dct must be a logical");
   bool dct = LOGICAL_RO(sdct)[0];
   SEXP dim = Rf_getAttrib(x, R_DimSymbol);
+  if (XLENGTH(x) > INT_MAX)
+    Rf_error("arrays with more than %d elements are not supported", INT_MAX);
   // If no dim-attribute, assume one-dimensional
-  const int sdims = LENGTH(x);
+  const int sdims = (int)XLENGTH(x);
   int rank = 1;
   const int *dims = &sdims;
   if (!Rf_isNull(dim)) {
