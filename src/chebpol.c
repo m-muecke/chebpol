@@ -482,11 +482,24 @@ void C_evalongrid(void (*fun)(double *x, double *y, int valuedim, void *ud), dou
   }
 }
 
+typedef struct {
+  SEXP call;
+  int rank;
+} gridcall;
+
 static void C_call(double *x, double *y, const int valuedim, void *userdata) {
-  // x is not needed: the argument vector is already part of the call in userdata
-  UNUSED(x);
+  const gridcall *gc = (const gridcall *)userdata;
+  // Reuse the argument vector of the previous call, unless the function kept a reference to it.
+  // The call holds one reference itself, so the vector is shared only if something else does too.
+  SEXP arg = CADR(gc->call);
+  if (MAYBE_SHARED(arg)) {
+    arg = Rf_allocVector(REALSXP, gc->rank);
+    SETCADR(gc->call, arg);
+  }
+  if (gc->rank > 0)
+    memcpy(REAL(arg), x, gc->rank * sizeof(double));
   PROTECT_INDEX ipx;
-  SEXP fv = Rf_eval(*(SEXP *)userdata, R_BaseEnv);
+  SEXP fv = Rf_eval(gc->call, R_BaseEnv);
   PROTECT_WITH_INDEX(fv, &ipx);
   if (!Rf_isNumeric(fv))
     Rf_error("`fun` must return a numeric value.");
@@ -527,10 +540,11 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
     Rf_error("`fun` must return a numeric value.");
   const int valuedim = LENGTH(fv);
 
-  // Now, it's just to fill in arg, and
-  // do REAL(Rf_eval(R_fcall,NULL))[0]
+  // Now, fill in the grid points one by one in a buffer, C_call copies it into the call
   SEXP resvec = PROTECT(Rf_allocVector(REALSXP, len * valuedim));
-  C_evalongrid(C_call, REAL(R_arg), grid, dims, rank, valuedim, REAL(resvec), (void *)&R_fcall);
+  double *arg = (double *)R_alloc(rank, sizeof(double));
+  gridcall gc = {R_fcall, rank};
+  C_evalongrid(C_call, arg, grid, dims, rank, valuedim, REAL(resvec), (void *)&gc);
 
   // Set the dim-attribute
   if (valuedim == 1) {
