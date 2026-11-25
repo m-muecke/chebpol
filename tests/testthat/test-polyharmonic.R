@@ -97,10 +97,23 @@ test_that("polyharmonic interpolation handles knots on a line or in a plane", {
   line <- rbind(t, 2 * t + 1)
   expect_no_warning(ph <- ipol(f, knots = line, method = "polyharmonic"))
   expect_equal(ph(line), apply(line, 2L, f))
+  g <- function(x) 3 * x[1] - x[2] + 2
+  ph <- ipol(g, knots = line, method = "polyharmonic")
+  between <- rbind(t <- runif(10), 2 * t + 1)
+  expect_equal(ph(between), apply(between, 2L, g))
   plane <- rbind(runif(30), runif(30))
   plane <- rbind(plane, plane[1L, ] - plane[2L, ])
   expect_no_warning(ph <- ipol(f, knots = plane, method = "polyharmonic"))
   expect_equal(ph(plane), apply(plane, 2L, f))
   single <- ipol(25, knots = matrix(c(5, 2), 2), method = "polyharmonic")
   expect_equal(single(c(1, 1)), 25)
+})
+
+test_that("polyharmonic interpolation keeps a dimension with a small spread around a large offset", {
+  withr::local_seed(1)
+  knots <- rbind(runif(40), 0.5 + 1e-8 * runif(40))
+  f <- function(x) x[1] + (x[2] - 0.5) / 1e-8
+  ph <- ipol(f, knots = knots, method = "polyharmonic")
+  between <- rbind(runif(20), 0.5 + 1e-8 * runif(20))
+  expect_equal(ph(between), apply(between, 2L, f), tolerance = 1e-4)
 })

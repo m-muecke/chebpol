@@ -64,7 +64,8 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   A <- .Call(C_phifunc, .Call(C_sqdiffs, knots, knots, threads), k, threads)
   # drop linearly dependent rows of the linear term, e.g. when the knots lie on a line or a plane
   B <- rbind(1, knots)
-  q <- qr(t(B))
+  # the default tolerance treats a small spread around a large offset as constant
+  q <- qr(t(B), tol = 1e-10)
   keep <- sort(q$pivot[seq_len(q$rank)])
   B <- B[keep, , drop = FALSE]
   L <- nrow(B)
