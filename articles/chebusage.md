@@ -244,7 +244,7 @@ grid <- list(x = as.numeric(seq_len(nrow(volc))), y = as.numeric(seq_len(ncol(vo
 fh <- ipol(volc, grid = grid, method = "fh", k = 0)
 knots <- t(expand.grid(grid))
 sl <- ipol(volc, knots = knots, method = "simplex")
-ph <- ipol(volc, knots = knots, method = "poly")
+ph <- ipol(volc, knots = knots, method = "polyharmonic")
 g <- list(x = seq(1, nrow(volc), len = 50), y = seq(1, ncol(volc), len = 50))
 par(mar = rep(0, 4))
 col <- "green"
@@ -456,7 +456,7 @@ system.time(sin(a))
 ```
 
     ##    user  system elapsed 
-    ##   0.008   0.000   0.008
+    ##   0.012   0.002   0.014
 
 ``` r
 
@@ -464,7 +464,7 @@ system.time(f(a, threads = 8))
 ```
 
     ##    user  system elapsed 
-    ##   0.059   0.003   0.018
+    ##   0.088   0.000   0.025
 
 ## References
 

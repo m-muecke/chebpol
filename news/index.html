@@ -131,6 +131,8 @@
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now computes the size of the knots-by-knots distance matrix correctly for 46,341 or more knots. Previously the size computation overflowed, giving “negative length vectors are not allowed” or, from 65,536 knots, possibly writing outside the allocated memory. Fitting that many knots still needs enough memory for the matrix, about 17 GB at 46,341 knots.</li>
 <li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now fits knots that lie on a line or plane, such as knots sharing a coordinate in some dimension or a single knot, without falling back to least squares with a warning. When the knots shared a coordinate, normalization also divided by zero and the interpolant returned <code>NaN</code>.</li>
+<li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now fits a spline with a single knot. Previously it failed with “invalid ‘nrow’ value”.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now stops with an error when the number of values differs from the number of knots. Previously it warned about falling back to a least squares fit and suggested <code>normalize = TRUE</code>.</li>

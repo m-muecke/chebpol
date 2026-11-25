@@ -68,8 +68,8 @@ grid.</p>
 
 
 <dl><dt id="arg-val">val<a class="anchor" aria-label="anchor" href="#arg-val"></a></dt>
-<dd><p>An <code>array</code> of function values on a Chebyshev grid.  The
-<code>dim</code>-attribute must be appropriately set.  If not set, it is assumed
+<dd><p>An <code>array</code> of function values on a Chebyshev grid. The
+<code>dim</code>-attribute must be appropriately set. If not set, it is assumed
 to be one-dimensional.</p></dd>
 
 
@@ -77,7 +77,7 @@ to be one-dimensional.</p></dd>
 <dd><p>Logical. Since the Chebyshev coefficients are closely related to
 the DCT-II transform of <code>val</code>, the non-normalized real-even DCT-II
 coefficients may be retrieved instead. I.e. those from FFTW_REDFT10 in each
-dimension.  This is not used anywhere in the package, it is merely provided
+dimension. This is not used anywhere in the package, it is merely provided
 as a convenience for those who might need it.</p></dd>
 
 </dl></div>
@@ -89,7 +89,7 @@ Chebyshev-polynomial.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>If <code>val</code> has no <code>dim</code>-attribute, it is assumed to be
-one-dimensional of length the length of <code>val</code>.</p>
+one-dimensional with length <code>length(val)</code>.</p>
 <p>If chebpol was compiled without FFTW, running
 <code>chebcoef</code> on large grids may be slow and memory-demanding.</p>
     </div>

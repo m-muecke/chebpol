@@ -95,7 +95,7 @@ in each dimension. Not used if <code>grid</code> is specified.</p></dd>
 
 <dt id="arg-grid">grid<a class="anchor" aria-label="anchor" href="#arg-grid"></a></dt>
 <dd><p>list. Each element is a vector of ordered grid-points for a
-dimension.  These need not be Chebyshev-knots, nor evenly spaced.</p></dd>
+dimension. These need not be Chebyshev-knots, nor evenly spaced.</p></dd>
 
 
 <dt id="arg-knots">knots<a class="anchor" aria-label="anchor" href="#arg-knots"></a></dt>
@@ -119,9 +119,9 @@ extra arguments for interpolant creation described in section Details.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <code>function(x, threads = getOption("chebpol.threads"))</code> defined on a hypercube, an <a href="interpolant.html">interpolant</a>
 for the given function. The argument <code>x</code> can be a matrix of column
-vectors which are evaluated in parallel in a number of threads.  The
+vectors which are evaluated in parallel in a number of threads. The
 function yields values for arguments outside the hypercube as well, though
-it will typically be a poor approximation.  <code>threads</code> is an integer
+it will typically be a poor approximation. <code>threads</code> is an integer
 specifying the number of parallel threads which should be used when
 evaluating a matrix of column vectors.</p>
     </div>
@@ -132,15 +132,15 @@ Which arguments to specify depends on the method. The interpolation methods are 
 in <code><a href="../articles/chebpol.html">vignette("chebpol", package = "chebpol")</a></code>.</p>
 <p>The method <code>"chebyshev"</code> needs only the number of Chebyshev knots in
 each dimension. This is either the <code>"dim"</code> attribute of the array
-<code>val</code>, or the <code>dims</code> argument if <code>val</code> is a function.  Also
+<code>val</code>, or the <code>dims</code> argument if <code>val</code> is a function. Also
 the intervals can be specified if different from <code>[-1, 1]</code>.</p>
 <p>The method <code>"uniform"</code> is similar to the <code>"chebyshev"</code>, but
-uniformly spaced knots are created.  The argument
-<code>intervals</code> generally goes with <code>dims</code> when something else than
+uniformly spaced knots are created. The argument
+<code>intervals</code> generally goes with <code>dims</code> when other than
 standard intervals <code>[-1, 1]</code> are used.</p>
 <p>The methods <code>"multilinear"</code>, <code>"fh"</code> (Floater-Hormann), <code>"stalker"</code>,
 <code>"hstalker"</code>, and
-<code>"general"</code> need the argument <code>grid</code>.  These are the methods
+<code>"general"</code> need the argument <code>grid</code>. These are the methods
 which can use arbitrary Cartesian grids.
 The stalker spline
 is described in <code><a href="../articles/stalker.html">vignette("stalker", package = "chebpol")</a></code>. The Floater-Hormann
@@ -153,7 +153,7 @@ for normalizing the knots to the unit hypercube. The default is <code>NA</code>,
 uses normalization if any of the knots are outside the unit hypercube. <code>normalize</code> can also
 be a vector <code>c(a, b)</code>, or a matrix with columns <code>a</code> and <code>b</code> and one row per dimension, in which
 case each coordinate is transformed as <code>a * (x - b)</code>. Also, a logical
-<code>nowarn</code> is accepted, it is used to suppress a warning in case the system can't
+<code>nowarn</code> is accepted. It is used to suppress a warning in case the system can't
 be solved exactly and a least squares fallback method is used.
 Fitting solves a dense linear system with one row and column per knot, so it
 becomes slow beyond a few thousand knots.</p>
@@ -161,7 +161,7 @@ becomes slow beyond a few thousand knots.</p>
 Delaunay triangulation from the knots, and does linear interpolation in each simplex
 by weighting the vertex values with the barycentric coordinates.</p>
 <p>If knots are required, but the grid argument is given, knots are constructed as
-<code>t(expand.grid(grid))</code></p>
+<code>t(expand.grid(grid))</code>.</p>
 <p>The <code>"crbf"</code> is the multilayer compact radial basis function
 interpolation in ALGLIB (<a href="https://www.alglib.net/interpolation/fastrbf.php" class="external-link">https://www.alglib.net/interpolation/fastrbf.php</a>).
 It is only available if ALGLIB was available at

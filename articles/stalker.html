@@ -301,7 +301,7 @@ overshoot, or <span class="math inline">\(r=|c/b|\)</span> when <span class="mat
 |b/(rc)|^{1/(r-1)}  =
 -\operatorname{sgn}(bc)r^{2/(1-r)}.\)</span></p>
 <p>The function value in the extreme point <span class="math inline">\(x_0\)</span> is then <span class="math inline">\(a
-- |b| \operatorname{sgn}(c) r^{2/(1-r)} +  cr^{2r/(1-r)}\)</span>. The
+- |b| \operatorname{sgn}(c) r^{2/(1-r)} + cr^{2r/(1-r)}\)</span>. The
 distance to <span class="math inline">\(v_0=a\)</span> is <span class="math inline">\(d_r = \left|  |c| r^{2r/(1-r)} - |b|
 r^{2/(1-r)}  \right| =
 |b| \left| r^{(1+r)/(1-r)} - r^{2/(1-r)}\right|\)</span>. Again, it is
@@ -586,7 +586,7 @@ The equations (13) then simplify to:</p>
 <p><span class="math display">\[\begin{equation}\tag{14}
   \begin{aligned}
     b_i &amp;= 0,\\
-    c_i &amp;= -\frac{k_i^- v_i^+ - k_i^+ v_i^-}{k_i^-  k_i^+ (v_i^+ -
+    c_i &amp;= -\frac{k_i^- v_i^+ - k_i^+ v_i^-}{k_i^- k_i^+ (v_i^+ -
 v_i^-)},\\
     d_i &amp;= -\frac{v_i^+ v_i^- (k_i^- - k_i^+)}{k_i^- v_i^+ - k_i^+
 v_i^-}.\\
@@ -783,7 +783,7 @@ singularity, but the resulting curve may not be very pleasant. Plotting
 the derivative of these interpolants is not for the faint-hearted.</p>
 <p><img src="stalker_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="576"></p>
 <p>Note that both the stalker and the <code>"monoH.FC"</code> spline
-honours the completely flat region between points 4 and 5, but between
+honour the completely flat region between points 4 and 5, but between
 points 7 and 8 <code>"monoH.FC"</code> has considerable overshoot, even
 though the points are very close. The reason is that point 8 is slightly
 lower than point 7, so that points 7-10 are not monotonic, and then the

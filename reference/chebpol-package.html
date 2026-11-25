@@ -71,18 +71,18 @@ and polyharmonic spline for scattered multi dimensional data.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The primary method of the package is <code><a href="ipol.html">ipol()</a></code> which
-dispatches to some other method.  All the generated
+dispatches to some other method. All the generated
 <a href="interpolant.html">interpolant</a>s accept as an argument a matrix of column
 vectors. The generated functions also accept an argument
 <code>threads = getOption("chebpol.threads")</code> to utilize more than
-one CPU if a matrix of column vectors is evaluated.  Unless the option
+one CPU if a matrix of column vectors is evaluated. Unless the option
 <code>chebpol.threads</code> is already set, it is initialized from the environment variable
 <code>CHEBPOL_THREADS</code> upon loading of the package. It defaults to <code>1</code>.</p>
 <p>The interpolants are ordinary R-objects and can be saved with <code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code> and loaded
 later with <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> or serialized/unserialized with other tools, just like any R-object.
 However, they contain calls to functions in the package, and while the author will make efforts
 to ensure that generated interpolants are compatible with future versions of chebpol,
-I can issue no such absolute guarantee.</p>
+no absolute guarantee can be given.</p>
     </div>
     <div class="section level2">
     <h2 id="chebyshev">Chebyshev<a class="anchor" aria-label="anchor" href="#chebyshev"></a></h2>
@@ -110,7 +110,7 @@ Chebyshev variant <code>ipol(..., method = "general")</code>, as well as a multi
 <code>ipol(..., method = "multilinear")</code>. These methods work on uniform grids as well.
 There is also a <code>method = "stalker"</code> which is a shape preserving spline, and a variant
 <code>method = "hstalker"</code>. Both are described in a vignette. These splines in one dimension
-attempts to honour monotonicity and local extrema, in particular the <code>"hstalker"</code> is
+attempt to honour monotonicity and local extrema, in particular the <code>"hstalker"</code> is
 positivity-preserving in the sense that it will preserve maxima and minima.</p>
     </div>
     <div class="section level2">

@@ -719,7 +719,7 @@ not for the faint-hearted.
 
 ![](stalker_files/figure-html/unnamed-chunk-6-1.png)
 
-Note that both the stalker and the `"monoH.FC"` spline honours the
+Note that both the stalker and the `"monoH.FC"` spline honour the
 completely flat region between points 4 and 5, but between points 7 and
 8 `"monoH.FC"` has considerable overshoot, even though the points are
 very close. The reason is that point 8 is slightly lower than point 7,

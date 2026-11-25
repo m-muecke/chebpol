@@ -187,6 +187,12 @@
   memory. Fitting that many knots still needs enough memory for the
   matrix, about 17 GB at 46,341 knots.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "polyharmonic"` now fits knots that lie on a line or plane,
+  such as knots sharing a coordinate in some dimension or a single knot,
+  without falling back to least squares with a warning. When the knots
+  shared a coordinate, normalization also divided by zero and the
+  interpolant returned `NaN`.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "polyharmonic"` now fits a spline with a single knot.
   Previously it failed with “invalid ‘nrow’ value”.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
