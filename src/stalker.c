@@ -142,7 +142,7 @@ static inline double stalkhyp(double x, double vmin, double vplus, double dmin, 
   // a+bx-a/(cx+1)
   if (fabs(vplus * dmin + vmin * dplus) < 1e3 * DBL_EPSILON * dmin * dplus)
     return x * (vplus - vmin) / (dplus + dmin); // linear
-  if (sign(vplus * vmin) < 0) {
+  if (vplus * vmin < 0) {
     // monotonic, set b=0
     double a, c;
     if (fabs(vmin - vplus) < 1e3 * DBL_EPSILON)
@@ -206,7 +206,7 @@ static inline double stalk1(double x, double vmin, double v0, double vplus, doub
 
       // Find the degree. For uniform grids in normalized coordinates, this is quite easy
       double ac = fabs(c), ab = fabs(b);
-      if (sign(vplus * vmin) <= 0) {
+      if (vplus * vmin <= 0) {
         // monotonic
         r = (ab < 2.0 * ac) ? ab / ac : 2.0;
       } else {
@@ -227,7 +227,7 @@ static inline double stalk1(double x, double vmin, double v0, double vplus, doub
 
       // We must solve for r:
       double b, c;
-      if (sign(vmin * vplus) < 0) {
+      if (vmin * vplus < 0) {
         // monotonic
         r = findmonor(dmin, dplus, vmin, vplus);
       } else {
@@ -307,7 +307,7 @@ static void makestalk(const int nrank, const int *dims, const double **grid, con
       double r;
 
       // If non-monotonic, simulate monotonic by changing sign on vmin when computing r
-      if (sign(vplus * vmin) <= 0) {
+      if (vplus * vmin <= 0) {
         // monotonic
         if (fabs(vplus - vmin) <= MYEPS * kplus) {
           // constant zero
@@ -485,7 +485,7 @@ static void makehyp(const int nrank, const int *dims, const double **grid, const
       // Many common expressions below. Fix later. Compiler does anyway.
       double D = kmin * vplus - kplus * vmin;
       double D2 = kmin * kmin * vplus - kplus * kplus * vmin;
-      if (sign(vplus * vmin) <= 0 || fabs(vplus) <= MYEPS || fabs(vmin) <= MYEPS) {
+      if (vplus * vmin <= 0 || fabs(vplus) <= MYEPS || fabs(vmin) <= MYEPS) {
         // Monotonic
         if (fabs(vplus - vmin) <= MYEPS * kplus) {
           // constant zero
