@@ -10,6 +10,12 @@
   `ucappxf()`, deprecated since version 1.7, have been removed. Use
   [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   instead.
+- geometry is now a suggested package instead of a required one, so
+  installing chebpol no longer pulls in geometry and its dependencies.
+  [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "simplexlinear"` needs it to build the triangulation and
+  stops with an error when it is missing. Saved simplex linear
+  interpolants can be evaluated without it.
 
 ### Bug fixes
 

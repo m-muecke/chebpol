@@ -159,7 +159,6 @@ hst <- ipol(f, grid = grid, method = "hstalker")
 ch2 <- ipol(f, dims = c(10, 10, 10), intervals = list(0:1, 0:1, 0:1), method = "cheb")
 knots <- matrix(runif(3 * 1000), 3)
 ph2 <- ipol(f, knots = knots, k = 2, method = "poly")
-sl2 <- ipol(f, knots = knots, method = "simplexlinear")
 # my alglib is a bit slow, so stick to 100 knots
 if (havealglib()) {
   crb <- ipol(f, knots = knots[, 1:100], method = "crbf", rbase = 2, layers = 5, lambda = 0)
@@ -172,7 +171,6 @@ rbind(
   fh = fh2(m),
   cheb = ch2(m),
   poly = ph2(m),
-  sl = sl2(m),
   hst = hst(m),
   crbf = if (havealglib()) crb(m) else NULL
 )
@@ -182,6 +180,11 @@ rbind(
 #> fh   1.798963 0.5782988 2.576696 0.7834285 0.8153104 0.6146149 1.0629866
 #> cheb 1.798575 0.5777645 2.575911 0.7834264 0.8153354 0.6138369 1.0000685
 #> poly 1.796145 0.5727733 2.575861 0.7841188 0.8153223 0.6139370 0.9992751
-#> sl   1.815287        NA 2.516053 0.7678750 0.8030794 0.6111925 0.9840601
 #> hst  1.795038 0.5817112 2.574213 0.7835482 0.8163775 0.6176764 1.0039954
+# simplex linear interpolation needs the geometry package
+sl2 <- ipol(f, knots = knots, method = "simplexlinear")
+rbind(true = apply(m, 2, f), sl = sl2(m))
+#>          [,1]      [,2]     [,3]      [,4]      [,5]      [,6]      [,7]
+#> true 1.798658 0.5777646 2.575931 0.7834249 0.8153359 0.6138369 1.0000857
+#> sl   1.815287        NA 2.516053 0.7678750 0.8030794 0.6111925 0.9840601
 ```
