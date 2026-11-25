@@ -51,6 +51,12 @@
   it is already set, for example in `.Rprofile`. The `CHEBPOL_THREADS`
   environment variable is only used when the option is unset.
 - [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
+  and [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  no longer overwrite an argument vector that the function has kept.
+  Previously one vector was reused for every grid point, so a function
+  that kept its argument, for example to record the points it was called
+  with, saw every copy change to the last grid point.
+- [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
   now stops with an error when a grid dimension has no points.
   Previously it crashed R.
 - [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
@@ -140,6 +146,10 @@
   `method = "stalker"`, `"hstalker"` or `"oldstalker"` now stops with an
   error when a grid dimension has a single point. Previously the spline
   read past the end of the values and the grid.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  interpolants created with `method = "hstalker"` no longer return `NaN`
+  at a grid point with `blend = "mean"` when two neighboring values are
+  equal.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "hstalker"` no longer depends on the scale of the values or
   of the grid. Previously small differences between neighboring values
