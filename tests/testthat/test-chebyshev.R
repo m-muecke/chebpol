@@ -85,6 +85,15 @@ test_that("chebeval() maps points into the given intervals", {
   expect_equal(chebeval(x[, 1L], coef, intervals), ch(x[, 1L]))
 })
 
+test_that("ipol() errors on malformed Chebyshev intervals", {
+  val <- array(0, c(3, 4))
+  expect_snapshot(error = TRUE, {
+    ipol(val, intervals = "a", method = "chebyshev")
+    ipol(val, intervals = list(c(0, 1)), method = "chebyshev")
+    ipol(val, intervals = list(c(0, 1), c(0, 1, 2)), method = "chebyshev")
+  })
+})
+
 test_that("chebeval() accepts a single interval as a vector", {
   f <- function(x) exp(-x^2)
   coef <- chebcoef(evalongrid(f, 12, c(0, 2)))

@@ -163,18 +163,8 @@ chebappx.real <- function(val, intervals = NULL) {
     )
   } else {
     # it's intervals, create mapping into [-1, 1]
-    if (!is.list(intervals)) {
-      stop("`intervals` must be a list with one length-2 vector per dimension.")
-    }
-    if (any(lengths(intervals) != 2L)) {
-      stop("Each element of `intervals` must have length 2.")
-    }
-    if (length(intervals) != length(dim(val))) {
-      stop(sprintf(
-        "`intervals` must have one element per dimension of `val` (%d), not %d.",
-        length(dim(val)),
-        length(intervals)
-      ))
+    if (!is.list(intervals) || length(intervals) != K || any(lengths(intervals) != 2L)) {
+      stop(sprintf("`intervals` must be a list of %d `c(lower, upper)` pairs, one per dimension of `val`.", K))
     }
     ispan <- vapply(intervals, \(x) 2 / diff(x), numeric(1L))
     mid <- vapply(intervals, mean, numeric(1L))
