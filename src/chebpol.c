@@ -338,6 +338,8 @@ double C_evalcheb(const double *cf, const double *x, const int *dims, const int 
 }
 
 SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
+  if (XLENGTH(coef) == 0)
+    Rf_error("`coef` must have at least one element.");
   R_xlen_t siz = 1;
   const double *cf = REAL_RO(coef);
 #ifdef _OPENMP

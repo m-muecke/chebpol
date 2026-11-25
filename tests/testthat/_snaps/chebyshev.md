@@ -29,3 +29,16 @@
       Error in `chebappx.real()`:
       ! `intervals` must be a list of 2 `c(lower, upper)` pairs, one per dimension of `val`.
 
+# chebeval() errors on empty coefficients
+
+    Code
+      chebeval(0, numeric())
+    Condition
+      Error in `chebeval()`:
+      ! `coef` must have at least one element.
+    Code
+      chebeval(c(0, 0), matrix(numeric(), nrow = 0, ncol = 2))
+    Condition
+      Error in `chebeval()`:
+      ! `coef` must have at least one element.
+

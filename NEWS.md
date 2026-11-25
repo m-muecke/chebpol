@@ -24,6 +24,7 @@
 * `chebeval()` now works with `intervals` for a matrix of points, and for a single interval given as a vector `c(a, b)`. Before, only a single point in two or more dimensions was mapped correctly.
 * `chebcoef()` now stops with an error when `dct` is `NA` or not a single logical. Previously `dct = NA` was treated as `TRUE`.
 * `chebeval()` now treats coefficients without a `dim` attribute, such as `c(1, 0.5, 0.25)` or `as.numeric(chebcoef(val))`, as one-dimensional. Previously it failed with "INTEGER() can only be applied to a 'integer', not a 'NULL'".
+* `chebeval()` now errors when `coef` is empty. Previously it could crash R.
 * Loading chebpol no longer overwrites the `chebpol.threads` option when it is already set, for example in `.Rprofile`. The `CHEBPOL_THREADS` environment variable is only used when the option is unset.
 * `evalongrid()` and `ipol()` no longer overwrite an argument vector that the function has kept. Previously one vector was reused for every grid point, so a function that kept its argument, for example to record the points it was called with, saw every copy change to the last grid point.
 * `evalongrid()` now stops with an error when a grid dimension has no points. Previously it crashed R.

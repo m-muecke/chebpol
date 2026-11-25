@@ -116,3 +116,10 @@ test_that("chebeval() treats coefficients without a dim attribute as one-dimensi
   expect_equal(chebeval(0.3, as.numeric(coef)), chebeval(0.3, coef))
   expect_equal(chebeval(0.3, c(1, 0.5, 0.25)), 1 + 0.5 * 0.3 + 0.25 * (2 * 0.3^2 - 1))
 })
+
+test_that("chebeval() errors on empty coefficients", {
+  expect_snapshot(error = TRUE, {
+    chebeval(0, numeric())
+    chebeval(c(0, 0), matrix(numeric(), nrow = 0, ncol = 2))
+  })
+})
