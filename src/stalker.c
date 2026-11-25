@@ -144,29 +144,26 @@ static inline double stalkhyp(double x, double vmin, double vplus, double dmin, 
     return x * (vplus - vmin) / (dplus + dmin); // linear
   if (vplus * vmin < 0) {
     // monotonic, set b=0
-    double a, c;
     if (fabs(vmin - vplus) < 1e3 * DBL_EPSILON)
       return 0;
-    c = (vmin * dplus + vplus * dmin) / (dmin * dplus * (vmin - vplus));
-    a = vplus + vplus / (c * dplus);
+    const double c = (vmin * dplus + vplus * dmin) / (dmin * dplus * (vmin - vplus));
+    const double a = vplus + vplus / (c * dplus);
     return a - a / (1 + c * x);
   } else {
     // non-monotonic
-    double D = dplus * dplus * vmin - dmin * dmin * vplus;
+    const double D = dplus * dplus * vmin - dmin * dmin * vplus;
 
     if (fabs(D) < 1e3 * DBL_EPSILON) {
-      double a;
       // if c==0, it's a parabola y = a*x^2
       // we have (0,0), (-dmin,vmin), and (dplus,vplus)
       // vmin = a*dmin^2
       // vplus = a*dplus^2
-      a = vmin / (dmin * dmin);
+      const double a = vmin / (dmin * dmin);
       return a * x * x;
     }
-    double c = D / (dmin * dplus * (dmin * vplus + dplus * vmin));
-    double a, b;
-    b = vplus * (1 + c * dplus) / (c * dplus * dplus);
-    a = -b / c;
+    const double c = D / (dmin * dplus * (dmin * vplus + dplus * vmin));
+    const double b = vplus * (1 + c * dplus) / (c * dplus * dplus);
+    const double a = -b / c;
     return a + b * x - a / (1 + c * x);
   }
 }
@@ -174,7 +171,6 @@ static inline double stalkhyp(double x, double vmin, double vplus, double dmin, 
 // Variable degree stalker spline
 static inline double stalk1(double x, double vmin, double v0, double vplus, double dmin, double dplus, double r,
                               double iD, double powmin, double powplus, bool uniform) {
-  double b, c;
   // Do linear end points
 
   if (ISNAN(vmin))
@@ -187,8 +183,8 @@ static inline double stalk1(double x, double vmin, double v0, double vplus, doub
     return v0 + stalkhyp(x, vmin, vplus, dmin, dplus);
   if (!ISNAN(r)) {
     // use precomputed degree
-    b = (vplus * powmin - vmin * powplus) * iD;
-    c = (vplus * dmin + vmin * dplus) * iD;
+    const double b = (vplus * powmin - vmin * powplus) * iD;
+    const double c = (vplus * dmin + vmin * dplus) * iD;
     return v0 + b * x + c * pow(fabs(x), r);
   } else {
     // Compute r for this basis function
@@ -198,8 +194,8 @@ static inline double stalk1(double x, double vmin, double v0, double vplus, doub
       // Uniform grid
       // This works when dplus==dmin, otherwise we must solve an equation for r.
       x /= dplus;
-      b = 0.5 * (vplus - vmin);
-      c = 0.5 * (vplus + vmin);
+      const double b = 0.5 * (vplus - vmin);
+      const double c = 0.5 * (vplus + vmin);
 
       if (c == 0.0)
         return v0 + b * x;
