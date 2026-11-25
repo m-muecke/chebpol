@@ -144,38 +144,38 @@ chebappx.real <- function(val, intervals = NULL) {
     # allow for one-dimensional
     dim(val) <- length(val)
   }
-  K <- length(dim(val))
+  d <- length(dim(val))
   # allow for vector, e.g. intervals = c(0, 1), put it inside list
   if (is.numeric(intervals) && length(intervals) == 2L) {
     intervals <- list(intervals)
   }
   cf <- chebcoef(val)
-  varnames <- names(intervals) %||% names(dim(val))
+  nms <- names(intervals) %||% names(dim(val))
 
   if (is.null(intervals)) {
     # it's [-1, 1] intervals, so drop transformation
     fun <- function(x, threads = getOption("chebpol.threads")) {
-      x <- as_points(x, K)
+      x <- as_points(x, d)
       .Call(C_evalcheb, cf, x, threads, NULL)
     }
-    fun <- crate(fun, cf, K)
-    domain <- rep(list(c(-1, 1)), K)
+    fun <- crate(fun, cf, d)
+    domain <- rep(list(c(-1, 1)), d)
   } else {
     # it's intervals, create mapping into [-1, 1]
-    if (!is.list(intervals) || length(intervals) != K || any(lengths(intervals) != 2L)) {
-      stop(sprintf("`intervals` must be a list of %d `c(lower, upper)` pairs, one per dimension of `val`.", K))
+    if (!is.list(intervals) || length(intervals) != d || any(lengths(intervals) != 2L)) {
+      stop(sprintf("`intervals` must be a list of %d `c(lower, upper)` pairs, one per dimension of `val`.", d))
     }
     ispan <- vapply(intervals, \(x) 2 / diff(x), numeric(1L))
     mid <- vapply(intervals, mean, numeric(1L))
 
     fun <- function(x, threads = getOption("chebpol.threads")) {
-      x <- as_points(x, K)
+      x <- as_points(x, d)
       .Call(C_evalcheb, cf, (x - mid) * ispan, threads, NULL)
     }
-    fun <- crate(fun, cf, mid, ispan, K)
+    fun <- crate(fun, cf, mid, ispan, d)
     domain <- intervals
   }
-  new_interpolant(fun, method = "chebyshev", arity = K, domain = stats::setNames(domain, varnames))
+  new_interpolant(fun, method = "chebyshev", arity = d, domain = stats::setNames(domain, nms))
 }
 
 chebappxf.real <- function(fun, dims, intervals = NULL, ...) {

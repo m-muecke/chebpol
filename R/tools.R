@@ -21,10 +21,10 @@ as_domain <- function(domain) {
   if (length(domain) == 0L) {
     return(data.frame())
   }
-  varnames <- names(domain) %||% character(length(domain))
-  unnamed <- is.na(varnames) | !nzchar(varnames)
-  varnames[unnamed] <- paste0("X", which(unnamed))
-  names(domain) <- varnames
+  nms <- names(domain) %||% character(length(domain))
+  unnamed <- is.na(nms) | !nzchar(nms)
+  nms[unnamed] <- paste0("X", which(unnamed))
+  names(domain) <- nms
   as.data.frame(domain)
 }
 
@@ -56,12 +56,12 @@ as_points <- function(x, arity, call = sys.call(sys.parent())) {
     msg <- sprintf("`x` must have length %d or be a matrix with %d rows, not length %d.", arity, arity, length(x))
     stop(errorCondition(msg, call = call))
   }
-  numvec <- length(x) / arity
-  if (numvec > 1L) {
-    msg <- sprintf("Treating `x` of length %d as a %d x %d matrix, one point per column.", length(x), arity, numvec)
+  n <- length(x) / arity
+  if (n > 1L) {
+    msg <- sprintf("Treating `x` of length %d as a %d x %d matrix, one point per column.", length(x), arity, n)
     warning(warningCondition(msg, call = call))
   }
-  dim(x) <- c(arity, numvec)
+  dim(x) <- c(arity, n)
   x
 }
 
@@ -170,8 +170,8 @@ evalongrid <- function(fun, dims, intervals = NULL, ..., grid = NULL) {
     grid <- list(grid)
   }
   grid <- grid %||% chebknots(dims, intervals)
-  mf <- match.fun(fun)
-  .Call(C_evalongrid, \(x) mf(x, ...), lapply(grid, as.numeric))
+  fun <- match.fun(fun)
+  .Call(C_evalongrid, \(x) fun(x, ...), lapply(grid, as.numeric))
 }
 
 #' @rdname evalongrid

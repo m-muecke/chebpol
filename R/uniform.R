@@ -17,19 +17,19 @@ ucappx.real <- function(val, intervals = NULL) {
   cf <- chebcoef(val)
   # the per-dimension vectors recycle down the columns of x
   if (is.null(intervals)) {
-    gm <- crate(function(x) ugm(x, dims), dims)
+    map <- crate(function(x) ugm(x, dims), dims)
   } else {
     # precompute interval mid points and inverse lengths
-    md <- vapply(intervals, mean, numeric(1L))
+    mid <- vapply(intervals, mean, numeric(1L))
     ispan <- vapply(intervals, \(i) 2 / diff(i), numeric(1L))
-    gm <- crate(function(x) ugm(ispan * (x - md), dims), ispan, md, dims)
+    map <- crate(function(x) ugm(ispan * (x - mid), dims), ispan, mid, dims)
   }
   fun <- function(x, threads = getOption("chebpol.threads")) {
     x <- as_points(x, arity)
-    .Call(C_evalcheb, cf, gm(x), threads, NULL)
+    .Call(C_evalcheb, cf, map(x), threads, NULL)
   }
   domain <- stats::setNames(intervals %||% rep(list(c(-1, 1)), arity), names(intervals) %||% names(dims))
-  new_interpolant(crate(fun, cf, gm, arity), method = "uniform", arity = arity, domain = domain)
+  new_interpolant(crate(fun, cf, map, arity), method = "uniform", arity = arity, domain = domain)
 }
 
 ucappxf.real <- function(fun, dims, intervals = NULL, ...) {

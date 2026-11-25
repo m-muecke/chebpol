@@ -20,9 +20,9 @@ oldstalkerappx <- function(val, grid, r = 2, ..., blend = NULL) {
   if (is.function(val)) {
     val <- evalongrid(val, grid = grid, ...)
   }
-  gl <- prod(lengths(grid))
-  if (length(val) != gl) {
-    stop(sprintf("`val` must have one value per grid point (%d), not %d.", gl, length(val)))
+  n <- prod(lengths(grid))
+  if (length(val) != n) {
+    stop(sprintf("`val` must have one value per grid point (%d), not %d.", n, length(val)))
   }
 
   r <- rep_len(as.numeric(r), length(grid))

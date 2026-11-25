@@ -251,8 +251,8 @@ ipol <- function(
       # peel off normalize and nowarn
       normalize <- args[["normalize"]] %||% NA
       nowarn <- args[["nowarn"]] %||% FALSE
-      newarg <- args[!names(args) %in% c("normalize", "nowarn")]
-      do.call(polyh.real, c(list(val, knots, k, normalize, nowarn), newarg))
+      rest <- args[!names(args) %in% c("normalize", "nowarn")]
+      do.call(polyh.real, c(list(val, knots, k, normalize, nowarn), rest))
     },
     oldstalker = {
       if (is.null(grid)) {
@@ -306,8 +306,8 @@ ipol <- function(
       rbase <- args[["rbase"]] %||% 2
       layers <- args[["layers"]] %||% 5L
       lambda <- args[["lambda"]] %||% 0
-      newarg <- args[!names(args) %in% c("rbase", "layers", "lambda")]
-      do.call(rbf.alglib, c(list(val, knots, rbase, layers, lambda), newarg))
+      rest <- args[!names(args) %in% c("rbase", "layers", "lambda")]
+      do.call(rbf.alglib, c(list(val, knots, rbase, layers, lambda), rest))
     }
   )
 }
