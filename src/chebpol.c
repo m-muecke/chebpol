@@ -13,7 +13,7 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
   bool brokenfftw = false;
   double isiz = 1.0 / siz;
   int rdims[rank];
-  /* Create a plan */
+  // Create a plan
   fftw_r2r_kind kind[rank];
   for (int i = 0; i < rank; i++)
     kind[i] = FFTW_REDFT10; // type II DCT
@@ -235,7 +235,7 @@ SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spa
     if (rank != LENGTH(inx))
       Rf_error("coefficient rank(%d) does not match argument length(%d)", LENGTH(dim), LENGTH(inx));
   }
-  /* This shouldn't happen, but we check it anyway since we'll bomb if it's wrong */
+  // This shouldn't happen, but we check it anyway since we'll bomb if it's wrong
   for (int i = 0; i < rank; i++)
     siz *= dims[i];
   if (XLENGTH(vals) != siz)
@@ -361,7 +361,7 @@ SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
     if (rank != LENGTH(inx))
       Rf_error("coefficient rank(%d) does not match argument length(%d)", LENGTH(dim), LENGTH(inx));
   }
-  /* This shouldn't happen, but we check it anyway since we'll bomb if it's wrong */
+  // This shouldn't happen, but we check it anyway since we'll bomb if it's wrong
   for (int i = 0; i < rank; i++)
     siz *= dims[i];
   if (XLENGTH(coef) != siz)
@@ -565,17 +565,15 @@ double C_evalmlip(const int rank, const double *x, const double **grid, const in
   double weight[rank];
   R_xlen_t valpos = 0;
   double ipval = 0;
-  /*
-   Find first grid point which is larger or equal, compute
-   the weight, store it. As well as the linear position valpos in the grid
-   A binary search is faster if there are more grid points
-   but up to 10-20 linear search is usually equally fast or faster due to simplicity
-   Note that we never check whether x is within the grid. If it's outside we assume
-   the function continues linearly outwards.
-   Remaining optimizations:  We could have precomputed the stuff we divide by, if we should
-   do more than one vector in a row, this would save some time.  Likewise the stride (which is
-   integer multiplication, which is slow.)
-  */
+  // Find first grid point which is larger or equal, compute
+  // the weight, store it. As well as the linear position valpos in the grid
+  // A binary search is faster if there are more grid points
+  // but up to 10-20 linear search is usually equally fast or faster due to simplicity
+  // Note that we never check whether x is within the grid. If it's outside we assume
+  // the function continues linearly outwards.
+  // Remaining optimizations:  We could have precomputed the stuff we divide by, if we should
+  // do more than one vector in a row, this would save some time.  Likewise the stride (which is
+  // integer multiplication, which is slow.)
 
   R_xlen_t stride = 1;
   for (int i = 0; i < rank; i++) {
@@ -612,7 +610,7 @@ double C_evalmlip(const int rank, const double *x, const double **grid, const in
   return ipval / wsum;
 }
 
-/* Then a multilinear approximation */
+// Then a multilinear approximation
 SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   const int rank = LENGTH(sgrid);
   R_xlen_t gridsize = 1;
@@ -629,7 +627,7 @@ SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   if (Rf_isMatrix(x) ? (Rf_nrows(x) != rank) : (LENGTH(x) != rank))
     Rf_error("grid has dimension %d, you supplied a length %d vector", rank, Rf_isMatrix(x) ? Rf_nrows(x) : LENGTH(x));
 
-  /* Make some pointers into the grid data */
+  // Make some pointers into the grid data
   for (int i = 0; i < rank; i++) {
     dims[i] = LENGTH(VECTOR_ELT(sgrid, i));
     grid[i] = REAL_RO(VECTOR_ELT(sgrid, i));

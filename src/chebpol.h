@@ -21,7 +21,7 @@
 #define FCONE
 #endif
 
-/* .Call entry points, registered in init.c */
+// .Call entry points, registered in init.c
 SEXP R_evalcheb(SEXP, SEXP, SEXP, SEXP);
 SEXP R_chebcoef(SEXP, SEXP, SEXP);
 SEXP R_FH(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
@@ -44,7 +44,7 @@ SEXP R_evalstalk(SEXP, SEXP, SEXP, SEXP);
 SEXP R_analyzesimplex(SEXP, SEXP, SEXP);
 SEXP havegsl(void);
 
-/* C entry points made available to other packages in init.c */
+// C entry points made available to other packages in init.c
 double C_evalcheb(const double *cf, const double *x, const int *dims, const int rank);
 double C_evalmlip(const int rank, const double *x, const double **grid, const int *dims, const double *values,
                   int blend);
