@@ -87,6 +87,8 @@
   `c(1, 0.5, 0.25)` or `as.numeric(chebcoef(val))`, as one-dimensional.
   Previously it failed with “INTEGER() can only be applied to a
   ‘integer’, not a ‘NULL’”.
+- [`chebeval()`](https://m-muecke.github.io/chebpol/reference/chebeval.md)
+  now errors when `coef` is empty. Previously it could crash R.
 - Loading chebpol no longer overwrites the `chebpol.threads` option when
   it is already set, for example in `.Rprofile`. The `CHEBPOL_THREADS`
   environment variable is only used when the option is unset.
@@ -99,6 +101,11 @@
 - [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
   now stops with an error when a grid dimension has no points.
   Previously it crashed R.
+- [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
+  and [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  now stop with an error when `grid` has more points than R can store,
+  e.g. four dimensions of 65,536 points each. Previously the number of
+  points overflowed and R could crash.
 - [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
   and [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   now stop with an error when `grid` has no dimensions,

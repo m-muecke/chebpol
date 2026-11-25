@@ -87,11 +87,15 @@
 <code><a href="../reference/chebcoef.html">chebcoef()</a></code> now stops with an error when <code>dct</code> is <code>NA</code> or not a single logical. Previously <code>dct = NA</code> was treated as <code>TRUE</code>.</li>
 <li>
 <code><a href="../reference/chebeval.html">chebeval()</a></code> now treats coefficients without a <code>dim</code> attribute, such as <code>c(1, 0.5, 0.25)</code> or <code>as.numeric(chebcoef(val))</code>, as one-dimensional. Previously it failed with “INTEGER() can only be applied to a ‘integer’, not a ‘NULL’”.</li>
+<li>
+<code><a href="../reference/chebeval.html">chebeval()</a></code> now errors when <code>coef</code> is empty. Previously it could crash R.</li>
 <li>Loading chebpol no longer overwrites the <code>chebpol.threads</code> option when it is already set, for example in <code>.Rprofile</code>. The <code>CHEBPOL_THREADS</code> environment variable is only used when the option is unset.</li>
 <li>
 <code><a href="../reference/evalongrid.html">evalongrid()</a></code> and <code><a href="../reference/ipol.html">ipol()</a></code> no longer overwrite an argument vector that the function has kept. Previously one vector was reused for every grid point, so a function that kept its argument, for example to record the points it was called with, saw every copy change to the last grid point.</li>
 <li>
 <code><a href="../reference/evalongrid.html">evalongrid()</a></code> now stops with an error when a grid dimension has no points. Previously it crashed R.</li>
+<li>
+<code><a href="../reference/evalongrid.html">evalongrid()</a></code> and <code><a href="../reference/ipol.html">ipol()</a></code> now stop with an error when <code>grid</code> has more points than R can store, e.g. four dimensions of 65,536 points each. Previously the number of points overflowed and R could crash.</li>
 <li>
 <code><a href="../reference/evalongrid.html">evalongrid()</a></code> and <code><a href="../reference/ipol.html">ipol()</a></code> now stop with an error when <code>grid</code> has no dimensions, e.g. <code>grid = list()</code>. Previously <code><a href="../reference/ipol.html">ipol()</a></code> returned an interpolant without variables for several methods, and other methods failed with “‘dim’ cannot be of length 0”.</li>
 <li>
