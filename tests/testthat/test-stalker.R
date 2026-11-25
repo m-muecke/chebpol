@@ -108,3 +108,22 @@ test_that("stalker interpolants error on input of the wrong dimension", {
     hst(matrix(0, 3, 2))
   })
 })
+
+test_that("the hyperbolic stalker does not depend on the scale of the values or the grid", {
+  f <- function(x) x^3 - x
+  grid <- seq(0, 1, length.out = 6)
+  x <- seq(0, 1, length.out = 101)
+  expected <- ipol(f, grid = list(grid), method = "hstalker")(x)
+  for (scale in c(1e-150, 1e-7, 1e5, 1e150)) {
+    values <- ipol(\(x) scale * f(x), grid = list(grid), method = "hstalker")
+    expect_equal(values(x) / scale, expected)
+    stretched <- ipol(\(x) f(x / scale), grid = list(grid * scale), method = "hstalker")
+    expect_equal(stretched(x * scale), expected)
+  }
+})
+
+test_that("the hyperbolic stalker has no pole next to a nearly flat neighbor", {
+  hst <- ipol(c(1e-6, 0, 1, 2), grid = list(c(-1, 0, 1, 2)), method = "hstalker")
+  x <- c(0.999997, 0.999998, 0.999999)
+  expect_equal(hst(x, blend = "linear"), x, tolerance = 1e-5)
+})

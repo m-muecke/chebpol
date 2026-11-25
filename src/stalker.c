@@ -466,36 +466,44 @@ static void makehyp(const int nrank, const int *dims, const double **grid, const
       double vmin = val[index - stride] - v0;
       double kplus = gr[idx + 1] - gr[idx];
       double kmin = gr[idx - 1] - gr[idx];
-      // Many common expressions below. Fix later. Compiler does anyway.
-      double D = kmin * vplus - kplus * vmin;
-      double D2 = kmin * kmin * vplus - kplus * kplus * vmin;
-      if (vplus * vmin <= 0 || fabs(vplus) <= MYEPS || fabs(vmin) <= MYEPS) {
-        // Monotonic
-        if (fabs(vplus - vmin) <= MYEPS * kplus) {
-          // constant zero
-          bb[i] = cc[i] = dd[i] = 0.0;
-        } else if (fabs(D) <= MYEPS * kplus) {
-          // Linear
-          bb[i] = vplus / kplus;
-          cc[i] = dd[i] = 0.0;
-        } else {
-          // general
-          bb[i] = 0.0;
-          cc[i] = -D / (kmin * kplus * (vplus - vmin));
-          dd[i] = -vplus * vmin * (kmin - kplus) / D;
-        }
+      // Work in normalized coordinates, x / kplus and f / vscale, so that the special cases
+      // and the intermediate products do not depend on the scale of the values or of the grid.
+      const double vscale = fmax(fabs(vplus), fabs(vmin));
+      if (vscale == 0) {
+        // constant zero
+        bb[i] = cc[i] = dd[i] = 0.0;
       } else {
-        // Non-monotonic
-        if (fabs(D2) <= MYEPS * kplus) {
-          // Parabola
-          bb[i] = vplus / (kplus * kplus);
-          dd[i] = 0.0;
-          cc[i] = NA_REAL; // signals parabola
+        const double p = vplus / vscale;
+        const double m = vmin / vscale;
+        const double k = kmin / kplus;
+        const double D = k * p - m;
+        const double D2 = k * k * p - m;
+        // The special cases are detected relative to the size of the terms that cancel
+        if (p * m <= 0) {
+          // Monotonic
+          if (fabs(D) <= MYEPS * (fabs(k * p) + fabs(m))) {
+            // Linear
+            bb[i] = vplus / kplus;
+            cc[i] = dd[i] = 0.0;
+          } else {
+            // general
+            bb[i] = 0.0;
+            cc[i] = -D / (k * (p - m)) / kplus;
+            dd[i] = -p * m * (k - 1) / D * vscale;
+          }
         } else {
-          // general
-          bb[i] = vplus * vmin * (kmin - kplus) / D2;
-          cc[i] = -D2 / (kmin * kplus * D);
-          dd[i] = -kmin * vplus * kplus * vmin * (kmin - kplus) * D / (D2 * D2);
+          // Non-monotonic
+          if (fabs(D2) <= MYEPS * (fabs(k * k * p) + fabs(m))) {
+            // Parabola
+            bb[i] = vplus / kplus / kplus;
+            dd[i] = 0.0;
+            cc[i] = NA_REAL; // signals parabola
+          } else {
+            // general
+            bb[i] = p * m * (k - 1) / D2 * vscale / kplus;
+            cc[i] = -D2 / (k * D) / kplus;
+            dd[i] = -k * p * m * (k - 1) * D / (D2 * D2) * vscale;
+          }
         }
       }
     }
