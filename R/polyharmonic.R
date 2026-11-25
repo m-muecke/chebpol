@@ -66,10 +66,19 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   # offsets give a regular, well-conditioned system
   mu <- rowMeans(knots)
   centered <- knots - mu
-  s <- svd(centered, nv = 0L)
-  flat <- max(1e-10 * s$d[1L], max(dim(knots)) * .Machine$double.eps * sqrt(N) * max(abs(knots)))
-  U <- s$u[, s$d > flat, drop = FALSE]
-  B <- rbind(1, crossprod(U, centered))
+  s <- svd(centered)
+  # a direction is flat when the knots spread less along it than 1e-10 of their largest spread or than the rounding
+  # of the coordinates it combines, so that a coordinate on a much smaller scale than the others still counts
+  size <- sqrt(N) * drop(crossprod(abs(s$u), apply(abs(knots), 1L, max)))
+  flat <- pmax(1e-10 * pmin(s$d[1L], size), max(dim(knots)) * .Machine$double.eps * size)
+  spread <- s$d > flat
+  U <- s$u[, spread, drop = FALSE]
+  # orthonormal rows on the scale of the distance matrix keep the system well scaled whatever the spread
+  balance <- norm(A, "F")
+  if (balance == 0) {
+    balance <- 1
+  }
+  B <- balance * rbind(1 / sqrt(N), t(s$v[, spread, drop = FALSE]))
   L <- nrow(B)
   n <- N + L
   mat <- matrix(0, n, n)
@@ -92,9 +101,9 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     wv[is.na(wv)] <- 0
   }
   w <- wv[seq_len(N)]
-  coef <- wv[N + seq_len(L)]
-  lin <- drop(U %*% coef[-1L])
-  v <- c(coef[1L] - sum(lin * mu), lin)
+  coef <- balance * wv[N + seq_len(L)]
+  lin <- drop(U %*% (coef[-1L] / s$d[spread]))
+  v <- c(coef[1L] / sqrt(N) - sum(lin * mu), lin)
   fun <- function(x, threads = getOption("chebpol.threads")) {
     x <- as_points(x, M)
     .Call(C_evalpolyh, normfun(x), knots, w, v, k, threads, NULL)
