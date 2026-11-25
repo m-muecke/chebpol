@@ -464,7 +464,7 @@ system.time(f(a, threads = 8))
 ```
 
     ##    user  system elapsed 
-    ##   0.094   0.006   0.030
+    ##   0.075   0.003   0.023
 
 ## References
 
