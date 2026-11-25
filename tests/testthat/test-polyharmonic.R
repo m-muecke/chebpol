@@ -63,6 +63,13 @@ test_that("ipol() errors on a malformed normalize", {
   })
 })
 
+test_that("ipol() errors when values and knots differ in number", {
+  knots <- matrix(seq(0, 1, length.out = 20), 2L)
+  expect_snapshot(error = TRUE, {
+    ipol(1:3, knots = knots, method = "polyharmonic")
+  })
+})
+
 test_that("the domain of a polyharmonic spline is the range of the knots", {
   withr::local_seed(42)
   knots <- matrix(runif(60, 5, 9), 2L)

@@ -11,6 +11,9 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   }
   N <- ncol(knots)
   M <- nrow(knots)
+  if (length(val) != N) {
+    stop(sprintf("length of values (%d) must equal the number of knots (%d)", length(val), N))
+  }
   domain <- data.frame(apply(knots, 1L, range))
   if (k > 0) {
     if (abs(round(k) - k) > sqrt(.Machine$double.eps)) {
