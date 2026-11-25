@@ -2,7 +2,7 @@ test_that("chebknots() returns Chebyshev knots", {
   expect_equal(chebknots(3), list(c(sqrt(3) / 2, 0, -sqrt(3) / 2)))
   expect_identical(chebknots(3)[[1L]][2L], 0)
   expect_equal(lengths(chebknots(c(x = 3, y = 4, z = 5))), c(x = 3L, y = 4L, z = 5L))
-  expect_equal(range(chebknots(4, c(2, 3))[[1]]), 2.5 + c(-0.5, 0.5) * cos(pi / 8))
+  expect_equal(range(chebknots(4, c(2, 3))[[1]]), 2.5 + c(-0.5, 0.5) * cospi(1 / 8))
 })
 
 test_that("chebcoef() keeps dimensions and scales the constant term", {
