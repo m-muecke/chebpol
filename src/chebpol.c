@@ -509,6 +509,8 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
   if (!Rf_isFunction(fun))
     Rf_error("`fun` must be a function.");
   const int rank = LENGTH(sgrid);
+  if (rank == 0)
+    Rf_error("`grid` must have at least one dimension.");
   const double *grid[rank];
   R_xlen_t len = 1;
   SEXP R_dim = PROTECT(Rf_allocVector(INTSXP, rank));

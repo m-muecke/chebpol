@@ -153,6 +153,9 @@ ipol <- function(
   if (!is.null(grid) && !is.list(grid)) {
     grid <- list(grid)
   }
+  if (!is.null(grid) && length(grid) == 0L) {
+    stop("`grid` must have at least one dimension.")
+  }
   switch(
     method,
     chebyshev = {

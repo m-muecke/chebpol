@@ -54,4 +54,14 @@
     Condition
       Error in `evalongrid()`:
       ! `grid` dimension 2 must have at least one point.
+    Code
+      evalongrid(sum, grid = list())
+    Condition
+      Error in `evalongrid()`:
+      ! `grid` must have at least one dimension.
+    Code
+      evalongrid(sum, dims = integer(0))
+    Condition
+      Error in `evalongrid()`:
+      ! `grid` must have at least one dimension.
 

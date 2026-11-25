@@ -85,6 +85,8 @@ test_that("evalongrid() errors on an empty grid dimension", {
   expect_snapshot(error = TRUE, {
     evalongrid(sum, grid = list(numeric(0), 1:3))
     evalongrid(sum, dims = c(2, 0))
+    evalongrid(sum, grid = list())
+    evalongrid(sum, dims = integer(0))
   })
 })
 

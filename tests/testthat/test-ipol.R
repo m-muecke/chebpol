@@ -75,3 +75,10 @@ test_that("ipol() accepts a one-dimensional grid as a bare vector", {
   })
   expect_equal(uc(x), uc_list(x))
 })
+
+test_that("ipol() errors on a grid without dimensions", {
+  expect_snapshot(error = TRUE, {
+    ipol(1, grid = list(), method = "multilinear")
+    ipol(sum, grid = list(), method = "fh")
+  })
+})
