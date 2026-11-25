@@ -3,7 +3,7 @@
 ### Interpolation
 
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) :
-  Create interpolating function.
+  Create an interpolating function
 - [`interpolant`](https://m-muecke.github.io/chebpol/reference/interpolant.md)
   : Evaluate an interpolant in a point
 

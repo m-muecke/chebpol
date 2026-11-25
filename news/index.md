@@ -92,6 +92,13 @@
   values do not match the grid lengths. Previously the interpolant read
   past the end of the grid and returned meaningless values.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "uniform"` now accepts a one-dimensional `grid` given as a
+  bare vector, as the other grid methods do. Previously the interpolant
+  returned `NaN`s.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "uniform"` now handles a reversed interval such as `c(1, 0)`
+  when given a function. Previously the interpolant was silently wrong.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "uniform"` now accepts a single interval given as a vector
   `c(a, b)` together with values. It already did when given a function.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
@@ -133,6 +140,11 @@
   `method = "stalker"`, `"hstalker"` or `"oldstalker"` now stops with an
   error when a grid dimension has a single point. Previously the spline
   read past the end of the values and the grid.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "hstalker"` no longer depends on the scale of the values or
+  of the grid. Previously small differences between neighboring values
+  were treated as constant or linear, and could produce a narrow spike
+  between grid points.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   interpolants created with `method = "stalker"`, `"hstalker"` or
   `"simplexlinear"` now stop with an error when given a matrix with the

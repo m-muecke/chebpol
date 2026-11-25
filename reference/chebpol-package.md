@@ -73,7 +73,7 @@ and a function for finding the Chebyshev coefficients
 
 ## See also
 
-[ipol](https://m-muecke.github.io/chebpol/reference/ipol.md),
+[`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md),
 [interpolant](https://m-muecke.github.io/chebpol/reference/interpolant.md)
 
 ## Author
@@ -98,7 +98,7 @@ f <- function(x) sqrt(1 + x[1]) * exp(x[2]) * sin(5 * x[3])^2
 value <- evalongrid(f, dims)
 # fit a Chebyshev approximation to it. Note that the value-array contains the
 # grid-structure.
-ch <- ipol(value, method = "cheb")
+ch <- ipol(value, method = "chebyshev")
 # To see the grid, use the chebknots function and expand.grid. Compare the
 # values with the approximation in the first few grid points.
 knots <- head(expand.grid(chebknots(dims)))

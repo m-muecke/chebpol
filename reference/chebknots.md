@@ -22,7 +22,7 @@ chebknots(dims, intervals = NULL)
 
 ## Value
 
-A array of dimension `dims`. The Chebyshev grid-points.
+An array of dimension `dims`. The Chebyshev grid-points.
 
 ## Details
 
@@ -40,7 +40,7 @@ chebknots(4)
 #> [1]  0.9238795  0.3826834 -0.3826834 -0.9238795
 #> 
 # Knots in the interval [2,3] for degree 3
-chebknots(4, interval = c(2, 3))
+chebknots(4, intervals = c(2, 3))
 #> [[1]]
 #> [1] 2.961940 2.691342 2.308658 2.038060
 #> 

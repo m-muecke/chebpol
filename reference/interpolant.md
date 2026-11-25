@@ -9,7 +9,7 @@ some reasonable values.
 
 - x:
 
-  The argument of the function. A function of more then one variable
+  The argument of the function. A function of more than one variable
   takes a vector. `x` can also be a matrix of column vectors.
 
 - threads:

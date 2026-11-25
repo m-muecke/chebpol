@@ -28,8 +28,8 @@ chebeval(x, coef, intervals = NULL, threads = getOption("chebpol.threads"))
 
 - threads:
 
-  And integer. In case `x` is a matrix of column vectors, use this
-  number of threads in parallel to evaluate.
+  An integer. In case `x` is a matrix of column vectors, use this number
+  of threads in parallel to evaluate.
 
 ## Value
 
