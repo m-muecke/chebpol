@@ -99,6 +99,12 @@
   that kept its argument, for example to record the points it was called
   with, saw every copy change to the last grid point.
 - [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
+  and [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  now call the function once at each grid point. Previously it was
+  called twice at the first grid point, so a function that draws random
+  numbers, counts its calls or has other side effects did so once more
+  than the grid has points.
+- [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
   now stops with an error when a grid dimension has no points.
   Previously it crashed R.
 - [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
@@ -201,8 +207,9 @@
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "polyharmonic"` now fits knots on a line or plane, such as a
   single knot or knots sharing a coordinate, and knots with a large
-  offset. Previously these returned `NaN` or fell back to an inaccurate
-  least squares fit with a warning.
+  offset or with coordinates on very different scales. Previously these
+  returned `NaN` or fell back to an inaccurate least squares fit with a
+  warning.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "polyharmonic"` now fits a spline with a single knot.
   Previously it failed with “invalid ‘nrow’ value”.
