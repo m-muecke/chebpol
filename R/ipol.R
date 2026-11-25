@@ -184,14 +184,10 @@ ipol <- function(
       mlappx.real(val, grid, ...)
     },
     simplexlinear = {
-      if (is.null(knots)) {
-        if (!is.null(grid)) {
-          knots <- t(expand.grid(lapply(grid, as.numeric)))
-          rownames(knots) <- names(grid)
-        } else {
-          stop("`knots` or `grid` must be given for method = \"simplexlinear\".")
-        }
+      if (is.null(knots) && is.null(grid)) {
+        stop("`knots` or `grid` must be given for method = \"simplexlinear\".")
       }
+      knots <- knots %||% grid_knots(grid)
       slappx.real(val, knots, ...)
     },
     fh = {
@@ -242,14 +238,10 @@ ipol <- function(
       chebappxg.real(val, grid)
     },
     polyharmonic = {
-      if (is.null(knots)) {
-        if (!is.null(grid)) {
-          knots <- t(expand.grid(lapply(grid, as.numeric)))
-          rownames(knots) <- names(grid)
-        } else {
-          stop("`knots` or `grid` must be given for method = \"polyharmonic\".")
-        }
+      if (is.null(knots) && is.null(grid)) {
+        stop("`knots` or `grid` must be given for method = \"polyharmonic\".")
       }
+      knots <- knots %||% grid_knots(grid)
       k <- k %||% 3
       # Now, ... may contain normalize and nowarn in addition to
       # arguments to val if it is a function
@@ -305,16 +297,8 @@ ipol <- function(
       }
       if (length(args) == 0L) {
         # old interface
-        if (is.null(k)) {
-          rbase <- 2
-          layers <- 5L
-          lambda <- 0
-        } else {
-          rbase <- k[1L]
-          layers <- k[2L]
-          lambda <- k[3L]
-        }
-        return(rbf.alglib(val, knots, rbase, layers, lambda))
+        k <- k %||% c(2, 5, 0)
+        return(rbf.alglib(val, knots, k[1L], k[2L], k[3L]))
       }
       rbase <- args[["rbase"]] %||% 2
       layers <- args[["layers"]] %||% 5L

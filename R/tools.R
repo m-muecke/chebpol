@@ -65,6 +65,12 @@ as_points <- function(x, arity, call = sys.call(sys.parent())) {
   x
 }
 
+grid_knots <- function(grid) {
+  knots <- t(expand.grid(lapply(grid, as.numeric)))
+  rownames(knots) <- names(grid)
+  knots
+}
+
 `%||%` <- function(lhs, rhs) {
   if (is.null(lhs)) rhs else lhs
 }
@@ -163,9 +169,7 @@ evalongrid <- function(fun, dims, intervals = NULL, ..., grid = NULL) {
   if (is.numeric(grid)) {
     grid <- list(grid)
   }
-  if (is.null(grid)) {
-    grid <- chebknots(dims, intervals)
-  }
+  grid <- grid %||% chebknots(dims, intervals)
   mf <- match.fun(fun)
   .Call(C_evalongrid, \(x) mf(x, ...), lapply(grid, as.numeric))
 }
@@ -176,9 +180,7 @@ evalongridV <- function(fun, dims, intervals = NULL, ..., grid = NULL) {
   if (is.numeric(grid)) {
     grid <- list(grid)
   }
-  if (is.null(grid)) {
-    grid <- chebknots(dims, intervals)
-  }
+  grid <- grid %||% chebknots(dims, intervals)
   fun <- match.fun(fun)
   structure(fun(t(expand.grid(grid)), ...), dim = if (length(grid) > 1L) lengths(grid) else NULL)
 }
