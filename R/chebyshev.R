@@ -163,7 +163,6 @@ chebappx.real <- function(val, intervals = NULL) {
       arity = K,
       domain = rep(list(c(-1, 1)), K)
     )
-    rm(val)
   } else {
     # it's intervals, create mapping into [-1, 1]
     if (!is.list(intervals)) {
@@ -184,8 +183,8 @@ chebappx.real <- function(val, intervals = NULL) {
       arity = K,
       domain = intervals
     )
-    rm(val)
   }
+  rm(val)
   fun
 }
 
