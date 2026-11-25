@@ -1,3 +1,30 @@
+test_that("interpolants accept a point, a matrix, or a vector of several points", {
+  grid <- list(c(0, 1, 2), c(0, 1))
+  ml <- ipol(evalongrid(sum, grid = grid), grid = grid, method = "multilinear")
+  m <- rbind(c(0.5, 1.5, 2), c(0.2, 0.4, 1))
+  expect_equal(ml(c(0.5, 0.2)), 0.7)
+  expect_equal(ml(m), colSums(m))
+  expect_equal(ml(c(1L, 1L)), 2)
+  expect_snapshot(out <- ml(c(m)))
+  expect_equal(out, colSums(m))
+  ml1 <- ipol(c(0, 2, 4), grid = list(c(0, 1, 2)), method = "multilinear")
+  expect_equal(ml1(c(0.5, 1.5)), c(1, 3))
+})
+
+test_that("interpolants error when the input length does not fit the number of variables", {
+  grid <- list(c(0, 1), c(0, 1), c(0, 1))
+  ml <- ipol(evalongrid(sum, grid = grid), grid = grid, method = "multilinear")
+  expect_snapshot(ml(c(0.1, 0.2)), error = TRUE)
+})
+
+test_that("ipol() sets the default blend of the interpolant", {
+  grid <- list(c(0, 1, 2))
+  ml <- ipol(c(0, 1, 0), grid = grid, method = "multilinear", blend = "cubic")
+  expect_equal(eval(formals(ml)$blend), c("cubic", "linear", "sigmoid", "parodic", "square"))
+  expect_equal(ml(0.25), ml(0.25, blend = "cubic"))
+  expect_equal(attr(ml, "arity"), 1)
+})
+
 test_that("evalongrid() evaluates scalar and vector valued functions", {
   dims <- c(8, 7, 6)
   f <- function(x) exp(-sum(x^2))

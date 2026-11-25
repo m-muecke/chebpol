@@ -11,12 +11,12 @@
     Code
       sl(matrix(0, 1, 5))
     Condition
-      Error:
+      Error in `sl()`:
       ! `x` must have 2 rows, one per dimension, not 1.
     Code
       sl(matrix(0, 3, 2))
     Condition
-      Error:
+      Error in `sl()`:
       ! `x` must have 2 rows, one per dimension, not 3.
 
 # ipol() errors when values and knots differ in number for simplex linear interpolation

@@ -1,64 +1,44 @@
-vectorfun <- function(fun, arity, domain = NULL) {
-  force(arity)
-  f <- function(x) {
-    mc <- match.call(expand.dots = TRUE)
-    mc[[1L]] <- quote(list)
-    arglist <- eval.parent(mc)
-    x <- arglist[[1L]]
-    if (is.integer(x) || is.logical(x)) {
-      storage.mode(x) <- "double"
-      arglist[[1L]] <- x
-    }
-    if (is.matrix(x) || length(x) == arity) {
-      return(do.call(fun, arglist))
-    }
-    if (arity == 1L) {
-      arglist[[1L]] <- matrix(x, 1L)
-      return(do.call(fun, arglist))
-    }
-    # try to coerce argument to matrix
-    if (length(x) %% arity == 0L) {
-      numvec <- length(x) / arity
-      if (numvec > 1L) {
-        warning(sprintf(
-          "Treating `x` of length %d as a %d x %d matrix, one point per column.",
-          length(x),
-          arity,
-          numvec
-        ))
-      }
-      dim(x) <- c(arity, numvec)
-      arglist[[1L]] <- x
-      do.call(fun, arglist)
-    } else {
-      stop(sprintf("`x` must have length %d or be a matrix with %d rows, not length %d.", arity, arity, length(x)))
-    }
+# Mark a function as an interpolant of `arity` variables on `domain`
+new_interpolant <- function(fun, arity, domain = NULL) {
+  structure(fun, arity = arity, domain = as.data.frame(domain), chebpol.version = utils::packageVersion("chebpol"))
+}
+
+# Coerce the argument of an interpolant to a point, or to a matrix with one point per column
+as_points <- function(x, arity, call = sys.call(-1L)) {
+  if (is.integer(x) || is.logical(x)) {
+    storage.mode(x) <- "double"
   }
-  formals(f) <- formals(fun)
-  structure(f, arity = arity, domain = as.data.frame(domain), chebpol.version = utils::packageVersion("chebpol"))
+  if (is.matrix(x) || length(x) == arity) {
+    return(x)
+  }
+  if (arity == 1L) {
+    return(matrix(x, 1L))
+  }
+  if (length(x) %% arity != 0L) {
+    msg <- sprintf("`x` must have length %d or be a matrix with %d rows, not length %d.", arity, arity, length(x))
+    stop(errorCondition(msg, call = call))
+  }
+  numvec <- length(x) / arity
+  if (numvec > 1L) {
+    msg <- sprintf("Treating `x` of length %d as a %d x %d matrix, one point per column.", length(x), arity, numvec)
+    warning(warningCondition(msg, call = call))
+  }
+  dim(x) <- c(arity, numvec)
+  x
 }
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
 blend_types <- c(linear = 0L, sigmoid = 1L, parodic = 2L, cubic = 3L, square = 4L, mean = 5L)
 
-blenddef <- function(fun, blend) {
-  f <- formals(fun)
-  if (is.null(blend) || !"blend" %in% names(f)) {
+# Make `blend` the default blend of the interpolant `fun` by moving it to the front of the choices
+set_default_blend <- function(fun, blend) {
+  if (is.null(blend)) {
     return(fun)
   }
-  choices <- eval(f[["blend"]])
+  choices <- eval(formals(fun)$blend)
   blend <- match.arg(blend, choices)
-  f[["blend"]] <- as.call(c(list(as.name("c")), c(blend, setdiff(choices, blend))))
-  formals(fun) <- f
-  ffun <- get("fun", environment(fun))
-  ff <- formals(ffun)
-  if (!"blend" %in% names(ff)) {
-    return(fun)
-  }
-  ff[["blend"]] <- f[["blend"]]
-  formals(ffun) <- ff
-  assign("fun", ffun, envir = environment(fun))
+  formals(fun)$blend <- c(blend, setdiff(choices, blend))
   fun
 }
 

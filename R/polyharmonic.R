@@ -84,8 +84,10 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   w <- wv[seq_len(N)]
   v <- wv[(N + 1L):length(wv)]
   rm(mat, rhs, wv)
-  vectorfun(
-    function(x, threads = getOption("chebpol.threads")) .Call(C_evalpolyh, normfun(x), knots, w, v, k, threads, NULL),
+  new_interpolant(
+    function(x, threads = getOption("chebpol.threads")) {
+      .Call(C_evalpolyh, normfun(as_points(x, M)), knots, w, v, k, threads, NULL)
+    },
     arity = M,
     domain = domain
   )

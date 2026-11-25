@@ -1,3 +1,19 @@
+# interpolants accept a point, a matrix, or a vector of several points
+
+    Code
+      out <- ml(c(m))
+    Condition
+      Warning in `ml()`:
+      Treating `x` of length 6 as a 2 x 3 matrix, one point per column.
+
+# interpolants error when the input length does not fit the number of variables
+
+    Code
+      ml(c(0.1, 0.2))
+    Condition
+      Error in `ml()`:
+      ! `x` must have length 3 or be a matrix with 3 rows, not length 2.
+
 # evalongrid() errors when the function value is not usable
 
     Code

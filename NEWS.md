@@ -9,6 +9,7 @@
 ## Minor improvements
 
 * `ipol()` interpolants created with `method = "general"` or `"uniform"` evaluate a matrix of points about three times faster. The points are now mapped onto the Chebyshev grid one dimension at a time instead of one point at a time.
+* `ipol()` interpolants take about half the time per call, which matters when they are called one point at a time. Errors about their input now name the interpolant, e.g. "Error in `ip()`" instead of "Error".
 
 ## Bug fixes
 
@@ -22,6 +23,7 @@
 * `evalongrid()` and `ipol()` no longer overwrite an argument vector that the function has kept. Previously one vector was reused for every grid point, so a function that kept its argument, for example to record the points it was called with, saw every copy change to the last grid point.
 * `evalongrid()` now stops with an error when a grid dimension has no points. Previously it crashed R.
 * `evalongrid()` and `ipol()` now accept functions that return integer or logical values, and stop with an error when the length of the returned value changes between grid points.
+* `ipol()` interpolants created with an explicit `blend` now keep their `arity`, `domain` and `chebpol.version` attributes. Previously setting the default blend dropped them.
 * `ipol()` now stops with an error when `blend` is not supported by the chosen method. Previously `blend = "mean"` was accepted for `method = "multilinear"` and `"oldstalker"` and silently treated as linear blending.
 * `ipol()` interpolants created with `method = "multilinear"` now return `NA` for `NA` or `NaN` input. Previously the evaluation never returned. `ipol()` also stops with an error for a multilinear grid dimension with a single point, which was read out of bounds.
 * `ipol()` interpolants created with `method = "simplexlinear"` no longer return `NaN` with `blend = "square"` or `blend = "sigmoid"`. Square blending now uses the value at the vertex with the largest barycentric coordinate, and coordinates are clamped to `[0, 1]` before blending. `NA` or `NaN` input now gives `NA` for every blend.

@@ -6,9 +6,10 @@ rbf.alglib <- function(val, knots, rbase = 2, layers = 5, lambda = 0, ...) {
     val <- apply(knots, 2L, val, ...)
   }
   model <- .Call(C_makerbf, rbind(knots, val), layers, rbase, lambda)
-  vectorfun(
-    function(x, threads = getOption("chebpol.threads")) .Call(C_evalrbf, model, x, threads),
-    arity = nrow(knots),
+  arity <- nrow(knots)
+  new_interpolant(
+    function(x, threads = getOption("chebpol.threads")) .Call(C_evalrbf, model, as_points(x, arity), threads),
+    arity = arity,
     domain = data.frame(apply(knots, 1L, range))
   )
 }

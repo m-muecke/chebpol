@@ -13,7 +13,8 @@ ucappx.real <- function(val, intervals = NULL) {
     intervals <- list(intervals)
   }
   dims <- dim(val)
-  ch <- chebappx.real(val)
+  arity <- length(dims)
+  cf <- chebcoef(val)
   # x is a point or a matrix with one row per dimension, so the per-dimension
   # vectors below recycle down each column
   if (is.null(intervals)) {
@@ -24,10 +25,10 @@ ucappx.real <- function(val, intervals = NULL) {
     ispan <- vapply(intervals, \(i) 2 / diff(i), numeric(1L))
     gm <- function(x) ugm(ispan * (x - md), dims)
   }
-  vectorfun(
-    function(x, threads = getOption("chebpol.threads")) ch(gm(x), threads),
-    arity = length(dims),
-    domain = if (is.null(intervals)) rep(list(c(-1, 1)), length(dim(val))) else intervals
+  new_interpolant(
+    function(x, threads = getOption("chebpol.threads")) .Call(C_evalcheb, cf, gm(as_points(x, arity)), threads, NULL),
+    arity = arity,
+    domain = if (is.null(intervals)) rep(list(c(-1, 1)), arity) else intervals
   )
 }
 

@@ -301,7 +301,7 @@ r <- sqrt(runif(200))
 knots <- rbind(r * cos(theta), r * sin(theta))
 g <- ipol(f, knots = knots, method = "simplexlinear")
 # yank out the simplices for drawing
-simp <- get("dtri", environment(get("fun", environment(g))))
+simp <- get("dtri", environment(g))
 drawtri <- function(pts, col) lines(c(pts[1, ], pts[1, 1]), c(pts[2, ], pts[2, 1]), col = col)
 plot(knots[1, ], knots[2, ], typ = "p", pch = 20, xlab = "x", ylab = "y", main = "Triangulation")
 invisible(apply(simp, 2, function(kn) drawtri(knots[, kn], col = "blue")))

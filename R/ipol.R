@@ -178,12 +178,7 @@ ipol <- function(
       if (unsortedgrid(grid)) {
         stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
       }
-      blend <- args[["blend"]]
-      if (is.null(blend)) {
-        return(mlappx.real(val, grid, ...))
-      }
-      newarg <- args[!names(args) %in% "blend"]
-      blenddef(do.call(mlappx.real, c(list(val, grid), newarg)), blend)
+      mlappx.real(val, grid, ...)
     },
     simplexlinear = {
       if (is.null(knots)) {
@@ -193,12 +188,7 @@ ipol <- function(
           stop("`knots` or `grid` must be given for method = \"simplexlinear\".")
         }
       }
-      blend <- args[["blend"]]
-      if (is.null(blend)) {
-        return(slappx.real(val, knots, ...))
-      }
-      newarg <- args[!names(args) %in% "blend"]
-      blenddef(do.call(slappx.real, c(list(val, knots), newarg)), blend)
+      slappx.real(val, knots, ...)
     },
     fh = {
       if (is.null(grid)) {
@@ -276,12 +266,7 @@ ipol <- function(
       }
       grid <- lapply(grid, as.numeric)
       k <- k %||% 2
-      blend <- args[["blend"]]
-      if (is.null(blend)) {
-        return(oldstalkerappx(val, grid, r = k, ...))
-      }
-      newarg <- args[!names(args) %in% "blend"]
-      blenddef(do.call(oldstalkerappx, c(list(val, grid, r = k), newarg)), blend)
+      oldstalkerappx(val, grid, r = k, ...)
     },
     hstalker = {
       if (is.null(grid)) {
@@ -294,12 +279,7 @@ ipol <- function(
         stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
       }
       grid <- lapply(grid, as.numeric)
-      blend <- args[["blend"]]
-      if (is.null(blend)) {
-        return(hstalkerappx(val, grid, ...))
-      }
-      newarg <- args[!names(args) %in% "blend"]
-      blenddef(do.call(hstalkerappx, c(list(val, grid), newarg)), blend)
+      hstalkerappx(val, grid, ...)
     },
     stalker = {
       if (is.null(grid)) {
@@ -312,12 +292,7 @@ ipol <- function(
         stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
       }
       grid <- lapply(grid, as.numeric)
-      blend <- args[["blend"]]
-      if (is.null(blend)) {
-        return(stalkerappx(val, grid, ...))
-      }
-      newarg <- args[!names(args) %in% "blend"]
-      blenddef(do.call(stalkerappx, c(list(val, grid), newarg)), blend)
+      stalkerappx(val, grid, ...)
     },
     crbf = {
       if (is.null(knots)) {

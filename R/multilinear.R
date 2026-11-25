@@ -1,4 +1,4 @@
-mlappx.real <- function(val, grid, ...) {
+mlappx.real <- function(val, grid, ..., blend = NULL) {
   if (is.numeric(grid)) {
     grid <- list(grid)
   }
@@ -16,12 +16,14 @@ mlappx.real <- function(val, grid, ...) {
     stop(sprintf("`val` must have one value per grid point (%d), not %d.", gl, length(val)))
   }
   val <- as.numeric(val)
-  vectorfun(
-    function(x, threads = getOption("chebpol.threads"), blend = c("linear", "cubic", "sigmoid", "parodic", "square")) {
-      blend <- blend_types[[match.arg(blend)]]
-      .Call(C_evalmlip, grid, val, x, threads, blend)
-    },
-    arity = length(grid),
-    domain = lapply(grid, range)
-  )
+  arity <- length(grid)
+  fun <- function(
+    x,
+    threads = getOption("chebpol.threads"),
+    blend = c("linear", "cubic", "sigmoid", "parodic", "square")
+  ) {
+    blend <- blend_types[[match.arg(blend)]]
+    .Call(C_evalmlip, grid, val, as_points(x, arity), threads, blend)
+  }
+  new_interpolant(set_default_blend(fun, blend), arity = arity, domain = lapply(grid, range))
 }

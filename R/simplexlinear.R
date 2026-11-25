@@ -1,4 +1,4 @@
-slappx.real <- function(val, knots, ...) {
+slappx.real <- function(val, knots, ..., blend = NULL) {
   if (!requireNamespace("geometry", quietly = TRUE)) {
     stop("method = \"simplexlinear\" requires the geometry package.")
   }
@@ -12,16 +12,15 @@ slappx.real <- function(val, knots, ...) {
   # For fast evaluation: For each simplex, we precompute the LU-factorization
   # needed for transforming to barycentric coordinates. These are used for finding the right simplex.
   adata <- .Call(C_analyzesimplex, dtri, knots, getOption("chebpol.threads"))
-  vectorfun(
-    function(
-      x,
-      threads = getOption("chebpol.threads"),
-      epol = FALSE,
-      blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
-    ) {
-      blend <- blend_types[[match.arg(blend)]]
-      .Call(C_evalsl, x, knots, dtri, adata, val, epol, threads, blend)
-    },
-    arity = nrow(knots)
-  )
+  arity <- nrow(knots)
+  fun <- function(
+    x,
+    threads = getOption("chebpol.threads"),
+    epol = FALSE,
+    blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
+  ) {
+    blend <- blend_types[[match.arg(blend)]]
+    .Call(C_evalsl, as_points(x, arity), knots, dtri, adata, val, epol, threads, blend)
+  }
+  new_interpolant(set_default_blend(fun, blend), arity = arity)
 }

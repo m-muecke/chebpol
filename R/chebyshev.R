@@ -155,8 +155,8 @@ chebappx.real <- function(val, intervals = NULL) {
 
   if (is.null(intervals)) {
     # it's [-1, 1] intervals, so drop transformation
-    fun <- vectorfun(
-      function(x, threads = getOption("chebpol.threads")) .Call(C_evalcheb, cf, x, threads, NULL),
+    fun <- new_interpolant(
+      function(x, threads = getOption("chebpol.threads")) .Call(C_evalcheb, cf, as_points(x, K), threads, NULL),
       arity = K,
       domain = rep(list(c(-1, 1)), K)
     )
@@ -169,8 +169,10 @@ chebappx.real <- function(val, intervals = NULL) {
     mid <- vapply(intervals, mean, numeric(1L))
     imap <- function(x) (x - mid) * ispan
 
-    fun <- vectorfun(
-      function(x, threads = getOption("chebpol.threads")) .Call(C_evalcheb, cf, imap(x), threads, NULL),
+    fun <- new_interpolant(
+      function(x, threads = getOption("chebpol.threads")) {
+        .Call(C_evalcheb, cf, imap(as_points(x, K)), threads, NULL)
+      },
       arity = K,
       domain = intervals
     )
@@ -230,10 +232,13 @@ chebappxg.real <- function(val, grid = NULL, mapdim = NULL) {
     }
     x
   }
-  ch <- chebappx.real(val)
-  vectorfun(
-    function(x, threads = getOption("chebpol.threads")) ch(gridmap(x), threads),
-    arity = length(grid),
+  cf <- chebcoef(val)
+  arity <- length(grid)
+  new_interpolant(
+    function(x, threads = getOption("chebpol.threads")) {
+      .Call(C_evalcheb, cf, gridmap(as_points(x, arity)), threads, NULL)
+    },
+    arity = arity,
     domain = intervals
   )
 }

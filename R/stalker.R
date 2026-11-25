@@ -6,7 +6,7 @@ stalkercontext <- function(dmin, dplus, r) {
   list(det = det, pmin = powmin, pplus = powplus)
 }
 
-oldstalkerappx <- function(val, grid, r = 2, ...) {
+oldstalkerappx <- function(val, grid, r = 2, ..., blend = NULL) {
   if (!is.list(grid)) {
     grid <- list(grid)
   }
@@ -37,29 +37,27 @@ oldstalkerappx <- function(val, grid, r = 2, ...) {
     stop("`k = NA` on a non-uniform grid requires chebpol built with GSL.")
   }
 
-  vectorfun(
-    function(
-      x,
-      threads = getOption("chebpol.threads"),
-      degree = r,
-      blend = c("linear", "cubic", "sigmoid", "parodic", "square")
-    ) {
-      blend <- blend_types[[match.arg(blend)]]
-      if (!identical(degree, r)) {
-        degree <- rep_len(as.numeric(degree), length(grid))
-        if (!havegsl() && any(is.na(degree) & !uniform)) {
-          stop("`degree = NA` on a non-uniform grid requires chebpol built with GSL.")
-        }
-        stalker <- c(list(val = val, grid = grid), stalkercontext(dmin, dplus, degree), uniform = list(uniform))
+  arity <- length(grid)
+  fun <- function(
+    x,
+    threads = getOption("chebpol.threads"),
+    degree = r,
+    blend = c("linear", "cubic", "sigmoid", "parodic", "square")
+  ) {
+    blend <- blend_types[[match.arg(blend)]]
+    if (!identical(degree, r)) {
+      degree <- rep_len(as.numeric(degree), length(grid))
+      if (!havegsl() && any(is.na(degree) & !uniform)) {
+        stop("`degree = NA` on a non-uniform grid requires chebpol built with GSL.")
       }
-      .Call(C_evalstalker, x, stalker, degree, blend, as.integer(threads))
-    },
-    arity = length(grid),
-    domain = lapply(grid, range)
-  )
+      stalker <- c(list(val = val, grid = grid), stalkercontext(dmin, dplus, degree), uniform = list(uniform))
+    }
+    .Call(C_evalstalker, as_points(x, arity), stalker, degree, blend, as.integer(threads))
+  }
+  new_interpolant(set_default_blend(fun, blend), arity = arity, domain = lapply(grid, range))
 }
 
-hstalkerappx <- function(val, grid, ...) {
+hstalkerappx <- function(val, grid, ..., blend = NULL) {
   if (!is.list(grid)) {
     grid <- list(grid)
   }
@@ -74,21 +72,19 @@ hstalkerappx <- function(val, grid, ...) {
     val <- evalongrid(val, grid = grid, ...)
   }
   stalker <- .Call(C_makehyp, val, grid)
-  vectorfun(
-    function(
-      x,
-      threads = getOption("chebpol.threads"),
-      blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
-    ) {
-      blend <- blend_types[[match.arg(blend)]]
-      .Call(C_evalhyp, x, stalker, blend, as.integer(threads))
-    },
-    arity = length(grid),
-    domain = lapply(grid, range)
-  )
+  arity <- length(grid)
+  fun <- function(
+    x,
+    threads = getOption("chebpol.threads"),
+    blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
+  ) {
+    blend <- blend_types[[match.arg(blend)]]
+    .Call(C_evalhyp, as_points(x, arity), stalker, blend, as.integer(threads))
+  }
+  new_interpolant(set_default_blend(fun, blend), arity = arity, domain = lapply(grid, range))
 }
 
-stalkerappx <- function(val, grid, ...) {
+stalkerappx <- function(val, grid, ..., blend = NULL) {
   if (!is.list(grid)) {
     grid <- list(grid)
   }
@@ -103,18 +99,16 @@ stalkerappx <- function(val, grid, ...) {
     val <- evalongrid(val, grid = grid, ...)
   }
   stalker <- .Call(C_makestalk, val, grid)
-  vectorfun(
-    function(
-      x,
-      threads = getOption("chebpol.threads"),
-      blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
-    ) {
-      blend <- blend_types[[match.arg(blend)]]
-      .Call(C_evalstalk, x, stalker, blend, as.integer(threads))
-    },
-    arity = length(grid),
-    domain = lapply(grid, range)
-  )
+  arity <- length(grid)
+  fun <- function(
+    x,
+    threads = getOption("chebpol.threads"),
+    blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
+  ) {
+    blend <- blend_types[[match.arg(blend)]]
+    .Call(C_evalstalk, as_points(x, arity), stalker, blend, as.integer(threads))
+  }
+  new_interpolant(set_default_blend(fun, blend), arity = arity, domain = lapply(grid, range))
 }
 
 havegsl <- function() .Call(C_havegsl)
