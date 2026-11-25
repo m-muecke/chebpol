@@ -60,6 +60,19 @@ typedef enum {
   BLEND_MEAN = 5
 } blend_type;
 
+// Index i of the grid interval [xt[i], xt[i + 1]) that holds x, clamped to 0 .. n - 2.
+static inline int find_interval(const double *xt, const int n, const double x) {
+  int lo = 0, hi = n - 1;
+  while (hi - lo > 1) {
+    const int mid = (lo + hi) / 2;
+    if (x >= xt[mid])
+      lo = mid;
+    else
+      hi = mid;
+  }
+  return lo;
+}
+
 static inline double blendfun(double w, blend_type blend) {
   switch (blend) {
   case BLEND_LINEAR:

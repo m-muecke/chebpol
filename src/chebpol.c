@@ -542,25 +542,6 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
   return resvec;
 }
 
-// return index of the smallest element larger or equal to val
-// binary search is slower than linear for small n, but we don't optimize that here
-// small grids anyway run faster
-// we never return 0, if val < arr[0] we return 1
-// if val > arr[n-1], we return n-1
-// this is suited for our particular application
-static inline int binsearch(const int n, const double *arr, const double val) {
-  int toosmall = 0, toolarge = n - 1;
-  while (toosmall + 1 < toolarge) {
-    const int test = (toosmall + toolarge) >> 1;
-    if (arr[test] >= val) {
-      toolarge = test;
-    } else {
-      toosmall = test;
-    }
-  }
-  return toolarge;
-}
-
 double C_evalmlip(const int rank, const double *x, const double **grid, const int *dims, const double *values,
                   int blend) {
 
@@ -582,7 +563,8 @@ double C_evalmlip(const int rank, const double *x, const double **grid, const in
     if (ISNAN(x[i]))
       return x[i];
     const double *gdvec = grid[i];
-    int gp = binsearch(dims[i], gdvec, x[i]);
+    // upper end of the grid interval holding x[i]
+    const int gp = find_interval(gdvec, dims[i], x[i]) + 1;
     weight[i] = (x[i] - gdvec[gp - 1]) / (gdvec[gp] - gdvec[gp - 1]);
     valpos += stride * gp;
     stride *= dims[i];
