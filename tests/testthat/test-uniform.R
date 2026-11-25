@@ -19,6 +19,20 @@ test_that("uniform grid interpolation is the same from values and from a functio
   expect_equal(uc_fun(a), f(a), tolerance = 0.05)
 })
 
+test_that("uniform grid interpolation maps each dimension of a matrix of points", {
+  withr::local_seed(42)
+  f <- function(x) exp(x[1] - x[2] / 4)
+  intervals <- list(c(0, 1), c(3, -2))
+  uc <- ipol(f, dims = c(12, 9), intervals = intervals, method = "uniform")
+  m <- rbind(runif(30), runif(30, -2, 3))
+  expect_equal(uc(m), apply(m, 2L, uc))
+  expect_equal(uc(m), apply(m, 2L, f), tolerance = 0.05)
+  expect_equal(uc(m[, 1L, drop = FALSE]), uc(m[, 1L]))
+  ud <- ipol(array(runif(6 * 4), c(6, 4)), method = "uniform")
+  m <- matrix(runif(20, -1, 1), 2)
+  expect_equal(ud(m), apply(m, 2L, ud))
+})
+
 test_that("uniform grid interpolation from values accepts a single interval as a vector", {
   f <- function(x) exp(-x^2)
   values <- f(seq(0, 2, length.out = 15))

@@ -220,11 +220,15 @@ chebappxg.real <- function(val, grid = NULL, mapdim = NULL) {
   intervals <- lapply(grid, range)
   # create monotone splines with splinefun, method hyman
   gridmaps <- Map(stats::splinefun, grid, chebknots(dim(val)), MoreArgs = list(method = "hyman"))
+  # map one dimension at a time, the spline functions are vectorized
   gridmap <- function(x) {
     if (!is.matrix(x)) {
-      return(mapply(\(gm, x) gm(x), gridmaps, x))
+      return(vapply(seq_along(gridmaps), \(i) gridmaps[[i]](x[i]), numeric(1L)))
     }
-    apply(x, 2L, \(x) mapply(\(gm, x) gm(x), gridmaps, x))
+    for (i in seq_along(gridmaps)) {
+      x[i, ] <- gridmaps[[i]](x[i, ])
+    }
+    x
   }
   ch <- chebappx.real(val)
   vectorfun(

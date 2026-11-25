@@ -67,6 +67,16 @@ test_that("general grid interpolation approximates a smooth function", {
   expect_equal(ch(r), exp(r), tolerance = 0.05)
 })
 
+test_that("general grid interpolation maps each dimension of a matrix of points", {
+  withr::local_seed(42)
+  f <- function(x) exp(-sum(x^2)) + sin(3 * x[1]) * x[2]
+  grid <- list(seq(0, 1, length.out = 12)^2, seq(-2, 3, length.out = 9)^3 / 9)
+  ch <- ipol(f, grid = grid, method = "general")
+  m <- rbind(runif(30), runif(30, -1, 3))
+  expect_equal(ch(m), apply(m, 2L, ch))
+  expect_equal(ch(m[, 1L, drop = FALSE]), ch(m[, 1L]))
+})
+
 test_that("chebcoef() and chebeval() accept integer input", {
   values <- array(seq_len(20), c(5L, 4L))
   coef <- chebcoef(values + 0)

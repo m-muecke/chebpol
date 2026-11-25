@@ -6,6 +6,10 @@
 * `chebappx()`, `chebappxf()`, `chebappxg()`, `chebappxgf()`, `fhappx()`, `mlappx()`, `polyh()`, `slappx()`, `ucappx()` and `ucappxf()`, deprecated since version 1.7, have been removed. Use `ipol()` instead.
 * geometry is now a suggested package instead of a required one, so installing chebpol no longer pulls in geometry and its dependencies. `ipol()` with `method = "simplexlinear"` needs it to build the triangulation and stops with an error when it is missing. Saved simplex linear interpolants can be evaluated without it.
 
+## Minor improvements
+
+* `ipol()` interpolants created with `method = "general"` or `"uniform"` evaluate a matrix of points about three times faster. The points are now mapped onto the Chebyshev grid one dimension at a time instead of one point at a time.
+
 ## Bug fixes
 
 * chebpol compiles again with current versions of R. FFTW is now found when it is installed outside the default include path.
