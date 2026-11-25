@@ -28,7 +28,7 @@ needed if \code{val} is an array or \code{grid} is used.}
 in each dimension. Not used if \code{grid} is specified.}
 
 \item{grid}{list. Each element is a vector of ordered grid-points for a
-dimension.  These need not be Chebyshev-knots, nor evenly spaced.}
+dimension. These need not be Chebyshev-knots, nor evenly spaced.}
 
 \item{knots}{matrix. Each column is a point in an M-dimensional space.}
 
@@ -42,9 +42,9 @@ extra arguments for interpolant creation described in section Details.}
 \value{
 A \verb{function(x, threads = getOption("chebpol.threads"))} defined on a hypercube, an \link{interpolant}
 for the given function. The argument \code{x} can be a matrix of column
-vectors which are evaluated in parallel in a number of threads.  The
+vectors which are evaluated in parallel in a number of threads. The
 function yields values for arguments outside the hypercube as well, though
-it will typically be a poor approximation.  \code{threads} is an integer
+it will typically be a poor approximation. \code{threads} is an integer
 specifying the number of parallel threads which should be used when
 evaluating a matrix of column vectors.
 }
@@ -59,17 +59,17 @@ in \code{vignette("chebpol", package = "chebpol")}.
 
 The method \code{"chebyshev"} needs only the number of Chebyshev knots in
 each dimension. This is either the \code{"dim"} attribute of the array
-\code{val}, or the \code{dims} argument if \code{val} is a function.  Also
+\code{val}, or the \code{dims} argument if \code{val} is a function. Also
 the intervals can be specified if different from \verb{[-1, 1]}.
 
 The method \code{"uniform"} is similar to the \code{"chebyshev"}, but
-uniformly spaced knots are created.  The argument
+uniformly spaced knots are created. The argument
 \code{intervals} generally goes with \code{dims} when something else than
 standard intervals \verb{[-1, 1]} are used.
 
 The methods \code{"multilinear"}, \code{"fh"} (Floater-Hormann), \code{"stalker"},
 \code{"hstalker"}, and
-\code{"general"} need the argument \code{grid}.  These are the methods
+\code{"general"} need the argument \code{grid}. These are the methods
 which can use arbitrary Cartesian grids.
 The stalker spline
 is described in \code{vignette("stalker", package = "chebpol")}. The Floater-Hormann

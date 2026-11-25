@@ -27,7 +27,7 @@ Cartesian product will be the grid, as in \code{expand.grid(grid)}.}
 }
 \value{
 An array with the value of \code{fun} on each grid point. The
-\code{dim} attribute has been appropriately set for the grid.  If \code{fun}
+\code{dim} attribute has been appropriately set for the grid. If \code{fun}
 returns a vector, this will be the first dimension of the returned array.
 }
 \description{
@@ -41,7 +41,7 @@ If \code{grid} is provided, \code{fun} is evaluated on each point in the
 Cartesian product of the vectors in \code{grid}.
 
 If \code{intervals} is not provided, it is assumed that the domain of the
-function is the hypercube \verb{[-1, 1] x [-1, 1] x ... x [-1, 1]}.  Thus, the
+function is the hypercube \verb{[-1, 1] x [-1, 1] x ... x [-1, 1]}. Thus, the
 function is evaluated on a standard Chebyshev grid.
 
 If \code{intervals} is provided, it should be a \code{list} with elements of
@@ -56,7 +56,7 @@ it's faster and more memory-efficient for large grids because it does not
 actually expand the grid.
 
 The function \code{evalongridV} is for vectorized functions, i.e. those that
-can take a matrix of column vectors as argument.  It's equivalent to
+can take a matrix of column vectors as argument. It's equivalent to
 \code{fun(t(expand.grid(grid)))}.
 }
 \examples{

@@ -109,7 +109,7 @@ separgs <- function(fun, ...) {
 #' Cartesian product of the vectors in `grid`.
 #'
 #' If `intervals` is not provided, it is assumed that the domain of the
-#' function is the hypercube `[-1, 1] x [-1, 1] x ... x [-1, 1]`.  Thus, the
+#' function is the hypercube `[-1, 1] x [-1, 1] x ... x [-1, 1]`. Thus, the
 #' function is evaluated on a standard Chebyshev grid.
 #'
 #' If `intervals` is provided, it should be a `list` with elements of
@@ -124,7 +124,7 @@ separgs <- function(fun, ...) {
 #' actually expand the grid.
 #'
 #' The function `evalongridV` is for vectorized functions, i.e. those that
-#' can take a matrix of column vectors as argument.  It's equivalent to
+#' can take a matrix of column vectors as argument. It's equivalent to
 #' `fun(t(expand.grid(grid)))`.
 #'
 #' @param fun Multivariate real-valued function to be evaluated. Must be
@@ -138,7 +138,7 @@ separgs <- function(fun, ...) {
 #' grid, you may specify your own `grid` as a list of vectors whose
 #' Cartesian product will be the grid, as in `expand.grid(grid)`.
 #' @return An array with the value of `fun` on each grid point. The
-#' `dim` attribute has been appropriately set for the grid.  If `fun`
+#' `dim` attribute has been appropriately set for the grid. If `fun`
 #' returns a vector, this will be the first dimension of the returned array.
 #' @export
 #' @examples
@@ -185,9 +185,9 @@ evalongridV <- function(fun, dims, intervals = NULL, ..., grid = NULL) {
 
 #' Check whether chebpol uses FFTW
 #'
-#' It is possible to compile chebpol without FFTW.  If this is done, it will
-#' not be feasible with high-degree Chebyshev polynomials.  I.e. a 100x100x100
-#' approximation will be possible, but not a one-dimensional 1000000.  This
+#' It is possible to compile chebpol without FFTW. If this is done, it will
+#' not be feasible with high-degree Chebyshev polynomials. I.e. a 100x100x100
+#' approximation will be possible, but not a one-dimensional 1000000. This
 #' function checks whether chebpol uses FFTW.
 #'
 #' @return Returns TRUE if chebpol uses FFTW. Otherwise FALSE.

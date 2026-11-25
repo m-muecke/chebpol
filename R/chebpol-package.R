@@ -7,11 +7,11 @@
 #' and polyharmonic spline for scattered multi dimensional data.
 #'
 #' The primary method of the package is [ipol()] which
-#' dispatches to some other method.  All the generated
+#' dispatches to some other method. All the generated
 #' [interpolant]s accept as an argument a matrix of column
 #' vectors. The generated functions also accept an argument
 #' `threads = getOption("chebpol.threads")` to utilize more than
-#' one CPU if a matrix of column vectors is evaluated.  Unless the option
+#' one CPU if a matrix of column vectors is evaluated. Unless the option
 #' `chebpol.threads` is already set, it is initialized from the environment variable
 #' `CHEBPOL_THREADS` upon loading of the package. It defaults to `1`.
 #'

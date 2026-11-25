@@ -9,17 +9,17 @@
 #'
 #' The method `"chebyshev"` needs only the number of Chebyshev knots in
 #' each dimension. This is either the `"dim"` attribute of the array
-#' `val`, or the `dims` argument if `val` is a function.  Also
+#' `val`, or the `dims` argument if `val` is a function. Also
 #' the intervals can be specified if different from `[-1, 1]`.
 #'
 #' The method `"uniform"` is similar to the `"chebyshev"`, but
-#' uniformly spaced knots are created.  The argument
+#' uniformly spaced knots are created. The argument
 #' `intervals` generally goes with `dims` when something else than
 #' standard intervals `[-1, 1]` are used.
 #'
 #' The methods `"multilinear"`, `"fh"` (Floater-Hormann), `"stalker"`,
 #' `"hstalker"`, and
-#' `"general"` need the argument `grid`.  These are the methods
+#' `"general"` need the argument `grid`. These are the methods
 #' which can use arbitrary Cartesian grids.
 #' The stalker spline
 #' is described in `vignette("stalker", package = "chebpol")`. The Floater-Hormann
@@ -61,7 +61,7 @@
 #' @param intervals list of length 2 numeric vectors. The lower and upper bound
 #' in each dimension. Not used if `grid` is specified.
 #' @param grid list. Each element is a vector of ordered grid-points for a
-#' dimension.  These need not be Chebyshev-knots, nor evenly spaced.
+#' dimension. These need not be Chebyshev-knots, nor evenly spaced.
 #' @param knots matrix. Each column is a point in an M-dimensional space.
 #' @param k numeric. Additional value, used with some methods.
 #' @param method character. The interpolation method to use.
@@ -69,9 +69,9 @@
 #' extra arguments for interpolant creation described in section Details.
 #' @return A `function(x, threads = getOption("chebpol.threads"))` defined on a hypercube, an [interpolant]
 #' for the given function. The argument `x` can be a matrix of column
-#' vectors which are evaluated in parallel in a number of threads.  The
+#' vectors which are evaluated in parallel in a number of threads. The
 #' function yields values for arguments outside the hypercube as well, though
-#' it will typically be a poor approximation.  `threads` is an integer
+#' it will typically be a poor approximation. `threads` is an integer
 #' specifying the number of parallel threads which should be used when
 #' evaluating a matrix of column vectors.
 #' @export

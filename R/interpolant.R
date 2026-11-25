@@ -12,7 +12,7 @@
 #' @name interpolant
 #' @param x The argument of the function. A function of more than one variable takes a
 #' vector. `x` can also be a matrix of column vectors.
-#' @param threads The number of threads to use for evaluation. All  interpolants created by
+#' @param threads The number of threads to use for evaluation. All interpolants created by
 #' chebpol are parallelized. If given a matrix argument `x`, the vectors can
 #' be evaluated in parallel.
 #' @param ... Other parameters. Currently used for simplex linear interpolants with the logical argument

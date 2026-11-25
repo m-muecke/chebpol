@@ -14,11 +14,11 @@ and polyharmonic spline for scattered multi dimensional data.
 }
 \details{
 The primary method of the package is \code{\link[=ipol]{ipol()}} which
-dispatches to some other method.  All the generated
+dispatches to some other method. All the generated
 \link{interpolant}s accept as an argument a matrix of column
 vectors. The generated functions also accept an argument
 \code{threads = getOption("chebpol.threads")} to utilize more than
-one CPU if a matrix of column vectors is evaluated.  Unless the option
+one CPU if a matrix of column vectors is evaluated. Unless the option
 \code{chebpol.threads} is already set, it is initialized from the environment variable
 \code{CHEBPOL_THREADS} upon loading of the package. It defaults to \code{1}.
 

@@ -7,7 +7,7 @@
 \item{x}{The argument of the function. A function of more than one variable takes a
 vector. \code{x} can also be a matrix of column vectors.}
 
-\item{threads}{The number of threads to use for evaluation. All  interpolants created by
+\item{threads}{The number of threads to use for evaluation. All interpolants created by
 chebpol are parallelized. If given a matrix argument \code{x}, the vectors can
 be evaluated in parallel.}
 

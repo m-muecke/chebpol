@@ -394,7 +394,7 @@ $|c/2| < |b| < |c|$. We have $x_0 = -\operatorname{sgn}(bc) |b/(rc)|^{1/(r-1)}  
 -\operatorname{sgn}(bc)r^{2/(1-r)}.$
 
 The function value in the extreme point $x_0$ is then
-$a - |b| \operatorname{sgn}(c) r^{2/(1-r)} +  cr^{2r/(1-r)}$. The distance to $v_0=a$ is
+$a - |b| \operatorname{sgn}(c) r^{2/(1-r)} + cr^{2r/(1-r)}$. The distance to $v_0=a$ is
 $d_r = \left|  |c| r^{2r/(1-r)} - |b| r^{2/(1-r)}  \right| =
 |b| \left| r^{(1+r)/(1-r)} - r^{2/(1-r)}\right|$.
 Again, it is easy to show by elementary calculus that $d_r$ is increasing in $r$,
@@ -693,7 +693,7 @@ These can be solved for $c_i$ and $d_i$ to yield,
 \begin{equation}\tag{14}
   \begin{aligned}
     b_i &= 0,\\
-    c_i &= -\frac{k_i^- v_i^+ - k_i^+ v_i^-}{k_i^-  k_i^+ (v_i^+ - v_i^-)},\\
+    c_i &= -\frac{k_i^- v_i^+ - k_i^+ v_i^-}{k_i^- k_i^+ (v_i^+ - v_i^-)},\\
     d_i &= -\frac{v_i^+ v_i^- (k_i^- - k_i^+)}{k_i^- v_i^+ - k_i^+ v_i^-}.\\
   \end{aligned}
 \end{equation}
