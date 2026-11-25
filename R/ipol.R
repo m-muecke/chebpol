@@ -25,7 +25,7 @@
 #' is described in `vignette("stalker", package = "chebpol")`. The Floater-Hormann
 #' method (`"fh"`) also needs the `k` argument, the degree of the blending
 #' polynomials. It defaults to 4. It must be between 0 and one less than the number of grid points in
-#' each dimension.
+#' each dimension. Give either one value for all dimensions or one value per dimension.
 #'
 #' The method `"polyharmonic"` needs the arguments `knots` and
 #' `k`. In addition it can take the logical argument `normalize`
@@ -211,6 +211,10 @@ ipol <- function(
       }
       grid <- lapply(grid, as.numeric)
       k <- k %||% pmin(4L, lengths(grid) - 1L)
+      if (!length(k) %in% c(1L, length(grid))) {
+        stop(sprintf("`k` must have length 1 or %d, not %d.", length(grid), length(k)))
+      }
+      k <- rep_len(k, length(grid))
       if (anyNA(k) || any(k < 0 | k > lengths(grid) - 1L)) {
         stop("k must be between 0 and one less than the number of grid points in each dimension")
       }

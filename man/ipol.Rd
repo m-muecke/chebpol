@@ -75,7 +75,7 @@ The stalker spline
 is described in \code{vignette("stalker", package = "chebpol")}. The Floater-Hormann
 method (\code{"fh"}) also needs the \code{k} argument, the degree of the blending
 polynomials. It defaults to 4. It must be between 0 and one less than the number of grid points in
-each dimension.
+each dimension. Give either one value for all dimensions or one value per dimension.
 
 The method \code{"polyharmonic"} needs the arguments \code{knots} and
 \code{k}. In addition it can take the logical argument \code{normalize}

@@ -19,6 +19,7 @@
 * `ipol()` interpolants created with `method = "multilinear"` now return `NA` for `NA` or `NaN` input. Previously the evaluation never returned. `ipol()` also stops with an error for a multilinear grid dimension with a single point, which was read out of bounds.
 * `ipol()` interpolants created with `method = "simplexlinear"` no longer return `NaN` with `blend = "square"` or `blend = "sigmoid"`. Square blending now uses the value at the vertex with the largest barycentric coordinate, and coordinates are clamped to `[0, 1]` before blending. `NA` or `NaN` input now gives `NA` for every blend.
 * `ipol()` with `method = "fh"` now stops with an error when the degree `k` is negative or not smaller than the number of grid points in a dimension. Before, the interpolant returned `NaN` between the grid points.
+* `ipol()` with `method = "fh"` now stops with an error when `k` has neither length 1 nor one value per grid dimension. Previously a shorter `k` was silently repeated, or failed with "Length of grid (3) should equal length of d (2)".
 * `ipol()` with `method = "fh"` now forwards extra arguments in `...` to the function being interpolated.
 * `ipol()` with `method = "fh"` now stops with an error when the dimensions of the values do not match the grid lengths. Previously the interpolant read past the end of the grid and returned meaningless values.
 * `ipol()` with `method = "uniform"` now accepts a single interval given as a vector `c(a, b)` together with values. It already did when given a function.

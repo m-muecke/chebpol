@@ -21,8 +21,7 @@ fhappx.real <- function(val, grid = NULL, d = 1L, ...) {
       paste(grid_dims, collapse = " x ")
     ))
   }
-  dd <- as.integer(d)
-  dd <- rep(dd, length(grid) %/% length(d))
+  dd <- rep_len(as.integer(d), length(grid))
   # calculate weights, formula 18 in Floater & Hormann, in C, parallelized
   weights <- .Call(C_FHweights, grid, dd, getOption("chebpol.threads"))
   rm(dd, d)
