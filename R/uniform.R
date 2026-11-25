@@ -15,8 +15,7 @@ ucappx.real <- function(val, intervals = NULL) {
   dims <- dim(val)
   arity <- length(dims)
   cf <- chebcoef(val)
-  # x is a point or a matrix with one row per dimension, so the per-dimension
-  # vectors below recycle down each column
+  # the per-dimension vectors recycle down the columns of x
   if (is.null(intervals)) {
     gm <- function(x) ugm(x, dims)
   } else {

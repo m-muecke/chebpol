@@ -41,7 +41,7 @@ print.chebpol_interpolant <- function(x, ...) {
   defaults <- formals(x)
   defaults <- defaults[setdiff(names(defaults), c("x", "threads"))]
   if (length(defaults) > 0L) {
-    # the first blend is the default, other defaults may refer to values inside the interpolant
+    # evaluated in the interpolant, since `degree = r` refers to a value there
     shown <- vapply(
       names(defaults),
       function(arg) {

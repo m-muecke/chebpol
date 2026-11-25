@@ -240,8 +240,7 @@ static inline double stalk1(double x, double vmin, double v0, double vplus, doub
 static void makestalk(const int nrank, const int *dims, const double **grid, const double *val, double *b, double *c,
                       double *r, int depth, int *point) {
   // Loop over every grid point
-  // In each grid point, find the function living there, i.e. an a,
-  // and b,c,d for each dimension.
+  // In each grid point, find the function living there, i.e. b, c and r for each dimension.
   // how many grid points are there? prod(dims)
   // We need nested loops to nrank depth. I.e. recursion.
   // record point
@@ -296,7 +295,6 @@ static void makestalk(const int nrank, const int *dims, const double **grid, con
         if (fabs(vplus - vmin) <= MYEPS * kplus) {
           // constant zero
           r = 2.0;
-          bb[i] = cc[i] = 0.0;
         } else if (fabs(kmin * vplus - kplus * vmin) <= MYEPS * kplus) {
           // Linear
           r = 2.0;
@@ -344,8 +342,7 @@ static double evalstalk(const double *x, const int nrank, const int *dims, const
   double weight[nrank];
   int gbase[nrank];
   R_xlen_t llcorner = 0;
-  // Find the lower left corner for each dimension.
-  // Store in gpos
+  // Find the lower left corner for each dimension, store it in gbase
   for (int g = 0; g < nrank; g++) {
     const double *gr = grid[g];
     int gp = find_interval(gr, dims[g], x[g]);
@@ -392,9 +389,8 @@ static double evalstalk(const double *x, const int nrank, const int *dims, const
     const double *bb = &b[nrank * corner], *cc = &c[nrank * corner], *rr = &r[nrank * corner];
     // These are for a zero-based function, i.e. based on the corner being 0,
     // and f(0)=0
-    // Compute the hyperbolic stalker in x
+    // Compute the stalker in x
     // The zero-based x is in zx
-    //
     double fval = val[corner];
     for (int j = 0; j < nrank; j++) {
       // It might be linear
@@ -526,8 +522,7 @@ static double evalhyp(const double *x, const int nrank, const int *dims, const d
   double weight[nrank];
   int gbase[nrank];
   R_xlen_t llcorner = 0;
-  // Find the lower left corner for each dimension.
-  // Store in gpos
+  // Find the lower left corner for each dimension, store it in gbase
   for (int g = 0; g < nrank; g++) {
     const double *gr = grid[g];
     int gp = find_interval(gr, dims[g], x[g]);
@@ -576,7 +571,6 @@ static double evalhyp(const double *x, const int nrank, const int *dims, const d
     // and f(0)=0
     // Compute the hyperbolic stalker in x
     // The zero-based x is in zx
-    //
     double fval = val[corner] + a[corner];
     for (int j = 0; j < nrank; j++) {
       // It might be a parabola, but typically a hyperbola

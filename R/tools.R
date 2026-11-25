@@ -1,5 +1,4 @@
-# Mark a function as an interpolant of `arity` variables on `domain`, created by `method`.
-# The class is set last because `formals<-` drops attributes.
+# Call after any change to the formals of `fun`, `formals<-` drops the class and attributes
 new_interpolant <- function(fun, method, arity, domain = NULL) {
   structure(
     fun,
@@ -11,8 +10,7 @@ new_interpolant <- function(fun, method, arity, domain = NULL) {
   )
 }
 
-# Coerce the argument of an interpolant to a point, or to a matrix with one point per column
-# `call` is the call of the interpolant, the frame that asked for the conversion
+# `sys.call(-1L)` would name a helper when `as_points()` is forced lazily inside it
 as_points <- function(x, arity, call = sys.call(sys.parent())) {
   if (is.integer(x) || is.logical(x)) {
     storage.mode(x) <- "double"
@@ -36,11 +34,12 @@ as_points <- function(x, arity, call = sys.call(sys.parent())) {
   x
 }
 
-`%||%` <- function(x, y) if (is.null(x)) y else x
+`%||%` <- function(lhs, rhs) {
+  if (is.null(lhs)) rhs else lhs
+}
 
 blend_types <- c(linear = 0L, sigmoid = 1L, parodic = 2L, cubic = 3L, square = 4L, mean = 5L)
 
-# Make `blend` the default blend of the interpolant `fun` by moving it to the front of the choices
 set_default_blend <- function(fun, blend) {
   if (is.null(blend)) {
     return(fun)
@@ -67,8 +66,6 @@ separgs <- function(fun, ...) {
   formals(f) <- args
   f
 }
-
-# evaluate a function on a Chebyshev grid
 
 #' Evaluate a function on a grid
 #'

@@ -73,7 +73,6 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
     double beta = 0;
 
     // Some work space
-    //
     buf = (double *)R_alloc(siz, sizeof(double));
     mat = (double **)R_alloc(rank, sizeof(double *));
     // Create the needed transform matrices
@@ -562,15 +561,8 @@ double C_evalmlip(const int rank, const double *x, const double **grid, const in
   double weight[rank];
   R_xlen_t valpos = 0;
   double ipval = 0;
-  // Find first grid point which is larger or equal, compute
-  // the weight, store it. As well as the linear position valpos in the grid
-  // A binary search is faster if there are more grid points
-  // but up to 10-20 linear search is usually equally fast or faster due to simplicity
-  // Note that we never check whether x is within the grid. If it's outside we assume
-  // the function continues linearly outwards.
-  // Remaining optimizations:  We could have precomputed the stuff we divide by, if we should
-  // do more than one vector in a row, this would save some time.  Likewise the stride (which is
-  // integer multiplication, which is slow.)
+  // For each dimension, find the grid interval holding x and the weight within it, and accumulate the
+  // linear position valpos of the upper corner. Points outside the grid use the outermost interval.
 
   R_xlen_t stride = 1;
   for (int i = 0; i < rank; i++) {
@@ -608,7 +600,6 @@ double C_evalmlip(const int rank, const double *x, const double **grid, const in
   return ipval / wsum;
 }
 
-// Then a multilinear approximation
 SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   const int rank = LENGTH(sgrid);
   R_xlen_t gridsize = 1;
@@ -792,7 +783,6 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
 }
 
 SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extrapolate, SEXP Sthreads, SEXP Sblend) {
-  // Loop over the triangulation
   const int *dtri = INTEGER_RO(Sdtri);
   const int numsimplex = Rf_ncols(Sdtri);
   const double *lumats = REAL_RO(VECTOR_ELT(adata, 0));

@@ -139,8 +139,6 @@ chebeval <- function(x, coef, intervals = NULL, threads = getOption("chebpol.thr
   .Call(C_evalcheb, coef, (x - mid) * ispan, threads, NULL)
 }
 
-# return a function which is a Chebyshev interpolation
-
 chebappx.real <- function(val, intervals = NULL) {
   if (is.null(dim(val))) {
     # allow for one-dimensional
@@ -191,23 +189,11 @@ chebappxf.real <- function(fun, dims, intervals = NULL, ...) {
   chebappx.real(evalongrid(fun, dims, intervals, ...), intervals)
 }
 
-# interpolate on a non-Chebyshev grid. This is useful if you for some reason
-# do not have the function values on a Chebyshev-grid, but on some other grid.  It comes at a cost,
-# The interpolation may not be very good compared to the Chebyshev-one.
-
-# val are the function values on a grid, an array of appropriate dimension
-# in the order of expand.grid()
-
-# if grid is unspecified, it is assumed that it is on a Chebyshev grid in [-1, 1]
-# If grid is specified, it is a list of vectors. The length of the list
-# is the dimension of the grid. Each vector contains grid-points in increasing or decreasing order.
-# val is assumed to be the function values on expand.grid(grid)
-# The user-grid is mapped to Chebyshev knots in [-1, 1] by splinefun in pkg stats
-
+# Interpolate on a Cartesian grid that is not a Chebyshev grid. `val` holds the function values in the
+# order of expand.grid(grid), and each grid dimension, increasing or decreasing, is mapped onto the
+# Chebyshev knots in [-1, 1]. This may be less accurate than a Chebyshev interpolation. Without a `grid`,
+# `val` must be on a Chebyshev grid and carry its dimensions.
 chebappxg.real <- function(val, grid = NULL, mapdim = NULL) {
-  # grid is a list of grid points. val is the values as in expand.grid(grid)
-  # if grid is null it is assumed to be a chebyshev grid. The dimensions
-  # must be present in val
   if (is.null(grid)) {
     return(chebappx.real(val))
   }
@@ -222,13 +208,9 @@ chebappxg.real <- function(val, grid = NULL, mapdim = NULL) {
   }
   dim(val) <- lengths(grid)
 
-  # ok, grid is something like list(c(...), c(...), c(...))
-  # create piecewise linear functions which maps grid-points to chebyshev grids
-
   intervals <- lapply(grid, range)
   # create monotone splines with splinefun, method hyman
   gridmaps <- Map(stats::splinefun, grid, chebknots(dim(val)), MoreArgs = list(method = "hyman"))
-  # map one dimension at a time, the spline functions are vectorized
   gridmap <- function(x) {
     if (!is.matrix(x)) {
       return(vapply(seq_along(gridmaps), \(i) gridmaps[[i]](x[i]), numeric(1L)))
