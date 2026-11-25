@@ -24,7 +24,8 @@ Depends:
     R (>= 4.1.0)
 Imports:
     geometry,
-    stats
+    stats,
+    utils
 Suggests:
     cubature,
     knitr,
