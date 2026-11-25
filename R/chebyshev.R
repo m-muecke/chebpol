@@ -156,7 +156,10 @@ chebappx.real <- function(val, intervals = NULL) {
   if (is.null(intervals)) {
     # it's [-1, 1] intervals, so drop transformation
     fun <- new_interpolant(
-      function(x, threads = getOption("chebpol.threads")) .Call(C_evalcheb, cf, as_points(x, K), threads, NULL),
+      function(x, threads = getOption("chebpol.threads")) {
+        x <- as_points(x, K)
+        .Call(C_evalcheb, cf, x, threads, NULL)
+      },
       arity = K,
       domain = rep(list(c(-1, 1)), K)
     )
@@ -171,7 +174,8 @@ chebappx.real <- function(val, intervals = NULL) {
 
     fun <- new_interpolant(
       function(x, threads = getOption("chebpol.threads")) {
-        .Call(C_evalcheb, cf, imap(as_points(x, K)), threads, NULL)
+        x <- as_points(x, K)
+        .Call(C_evalcheb, cf, imap(x), threads, NULL)
       },
       arity = K,
       domain = intervals
@@ -236,7 +240,8 @@ chebappxg.real <- function(val, grid = NULL, mapdim = NULL) {
   arity <- length(grid)
   new_interpolant(
     function(x, threads = getOption("chebpol.threads")) {
-      .Call(C_evalcheb, cf, gridmap(as_points(x, arity)), threads, NULL)
+      x <- as_points(x, arity)
+      .Call(C_evalcheb, cf, gridmap(x), threads, NULL)
     },
     arity = arity,
     domain = intervals

@@ -4,7 +4,8 @@ new_interpolant <- function(fun, arity, domain = NULL) {
 }
 
 # Coerce the argument of an interpolant to a point, or to a matrix with one point per column
-as_points <- function(x, arity, call = sys.call(-1L)) {
+# `call` is the call of the interpolant, the frame that asked for the conversion
+as_points <- function(x, arity, call = sys.call(sys.parent())) {
   if (is.integer(x) || is.logical(x)) {
     storage.mode(x) <- "double"
   }

@@ -26,7 +26,10 @@ ucappx.real <- function(val, intervals = NULL) {
     gm <- function(x) ugm(ispan * (x - md), dims)
   }
   new_interpolant(
-    function(x, threads = getOption("chebpol.threads")) .Call(C_evalcheb, cf, gm(as_points(x, arity)), threads, NULL),
+    function(x, threads = getOption("chebpol.threads")) {
+      x <- as_points(x, arity)
+      .Call(C_evalcheb, cf, gm(x), threads, NULL)
+    },
     arity = arity,
     domain = if (is.null(intervals)) rep(list(c(-1, 1)), arity) else intervals
   )

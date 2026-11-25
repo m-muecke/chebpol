@@ -44,6 +44,7 @@ oldstalkerappx <- function(val, grid, r = 2, ..., blend = NULL) {
     degree = r,
     blend = c("linear", "cubic", "sigmoid", "parodic", "square")
   ) {
+    x <- as_points(x, arity)
     blend <- blend_types[[match.arg(blend)]]
     if (!identical(degree, r)) {
       degree <- rep_len(as.numeric(degree), length(grid))
@@ -52,7 +53,7 @@ oldstalkerappx <- function(val, grid, r = 2, ..., blend = NULL) {
       }
       stalker <- c(list(val = val, grid = grid), stalkercontext(dmin, dplus, degree), uniform = list(uniform))
     }
-    .Call(C_evalstalker, as_points(x, arity), stalker, degree, blend, as.integer(threads))
+    .Call(C_evalstalker, x, stalker, degree, blend, as.integer(threads))
   }
   new_interpolant(set_default_blend(fun, blend), arity = arity, domain = lapply(grid, range))
 }
@@ -78,8 +79,9 @@ hstalkerappx <- function(val, grid, ..., blend = NULL) {
     threads = getOption("chebpol.threads"),
     blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
   ) {
+    x <- as_points(x, arity)
     blend <- blend_types[[match.arg(blend)]]
-    .Call(C_evalhyp, as_points(x, arity), stalker, blend, as.integer(threads))
+    .Call(C_evalhyp, x, stalker, blend, as.integer(threads))
   }
   new_interpolant(set_default_blend(fun, blend), arity = arity, domain = lapply(grid, range))
 }
@@ -105,8 +107,9 @@ stalkerappx <- function(val, grid, ..., blend = NULL) {
     threads = getOption("chebpol.threads"),
     blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
   ) {
+    x <- as_points(x, arity)
     blend <- blend_types[[match.arg(blend)]]
-    .Call(C_evalstalk, as_points(x, arity), stalker, blend, as.integer(threads))
+    .Call(C_evalstalk, x, stalker, blend, as.integer(threads))
   }
   new_interpolant(set_default_blend(fun, blend), arity = arity, domain = lapply(grid, range))
 }

@@ -14,7 +14,11 @@ test_that("interpolants accept a point, a matrix, or a vector of several points"
 test_that("interpolants error when the input length does not fit the number of variables", {
   grid <- list(c(0, 1), c(0, 1), c(0, 1))
   ml <- ipol(evalongrid(sum, grid = grid), grid = grid, method = "multilinear")
-  expect_snapshot(ml(c(0.1, 0.2)), error = TRUE)
+  gen <- ipol(evalongrid(sum, grid = grid), grid = grid, method = "general")
+  expect_snapshot(error = TRUE, {
+    ml(c(0.1, 0.2))
+    gen(c(0.1, 0.2))
+  })
 })
 
 test_that("ipol() sets the default blend of the interpolant", {

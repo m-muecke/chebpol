@@ -25,7 +25,8 @@ fhappx.real <- function(val, grid = NULL, d = 1L, ...) {
   arity <- length(grid)
   new_interpolant(
     function(x, threads = getOption("chebpol.threads")) {
-      .Call(C_FH, as_points(x, arity), val, grid, weights, threads, NULL)
+      x <- as_points(x, arity)
+      .Call(C_FH, x, val, grid, weights, threads, NULL)
     },
     arity = arity,
     domain = lapply(grid, range)

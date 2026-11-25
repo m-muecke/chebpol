@@ -22,8 +22,9 @@ mlappx.real <- function(val, grid, ..., blend = NULL) {
     threads = getOption("chebpol.threads"),
     blend = c("linear", "cubic", "sigmoid", "parodic", "square")
   ) {
+    x <- as_points(x, arity)
     blend <- blend_types[[match.arg(blend)]]
-    .Call(C_evalmlip, grid, val, as_points(x, arity), threads, blend)
+    .Call(C_evalmlip, grid, val, x, threads, blend)
   }
   new_interpolant(set_default_blend(fun, blend), arity = arity, domain = lapply(grid, range))
 }

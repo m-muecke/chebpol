@@ -19,8 +19,9 @@ slappx.real <- function(val, knots, ..., blend = NULL) {
     epol = FALSE,
     blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
   ) {
+    x <- as_points(x, arity)
     blend <- blend_types[[match.arg(blend)]]
-    .Call(C_evalsl, as_points(x, arity), knots, dtri, adata, val, epol, threads, blend)
+    .Call(C_evalsl, x, knots, dtri, adata, val, epol, threads, blend)
   }
   new_interpolant(set_default_blend(fun, blend), arity = arity)
 }

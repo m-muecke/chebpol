@@ -13,6 +13,11 @@
     Condition
       Error in `ml()`:
       ! `x` must have length 3 or be a matrix with 3 rows, not length 2.
+    Code
+      gen(c(0.1, 0.2))
+    Condition
+      Error in `gen()`:
+      ! `x` must have length 3 or be a matrix with 3 rows, not length 2.
 
 # evalongrid() errors when the function value is not usable
 
