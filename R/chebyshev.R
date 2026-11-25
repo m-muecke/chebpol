@@ -154,19 +154,12 @@ chebappx.real <- function(val, intervals = NULL) {
 
   if (is.null(intervals)) {
     # it's [-1, 1] intervals, so drop transformation
-    fun <- new_interpolant(
-      method = "chebyshev",
-      crate(
-        function(x, threads = getOption("chebpol.threads")) {
-          x <- as_points(x, K)
-          .Call(C_evalcheb, cf, x, threads, NULL)
-        },
-        cf,
-        K
-      ),
-      arity = K,
-      domain = stats::setNames(rep(list(c(-1, 1)), K), varnames)
-    )
+    fun <- function(x, threads = getOption("chebpol.threads")) {
+      x <- as_points(x, K)
+      .Call(C_evalcheb, cf, x, threads, NULL)
+    }
+    fun <- crate(fun, cf, K)
+    domain <- rep(list(c(-1, 1)), K)
   } else {
     # it's intervals, create mapping into [-1, 1]
     if (!is.list(intervals) || length(intervals) != K || any(lengths(intervals) != 2L)) {
@@ -175,23 +168,14 @@ chebappx.real <- function(val, intervals = NULL) {
     ispan <- vapply(intervals, \(x) 2 / diff(x), numeric(1L))
     mid <- vapply(intervals, mean, numeric(1L))
 
-    fun <- new_interpolant(
-      method = "chebyshev",
-      crate(
-        function(x, threads = getOption("chebpol.threads")) {
-          x <- as_points(x, K)
-          .Call(C_evalcheb, cf, (x - mid) * ispan, threads, NULL)
-        },
-        cf,
-        mid,
-        ispan,
-        K
-      ),
-      arity = K,
-      domain = stats::setNames(intervals, varnames)
-    )
+    fun <- function(x, threads = getOption("chebpol.threads")) {
+      x <- as_points(x, K)
+      .Call(C_evalcheb, cf, (x - mid) * ispan, threads, NULL)
+    }
+    fun <- crate(fun, cf, mid, ispan, K)
+    domain <- intervals
   }
-  fun
+  new_interpolant(fun, method = "chebyshev", arity = K, domain = stats::setNames(domain, varnames))
 }
 
 chebappxf.real <- function(fun, dims, intervals = NULL, ...) {
@@ -238,20 +222,11 @@ chebappxg.real <- function(val, grid = NULL, mapdim = NULL) {
   )
   cf <- chebcoef(val)
   arity <- length(grid)
-  new_interpolant(
-    method = "general",
-    crate(
-      function(x, threads = getOption("chebpol.threads")) {
-        x <- as_points(x, arity)
-        .Call(C_evalcheb, cf, gridmap(x), threads, NULL)
-      },
-      cf,
-      gridmap,
-      arity
-    ),
-    arity = arity,
-    domain = intervals
-  )
+  fun <- function(x, threads = getOption("chebpol.threads")) {
+    x <- as_points(x, arity)
+    .Call(C_evalcheb, cf, gridmap(x), threads, NULL)
+  }
+  new_interpolant(crate(fun, cf, gridmap, arity), method = "general", arity = arity, domain = intervals)
 }
 
 chebappxgf.real <- function(fun, grid, ..., mapdim = NULL) {

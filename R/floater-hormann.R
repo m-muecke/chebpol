@@ -22,19 +22,9 @@ fhappx.real <- function(val, grid = NULL, d = 1L, ...) {
   # calculate weights, formula 18 in Floater & Hormann, in C, parallelized
   weights <- .Call(C_FHweights, grid, dd, getOption("chebpol.threads"))
   arity <- length(grid)
-  new_interpolant(
-    method = "fh",
-    crate(
-      function(x, threads = getOption("chebpol.threads")) {
-        x <- as_points(x, arity)
-        .Call(C_FH, x, val, grid, weights, threads, NULL)
-      },
-      val,
-      grid,
-      weights,
-      arity
-    ),
-    arity = arity,
-    domain = lapply(grid, range)
-  )
+  fun <- function(x, threads = getOption("chebpol.threads")) {
+    x <- as_points(x, arity)
+    .Call(C_FH, x, val, grid, weights, threads, NULL)
+  }
+  new_interpolant(crate(fun, val, grid, weights, arity), method = "fh", arity = arity, domain = lapply(grid, range))
 }

@@ -24,20 +24,12 @@ ucappx.real <- function(val, intervals = NULL) {
     ispan <- vapply(intervals, \(i) 2 / diff(i), numeric(1L))
     gm <- crate(function(x) ugm(ispan * (x - md), dims), ispan, md, dims)
   }
-  new_interpolant(
-    method = "uniform",
-    crate(
-      function(x, threads = getOption("chebpol.threads")) {
-        x <- as_points(x, arity)
-        .Call(C_evalcheb, cf, gm(x), threads, NULL)
-      },
-      cf,
-      gm,
-      arity
-    ),
-    arity = arity,
-    domain = stats::setNames(intervals %||% rep(list(c(-1, 1)), arity), names(intervals) %||% names(dims))
-  )
+  fun <- function(x, threads = getOption("chebpol.threads")) {
+    x <- as_points(x, arity)
+    .Call(C_evalcheb, cf, gm(x), threads, NULL)
+  }
+  domain <- stats::setNames(intervals %||% rep(list(c(-1, 1)), arity), names(intervals) %||% names(dims))
+  new_interpolant(crate(fun, cf, gm, arity), method = "uniform", arity = arity, domain = domain)
 }
 
 ucappxf.real <- function(fun, dims, intervals = NULL, ...) {
