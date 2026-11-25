@@ -43,7 +43,7 @@ ucappxf.real <- function(fun, dims, intervals = NULL, ...) {
     evalongrid(
       fun,
       ...,
-      grid = Map(\(d, i) seq(min(i), max(i), length.out = d), dims, intervals)
+      grid = Map(\(d, i) seq(i[1L], i[2L], length.out = d), dims, intervals)
     ),
     intervals
   )

@@ -27,3 +27,8 @@ test_that("uniform grid interpolation from values accepts a single interval as a
   expect_equal(uc(0.7), ipol(values, intervals = list(c(0, 2)), method = "uniform")(0.7))
   expect_equal(attr(uc, "domain"), attr(ipol(values, intervals = list(c(0, 2)), method = "uniform"), "domain"))
 })
+
+test_that("uniform grid interpolation works on a reversed interval", {
+  uc <- ipol(exp, dims = 8, intervals = c(1, 0), method = "uniform")
+  expect_equal(uc(0.2), ipol(exp, dims = 8, intervals = c(0, 1), method = "uniform")(0.2))
+})
