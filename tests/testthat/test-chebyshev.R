@@ -84,3 +84,9 @@ test_that("chebeval() accepts a single interval as a vector", {
   expect_equal(chebeval(0.7, coef, c(0, 2)), f(0.7), tolerance = 1e-6)
   expect_equal(chebeval(0.7, coef, list(c(0, 2))), chebeval(0.7, coef, c(0, 2)))
 })
+
+test_that("chebeval() treats coefficients without a dim attribute as one-dimensional", {
+  coef <- chebcoef(sin(chebknots(10)[[1L]]))
+  expect_equal(chebeval(0.3, as.numeric(coef)), chebeval(0.3, coef))
+  expect_equal(chebeval(0.3, c(1, 0.5, 0.25)), 1 + 0.5 * 0.3 + 0.25 * (2 * 0.3^2 - 1))
+})

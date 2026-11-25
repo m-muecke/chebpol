@@ -10,6 +10,7 @@
 * chebpol compiles again with current versions of R. FFTW is now found when it is installed outside the default include path.
 * Integer input is now accepted everywhere a number is expected: the points passed to an interpolant, the values, grids and knots passed to `ipol()`, the grid in `evalongrid()`, and the arguments of `chebcoef()` and `chebeval()`. Previously most of these failed with "REAL() can only be applied to a 'numeric'".
 * `chebeval()` now works with `intervals` for a matrix of points, and for a single interval given as a vector `c(a, b)`. Before, only a single point in two or more dimensions was mapped correctly.
+* `chebeval()` now treats coefficients without a `dim` attribute, such as `c(1, 0.5, 0.25)` or `as.numeric(chebcoef(val))`, as one-dimensional. Previously it failed with "INTEGER() can only be applied to a 'integer', not a 'NULL'".
 * Loading chebpol no longer overwrites the `chebpol.threads` option when it is already set, for example in `.Rprofile`. The `CHEBPOL_THREADS` environment variable is only used when the option is unset.
 * `evalongrid()` now stops with an error when a grid dimension has no points. Previously it crashed R.
 * `evalongrid()` and `ipol()` now accept functions that return integer or logical values, and stop with an error when the length of the returned value changes between grid points.

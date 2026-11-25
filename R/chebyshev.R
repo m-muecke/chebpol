@@ -94,7 +94,8 @@ chebcoef <- function(val, dct = FALSE) {
 #'
 #' @param x The point to evaluate.
 #' @param coef The Chebyshev coefficients. Typically from a call to
-#' [chebcoef()], possibly modified.
+#' [chebcoef()], possibly modified. A vector without a `dim` attribute is
+#' treated as one-dimensional.
 #' @param intervals A list of minimum and maximum values. One for each
 #' dimension of the hypercube.
 #' @param threads And integer. In case `x` is a matrix of column vectors,
@@ -127,6 +128,9 @@ chebeval <- function(x, coef, intervals = NULL, threads = getOption("chebpol.thr
   }
   if (is.integer(coef) || is.logical(coef)) {
     storage.mode(coef) <- "double"
+  }
+  if (is.null(dim(coef))) {
+    dim(coef) <- length(coef)
   }
   if (is.null(intervals)) {
     return(.Call(C_evalcheb, coef, x, threads, NULL))
