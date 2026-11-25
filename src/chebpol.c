@@ -38,7 +38,7 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
       fftw_plan plan;
       fftw_r2r_kind kind = FFTW_REDFT10;
       const int tlen = dims[i];
-      const int ntrans = siz / tlen;
+      const R_xlen_t ntrans = siz / tlen;
       dim.n = tlen;
       dim.is = stride;
       dim.os = stride;
@@ -54,8 +54,7 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
 #pragma omp parallel for num_threads(threads) schedule(static) if (threads > 1)
 #endif
       for (R_xlen_t j = 0; j < ntrans; j++) {
-        div_t dv = div(j, stride);
-        int offset = dv.rem + stride * tlen * dv.quot;
+        const R_xlen_t offset = j % stride + (R_xlen_t)stride * tlen * (j / stride);
         fftw_execute_r2r(plan, F + offset, F + offset);
       }
       fftw_destroy_plan(plan);
@@ -64,7 +63,7 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
   }
   // adjust scale to fit our setup
   if (!dct)
-    for (int i = 0; i < siz; i++)
+    for (R_xlen_t i = 0; i < siz; i++)
       F[i] *= isiz;
 
   if (brokenfftw) {
@@ -132,12 +131,12 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
   if (!dct) {
     // We need to adjust the first element in each dimension by 0.5
     // The DCT-II isn't exactly equal to the Chebyshev transform
-    int blocklen = 1; // length of block
-    int stride = 1;   // distance between blocks
+    R_xlen_t blocklen = 1; // length of block
+    R_xlen_t stride = 1;   // distance between blocks
     for (int i = 0; i < rank; i++) {
       stride *= dims[i];
-      for (int j = 0; j < siz; j += stride) {
-        for (int s = 0; s < blocklen; s++) {
+      for (R_xlen_t j = 0; j < siz; j += stride) {
+        for (R_xlen_t s = 0; s < blocklen; s++) {
           F[j + s] *= 0.5;
         }
       }
@@ -162,7 +161,7 @@ SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
       Rf_error("Rank must be positive");
     dims = INTEGER_RO(dim);
   }
-  int siz = 1;
+  R_xlen_t siz = 1;
   for (int i = 0; i < rank; i++)
     siz *= dims[i];
   if (siz == 0)
@@ -182,7 +181,7 @@ static double FH(const double *fv, const double *x, const double **knots, const 
   // Use Floater-Hormann method
   if (rank == 0)
     return fv[0];
-  int siz = 1;
+  R_xlen_t siz = 1;
   const int newrank = rank - 1;
   const int N = dims[newrank];
   const double xx = x[newrank];
@@ -208,8 +207,8 @@ static double FH(const double *fv, const double *x, const double **knots, const 
     }
     return num / denom;
   }
-  for (int i = 0, j = 0; i < N; i++, j += siz) {
-    const double val = FH(&fv[j], x, knots, dims, newrank, weights);
+  for (int i = 0; i < N; i++) {
+    const double val = FH(&fv[i * siz], x, knots, dims, newrank, weights);
     double pole = w[i] / (xx - kn[i]);
     num += pole * val;
     denom += pole;
@@ -218,7 +217,7 @@ static double FH(const double *fv, const double *x, const double **knots, const 
 }
 
 SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spare) {
-  int siz = 1;
+  R_xlen_t siz = 1;
   const double *val = REAL_RO(vals);
 #ifdef _OPENMP
   int threads = Rf_asInteger(Rthreads);
@@ -239,8 +238,8 @@ SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spa
   /* This shouldn't happen, but we check it anyway since we'll bomb if it's wrong */
   for (int i = 0; i < rank; i++)
     siz *= dims[i];
-  if (LENGTH(vals) != siz)
-    Rf_error("coefficient length(%d) does not match data length(%d)", LENGTH(vals), siz);
+  if (XLENGTH(vals) != siz)
+    Rf_error("coefficient length(%lld) does not match data length(%lld)", (long long)XLENGTH(vals), (long long)siz);
 
   if (LENGTH(grid) != rank)
     Rf_error("There must be one value for each knot");
@@ -319,7 +318,7 @@ double C_evalcheb(const double *cf, const double *x, const int *dims, const int 
   if (rank == 0)
     return cf[0];
   // Otherwise, use the Clenshaw algorithm
-  int siz = 1;
+  R_xlen_t siz = 1;
   const int newrank = rank - 1;
   const int N = dims[newrank];
   double x2 = 2.0 * x[newrank], bn1 = 0, bn2 = 0, bn = 0;
@@ -335,16 +334,16 @@ double C_evalcheb(const double *cf, const double *x, const int *dims, const int 
   }
   for (int i = 0; i < newrank; i++)
     siz *= dims[i];
-  for (int i = N - 1, j = siz * (N - 1); i >= 0; i--, j -= siz) {
+  for (int i = N - 1; i >= 0; i--) {
     bn2 = bn1;
     bn1 = bn;
-    bn = x2 * bn1 - bn2 + C_evalcheb(&cf[j], x, dims, newrank);
+    bn = x2 * bn1 - bn2 + C_evalcheb(&cf[i * siz], x, dims, newrank);
   }
   return bn - x[newrank] * bn1;
 }
 
 SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
-  int siz = 1;
+  R_xlen_t siz = 1;
   const double *cf = REAL_RO(coef);
 #ifdef _OPENMP
   int threads = Rf_asInteger(Rthreads);
@@ -365,8 +364,8 @@ SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
   /* This shouldn't happen, but we check it anyway since we'll bomb if it's wrong */
   for (int i = 0; i < rank; i++)
     siz *= dims[i];
-  if (LENGTH(coef) != siz)
-    Rf_error("coefficient length(%d) does not match data length(%d)", LENGTH(coef), siz);
+  if (XLENGTH(coef) != siz)
+    Rf_error("coefficient length(%lld) does not match data length(%lld)", (long long)XLENGTH(coef), (long long)siz);
 
   const double *xp = REAL_RO(inx);
   const int numvec = Rf_isMatrix(inx) ? Rf_ncols(inx) : 1;
@@ -463,7 +462,7 @@ SEXP R_evalpolyh(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, SE
 void C_evalongrid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, const double **grid,
                   const int *dims, const int rank, const int valuedim, double *result, void *userdata) {
   int mrank = rank - 1;
-  int stride = valuedim;
+  R_xlen_t stride = valuedim;
 
   if (rank == 0) {
     fun(arg, &result[0], valuedim, userdata);
@@ -472,9 +471,9 @@ void C_evalongrid(void (*fun)(double *x, double *y, int valuedim, void *ud), dou
 
   for (int i = 0; i < mrank; i++)
     stride *= dims[i];
-  for (int i = 0, j = 0; i < dims[mrank]; i++, j += stride) {
+  for (int i = 0; i < dims[mrank]; i++) {
     arg[mrank] = grid[mrank][i];
-    C_evalongrid(fun, arg, grid, dims, mrank, valuedim, &result[j], userdata);
+    C_evalongrid(fun, arg, grid, dims, mrank, valuedim, &result[i * stride], userdata);
   }
 }
 
@@ -564,7 +563,7 @@ double C_evalmlip(const int rank, const double *x, const double **grid, const in
                   int blend) {
 
   double weight[rank];
-  int valpos = 0;
+  R_xlen_t valpos = 0;
   double ipval = 0;
   /*
    Find first grid point which is larger or equal, compute
@@ -578,7 +577,7 @@ double C_evalmlip(const int rank, const double *x, const double **grid, const in
    integer multiplication, which is slow.)
   */
 
-  int stride = 1;
+  R_xlen_t stride = 1;
   for (int i = 0; i < rank; i++) {
     if (ISNAN(x[i]))
       return x[i];
@@ -595,8 +594,8 @@ double C_evalmlip(const int rank, const double *x, const double **grid, const in
     // i represents a corner. bit=1 if upper corner, 0 if lower corner.
     // We should find its weight
     // it's a product of the weights from each dimension
-    int vpos = valpos;
-    int stride = 1;
+    R_xlen_t vpos = valpos;
+    R_xlen_t stride = 1;
     double cw = 1;
     for (int g = 0; g < rank; g++) {
       if ((1 << g) & i) {
@@ -616,7 +615,7 @@ double C_evalmlip(const int rank, const double *x, const double **grid, const in
 /* Then a multilinear approximation */
 SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   const int rank = LENGTH(sgrid);
-  int gridsize = 1;
+  R_xlen_t gridsize = 1;
   int dims[rank];
 #ifdef _OPENMP
   int threads = Rf_asInteger(Rthreads);
@@ -637,8 +636,8 @@ SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
     gridsize *= dims[i];
   }
 
-  if (LENGTH(values) != gridsize)
-    Rf_error("grid has size %d, you supplied %d values", gridsize, LENGTH(values));
+  if (XLENGTH(values) != gridsize)
+    Rf_error("grid has size %lld, you supplied %lld values", (long long)gridsize, (long long)XLENGTH(values));
   if (!Rf_isNull(Sblend))
     blend = (blend_type)Rf_asInteger(Sblend);
   const int numvec = Rf_isMatrix(x) ? Rf_ncols(x) : 1;

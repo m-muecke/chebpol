@@ -372,10 +372,10 @@ static double evalstalk(const double *x, const int nrank, const int *dims, const
   // For each corner, evaluate the function there.
   // Make weighted sum.
 
-  int stride = 1;
+  R_xlen_t stride = 1;
   double weight[nrank];
   int gbase[nrank];
-  int llcorner = 0;
+  R_xlen_t llcorner = 0;
   // Find the lower left corner for each dimension.
   // Store in gpos
   for (int g = 0; g < nrank; g++) {
@@ -401,8 +401,8 @@ static double evalstalk(const double *x, const int nrank, const int *dims, const
     // i is a corner represented as nrank bits
     // bit j is 1 if above in dimension j, 0 if below
     // Find the position and weight of the corner
-    int stride = 1;
-    int corner = llcorner;
+    R_xlen_t stride = 1;
+    R_xlen_t corner = llcorner;
     double cw = 1.0;
     for (int g = 0; g < nrank; g++) {
       const double *gr = grid[g];
@@ -542,10 +542,10 @@ static double evalhyp(const double *x, const int nrank, const int *dims, const d
   // For each corner, evaluate the function there.
   // Make weighted sum.
 
-  int stride = 1;
+  R_xlen_t stride = 1;
   double weight[nrank];
   int gbase[nrank];
-  int llcorner = 0;
+  R_xlen_t llcorner = 0;
   // Find the lower left corner for each dimension.
   // Store in gpos
   for (int g = 0; g < nrank; g++) {
@@ -571,8 +571,8 @@ static double evalhyp(const double *x, const int nrank, const int *dims, const d
     // i is a corner represented as nrank bits
     // bit j is 1 if above in dimension j, 0 if below
     // Find the position and weight of the corner
-    int stride = 1;
-    int corner = llcorner;
+    R_xlen_t stride = 1;
+    R_xlen_t corner = llcorner;
     double cw = 1.0;
     for (int g = 0; g < nrank; g++) {
       const double *gr = grid[g];
@@ -624,7 +624,7 @@ static double evalstalker(const double *x, const int nrank, const int *dims, con
   const double xx = x[newrank];
   const double *rdet = pcomp[newrank].det, *rpmin = pcomp[newrank].pmin, *rpplus = pcomp[newrank].pplus;
   bool uniform = pcomp[newrank].uniform;
-  int stride = 1;
+  R_xlen_t stride = 1;
   for (int r = 0; r < newrank; r++)
     stride *= dims[r];
   // Find the interval of the last coordinate, convert to zero-based
