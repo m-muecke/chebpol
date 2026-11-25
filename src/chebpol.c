@@ -264,7 +264,7 @@ SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spa
   return resvec;
 }
 
-R_INLINE static void fhweights(const int n, const double *grid, const int d, double *w, int threads) {
+static inline void fhweights(const int n, const double *grid, const int d, double *w, int threads) {
 #ifdef _OPENMP
 #pragma omp parallel for schedule(static) num_threads(threads) if (threads > 1)
 #endif

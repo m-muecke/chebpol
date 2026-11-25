@@ -60,7 +60,7 @@ typedef enum {
   BLEND_MEAN = 5
 } blend_type;
 
-static R_INLINE double blendfun(double w, blend_type blend) {
+static inline double blendfun(double w, blend_type blend) {
   switch (blend) {
   case BLEND_LINEAR:
     break;
