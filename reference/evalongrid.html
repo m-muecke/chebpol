@@ -82,11 +82,11 @@ and upper end of the interval in each dimension.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Further arguments to fun.</p></dd>
+<dd><p>Further arguments to <code>fun</code>.</p></dd>
 
 
 <dt id="arg-grid">grid<a class="anchor" aria-label="anchor" href="#arg-grid"></a></dt>
-<dd><p>Rather than specifying dims and intervals to get a Chebyshev
+<dd><p>Rather than specifying <code>dims</code> and <code>intervals</code> to get a Chebyshev
 grid, you may specify your own <code>grid</code> as a list of vectors whose
 Cartesian product will be the grid, as in <code>expand.grid(grid)</code>.</p></dd>
 
@@ -114,7 +114,7 @@ length 2, providing minimum and maximum for each dimension.</p>
 <p>This function does the same as <code>apply(expand.grid(grid), 1, fun)</code>, but
 it's faster and more memory-efficient for large grids because it does not
 actually expand the grid.</p>
-<p>The function <code>evalongridV</code> is for vectorized functions, i.e. those that
+<p>The function <code>evalongridV()</code> is for vectorized functions, i.e. those that
 can take a matrix of column vectors as argument. It's equivalent to
 <code>fun(t(expand.grid(grid)))</code>.</p>
     </div>

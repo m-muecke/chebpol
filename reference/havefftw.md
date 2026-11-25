@@ -13,4 +13,4 @@ havefftw()
 
 ## Value
 
-Returns TRUE if chebpol uses FFTW. Otherwise FALSE.
+Returns `TRUE` if chebpol uses FFTW. Otherwise `FALSE`.

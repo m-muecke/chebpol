@@ -116,6 +116,11 @@
   `domain` and `chebpol.version` attributes. Previously setting the
   default blend dropped them.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) now
+  stops with an error when `val` is neither numeric values nor a
+  function, such as a function name given as a string. Previously such
+  input failed with unrelated errors, and a list of values was accepted
+  by some methods.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) now
   stops with an error when `blend` is not supported by the chosen
   method. Previously `blend = "mean"` was accepted for
   `method = "multilinear"` and `"oldstalker"` and silently treated as

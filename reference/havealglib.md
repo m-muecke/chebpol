@@ -12,4 +12,4 @@ havealglib()
 
 ## Value
 
-Returns TRUE if ALGLIB is available. Otherwise FALSE.
+Returns `TRUE` if ALGLIB is available. Otherwise `FALSE`.

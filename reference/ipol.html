@@ -127,7 +127,7 @@ evaluating a matrix of column vectors.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p><code>ipol</code> is a wrapper around various interpolation methods in package chebpol.
+    <p><code>ipol()</code> is a wrapper around various interpolation methods in package chebpol.
 Which arguments to specify depends on the method. The interpolation methods are described
 in <code><a href="../articles/chebpol.html">vignette("chebpol", package = "chebpol")</a></code>.</p>
 <p>The method <code>"chebyshev"</code> needs only the number of Chebyshev knots in
@@ -160,7 +160,7 @@ becomes slow beyond a few thousand knots.</p>
 <p>The method <code>"simplexlinear"</code> needs the argument <code>knots</code>. It creates a
 Delaunay triangulation from the knots, and does linear interpolation in each simplex
 by weighting the vertex values with the barycentric coordinates.</p>
-<p>If knots are required, but the grid argument is given, knots are constructed as
+<p>If knots are required, but the <code>grid</code> argument is given, knots are constructed as
 <code>t(expand.grid(grid))</code>.</p>
 <p>The <code>"crbf"</code> is the multilayer compact radial basis function
 interpolation in ALGLIB (<a href="https://www.alglib.net/interpolation/fastrbf.php" class="external-link">https://www.alglib.net/interpolation/fastrbf.php</a>).

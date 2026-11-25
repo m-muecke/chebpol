@@ -99,6 +99,8 @@
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with an explicit <code>blend</code> now keep their <code>arity</code>, <code>domain</code> and <code>chebpol.version</code> attributes. Previously setting the default blend dropped them.</li>
 <li>
+<code><a href="../reference/ipol.html">ipol()</a></code> now stops with an error when <code>val</code> is neither numeric values nor a function, such as a function name given as a string. Previously such input failed with unrelated errors, and a list of values was accepted by some methods.</li>
+<li>
 <code><a href="../reference/ipol.html">ipol()</a></code> now stops with an error when <code>blend</code> is not supported by the chosen method. Previously <code>blend = "mean"</code> was accepted for <code>method = "multilinear"</code> and <code>"oldstalker"</code> and silently treated as linear blending.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "multilinear"</code> now return <code>NA</code> for <code>NA</code> or <code>NaN</code> input. Previously the evaluation never returned. <code><a href="../reference/ipol.html">ipol()</a></code> also stops with an error for a multilinear grid dimension with a single point, which was read out of bounds.</li>

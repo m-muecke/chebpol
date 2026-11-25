@@ -21,9 +21,9 @@ chebcoef(val, dct = FALSE)
 
   Logical. Since the Chebyshev coefficients are closely related to the
   DCT-II transform of `val`, the non-normalized real-even DCT-II
-  coefficients may be retrieved instead. I.e. those from FFTW_REDFT10 in
-  each dimension. This is not used anywhere in the package, it is merely
-  provided as a convenience for those who might need it.
+  coefficients may be retrieved instead. I.e. those from `FFTW_REDFT10`
+  in each dimension. This is not used anywhere in the package, it is
+  merely provided as a convenience for those who might need it.
 
 ## Value
 
@@ -35,8 +35,8 @@ Chebyshev-polynomial.
 If `val` has no `dim`-attribute, it is assumed to be one-dimensional
 with length `length(val)`.
 
-If chebpol was compiled without FFTW, running `chebcoef` on large grids
-may be slow and memory-demanding.
+If chebpol was compiled without FFTW, running `chebcoef()` on large
+grids may be slow and memory-demanding.
 
 ## See also
 

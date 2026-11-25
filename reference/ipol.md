@@ -73,7 +73,7 @@ when evaluating a matrix of column vectors.
 
 ## Details
 
-`ipol` is a wrapper around various interpolation methods in package
+`ipol()` is a wrapper around various interpolation methods in package
 chebpol. Which arguments to specify depends on the method. The
 interpolation methods are described in
 [`vignette("chebpol", package = "chebpol")`](https://m-muecke.github.io/chebpol/articles/chebpol.md).
@@ -114,7 +114,7 @@ Delaunay triangulation from the knots, and does linear interpolation in
 each simplex by weighting the vertex values with the barycentric
 coordinates.
 
-If knots are required, but the grid argument is given, knots are
+If knots are required, but the `grid` argument is given, knots are
 constructed as `t(expand.grid(grid))`.
 
 The `"crbf"` is the multilayer compact radial basis function

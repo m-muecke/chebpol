@@ -28,12 +28,12 @@ evalongridV(fun, dims, intervals = NULL, ..., grid = NULL)
 
 - ...:
 
-  Further arguments to fun.
+  Further arguments to `fun`.
 
 - grid:
 
-  Rather than specifying dims and intervals to get a Chebyshev grid, you
-  may specify your own `grid` as a list of vectors whose Cartesian
+  Rather than specifying `dims` and `intervals` to get a Chebyshev grid,
+  you may specify your own `grid` as a list of vectors whose Cartesian
   product will be the grid, as in `expand.grid(grid)`.
 
 ## Value
@@ -64,8 +64,8 @@ This function does the same as `apply(expand.grid(grid), 1, fun)`, but
 it's faster and more memory-efficient for large grids because it does
 not actually expand the grid.
 
-The function `evalongridV` is for vectorized functions, i.e. those that
-can take a matrix of column vectors as argument. It's equivalent to
+The function `evalongridV()` is for vectorized functions, i.e. those
+that can take a matrix of column vectors as argument. It's equivalent to
 `fun(t(expand.grid(grid)))`.
 
 ## Examples
