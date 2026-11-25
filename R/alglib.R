@@ -20,6 +20,6 @@ rbf.alglib <- function(val, knots, rbase = 2, layers = 5, lambda = 0, ...) {
 #' support radial basis function interpolations on scattered data.
 #' This function checks whether ALGLIB is available.
 #'
-#' @return Returns TRUE if ALGLIB is available. Otherwise FALSE.
+#' @return Returns `TRUE` if ALGLIB is available. Otherwise `FALSE`.
 #' @export
 havealglib <- function() .Call(C_havealglib)

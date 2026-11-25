@@ -3,7 +3,7 @@
 #' Create an interpolating function from given values. Several interpolation methods are
 #' supported.
 #'
-#' `ipol` is a wrapper around various interpolation methods in package chebpol.
+#' `ipol()` is a wrapper around various interpolation methods in package chebpol.
 #' Which arguments to specify depends on the method. The interpolation methods are described
 #' in `vignette("chebpol", package = "chebpol")`.
 #'
@@ -42,7 +42,7 @@
 #' Delaunay triangulation from the knots, and does linear interpolation in each simplex
 #' by weighting the vertex values with the barycentric coordinates.
 #'
-#' If knots are required, but the grid argument is given, knots are constructed as
+#' If knots are required, but the `grid` argument is given, knots are constructed as
 #' `t(expand.grid(grid))`.
 #'
 #' The `"crbf"` is the multilayer compact radial basis function

@@ -13,7 +13,7 @@ to be one-dimensional.}
 
 \item{dct}{Logical. Since the Chebyshev coefficients are closely related to
 the DCT-II transform of \code{val}, the non-normalized real-even DCT-II
-coefficients may be retrieved instead. I.e. those from FFTW_REDFT10 in each
+coefficients may be retrieved instead. I.e. those from \code{FFTW_REDFT10} in each
 dimension. This is not used anywhere in the package, it is merely provided
 as a convenience for those who might need it.}
 }
@@ -30,7 +30,7 @@ If \code{val} has no \code{dim}-attribute, it is assumed to be
 one-dimensional with length \code{length(val)}.
 
 If chebpol was compiled without FFTW, running
-\code{chebcoef} on large grids may be slow and memory-demanding.
+\code{chebcoef()} on large grids may be slow and memory-demanding.
 }
 \examples{
 # Coefficients for a 2x3x4 grid

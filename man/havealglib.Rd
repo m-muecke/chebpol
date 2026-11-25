@@ -7,7 +7,7 @@
 havealglib()
 }
 \value{
-Returns TRUE if ALGLIB is available. Otherwise FALSE.
+Returns \code{TRUE} if ALGLIB is available. Otherwise \code{FALSE}.
 }
 \description{
 If ALGLIB was available at compile time, it can be used for compact

@@ -53,7 +53,7 @@ Create an interpolating function from given values. Several interpolation method
 supported.
 }
 \details{
-\code{ipol} is a wrapper around various interpolation methods in package chebpol.
+\code{ipol()} is a wrapper around various interpolation methods in package chebpol.
 Which arguments to specify depends on the method. The interpolation methods are described
 in \code{vignette("chebpol", package = "chebpol")}.
 
@@ -92,7 +92,7 @@ The method \code{"simplexlinear"} needs the argument \code{knots}. It creates a
 Delaunay triangulation from the knots, and does linear interpolation in each simplex
 by weighting the vertex values with the barycentric coordinates.
 
-If knots are required, but the grid argument is given, knots are constructed as
+If knots are required, but the \code{grid} argument is given, knots are constructed as
 \code{t(expand.grid(grid))}.
 
 The \code{"crbf"} is the multilayer compact radial basis function

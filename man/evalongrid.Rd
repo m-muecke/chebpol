@@ -19,9 +19,9 @@ dimension.}
 \item{intervals}{A list. Each entry is a vector of length 2 with the lower
 and upper end of the interval in each dimension.}
 
-\item{...}{Further arguments to fun.}
+\item{...}{Further arguments to \code{fun}.}
 
-\item{grid}{Rather than specifying dims and intervals to get a Chebyshev
+\item{grid}{Rather than specifying \code{dims} and \code{intervals} to get a Chebyshev
 grid, you may specify your own \code{grid} as a list of vectors whose
 Cartesian product will be the grid, as in \code{expand.grid(grid)}.}
 }
@@ -55,7 +55,7 @@ This function does the same as \code{apply(expand.grid(grid), 1, fun)}, but
 it's faster and more memory-efficient for large grids because it does not
 actually expand the grid.
 
-The function \code{evalongridV} is for vectorized functions, i.e. those that
+The function \code{evalongridV()} is for vectorized functions, i.e. those that
 can take a matrix of column vectors as argument. It's equivalent to
 \code{fun(t(expand.grid(grid)))}.
 }

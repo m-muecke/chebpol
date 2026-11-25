@@ -7,7 +7,7 @@
 havefftw()
 }
 \value{
-Returns TRUE if chebpol uses FFTW. Otherwise FALSE.
+Returns \code{TRUE} if chebpol uses FFTW. Otherwise \code{FALSE}.
 }
 \description{
 It is possible to compile chebpol without FFTW. If this is done, it will

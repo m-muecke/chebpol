@@ -123,7 +123,7 @@ separgs <- function(fun, ...) {
 #' it's faster and more memory-efficient for large grids because it does not
 #' actually expand the grid.
 #'
-#' The function `evalongridV` is for vectorized functions, i.e. those that
+#' The function `evalongridV()` is for vectorized functions, i.e. those that
 #' can take a matrix of column vectors as argument. It's equivalent to
 #' `fun(t(expand.grid(grid)))`.
 #'
@@ -133,8 +133,8 @@ separgs <- function(fun, ...) {
 #' dimension.
 #' @param intervals A list. Each entry is a vector of length 2 with the lower
 #' and upper end of the interval in each dimension.
-#' @param ... Further arguments to fun.
-#' @param grid Rather than specifying dims and intervals to get a Chebyshev
+#' @param ... Further arguments to `fun`.
+#' @param grid Rather than specifying `dims` and `intervals` to get a Chebyshev
 #' grid, you may specify your own `grid` as a list of vectors whose
 #' Cartesian product will be the grid, as in `expand.grid(grid)`.
 #' @return An array with the value of `fun` on each grid point. The
@@ -190,6 +190,6 @@ evalongridV <- function(fun, dims, intervals = NULL, ..., grid = NULL) {
 #' approximation will be possible, but not a one-dimensional 1000000. This
 #' function checks whether chebpol uses FFTW.
 #'
-#' @return Returns TRUE if chebpol uses FFTW. Otherwise FALSE.
+#' @return Returns `TRUE` if chebpol uses FFTW. Otherwise `FALSE`.
 #' @export
 havefftw <- function() .Call(C_havefftw)

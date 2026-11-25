@@ -58,14 +58,14 @@ chebknots <- function(dims, intervals = NULL) {
 #' one-dimensional with length `length(val)`.
 #'
 #' If chebpol was compiled without FFTW, running
-#' `chebcoef` on large grids may be slow and memory-demanding.
+#' `chebcoef()` on large grids may be slow and memory-demanding.
 #'
 #' @param val An `array` of function values on a Chebyshev grid. The
 #' `dim`-attribute must be appropriately set. If not set, it is assumed
 #' to be one-dimensional.
 #' @param dct Logical. Since the Chebyshev coefficients are closely related to
 #' the DCT-II transform of `val`, the non-normalized real-even DCT-II
-#' coefficients may be retrieved instead. I.e. those from FFTW_REDFT10 in each
+#' coefficients may be retrieved instead. I.e. those from `FFTW_REDFT10` in each
 #' dimension. This is not used anywhere in the package, it is merely provided
 #' as a convenience for those who might need it.
 #' @return An array of Chebyshev-coefficients for an interpolating
