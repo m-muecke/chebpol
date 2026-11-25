@@ -10,6 +10,12 @@ new_interpolant <- function(fun, method, arity, domain = NULL) {
   )
 }
 
+crate <- function(.fn, ..., .parent = topenv(parent.frame())) {
+  nn <- vapply(as.list(substitute(list(...)))[-1L], as.character, character(1L))
+  environment(.fn) <- list2env(stats::setNames(list(...), nn), parent = .parent)
+  .fn
+}
+
 # The ranges of the variables as a data frame, with the columns named X1, X2, ... where no name was given
 as_domain <- function(domain) {
   if (length(domain) == 0L) {

@@ -26,5 +26,6 @@ mlappx.real <- function(val, grid, ..., blend = NULL) {
     blend <- blend_types[[match.arg(blend)]]
     .Call(C_evalmlip, grid, val, x, threads, blend)
   }
+  fun <- crate(fun, grid, val, arity)
   new_interpolant(set_default_blend(fun, blend), method = "multilinear", arity = arity, domain = lapply(grid, range))
 }

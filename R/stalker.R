@@ -55,6 +55,7 @@ oldstalkerappx <- function(val, grid, r = 2, ..., blend = NULL) {
     }
     .Call(C_evalstalker, x, stalker, degree, blend, as.integer(threads))
   }
+  fun <- crate(fun, r, grid, val, uniform, dmin, dplus, stalker, arity)
   new_interpolant(set_default_blend(fun, blend), method = "oldstalker", arity = arity, domain = lapply(grid, range))
 }
 
@@ -83,6 +84,7 @@ hstalkerappx <- function(val, grid, ..., blend = NULL) {
     blend <- blend_types[[match.arg(blend)]]
     .Call(C_evalhyp, x, stalker, blend, as.integer(threads))
   }
+  fun <- crate(fun, stalker, arity)
   new_interpolant(set_default_blend(fun, blend), method = "hstalker", arity = arity, domain = lapply(grid, range))
 }
 
@@ -111,6 +113,7 @@ stalkerappx <- function(val, grid, ..., blend = NULL) {
     blend <- blend_types[[match.arg(blend)]]
     .Call(C_evalstalk, x, stalker, blend, as.integer(threads))
   }
+  fun <- crate(fun, stalker, arity)
   new_interpolant(set_default_blend(fun, blend), method = "stalker", arity = arity, domain = lapply(grid, range))
 }
 

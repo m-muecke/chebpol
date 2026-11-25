@@ -156,10 +156,14 @@ chebappx.real <- function(val, intervals = NULL) {
     # it's [-1, 1] intervals, so drop transformation
     fun <- new_interpolant(
       method = "chebyshev",
-      function(x, threads = getOption("chebpol.threads")) {
-        x <- as_points(x, K)
-        .Call(C_evalcheb, cf, x, threads, NULL)
-      },
+      crate(
+        function(x, threads = getOption("chebpol.threads")) {
+          x <- as_points(x, K)
+          .Call(C_evalcheb, cf, x, threads, NULL)
+        },
+        cf,
+        K
+      ),
       arity = K,
       domain = stats::setNames(rep(list(c(-1, 1)), K), varnames)
     )
@@ -170,19 +174,23 @@ chebappx.real <- function(val, intervals = NULL) {
     }
     ispan <- vapply(intervals, \(x) 2 / diff(x), numeric(1L))
     mid <- vapply(intervals, mean, numeric(1L))
-    imap <- function(x) (x - mid) * ispan
 
     fun <- new_interpolant(
       method = "chebyshev",
-      function(x, threads = getOption("chebpol.threads")) {
-        x <- as_points(x, K)
-        .Call(C_evalcheb, cf, imap(x), threads, NULL)
-      },
+      crate(
+        function(x, threads = getOption("chebpol.threads")) {
+          x <- as_points(x, K)
+          .Call(C_evalcheb, cf, (x - mid) * ispan, threads, NULL)
+        },
+        cf,
+        mid,
+        ispan,
+        K
+      ),
       arity = K,
       domain = stats::setNames(intervals, varnames)
     )
   }
-  rm(val)
   fun
 }
 
@@ -216,23 +224,31 @@ chebappxg.real <- function(val, grid = NULL, mapdim = NULL) {
   intervals <- lapply(grid, range)
   # create monotone splines with splinefun, method hyman
   gridmaps <- Map(stats::splinefun, grid, chebknots(dim(val)), MoreArgs = list(method = "hyman"))
-  gridmap <- function(x) {
-    if (!is.matrix(x)) {
-      return(vapply(seq_along(gridmaps), \(i) gridmaps[[i]](x[i]), numeric(1L)))
-    }
-    for (i in seq_along(gridmaps)) {
-      x[i, ] <- gridmaps[[i]](x[i, ])
-    }
-    x
-  }
+  gridmap <- crate(
+    function(x) {
+      if (!is.matrix(x)) {
+        return(vapply(seq_along(gridmaps), \(i) gridmaps[[i]](x[i]), numeric(1L)))
+      }
+      for (i in seq_along(gridmaps)) {
+        x[i, ] <- gridmaps[[i]](x[i, ])
+      }
+      x
+    },
+    gridmaps
+  )
   cf <- chebcoef(val)
   arity <- length(grid)
   new_interpolant(
     method = "general",
-    function(x, threads = getOption("chebpol.threads")) {
-      x <- as_points(x, arity)
-      .Call(C_evalcheb, cf, gridmap(x), threads, NULL)
-    },
+    crate(
+      function(x, threads = getOption("chebpol.threads")) {
+        x <- as_points(x, arity)
+        .Call(C_evalcheb, cf, gridmap(x), threads, NULL)
+      },
+      cf,
+      gridmap,
+      arity
+    ),
     arity = arity,
     domain = intervals
   )

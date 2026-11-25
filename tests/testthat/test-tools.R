@@ -43,6 +43,14 @@ test_that("ipol() sets the default blend of a simplex linear interpolant", {
   expect_equal(sl(c(0.3, 0.6)), sl(c(0.3, 0.6), blend = "sigmoid"))
 })
 
+test_that("crate() keeps only the named objects in the environment of a function", {
+  a <- 1
+  unused <- 2
+  f <- crate(function(x) x + a, a)
+  expect_equal(f(1), 2)
+  expect_equal(ls(environment(f)), "a")
+})
+
 test_that("evalongrid() evaluates scalar and vector valued functions", {
   dims <- c(8, 7, 6)
   f <- function(x) exp(-sum(x^2))

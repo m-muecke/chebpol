@@ -23,6 +23,7 @@ slappx.real <- function(val, knots, ..., blend = NULL) {
     blend <- blend_types[[match.arg(blend)]]
     .Call(C_evalsl, x, knots, dtri, adata, val, epol, threads, blend)
   }
+  fun <- crate(fun, knots, dtri, adata, val, arity)
   new_interpolant(
     set_default_blend(fun, blend),
     method = "simplexlinear",

@@ -17,19 +17,24 @@ ucappx.real <- function(val, intervals = NULL) {
   cf <- chebcoef(val)
   # the per-dimension vectors recycle down the columns of x
   if (is.null(intervals)) {
-    gm <- function(x) ugm(x, dims)
+    gm <- crate(function(x) ugm(x, dims), dims)
   } else {
     # precompute interval mid points and inverse lengths
     md <- vapply(intervals, mean, numeric(1L))
     ispan <- vapply(intervals, \(i) 2 / diff(i), numeric(1L))
-    gm <- function(x) ugm(ispan * (x - md), dims)
+    gm <- crate(function(x) ugm(ispan * (x - md), dims), ispan, md, dims)
   }
   new_interpolant(
     method = "uniform",
-    function(x, threads = getOption("chebpol.threads")) {
-      x <- as_points(x, arity)
-      .Call(C_evalcheb, cf, gm(x), threads, NULL)
-    },
+    crate(
+      function(x, threads = getOption("chebpol.threads")) {
+        x <- as_points(x, arity)
+        .Call(C_evalcheb, cf, gm(x), threads, NULL)
+      },
+      cf,
+      gm,
+      arity
+    ),
     arity = arity,
     domain = stats::setNames(intervals %||% rep(list(c(-1, 1)), arity), names(intervals) %||% names(dims))
   )

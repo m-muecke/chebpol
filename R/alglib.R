@@ -9,10 +9,14 @@ rbf.alglib <- function(val, knots, rbase = 2, layers = 5, lambda = 0, ...) {
   arity <- nrow(knots)
   new_interpolant(
     method = "crbf",
-    function(x, threads = getOption("chebpol.threads")) {
-      x <- as_points(x, arity)
-      .Call(C_evalrbf, model, x, threads)
-    },
+    crate(
+      function(x, threads = getOption("chebpol.threads")) {
+        x <- as_points(x, arity)
+        .Call(C_evalrbf, model, x, threads)
+      },
+      model,
+      arity
+    ),
     arity = arity,
     domain = knots_domain(knots)
   )

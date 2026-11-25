@@ -57,6 +57,34 @@ test_that("a simplex linear interpolant records the range of its knots", {
   expect_equal(attr(sl, "domain"), data.frame(X1 = c(0, 2), X2 = c(0, 3)))
 })
 
+test_that("an interpolant does not keep the extra arguments of the function", {
+  f <- function(x, data) sum(x) + data[1]
+  data <- rep(1, 1e6)
+  grid <- list(seq(0, 1, length.out = 5), seq(0, 2, length.out = 4))
+  ips <- list(
+    ipol(f, dims = c(5, 4), method = "chebyshev", data = data),
+    ipol(f, dims = c(5, 4), method = "uniform", data = data),
+    ipol(f, grid = grid, method = "general", data = data),
+    ipol(f, grid = grid, method = "fh", data = data),
+    ipol(f, grid = grid, method = "multilinear", data = data),
+    ipol(f, grid = grid, method = "stalker", data = data),
+    ipol(f, grid = grid, method = "hstalker", data = data),
+    ipol(f, grid = grid, method = "oldstalker", data = data),
+    ipol(f, grid = grid, method = "polyharmonic", data = data)
+  )
+  for (ip in ips) {
+    expect_lt(length(serialize(ip, NULL)), length(serialize(data, NULL)) / 10)
+  }
+})
+
+test_that("a simplex linear interpolant does not keep the extra arguments of the function", {
+  skip_if_not_installed("geometry")
+  f <- function(x, data) sum(x) + data[1]
+  data <- rep(1, 1e6)
+  sl <- ipol(f, grid = list(c(0, 1, 2), c(0, 1)), method = "simplexlinear", data = data)
+  expect_lt(length(serialize(sl, NULL)), length(serialize(data, NULL)) / 10)
+})
+
 test_that("printing an interpolant summarizes it", {
   grid <- list(seq(0, 1, length.out = 5), seq(0, 2, length.out = 4))
   expect_snapshot({

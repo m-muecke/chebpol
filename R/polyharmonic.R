@@ -44,13 +44,13 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
     }
     wa <- normalize[, 1L]
     wb <- normalize[, 2L]
-    normfun <- function(x) wa * (x - wb)
+    normfun <- crate(function(x) wa * (x - wb), wa, wb)
     knots <- normfun(knots)
     normalize <- TRUE
   } else if (normalize) {
     wa <- as.vector(1 / diff(apply(knots, 1L, range)))
     wb <- apply(knots, 1L, min)
-    normfun <- function(x) wa * (x - wb)
+    normfun <- crate(function(x) wa * (x - wb), wa, wb)
     knots <- normfun(knots)
     normalize <- TRUE
   } else {
@@ -83,13 +83,20 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   }
   w <- wv[seq_len(N)]
   v <- wv[(N + 1L):length(wv)]
-  rm(mat, rhs, wv)
   new_interpolant(
     method = "polyharmonic",
-    function(x, threads = getOption("chebpol.threads")) {
-      x <- as_points(x, M)
-      .Call(C_evalpolyh, normfun(x), knots, w, v, k, threads, NULL)
-    },
+    crate(
+      function(x, threads = getOption("chebpol.threads")) {
+        x <- as_points(x, M)
+        .Call(C_evalpolyh, normfun(x), knots, w, v, k, threads, NULL)
+      },
+      normfun,
+      knots,
+      w,
+      v,
+      k,
+      M
+    ),
     arity = M,
     domain = domain
   )
