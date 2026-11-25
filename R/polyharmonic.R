@@ -85,6 +85,7 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   v <- wv[(N + 1L):length(wv)]
   rm(mat, rhs, wv)
   new_interpolant(
+    method = "polyharmonic",
     function(x, threads = getOption("chebpol.threads")) {
       x <- as_points(x, M)
       .Call(C_evalpolyh, normfun(x), knots, w, v, k, threads, NULL)

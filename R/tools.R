@@ -1,6 +1,14 @@
-# Mark a function as an interpolant of `arity` variables on `domain`
-new_interpolant <- function(fun, arity, domain = NULL) {
-  structure(fun, arity = arity, domain = as.data.frame(domain), chebpol.version = utils::packageVersion("chebpol"))
+# Mark a function as an interpolant of `arity` variables on `domain`, created by `method`.
+# The class is set last because `formals<-` drops attributes.
+new_interpolant <- function(fun, method, arity, domain = NULL) {
+  structure(
+    fun,
+    method = method,
+    arity = arity,
+    domain = as.data.frame(domain),
+    chebpol.version = utils::packageVersion("chebpol"),
+    class = c("chebpol_interpolant", "function")
+  )
 }
 
 # Coerce the argument of an interpolant to a point, or to a matrix with one point per column

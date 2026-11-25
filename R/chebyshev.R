@@ -156,6 +156,7 @@ chebappx.real <- function(val, intervals = NULL) {
   if (is.null(intervals)) {
     # it's [-1, 1] intervals, so drop transformation
     fun <- new_interpolant(
+      method = "chebyshev",
       function(x, threads = getOption("chebpol.threads")) {
         x <- as_points(x, K)
         .Call(C_evalcheb, cf, x, threads, NULL)
@@ -173,6 +174,7 @@ chebappx.real <- function(val, intervals = NULL) {
     imap <- function(x) (x - mid) * ispan
 
     fun <- new_interpolant(
+      method = "chebyshev",
       function(x, threads = getOption("chebpol.threads")) {
         x <- as_points(x, K)
         .Call(C_evalcheb, cf, imap(x), threads, NULL)
@@ -239,6 +241,7 @@ chebappxg.real <- function(val, grid = NULL, mapdim = NULL) {
   cf <- chebcoef(val)
   arity <- length(grid)
   new_interpolant(
+    method = "general",
     function(x, threads = getOption("chebpol.threads")) {
       x <- as_points(x, arity)
       .Call(C_evalcheb, cf, gridmap(x), threads, NULL)

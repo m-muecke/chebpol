@@ -8,6 +8,7 @@
 
 ## Minor improvements
 
+* `ipol()` interpolants now have class `chebpol_interpolant` and a `method` attribute. Printing one shows the method, the number of variables, the domain and the defaults of extra arguments such as `blend`, instead of the source code of the function.
 * `ipol()` interpolants created with `method = "general"` or `"uniform"` evaluate a matrix of points about three times faster. The points are now mapped onto the Chebyshev grid one dimension at a time instead of one point at a time.
 * `ipol()` interpolants take about half the time per call, which matters when they are called one point at a time. Errors about their input now name the interpolant, e.g. "Error in `ip()`" instead of "Error".
 

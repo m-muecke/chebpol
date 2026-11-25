@@ -24,11 +24,17 @@ A numeric. If more than one point was evaluated, a vector.
 An interpolant is a function returned by \code{\link[=ipol]{ipol()}} which has prespecified values in some
 points, and which fills in between with some reasonable values.
 }
+\details{
+Interpolants have class \code{chebpol_interpolant} and the attributes \code{method}, the interpolation method, \code{arity},
+the number of variables, and \code{domain}, a data frame with the lower and upper bound of each variable. Printing an
+interpolant shows these together with the defaults of its extra arguments, such as \code{blend}.
+}
 \examples{
 grid <- list(x = seq(0, 1, length.out = 10), y = seq(0, 1, length.out = 10))
 val <- runif(100)
 dim(val) <- c(10, 10)
 ip <- ipol(val, grid = grid, method = "fh")
+ip
 ip(c(0.3, 0.8))
 ip(matrix(runif(12), 2), threads = 2)
 }
