@@ -94,6 +94,8 @@
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now fits a spline with a single knot. Previously it failed with “invalid ‘nrow’ value”.</li>
 <li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now stops with an error when the number of values differs from the number of knots. Previously it warned about falling back to a least squares fit and suggested <code>normalize = TRUE</code>.</li>
+<li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "stalker"</code>, <code>"hstalker"</code> or <code>"simplexlinear"</code> now stop with an error when given a matrix with the wrong number of rows. Previously they returned values silently, and could read past the end of the input.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "oldstalker"</code> now report both ranks when given input of the wrong dimension.</li>

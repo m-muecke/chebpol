@@ -94,6 +94,10 @@
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "polyharmonic"` now fits a spline with a single knot.
   Previously it failed with “invalid ‘nrow’ value”.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "polyharmonic"` now stops with an error when the number of
+  values differs from the number of knots. Previously it warned about
+  falling back to a least squares fit and suggested `normalize = TRUE`.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   interpolants created with `method = "stalker"`, `"hstalker"` or
   `"simplexlinear"` now stop with an error when given a matrix with the
