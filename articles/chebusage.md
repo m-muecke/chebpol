@@ -240,7 +240,7 @@ triangles (more generally on simplices).
 
 data(volcano)
 volc <- volcano[seq(1, nrow(volcano), 3), seq(1, ncol(volcano), 3)] / 10 #low res volcano
-grid <- list(x = as.numeric(seq_len(nrow(volc))), y = as.numeric(seq_len(ncol(volc))))
+grid <- list(x = seq_len(nrow(volc)), y = seq_len(ncol(volc)))
 fh <- ipol(volc, grid = grid, method = "fh", k = 0)
 knots <- t(expand.grid(grid))
 sl <- ipol(volc, knots = knots, method = "simplex")
@@ -263,12 +263,6 @@ plot3D::persp3D(
   bty = "n",
   scale = FALSE
 )
-```
-
-    ## Warning: no DISPLAY variable so Tk is not available
-
-``` r
-
 for (f in list(ph, fh, sl)) {
   plot3D::persp3D(
     g$x,
@@ -456,7 +450,7 @@ system.time(sin(a))
 ```
 
     ##    user  system elapsed 
-    ##   0.012   0.000   0.012
+    ##   0.011   0.000   0.011
 
 ``` r
 
@@ -464,7 +458,7 @@ system.time(f(a, threads = 8))
 ```
 
     ##    user  system elapsed 
-    ##   0.088   0.005   0.031
+    ##   0.090   0.004   0.026
 
 ## References
 

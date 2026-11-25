@@ -563,8 +563,6 @@ dimension, monotonic in the second. We get the parameters: \\b_1 = -2,
 c_1 = -1/3, d_1 = 6, b_2=0, c_2=1/3, d_2=-4, a=-2\\. An illustration of
 the function can be found in Figure 4.
 
-    ## Warning: no DISPLAY variable so Tk is not available
-
 ![Figure 4: Hyperbolic 2d
 function](stalker_files/figure-html/2dhyp-1.png)
 
@@ -754,7 +752,7 @@ interpolation.
 
 data(volcano)
 volc <- volcano[seq(1, nrow(volcano), 3), seq(1, ncol(volcano), 3)] / 10 #low res volcano
-grid <- list(x = as.numeric(seq_len(nrow(volc))), y = as.numeric(seq_len(ncol(volc))))
+grid <- list(x = seq_len(nrow(volc)), y = seq_len(ncol(volc)))
 ph <- ipol(volc, grid = grid, method = "polyharmonic", k = 2)
 st <- ipol(volc, grid = grid, method = "stalker")
 ml <- ipol(volc, grid = grid, method = "multilinear")
