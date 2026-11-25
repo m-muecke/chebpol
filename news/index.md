@@ -20,6 +20,10 @@
 ### Minor improvements
 
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  interpolants created with `method = "simplexlinear"` now record the
+  range of their knots in the `domain` attribute, as polyharmonic
+  interpolants do.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   interpolants now have class `chebpol_interpolant` and a `method`
   attribute. Printing one shows the method, the number of variables, the
   domain and the defaults of extra arguments such as `blend`, instead of
@@ -36,6 +40,19 @@
 
 ### Bug fixes
 
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  interpolants no longer keep the extra arguments passed to the
+  interpolated function, nor intermediate results such as the function
+  values next to the Chebyshev coefficients. Previously an interpolant
+  built with a large extra argument,
+  e.g. `ipol(f, grid = grid, method = "fh", data = big)`, kept `big` in
+  memory and in saved files.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  interpolants now name the columns of their `domain` attribute after
+  the variables, taken from `grid`, `dims`, `intervals` or the row names
+  of `knots`, and `X1`, `X2`, … otherwise. Previously unnamed variables
+  got names made from their bounds, such as `c.0..1.`, and names given
+  in `dims` were dropped.
 - chebpol compiles again with current versions of R. FFTW is now found
   when it is installed outside the default include path.
 - Error messages are now consistent across interpolation methods and
