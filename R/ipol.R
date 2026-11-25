@@ -99,7 +99,6 @@
 #' ch2 <- ipol(f, dims = c(10, 10, 10), intervals = list(0:1, 0:1, 0:1), method = "cheb")
 #' knots <- matrix(runif(3 * 1000), 3)
 #' ph2 <- ipol(f, knots = knots, k = 2, method = "poly")
-#' sl2 <- ipol(f, knots = knots, method = "simplexlinear")
 #' # my alglib is a bit slow, so stick to 100 knots
 #' if (havealglib()) {
 #'   crb <- ipol(f, knots = knots[, 1:100], method = "crbf", rbase = 2, layers = 5, lambda = 0)
@@ -112,10 +111,13 @@
 #'   fh = fh2(m),
 #'   cheb = ch2(m),
 #'   poly = ph2(m),
-#'   sl = sl2(m),
 #'   hst = hst(m),
 #'   crbf = if (havealglib()) crb(m) else NULL
 #' )
+#' @examplesIf requireNamespace("geometry", quietly = TRUE)
+#' # simplex linear interpolation needs the geometry package
+#' sl2 <- ipol(f, knots = knots, method = "simplexlinear")
+#' rbind(true = apply(m, 2, f), sl = sl2(m))
 #' @export
 ipol <- function(
   val,

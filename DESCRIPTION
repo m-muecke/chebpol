@@ -23,11 +23,11 @@ BugReports: https://github.com/m-muecke/chebpol/issues
 Depends:
     R (>= 4.1.0)
 Imports:
-    geometry,
     stats,
     utils
 Suggests:
     cubature,
+    geometry,
     knitr,
     lattice,
     plot3D,

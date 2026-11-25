@@ -27,3 +27,11 @@
       Error in `slappx.real()`:
       ! length of values (3) must equal the number of knots (10)
 
+# ipol() errors for simplex linear interpolation without geometry
+
+    Code
+      ipol(sum, knots = matrix(runif(20), 2L), method = "simplexlinear")
+    Condition
+      Error in `slappx.real()`:
+      ! method = "simplexlinear" requires the geometry package.
+

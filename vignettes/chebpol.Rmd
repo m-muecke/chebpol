@@ -294,7 +294,7 @@ the Delaunay triangulation looks like.
 set.seed(42)
 ```
 
-```{r, fig.width=5, fig.asp=1.1, fig.align='center', message=FALSE}
+```{r, fig.width=5, fig.asp=1.1, fig.align='center', message=FALSE, eval=requireNamespace("geometry", quietly = TRUE)}
 f <- function(x) sqrt(1 - sum(x^2))
 theta <- runif(200, 0, 2 * pi)
 r <- sqrt(runif(200))

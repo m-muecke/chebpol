@@ -1,4 +1,7 @@
 slappx.real <- function(val, knots, ...) {
+  if (!requireNamespace("geometry", quietly = TRUE)) {
+    stop("method = \"simplexlinear\" requires the geometry package.")
+  }
   if (is.function(val)) {
     val <- apply(knots, 2L, val, ...)
   }
