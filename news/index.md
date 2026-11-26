@@ -316,6 +316,12 @@
   the grid. Previously a non-uniform grid spaced less than about 1e-8
   apart was treated as uniform, and the interpolant could overshoot the
   data by orders of magnitude.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "oldstalker"` and `k = 0` no longer depends on the scale of
+  the values or of the grid. Previously values below about 1e-9 or a
+  grid spaced less than about 1e-6 apart gave a different interpolant,
+  which could overshoot the data by orders of magnitude at a local
+  extremum.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   interpolants created with `method = "simplexlinear"` now stop with an
   error when `epol` is not `TRUE` or `FALSE`. Previously `epol = NA`

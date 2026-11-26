@@ -183,6 +183,8 @@
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "oldstalker"</code> and <code>k = NA</code> no longer depends on the scale of the grid. Previously a non-uniform grid spaced less than about 1e-8 apart was treated as uniform, and the interpolant could overshoot the data by orders of magnitude.</li>
 <li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "oldstalker"</code> and <code>k = 0</code> no longer depends on the scale of the values or of the grid. Previously values below about 1e-9 or a grid spaced less than about 1e-6 apart gave a different interpolant, which could overshoot the data by orders of magnitude at a local extremum.</li>
+<li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "simplexlinear"</code> now stop with an error when <code>epol</code> is not <code>TRUE</code> or <code>FALSE</code>. Previously <code>epol = NA</code> extrapolated as if it were <code>TRUE</code>.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "stalker"</code>, <code>"hstalker"</code> or <code>"simplexlinear"</code> now stop with an error when given a matrix with the wrong number of rows. Previously they returned values silently, and could read past the end of the input.</li>
