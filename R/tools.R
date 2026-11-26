@@ -97,23 +97,6 @@ set_default_blend <- function(fun, blend) {
   fun
 }
 
-separgs <- function(fun, ...) {
-  fun <- match.fun(fun)
-  f <- function() {
-    mc <- match.call()
-    mc[[1L]] <- quote(list)
-    arg <- eval.parent(mc)
-    nn <- lengths(arg)
-    if (all(nn == 1L)) {
-      return(fun(as.numeric(arg)))
-    }
-    fun(do.call(rbind, arg))
-  }
-  args <- as.list(sys.call())[-(1:2)]
-  formals(f) <- args
-  f
-}
-
 #' Evaluate a function on a grid
 #'
 #' Evaluate a function on a Chebyshev grid, or on a user-specified grid.
