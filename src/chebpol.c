@@ -4,14 +4,10 @@
 #include <fftw3.h>
 #endif
 
-static void chebcoef(const double *x, const int *dims, const int rank, double *F, bool dct, int threads) {
-  R_xlen_t siz = 1;
-  for (int i = 0; i < rank; i++)
-    siz *= dims[i];
-
 #ifdef HAVE_FFTW
-  bool brokenfftw = false;
-  double isiz = 1.0 / siz;
+// The DCT-II of x with FFTW, scaled to Chebyshev coefficients unless dct. Returns false if FFTW can't plan it.
+static bool dct_fftw(const double *x, const int *dims, const int rank, const R_xlen_t siz, double *F, bool dct,
+                     int threads) {
   int rdims[rank];
   fftw_r2r_kind kind[rank];
   for (int i = 0; i < rank; i++)
@@ -42,8 +38,7 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
       if (plan == NULL) {
         if (tlen > 10000)
           Rf_warning("FFTW fails on strided long (%d) vector, is it MKL?", tlen);
-        brokenfftw = true;
-        break;
+        return false;
       }
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (threads > 1)
@@ -57,68 +52,82 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
     }
   }
   // adjust scale to fit our setup
-  if (!dct)
+  if (!dct) {
+    const double isiz = 1.0 / siz;
     for (R_xlen_t i = 0; i < siz; i++)
       F[i] *= isiz;
-
-  if (brokenfftw) {
-#endif
-    double *src, *dest, *buf;
-    double **mat;
-    double beta = 0;
-
-    buf = (double *)R_alloc(siz, sizeof(double));
-    mat = (double **)R_alloc(rank, sizeof(double *));
-    // Create the needed transform matrices
-    // reuse same dimension matrices
-    for (int j = 0; j < rank; j++) {
-      int N = dims[j];
-      if (N > 10000)
-        Rf_warning("Long vector (%d), no FFTW. This may go wrong.", N);
-      double *jmat = NULL;
-      for (int k = 0; k < j; k++) {
-        if (dims[k] == N) {
-          jmat = mat[k];
-          break;
-        }
-      }
-      if (jmat != NULL) {
-        mat[j] = jmat;
-        continue;
-      }
-      jmat = mat[j] = (double *)R_alloc((size_t)N * N, sizeof(double));
-      for (int k = 0; k < N; k++) {
-        double *jkvec = &jmat[(R_xlen_t)k * N];
-        for (int i = 0; i < N; i++) {
-          jkvec[i] = cospi(k * (i + 0.5) / N);
-        }
-      }
-    }
-    // We will switch src and dest between F and buf
-    // We should end up with dest=F, so if
-    // rank is odd we should start with src = F, dest=buf
-    if ((rank & 1) == 1) {
-      src = F;
-      dest = buf;
-    } else {
-      src = buf;
-      dest = F;
-    }
-    memcpy(dest, x, siz * sizeof(double));
-    for (int i = rank - 1; i >= 0; i--) {
-      // transformation of dimension i, put in front
-      int N = dims[i]; // length of transform
-      int stride = (int)(siz / N);
-      double alpha = dct ? 2.0 : 2.0 / N; // Constant for transform
-      double *p = src;
-      src = dest;
-      dest = p;
-
-      F77_CALL(dgemm)("TRANS", "TRANS", &N, &stride, &N, &alpha, mat[i], &N, src, &stride, &beta, dest, &N FCONE FCONE);
-    }
-#ifdef HAVE_FFTW
   }
+  return true;
+}
 #endif
+
+// The same transform without FFTW, by multiplying with a cosine matrix in each dimension
+static void dct_matrix(const double *x, const int *dims, const int rank, const R_xlen_t siz, double *F, bool dct) {
+  double *src, *dest, *buf;
+  double **mat;
+  double beta = 0;
+
+  buf = (double *)R_alloc(siz, sizeof(double));
+  mat = (double **)R_alloc(rank, sizeof(double *));
+  // Create the needed transform matrices
+  // reuse same dimension matrices
+  for (int j = 0; j < rank; j++) {
+    int N = dims[j];
+    if (N > 10000)
+      Rf_warning("Long vector (%d), no FFTW. This may go wrong.", N);
+    double *jmat = NULL;
+    for (int k = 0; k < j; k++) {
+      if (dims[k] == N) {
+        jmat = mat[k];
+        break;
+      }
+    }
+    if (jmat != NULL) {
+      mat[j] = jmat;
+      continue;
+    }
+    jmat = mat[j] = (double *)R_alloc((size_t)N * N, sizeof(double));
+    for (int k = 0; k < N; k++) {
+      double *jkvec = &jmat[(R_xlen_t)k * N];
+      for (int i = 0; i < N; i++) {
+        jkvec[i] = cospi(k * (i + 0.5) / N);
+      }
+    }
+  }
+  // We will switch src and dest between F and buf
+  // We should end up with dest=F, so if
+  // rank is odd we should start with src = F, dest=buf
+  if ((rank & 1) == 1) {
+    src = F;
+    dest = buf;
+  } else {
+    src = buf;
+    dest = F;
+  }
+  memcpy(dest, x, siz * sizeof(double));
+  for (int i = rank - 1; i >= 0; i--) {
+    // transformation of dimension i, put in front
+    int N = dims[i]; // length of transform
+    int stride = (int)(siz / N);
+    double alpha = dct ? 2.0 : 2.0 / N; // Constant for transform
+    double *p = src;
+    src = dest;
+    dest = p;
+
+    F77_CALL(dgemm)("TRANS", "TRANS", &N, &stride, &N, &alpha, mat[i], &N, src, &stride, &beta, dest, &N FCONE FCONE);
+  }
+}
+
+static void chebcoef(const double *x, const int *dims, const int rank, double *F, bool dct, int threads) {
+  R_xlen_t siz = 1;
+  for (int i = 0; i < rank; i++)
+    siz *= dims[i];
+
+#ifdef HAVE_FFTW
+  if (!dct_fftw(x, dims, rank, siz, F, dct, threads))
+#endif
+    dct_matrix(x, dims, rank, siz, F, dct);
+
   if (!dct) {
     // We need to adjust the first element in each dimension by 0.5
     // The DCT-II isn't exactly equal to the Chebyshev transform
