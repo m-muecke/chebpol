@@ -903,9 +903,8 @@ static inline bool nextcell(int *cc, const int *c0, const int *c1, const int dim
   return false;
 }
 
-// Index the simplices by a uniform grid over the knots, so that evaluation need not scan all of them.
-// Fills in elements 3 to 6 of retlist: the bounds, the cells per dimension, and the offsets and items of the cell
-// lists.
+// Index the simplices by a uniform grid over the knots. Fills in elements 3 to 6 of retlist: the bounds, the
+// cells per dimension, and the offsets and items of the cell lists.
 static void buildsimplexgrid(SEXP retlist, const double *bboxmat, const int dim, const int numsimplex) {
   // the bounds of the grid, and the number of cells per unit length in each dimension
   SEXP Sbounds = Rf_allocVector(REALSXP, 3 * dim);
@@ -925,8 +924,7 @@ static void buildsimplexgrid(SEXP retlist, const double *bboxmat, const int dim,
     }
   }
 
-  // About one cell per simplex, with m cells in each dimension. Halve m while the simplices overlap too
-  // many cells, as they do in high dimensions. A single cell is a scan of all simplices.
+  // About one cell per simplex, with m cells in each dimension, halved while the simplices overlap too many
   int *c0 = (int *)R_alloc(dim, sizeof(int)), *c1 = (int *)R_alloc(dim, sizeof(int));
   int *cc = (int *)R_alloc(dim, sizeof(int));
   // the lists of all cells together hold at most 16 entries per simplex
@@ -949,7 +947,6 @@ static void buildsimplexgrid(SEXP retlist, const double *bboxmat, const int dim,
     ncells *= m;
   SET_VECTOR_ELT(retlist, 4, Rf_ScalarInteger(m));
 
-  // Cell i lists the simplices items[offsets[i]] .. items[offsets[i + 1] - 1]
   SEXP Soffsets = Rf_allocVector(INTSXP, ncells + 1);
   SET_VECTOR_ELT(retlist, 5, Soffsets);
   SEXP Sitems = Rf_allocVector(INTSXP, nitems);
