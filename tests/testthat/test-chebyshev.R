@@ -44,7 +44,7 @@ test_that("Chebyshev interpolation works on custom intervals", {
 })
 
 test_that("Chebyshev interpolation handles long one-dimensional grids", {
-  skip_if_not(havefftw())
+  skip_if_not(has_fftw())
   f <- function(x) ifelse(x == 0, 0, sin(1 / x))
   ch <- ipol(f, dims = 50000, method = "chebyshev")
   expect_equal(ch(c(0.03, 0.031)), f(c(0.03, 0.031)), tolerance = 0.01)

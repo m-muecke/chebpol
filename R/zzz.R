@@ -1,5 +1,5 @@
 .onAttach <- function(libname, pkgname) {
-  if (!havefftw()) {
+  if (!has_fftw()) {
     packageStartupMessage(
       "*** ",
       pkgname,

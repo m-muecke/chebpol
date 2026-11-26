@@ -13,13 +13,3 @@ ipol_crbf <- function(val, knots, rbase = 2, layers = 5, lambda = 0, ...) {
   }
   new_interpolant(crate(fun, model, arity), method = "crbf", arity = arity, domain = knots_domain(knots))
 }
-
-#' Check whether chebpol has the ALGLIB library
-#'
-#' If ALGLIB was available at compile time, it can be used for compact
-#' support radial basis function interpolations on scattered data.
-#' This function checks whether ALGLIB is available.
-#'
-#' @return Returns `TRUE` if ALGLIB is available. Otherwise `FALSE`.
-#' @export
-havealglib <- function() .Call(c_has_alglib)

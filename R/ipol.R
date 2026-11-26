@@ -101,7 +101,7 @@
 #' knots <- matrix(runif(3 * 1000), 3)
 #' ph2 <- ipol(f, knots = knots, k = 2, method = "polyharmonic")
 #' # my alglib is a bit slow, so stick to 100 knots
-#' if (havealglib()) {
+#' if (has_alglib()) {
 #'   crb <- ipol(f, knots = knots[, 1:100], method = "crbf", rbase = 2, layers = 5, lambda = 0)
 #' }
 #' # make 7 points in R3 to test them on
@@ -113,7 +113,7 @@
 #'   cheb = ch2(m),
 #'   poly = ph2(m),
 #'   hst = hst(m),
-#'   crbf = if (havealglib()) crb(m) else NULL
+#'   crbf = if (has_alglib()) crb(m) else NULL
 #' )
 #' @examplesIf requireNamespace("geometry", quietly = TRUE)
 #' # simplex linear interpolation needs the geometry package

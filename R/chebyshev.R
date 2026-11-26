@@ -70,7 +70,7 @@ chebknots <- function(dims, intervals = NULL) {
 #' as a convenience for those who might need it.
 #' @return An array of Chebyshev-coefficients for an interpolating
 #' Chebyshev-polynomial.
-#' @seealso [havefftw()]
+#' @seealso [has_fftw()]
 #' @export
 #' @examples
 #' # Coefficients for a 2x3x4 grid
@@ -240,14 +240,3 @@ ipol_general <- function(val, grid = NULL, ...) {
   }
   new_interpolant(crate(fun, cf, gridmap, arity), method = "general", arity = arity, domain = intervals)
 }
-
-#' Check whether chebpol uses FFTW
-#'
-#' It is possible to compile chebpol without FFTW. If this is done, it will
-#' not be feasible to use high-degree Chebyshev polynomials. I.e. a 100x100x100
-#' approximation will be possible, but not a one-dimensional 1000000. This
-#' function checks whether chebpol uses FFTW.
-#'
-#' @return Returns `TRUE` if chebpol uses FFTW. Otherwise `FALSE`.
-#' @export
-havefftw <- function() .Call(c_has_fftw)

@@ -38,5 +38,5 @@ a <- array(rnorm(24), dim = c(2, 3, 4))
 chebcoef(a)
 }
 \seealso{
-\code{\link[=havefftw]{havefftw()}}
+\code{\link[=has_fftw]{has_fftw()}}
 }

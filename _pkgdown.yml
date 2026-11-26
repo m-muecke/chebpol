@@ -19,8 +19,10 @@ reference:
   - subtitle: Package
     contents:
       - chebpol-package
-      - havefftw
-      - havealglib
+      - has_fftw
+  - subtitle: Deprecated
+    contents:
+      - chebpol-deprecated
 
 articles:
   - title: Vignettes

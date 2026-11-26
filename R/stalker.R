@@ -117,5 +117,3 @@ ipol_stalker <- function(val, grid, ..., blend = NULL) {
   fun <- crate(fun, stalker, arity)
   new_interpolant(set_default_blend(fun, blend), method = "stalker", arity = arity, domain = lapply(grid, range))
 }
-
-has_gsl <- function() .Call(c_has_gsl)
