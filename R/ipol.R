@@ -169,12 +169,12 @@ ipol <- function(
         stop("`dims` must be given when `val` is a function.")
       }
       if (is.function(val)) {
-        return(chebappxf.real(val, dims, intervals, ...))
+        return(ipol_chebyshev_fun(val, dims, intervals, ...))
       }
       if (is.null(dim(val)) && !is.null(dims)) {
         dim(val) <- dims
       }
-      chebappx.real(val, intervals)
+      ipol_chebyshev(val, intervals)
     },
     multilinear = {
       if (is.null(grid)) {
@@ -184,23 +184,23 @@ ipol <- function(
         stop("Each `grid` dimension must have at least two points for method = \"multilinear\".")
       }
       grid <- lapply(grid, as.numeric)
-      if (unsortedgrid(grid)) {
+      if (is_unsorted_grid(grid)) {
         stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
       }
-      mlappx.real(val, grid, ...)
+      ipol_multilinear(val, grid, ...)
     },
     simplexlinear = {
       if (is.null(knots) && is.null(grid)) {
         stop("`knots` or `grid` must be given for method = \"simplexlinear\".")
       }
       knots <- knots %||% grid_knots(grid)
-      slappx.real(val, knots, ...)
+      ipol_simplexlinear(val, knots, ...)
     },
     fh = {
       if (is.null(grid)) {
         stop("`grid` must be given for method = \"fh\".")
       }
-      if (unsortedgrid(grid)) {
+      if (is_unsorted_grid(grid)) {
         stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
       }
       grid <- lapply(grid, as.numeric)
@@ -212,7 +212,7 @@ ipol <- function(
       if (anyNA(k) || any(k < 0 | k > lengths(grid) - 1L)) {
         stop("`k` must be between 0 and one less than the number of grid points in each dimension.")
       }
-      fhappx.real(val, grid, d = k, ...)
+      ipol_fh(val, grid, d = k, ...)
     },
     uniform = {
       if (is.function(val) && is.null(dims)) {
@@ -223,25 +223,25 @@ ipol <- function(
         warning("`intervals` not given, using the range of `grid`.")
       }
       if (is.function(val)) {
-        return(ucappxf.real(val, dims, intervals, ...))
+        return(ipol_uniform_fun(val, dims, intervals, ...))
       }
       if (is.null(dim(val)) && !is.null(dims)) {
         dim(val) <- dims
       }
-      ucappx.real(val, intervals)
+      ipol_uniform(val, intervals)
     },
     general = {
       if (is.null(grid)) {
         stop("`grid` must be given for method = \"general\".")
       }
-      if (unsortedgrid(grid)) {
+      if (is_unsorted_grid(grid)) {
         stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
       }
       grid <- lapply(grid, as.numeric)
       if (is.function(val)) {
-        return(chebappxgf.real(val, grid, ...))
+        return(ipol_general_fun(val, grid, ...))
       }
-      chebappxg.real(val, grid)
+      ipol_general(val, grid)
     },
     polyharmonic = {
       if (is.null(knots) && is.null(grid)) {
@@ -255,7 +255,7 @@ ipol <- function(
       normalize <- args[["normalize"]] %||% NA
       nowarn <- args[["nowarn"]] %||% FALSE
       rest <- args[!names(args) %in% c("normalize", "nowarn")]
-      do.call(polyh.real, c(list(val, knots, k, normalize, nowarn), rest))
+      do.call(ipol_polyharmonic, c(list(val, knots, k, normalize, nowarn), rest))
     },
     oldstalker = {
       if (is.null(grid)) {
@@ -264,12 +264,12 @@ ipol <- function(
       if (any(lengths(grid) < 2L)) {
         stop("Each `grid` dimension must have at least two points for method = \"oldstalker\".")
       }
-      if (unsortedgrid(grid)) {
+      if (is_unsorted_grid(grid)) {
         stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
       }
       grid <- lapply(grid, as.numeric)
       k <- k %||% 2
-      oldstalkerappx(val, grid, r = k, ...)
+      ipol_oldstalker(val, grid, r = k, ...)
     },
     hstalker = {
       if (is.null(grid)) {
@@ -278,11 +278,11 @@ ipol <- function(
       if (any(lengths(grid) < 2L)) {
         stop("Each `grid` dimension must have at least two points for method = \"hstalker\".")
       }
-      if (unsortedgrid(grid)) {
+      if (is_unsorted_grid(grid)) {
         stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
       }
       grid <- lapply(grid, as.numeric)
-      hstalkerappx(val, grid, ...)
+      ipol_hstalker(val, grid, ...)
     },
     stalker = {
       if (is.null(grid)) {
@@ -291,11 +291,11 @@ ipol <- function(
       if (any(lengths(grid) < 2L)) {
         stop("Each `grid` dimension must have at least two points for method = \"stalker\".")
       }
-      if (unsortedgrid(grid)) {
+      if (is_unsorted_grid(grid)) {
         stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
       }
       grid <- lapply(grid, as.numeric)
-      stalkerappx(val, grid, ...)
+      ipol_stalker(val, grid, ...)
     },
     crbf = {
       if (is.null(knots)) {
@@ -304,17 +304,17 @@ ipol <- function(
       if (length(args) == 0L) {
         # old interface
         k <- k %||% c(2, 5, 0)
-        return(rbf.alglib(val, knots, k[1L], k[2L], k[3L]))
+        return(ipol_crbf(val, knots, k[1L], k[2L], k[3L]))
       }
       rbase <- args[["rbase"]] %||% 2
       layers <- args[["layers"]] %||% 5L
       lambda <- args[["lambda"]] %||% 0
       rest <- args[!names(args) %in% c("rbase", "layers", "lambda")]
-      do.call(rbf.alglib, c(list(val, knots, rbase, layers, lambda), rest))
+      do.call(ipol_crbf, c(list(val, knots, rbase, layers, lambda), rest))
     }
   )
 }
 
-unsortedgrid <- function(g) {
+is_unsorted_grid <- function(g) {
   any(vapply(g, \(s) is.unsorted(s, strictly = TRUE) && is.unsorted(-s, strictly = TRUE), logical(1L)))
 }

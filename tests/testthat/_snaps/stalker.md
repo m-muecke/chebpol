@@ -29,17 +29,17 @@
     Code
       ipol(1:5, grid = grid, method = "stalker")
     Condition
-      Error in `stalkerappx()`:
+      Error in `ipol_stalker()`:
       ! `val` must have one value per grid point (9), not 5.
     Code
       ipol(1:5, grid = grid, method = "hstalker")
     Condition
-      Error in `hstalkerappx()`:
+      Error in `ipol_hstalker()`:
       ! `val` must have one value per grid point (9), not 5.
     Code
       ipol(1:5, grid = grid, method = "oldstalker")
     Condition
-      Error in `oldstalkerappx()`:
+      Error in `ipol_oldstalker()`:
       ! `val` must have one value per grid point (9), not 5.
 
 # ipol() errors on a stalker grid dimension with a single point

@@ -1,6 +1,6 @@
 # General grids, Floater-Hormann
 
-fhappx.real <- function(val, grid = NULL, d = 1L, ...) {
+ipol_fh <- function(val, grid = NULL, d = 1L, ...) {
   if (!is.list(grid)) {
     grid <- list(grid)
   }

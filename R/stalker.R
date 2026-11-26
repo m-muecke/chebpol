@@ -1,12 +1,12 @@
 # Precompute some values used in the stalker evaluation
-stalkercontext <- function(dmin, dplus, r) {
+stalker_context <- function(dmin, dplus, r) {
   powmin <- Map(`^`, dmin, r)
   powplus <- Map(`^`, dplus, r)
   det <- Map(\(dm, dp, pm, pp) 1 / (dm * pp + dp * pm), dmin, dplus, powmin, powplus)
   list(det = det, pmin = powmin, pplus = powplus)
 }
 
-oldstalkerappx <- function(val, grid, r = 2, ..., blend = NULL) {
+ipol_oldstalker <- function(val, grid, r = 2, ..., blend = NULL) {
   if (!is.list(grid)) {
     grid <- list(grid)
   }
@@ -32,9 +32,9 @@ oldstalkerappx <- function(val, grid, r = 2, ..., blend = NULL) {
   dmin <- lapply(grid, \(gr) c(NaN, diff(gr)))
   dplus <- lapply(dmin, \(dd) c(dd[-1L], NaN))
   val <- as.numeric(val)
-  stalker <- c(list(val = val, grid = grid), stalkercontext(dmin, dplus, r), uniform = list(uniform))
+  stalker <- c(list(val = val, grid = grid), stalker_context(dmin, dplus, r), uniform = list(uniform))
 
-  if (!havegsl() && any(is.na(r) & !uniform)) {
+  if (!has_gsl() && any(is.na(r) & !uniform)) {
     stop("`k = NA` on a non-uniform grid requires chebpol built with GSL.")
   }
 
@@ -49,18 +49,18 @@ oldstalkerappx <- function(val, grid, r = 2, ..., blend = NULL) {
     blend <- blend_types[[match.arg(blend)]]
     if (!identical(degree, r)) {
       degree <- rep_len(as.numeric(degree), length(grid))
-      if (!havegsl() && any(is.na(degree) & !uniform)) {
+      if (!has_gsl() && any(is.na(degree) & !uniform)) {
         stop("`degree = NA` on a non-uniform grid requires chebpol built with GSL.")
       }
-      stalker <- c(list(val = val, grid = grid), stalkercontext(dmin, dplus, degree), uniform = list(uniform))
+      stalker <- c(list(val = val, grid = grid), stalker_context(dmin, dplus, degree), uniform = list(uniform))
     }
-    .Call(c_eval_stalker, x, stalker, degree, blend, as.integer(threads))
+    .Call(c_eval_oldstalker, x, stalker, degree, blend, as.integer(threads))
   }
   fun <- crate(fun, r, grid, val, uniform, dmin, dplus, stalker, arity)
   new_interpolant(set_default_blend(fun, blend), method = "oldstalker", arity = arity, domain = lapply(grid, range))
 }
 
-hstalkerappx <- function(val, grid, ..., blend = NULL) {
+ipol_hstalker <- function(val, grid, ..., blend = NULL) {
   if (!is.list(grid)) {
     grid <- list(grid)
   }
@@ -74,7 +74,7 @@ hstalkerappx <- function(val, grid, ..., blend = NULL) {
   if (is.function(val)) {
     val <- evalongrid(val, grid = grid, ...)
   }
-  stalker <- .Call(c_make_hyp, val, grid)
+  stalker <- .Call(c_make_hstalker, val, grid)
   arity <- length(grid)
   fun <- function(
     x,
@@ -83,13 +83,13 @@ hstalkerappx <- function(val, grid, ..., blend = NULL) {
   ) {
     x <- as_points(x, arity)
     blend <- blend_types[[match.arg(blend)]]
-    .Call(c_eval_hyp, x, stalker, blend, as.integer(threads))
+    .Call(c_eval_hstalker, x, stalker, blend, as.integer(threads))
   }
   fun <- crate(fun, stalker, arity)
   new_interpolant(set_default_blend(fun, blend), method = "hstalker", arity = arity, domain = lapply(grid, range))
 }
 
-stalkerappx <- function(val, grid, ..., blend = NULL) {
+ipol_stalker <- function(val, grid, ..., blend = NULL) {
   if (!is.list(grid)) {
     grid <- list(grid)
   }
@@ -103,7 +103,7 @@ stalkerappx <- function(val, grid, ..., blend = NULL) {
   if (is.function(val)) {
     val <- evalongrid(val, grid = grid, ...)
   }
-  stalker <- .Call(c_make_stalk, val, grid)
+  stalker <- .Call(c_make_stalker, val, grid)
   arity <- length(grid)
   fun <- function(
     x,
@@ -112,10 +112,10 @@ stalkerappx <- function(val, grid, ..., blend = NULL) {
   ) {
     x <- as_points(x, arity)
     blend <- blend_types[[match.arg(blend)]]
-    .Call(c_eval_stalk, x, stalker, blend, as.integer(threads))
+    .Call(c_eval_stalker, x, stalker, blend, as.integer(threads))
   }
   fun <- crate(fun, stalker, arity)
   new_interpolant(set_default_blend(fun, blend), method = "stalker", arity = arity, domain = lapply(grid, range))
 }
 
-havegsl <- function() .Call(c_have_gsl)
+has_gsl <- function() .Call(c_has_gsl)

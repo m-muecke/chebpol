@@ -37,7 +37,7 @@
     Code
       ipol(1:3, knots = knots, method = "simplexlinear")
     Condition
-      Error in `slappx.real()`:
+      Error in `ipol_simplexlinear()`:
       ! `val` must have one value per knot (10), not 3.
 
 # ipol() errors for simplex linear interpolation without geometry
@@ -45,6 +45,6 @@
     Code
       ipol(sum, knots = matrix(runif(20), 2L), method = "simplexlinear")
     Condition
-      Error in `slappx.real()`:
+      Error in `ipol_simplexlinear()`:
       ! method = "simplexlinear" requires the geometry package.
 

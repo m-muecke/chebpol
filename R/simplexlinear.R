@@ -1,4 +1,4 @@
-slappx.real <- function(val, knots, ..., blend = NULL) {
+ipol_simplexlinear <- function(val, knots, ..., blend = NULL) {
   if (!requireNamespace("geometry", quietly = TRUE)) {
     stop("method = \"simplexlinear\" requires the geometry package.")
   }

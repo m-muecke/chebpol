@@ -1,4 +1,4 @@
-mlappx.real <- function(val, grid, ..., blend = NULL) {
+ipol_multilinear <- function(val, grid, ..., blend = NULL) {
   if (is.numeric(grid)) {
     grid <- list(grid)
   }

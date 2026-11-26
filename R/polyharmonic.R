@@ -1,4 +1,4 @@
-polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
+ipol_polyharmonic <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   # Linear polyharmonic splines. Centres are columns in matrix knots. Function values in val.
   # k = 2 yields thin-plate splines.
   # k < 0 yields Gaussian kernel splines, with sigma^2 = -1 / k

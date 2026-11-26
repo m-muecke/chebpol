@@ -5,22 +5,22 @@
 #include <gsl/gsl_roots.h>
 #endif
 
-static const double MYEPS = 1e3 * 0x1p-26; // 1e3 * sqrt(DBL_EPSILON)
+static const double STALKER_EPS = 1e3 * 0x1p-26; // 1e3 * sqrt(DBL_EPSILON)
 typedef struct {
   double dmin, dplus, vmin, vplus;
   int pos;
-} rblock;
+} r_block;
 typedef struct {
   double kq, vmin, vplus;
-} sblock;
+} s_block;
 typedef struct {
   const double *det, *pmin, *pplus;
   bool uniform;
 } precomp;
 
 #ifdef HAVE_GSL
-static double rfun(double r, void *P) {
-  rblock *p = (rblock *)P;
+static double r_fun(double r, void *P) {
+  r_block *p = (r_block *)P;
   const double dmin = p->dmin, dplus = p->dplus, vmin = p->vmin, vplus = p->vplus;
   int pos = p->pos;
   if (pos)
@@ -29,21 +29,21 @@ static double rfun(double r, void *P) {
     return vmin * pow(dplus, r) - vplus * pow(dmin, r) + r * pow(dmin, r - 1) * (vmin * dplus + vplus * dmin);
 }
 
-static double findmonor(double dmin, double dplus, double vmin, double vplus) {
+static double find_mono_r(double dmin, double dplus, double vmin, double vplus) {
   double D2 = (vmin * dplus * dplus - vplus * dmin * dmin) / (vplus * dmin + dplus * vmin);
   double r;
   if (D2 > 2 * dplus || D2 < -2 * dmin) {
     r = 2.0;
-  } else if (fabs(dplus - dmin) < MYEPS * dplus) {
+  } else if (fabs(dplus - dmin) < STALKER_EPS * dplus) {
     // uniform grid
     r = fabs((vplus - vmin) / (vplus + vmin));
   } else {
     // Find the largest r which keeps it monotonic, i.e. derivative 0 in one
     // of the end points
-    rblock rb = {dmin, dplus, vmin, vplus, 1};
-    if (rfun(1, &rb) * rfun(2, &rb) > 0)
+    r_block rb = {dmin, dplus, vmin, vplus, 1};
+    if (r_fun(1, &rb) * r_fun(2, &rb) > 0)
       rb.pos = 0;
-    gsl_function F = {.function = &rfun, .params = &rb};
+    gsl_function F = {.function = &r_fun, .params = &rb};
     gsl_root_fsolver *s = gsl_root_fsolver_alloc(gsl_root_fsolver_brent);
     gsl_root_fsolver_set(s, &F, 1, 2);
     int status, iter = 0;
@@ -67,8 +67,8 @@ static double findmonor(double dmin, double dplus, double vmin, double vplus) {
   return r;
 }
 
-static double rfunnew(double r, void *P) {
-  sblock *p = (sblock *)P;
+static double r_fun_new(double r, void *P) {
+  s_block *p = (s_block *)P;
   const double kq = p->kq, vmin = p->vmin, vplus = p->vplus;
   return vplus * pow(-kq, r) - vmin - (vplus * kq - vmin) * r;
 }
@@ -79,7 +79,7 @@ static double solver(double kmin, double kplus, double vmin, double vplus) {
   double r;
   if (bn / ncn <= 2 * kmin || bn / ncn >= 2 * kplus) {
     r = 2.0;
-  } else if (fabs(kplus + kmin) < MYEPS * kplus) {
+  } else if (fabs(kplus + kmin) < STALKER_EPS * kplus) {
     // uniform grid
     r = fabs((vplus - vmin) / (vplus + vmin));
     if (r < 1)
@@ -89,7 +89,7 @@ static double solver(double kmin, double kplus, double vmin, double vplus) {
   } else {
     // Find the largest r which keeps it monotonic, i.e. derivative 0 in one
     // of the end points
-    sblock rb;
+    s_block rb;
     int eq1 = (vplus > 0 && ncn > 0) || (vplus < 0 && ncn < 0);
     if (eq1) {
       rb.kq = kmin / kplus;
@@ -100,7 +100,7 @@ static double solver(double kmin, double kplus, double vmin, double vplus) {
       rb.vmin = vplus;
       rb.vplus = vmin;
     }
-    gsl_function F = {.function = &rfunnew, .params = &rb};
+    gsl_function F = {.function = &r_fun_new, .params = &rb};
     gsl_root_fsolver *s = gsl_root_fsolver_alloc(gsl_root_fsolver_brent);
     gsl_root_fsolver_set(s, &F, 1, 2);
     int status, iter = 0;
@@ -120,7 +120,7 @@ static double solver(double kmin, double kplus, double vmin, double vplus) {
 #endif
 
 // hyperbolic stalker
-static double stalkhyp(double x, double vmin, double vplus, double dmin, double dplus) {
+static double stalk_hyp(double x, double vmin, double vplus, double dmin, double dplus) {
   if (fabs(x - dplus) < 1e3 * DBL_EPSILON * dplus)
     return vplus;
   if (fabs(x + dmin) < 1e3 * DBL_EPSILON * dmin)
@@ -156,8 +156,8 @@ static double stalkhyp(double x, double vmin, double vplus, double dmin, double 
 }
 
 // Variable degree stalker spline
-static double stalk1(double x, double vmin, double v0, double vplus, double dmin, double dplus, double r, double iD,
-                     double powmin, double powplus, bool uniform) {
+static double stalk_1(double x, double vmin, double v0, double vplus, double dmin, double dplus, double r, double iD,
+                      double powmin, double powplus, bool uniform) {
   // Do linear end points
 
   if (ISNAN(vmin))
@@ -167,7 +167,7 @@ static double stalk1(double x, double vmin, double v0, double vplus, double dmin
   vmin -= v0;
   vplus -= v0;
   if (r == 0)
-    return v0 + stalkhyp(x, vmin, vplus, dmin, dplus);
+    return v0 + stalk_hyp(x, vmin, vplus, dmin, dplus);
   if (!ISNAN(r)) {
     // use precomputed degree
     const double b = (vplus * powmin - vmin * powplus) * iD;
@@ -212,7 +212,7 @@ static double stalk1(double x, double vmin, double v0, double vplus, double dmin
       double b, c;
       if (vmin * vplus < 0) {
         // monotonic
-        r = findmonor(dmin, dplus, vmin, vplus);
+        r = find_mono_r(dmin, dplus, vmin, vplus);
       } else {
         // non-monotonic, should we keep f'(0) = 0? No, won't work.
         // We can use r=2, but if we just precisely is non-monotonic
@@ -220,7 +220,7 @@ static double stalk1(double x, double vmin, double v0, double vplus, double dmin
         // Keep it in some way "symmetric" with the monotonic case?  How?
         // Change sign on one of the values, compute the r which
         // fits these monotonic points.
-        r = findmonor(dmin, dplus, -vmin, vplus);
+        r = find_mono_r(dmin, dplus, -vmin, vplus);
       }
       if (ISNAN(r)) {
         c = 0;
@@ -236,15 +236,15 @@ static double stalk1(double x, double vmin, double v0, double vplus, double dmin
   }
 }
 
-static void make_stalk(const int nrank, const int *dims, const double **grid, const double *val, double *b, double *c,
-                       double *r, int depth, int *point) {
+static void make_stalker(const int nrank, const int *dims, const double **grid, const double *val, double *b, double *c,
+                         double *r, int depth, int *point) {
   // Loop over every grid point
   // In each grid point, find the function living there, i.e. b, c and r for each dimension.
   // Recurse over the dimensions to visit every grid point
   if (depth < nrank) {
     for (int i = 0; i < dims[depth]; i++) {
       point[depth] = i;
-      make_stalk(nrank, dims, grid, val, b, c, r, depth + 1, point);
+      make_stalker(nrank, dims, grid, val, b, c, r, depth + 1, point);
     }
     return;
   }
@@ -283,7 +283,7 @@ static void make_stalk(const int nrank, const int *dims, const double **grid, co
       double vmin = val[index - stride] - v0;
       double kplus = gr[idx + 1] - gr[idx];
       double kmin = gr[idx - 1] - gr[idx];
-      bool uniform = fabs(kplus + kmin) < MYEPS * kplus;
+      bool uniform = fabs(kplus + kmin) < STALKER_EPS * kplus;
       double r;
 
       // If non-monotonic, simulate monotonic by changing sign on vmin when computing r
@@ -293,7 +293,7 @@ static void make_stalk(const int nrank, const int *dims, const double **grid, co
         if (vplus == 0 && vmin == 0) {
           // constant zero
           r = 2.0;
-        } else if (fabs(kmin * vplus - kplus * vmin) <= MYEPS * (fabs(kmin * vplus) + fabs(kplus * vmin))) {
+        } else if (fabs(kmin * vplus - kplus * vmin) <= STALKER_EPS * (fabs(kmin * vplus) + fabs(kplus * vmin))) {
           // Linear
           r = 2.0;
         } else {
@@ -330,8 +330,8 @@ static void make_stalk(const int nrank, const int *dims, const double **grid, co
     stride *= dims[i];
   }
 }
-static double eval_stalk(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
-                         blend_type blend, const double *b, const double *c, const double *r) {
+static double eval_stalker(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
+                           blend_type blend, const double *b, const double *c, const double *r) {
   // loop over the corners of the hypercube surrounding x.
   // For each corner, evaluate the function there.
   // Make weighted sum.
@@ -353,8 +353,8 @@ static double eval_stalk(const double *x, const int nrank, const int *dims, cons
       weight = 0;
     if (weight > 1)
       weight = 1;
-    wlo[g] = blendfun(weight, blend);
-    wup[g] = blendfun(1 - weight, blend);
+    wlo[g] = blend_fun(weight, blend);
+    wup[g] = blend_fun(1 - weight, blend);
     llcorner += stride * gp;
     stride *= dims[g];
   }
@@ -406,8 +406,8 @@ static double eval_stalk(const double *x, const int nrank, const int *dims, cons
 
 // Find the parameters for the hyperbolic stalker in each grid point
 // use normalized coordinates as in the formulas, f(0) = 0
-static void make_hyp(const int nrank, const int *dims, const double **grid, const double *val, double *a, double *b,
-                     double *c, double *d, int depth, int *point) {
+static void make_hstalker(const int nrank, const int *dims, const double **grid, const double *val, double *a,
+                          double *b, double *c, double *d, int depth, int *point) {
   // Loop over every grid point
   // In each grid point, find the function living there, i.e. an a,
   // and b,c,d for each dimension.
@@ -415,7 +415,7 @@ static void make_hyp(const int nrank, const int *dims, const double **grid, cons
   if (depth < nrank) {
     for (int i = 0; i < dims[depth]; i++) {
       point[depth] = i;
-      make_hyp(nrank, dims, grid, val, a, b, c, d, depth + 1, point);
+      make_hstalker(nrank, dims, grid, val, a, b, c, d, depth + 1, point);
     }
     return;
   }
@@ -475,7 +475,7 @@ static void make_hyp(const int nrank, const int *dims, const double **grid, cons
           bb[i] = cc[i] = dd[i] = 0.0;
         } else if (p * m <= 0) {
           // Monotonic
-          if (fabs(D) <= MYEPS * (fabs(k * p) + fabs(m))) {
+          if (fabs(D) <= STALKER_EPS * (fabs(k * p) + fabs(m))) {
             // Linear
             bb[i] = vplus / kplus;
             cc[i] = dd[i] = 0.0;
@@ -487,7 +487,7 @@ static void make_hyp(const int nrank, const int *dims, const double **grid, cons
           }
         } else {
           // Non-monotonic
-          if (fabs(D2) <= MYEPS * (fabs(k * k * p) + fabs(m))) {
+          if (fabs(D2) <= STALKER_EPS * (fabs(k * k * p) + fabs(m))) {
             // Parabola
             bb[i] = vplus / kplus / kplus;
             dd[i] = 0.0;
@@ -506,8 +506,8 @@ static void make_hyp(const int nrank, const int *dims, const double **grid, cons
   }
 }
 
-static double eval_hyp(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
-                       blend_type blend, const double *a, const double *b, const double *c, const double *d) {
+static double eval_hstalker(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
+                            blend_type blend, const double *a, const double *b, const double *c, const double *d) {
   // loop over the corners of the hypercube surrounding x.
   // For each corner, evaluate the function there.
   // Make weighted sum.
@@ -529,8 +529,8 @@ static double eval_hyp(const double *x, const int nrank, const int *dims, const 
       weight = 0;
     if (weight > 1)
       weight = 1;
-    wlo[g] = blendfun(weight, blend);
-    wup[g] = blendfun(1 - weight, blend);
+    wlo[g] = blend_fun(weight, blend);
+    wup[g] = blend_fun(1 - weight, blend);
     llcorner += stride * gp;
     stride *= dims[g];
   }
@@ -581,8 +581,8 @@ static double eval_hyp(const double *x, const int nrank, const int *dims, const 
   return V / sumw;
 }
 
-static double eval_stalker(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
-                           blend_type blend, const double *degree, precomp *pcomp) {
+static double eval_oldstalker(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
+                              blend_type blend, const double *degree, precomp *pcomp) {
 
   if (nrank == 0)
     return val[0];
@@ -606,11 +606,11 @@ static double eval_stalker(const double *x, const int nrank, const int *dims, co
   double v1 = NA_REAL, v2, v3, v4 = NA_REAL;
   if (newrank > 0) {
     if (imin > 0)
-      v1 = eval_stalker(x, newrank, dims, grid, val + (imin - 1) * stride, blend, degree, pcomp);
-    v2 = eval_stalker(x, newrank, dims, grid, val + imin * stride, blend, degree, pcomp);
-    v3 = eval_stalker(x, newrank, dims, grid, val + (imin + 1) * stride, blend, degree, pcomp);
+      v1 = eval_oldstalker(x, newrank, dims, grid, val + (imin - 1) * stride, blend, degree, pcomp);
+    v2 = eval_oldstalker(x, newrank, dims, grid, val + imin * stride, blend, degree, pcomp);
+    v3 = eval_oldstalker(x, newrank, dims, grid, val + (imin + 1) * stride, blend, degree, pcomp);
     if (imin < N - 2)
-      v4 = eval_stalker(x, newrank, dims, grid, val + (imin + 2) * stride, blend, degree, pcomp);
+      v4 = eval_oldstalker(x, newrank, dims, grid, val + (imin + 2) * stride, blend, degree, pcomp);
   } else {
     // save a recursion step
     if (imin > 0)
@@ -625,14 +625,14 @@ static double eval_stalker(const double *x, const int nrank, const int *dims, co
     dmin = gr[imin] - gr[imin - 1];
   double dplus = gr[imin + 1] - gr[imin];
   const double low =
-      stalk1(xx - gr[imin], v1, v2, v3, dmin, dplus, degree[newrank], rdet[imin], rpmin[imin], rpplus[imin], uniform);
+      stalk_1(xx - gr[imin], v1, v2, v3, dmin, dplus, degree[newrank], rdet[imin], rpmin[imin], rpplus[imin], uniform);
   dmin = dplus;
   if (imin < N - 2)
     dplus = gr[imin + 2] - gr[imin + 1];
   else
     dplus = NA_REAL;
-  const double high = stalk1(xx - gr[imin + 1], v2, v3, v4, dmin, dplus, degree[newrank], rdet[imin + 1],
-                             rpmin[imin + 1], rpplus[imin + 1], uniform);
+  const double high = stalk_1(xx - gr[imin + 1], v2, v3, v4, dmin, dplus, degree[newrank], rdet[imin + 1],
+                              rpmin[imin + 1], rpplus[imin + 1], uniform);
 
   // combine the basis functions
   // map into normalized coordinates
@@ -643,11 +643,11 @@ static double eval_stalker(const double *x, const int nrank, const int *dims, co
     return high;
   if (w == 1)
     return low;
-  w = blendfun(w, blend);
+  w = blend_fun(w, blend);
   return w * low + (1 - w) * high;
 }
 
-SEXP c_make_stalk(SEXP Sval, SEXP Sgrid) {
+SEXP c_make_stalker(SEXP Sval, SEXP Sgrid) {
   const int nrank = LENGTH(Sgrid);
   int dims[nrank];
   R_xlen_t len = 1;
@@ -686,12 +686,12 @@ SEXP c_make_stalk(SEXP Sval, SEXP Sgrid) {
     const double *gr = grid[i];
     double df = gr[1] - gr[0];
     for (int j = 2; j < dims[i]; j++)
-      if (fabs(gr[j] - gr[j - 1] - df) > MYEPS)
+      if (fabs(gr[j] - gr[j - 1] - df) > STALKER_EPS)
         Rf_warning("Non-uniform grid requires linking chebpol with GSL");
   }
 #endif
 
-  make_stalk(nrank, dims, grid, val, REAL(Sb), REAL(Sc), REAL(Sr), 0, point);
+  make_stalker(nrank, dims, grid, val, REAL(Sb), REAL(Sc), REAL(Sr), 0, point);
 
 #ifdef HAVE_GSL
   gsl_set_error_handler(gslh);
@@ -701,7 +701,7 @@ SEXP c_make_stalk(SEXP Sval, SEXP Sgrid) {
   return ret;
 }
 
-SEXP c_make_hyp(SEXP Sval, SEXP Sgrid) {
+SEXP c_make_hstalker(SEXP Sval, SEXP Sgrid) {
   const int nrank = LENGTH(Sgrid);
   int dims[nrank];
   R_xlen_t len = 1;
@@ -735,12 +735,12 @@ SEXP c_make_hyp(SEXP Sval, SEXP Sgrid) {
   SET_VECTOR_ELT(ret, 4, Sval);
   SET_VECTOR_ELT(ret, 5, Sgrid);
 
-  make_hyp(nrank, dims, grid, val, REAL(Sa), REAL(Sb), REAL(Sc), REAL(Sd), 0, point);
+  make_hstalker(nrank, dims, grid, val, REAL(Sa), REAL(Sb), REAL(Sc), REAL(Sd), 0, point);
   UNPROTECT(5);
   return ret;
 }
 
-SEXP c_eval_stalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
+SEXP c_eval_stalker(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   const double *x = REAL_RO(Sx);
   const int N = Rf_ncols(Sx);
   blend_type blend = (blend_type)Rf_asInteger(Sblend);
@@ -769,14 +769,14 @@ SEXP c_eval_stalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
 #pragma omp parallel for num_threads(threads) schedule(guided) if (N > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < N; i++) {
-    out[i] = eval_stalk(x + i * nrank, nrank, dims, grid, val, blend, b, c, r);
+    out[i] = eval_stalker(x + i * nrank, nrank, dims, grid, val, blend, b, c, r);
   }
 
   UNPROTECT(1);
   return ret;
 }
 
-SEXP c_eval_hyp(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
+SEXP c_eval_hstalker(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   const double *x = REAL_RO(Sx);
   const int N = Rf_ncols(Sx);
   blend_type blend = (blend_type)Rf_asInteger(Sblend);
@@ -805,14 +805,14 @@ SEXP c_eval_hyp(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
 #pragma omp parallel for num_threads(threads) schedule(guided) if (N > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < N; i++) {
-    out[i] = eval_hyp(x + i * nrank, nrank, dims, grid, val, blend, a, b, c, d);
+    out[i] = eval_hstalker(x + i * nrank, nrank, dims, grid, val, blend, a, b, c, d);
   }
 
   UNPROTECT(1);
   return ret;
 }
 
-SEXP c_eval_stalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthreads) {
+SEXP c_eval_oldstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthreads) {
   const double *x = REAL_RO(Sx);
   const int K = Rf_nrows(Sx);
   const int N = Rf_ncols(Sx);
@@ -870,7 +870,7 @@ SEXP c_eval_stalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthre
 #pragma omp parallel for num_threads(threads) schedule(guided) if (N > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < N; i++) {
-    out[i] = eval_stalker(x + i * nrank, nrank, dims, grid, val, blend, degree, pcomp);
+    out[i] = eval_oldstalker(x + i * nrank, nrank, dims, grid, val, blend, degree, pcomp);
   }
 #ifdef HAVE_GSL
   gsl_set_error_handler(gslh);
@@ -879,7 +879,7 @@ SEXP c_eval_stalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthre
   return ret;
 }
 
-SEXP c_have_gsl(void) {
+SEXP c_has_gsl(void) {
 #ifdef HAVE_GSL
   return Rf_ScalarLogical(TRUE);
 #else

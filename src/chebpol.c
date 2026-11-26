@@ -490,10 +490,10 @@ void eval_on_grid(void (*fun)(double *x, double *y, int valuedim, void *ud), dou
 typedef struct {
   SEXP call;
   SEXP first;
-} gridcall;
+} grid_call;
 
 static void call_fun(double *x, double *y, const int valuedim, void *userdata) {
-  gridcall *gc = (gridcall *)userdata;
+  grid_call *gc = (grid_call *)userdata;
   // The first grid point was evaluated to find the length of the value, don't call the function there again
   if (gc->first != NULL) {
     memcpy(y, REAL_RO(gc->first), valuedim * sizeof(double));
@@ -531,8 +531,8 @@ SEXP c_eval_on_grid(SEXP fun, SEXP sgrid) {
     Rf_error("`grid` must have at least one dimension.");
   const double *grid[rank];
   R_xlen_t len = 1;
-  SEXP R_dim = PROTECT(Rf_allocVector(INTSXP, rank));
-  int *dims = INTEGER(R_dim);
+  SEXP sdim = PROTECT(Rf_allocVector(INTSXP, rank));
+  int *dims = INTEGER(sdim);
   for (int i = 0; i < rank; i++) {
     grid[i] = REAL_RO(VECTOR_ELT(sgrid, i));
     dims[i] = LENGTH(VECTOR_ELT(sgrid, i));
@@ -544,19 +544,19 @@ SEXP c_eval_on_grid(SEXP fun, SEXP sgrid) {
   }
 
   // Create a call to fun
-  SEXP R_fcall = PROTECT(Rf_lang2(fun, R_NilValue));
+  SEXP fcall = PROTECT(Rf_lang2(fun, R_NilValue));
   // and an argument list to it
-  SEXP R_arg = PROTECT(Rf_allocVector(REALSXP, rank));
-  SETCADR(R_fcall, R_arg);
+  SEXP sarg = PROTECT(Rf_allocVector(REALSXP, rank));
+  SETCADR(fcall, sarg);
 
   // find the dimension of the result from the value at the first grid point
   for (int i = 0; i < rank; i++)
-    REAL(R_arg)[i] = grid[i][0];
-  SEXP fv = PROTECT(Rf_eval(R_fcall, R_BaseEnv));
+    REAL(sarg)[i] = grid[i][0];
+  SEXP fv = PROTECT(Rf_eval(fcall, R_BaseEnv));
   if (!Rf_isNumeric(fv))
     Rf_error("`fun` must return a numeric value.");
   const int valuedim = LENGTH(fv);
-  gridcall gc = {R_fcall, PROTECT(Rf_coerceVector(fv, REALSXP))};
+  grid_call gc = {fcall, PROTECT(Rf_coerceVector(fv, REALSXP))};
   if (valuedim > 0 && len > R_XLEN_T_MAX / valuedim)
     Rf_error("`fun` returns too many values on `grid` to store them.");
 
@@ -567,7 +567,7 @@ SEXP c_eval_on_grid(SEXP fun, SEXP sgrid) {
 
   // Set the dim-attribute
   if (valuedim == 1) {
-    Rf_setAttrib(resvec, R_DimSymbol, R_dim);
+    Rf_setAttrib(resvec, R_DimSymbol, sdim);
   } else {
     SEXP snewdim = PROTECT(Rf_allocVector(INTSXP, rank + 1));
     int *newdim = INTEGER(snewdim);
@@ -598,8 +598,8 @@ double eval_mlip(const int rank, const double *x, const double **grid, const int
     // upper end of the grid interval holding x[i]
     const int gp = find_interval(gdvec, dims[i], x[i]) + 1;
     const double weight = (x[i] - gdvec[gp - 1]) / (gdvec[gp] - gdvec[gp - 1]);
-    wup[i] = blendfun(weight, blend);
-    wlo[i] = blendfun(1 - weight, blend);
+    wup[i] = blend_fun(weight, blend);
+    wlo[i] = blend_fun(1 - weight, blend);
     valpos += stride * gp;
     stride *= dims[i];
   }
@@ -710,16 +710,16 @@ typedef struct {
   const double *lo, *hi, *inv;
   int m;
   const int *offsets, *items;
-} simplexgrid;
+} simplex_grid;
 
-static int gridcell(const double v, const double lo, const double inv, const int m) {
+static int grid_cell(const double v, const double lo, const double inv, const int m) {
   const int c = (int)((v - lo) * inv);
   return c < 0 ? 0 : (c >= m ? m - 1 : c);
 }
 
 // Whether simplex holds x. If so, vec has the barycentric coordinates of x.
-static bool insimplex(const double *x, const R_xlen_t simplex, const double *lumats, const int *ipivs,
-                      const double *bbox, const int dim, double *vec) {
+static bool in_simplex(const double *x, const R_xlen_t simplex, const double *lumats, const int *ipivs,
+                       const double *bbox, const int dim, double *vec) {
   // x must be in the bounding box
   const double *box = bbox + simplex * 2 * dim;
   for (int i = 0; i < dim; i++) {
@@ -739,7 +739,7 @@ static bool insimplex(const double *x, const R_xlen_t simplex, const double *lum
 }
 
 // The blended value in a simplex with vertices tri, at barycentric coordinates vec
-static double simplexvalue(const double *vec, const int *tri, const double *val, const int N, const blend_type blend) {
+static double simplex_value(const double *vec, const int *tri, const double *val, const int N, const blend_type blend) {
   if (blend == BLEND_SQUARE) {
     // the value at the vertex with the largest barycentric coordinate
     int largest = 0;
@@ -753,7 +753,7 @@ static double simplexvalue(const double *vec, const int *tri, const double *val,
   for (int d = 0; d < N; d++) {
     // rounding can put a barycentric coordinate slightly outside [0, 1]; <= also turns -0.0 into 0
     const double coord = vec[d] <= 0 ? 0 : (vec[d] >= 1 ? 1 : vec[d]);
-    const double w = blendfun(coord, blend);
+    const double w = blend_fun(coord, blend);
     if (w == 0)
       continue;
     wsum += w;
@@ -762,9 +762,9 @@ static double simplexvalue(const double *vec, const int *tri, const double *val,
   return sum / wsum;
 }
 
-static double findsimplex(const double *x, const double *knots, const int *dtri, const double *lumats, const int *ipivs,
-                          const double *bbox, bool epol, const double *val, const int dim, const int numsimplex,
-                          int nknots, blend_type blend, const simplexgrid *sg) {
+static double eval_sl(const double *x, const double *knots, const int *dtri, const double *lumats, const int *ipivs,
+                      const double *bbox, bool epol, const double *val, const int dim, const int numsimplex, int nknots,
+                      blend_type blend, const simplex_grid *sg) {
 
   for (int i = 0; i < dim; i++)
     if (ISNAN(x[i]))
@@ -783,7 +783,7 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
         cell = -1;
         break;
       }
-      cell += stride * gridcell(x[i], sg->lo[i], sg->inv[i], sg->m);
+      cell += stride * grid_cell(x[i], sg->lo[i], sg->inv[i], sg->m);
       stride *= sg->m;
     }
     cand = cell < 0 ? NULL : sg->items + sg->offsets[cell];
@@ -791,8 +791,8 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
   }
   for (int c = 0; c < ncand; c++) {
     const R_xlen_t simplex = cand != NULL ? cand[c] : c;
-    if (insimplex(x, simplex, lumats, ipivs, bbox, dim, vec))
-      return simplexvalue(vec, dtri + simplex * N, val, N, blend);
+    if (in_simplex(x, simplex, lumats, ipivs, bbox, dim, vec))
+      return simplex_value(vec, dtri + simplex * N, val, N, blend);
   }
 
   if (epol) {
@@ -862,7 +862,7 @@ SEXP c_eval_sl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP ext
   if (!Rf_isNull(Sblend))
     blend = (blend_type)Rf_asInteger(Sblend);
   // interpolants saved by earlier versions have no grid and scan all simplices
-  simplexgrid grid, *sg = NULL;
+  simplex_grid grid, *sg = NULL;
   if (LENGTH(adata) >= 7) {
     const double *bounds = REAL_RO(VECTOR_ELT(adata, 3));
     grid.lo = bounds;
@@ -879,26 +879,26 @@ SEXP c_eval_sl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP ext
 #endif
   for (R_xlen_t i = 0; i < numvec; i++) {
     resvec[i] =
-        findsimplex(x + i * dim, knots, dtri, lumats, pivots, bboxmat, epol, val, dim, numsimplex, nknots, blend, sg);
+        eval_sl(x + i * dim, knots, dtri, lumats, pivots, bboxmat, epol, val, dim, numsimplex, nknots, blend, sg);
   }
   UNPROTECT(1);
   return ret;
 }
 
 // The cells c0[j] .. c1[j] of the grid that a bounding box overlaps in each dimension, and how many cells that is
-static R_xlen_t boxcells(const double *box, const double *lo, const double *inv, const int m, const int dim, int *c0,
-                         int *c1) {
+static R_xlen_t box_cells(const double *box, const double *lo, const double *inv, const int m, const int dim, int *c0,
+                          int *c1) {
   R_xlen_t ncells = 1;
   for (int j = 0; j < dim; j++) {
-    c0[j] = gridcell(box[2 * j], lo[j], inv[j], m);
-    c1[j] = gridcell(box[2 * j + 1], lo[j], inv[j], m);
+    c0[j] = grid_cell(box[2 * j], lo[j], inv[j], m);
+    c1[j] = grid_cell(box[2 * j + 1], lo[j], inv[j], m);
     ncells *= c1[j] - c0[j] + 1;
   }
   return ncells;
 }
 
 // The position of the cell with coordinates cc in the list of cells
-static R_xlen_t cellindex(const int *cc, const int m, const int dim) {
+static R_xlen_t cell_index(const int *cc, const int m, const int dim) {
   R_xlen_t cell = 0, stride = 1;
   for (int j = 0; j < dim; j++) {
     cell += stride * cc[j];
@@ -908,7 +908,7 @@ static R_xlen_t cellindex(const int *cc, const int m, const int dim) {
 }
 
 // Step cc to the next cell in c0 .. c1. Returns false after the last one.
-static bool nextcell(int *cc, const int *c0, const int *c1, const int dim) {
+static bool next_cell(int *cc, const int *c0, const int *c1, const int dim) {
   for (int j = 0; j < dim; j++) {
     if (cc[j] < c1[j]) {
       cc[j]++;
@@ -921,7 +921,7 @@ static bool nextcell(int *cc, const int *c0, const int *c1, const int dim) {
 
 // Index the simplices by a uniform grid over the knots. Fills in elements 3 to 6 of retlist: the bounds, the
 // cells per dimension, and the offsets and items of the cell lists.
-static void buildsimplexgrid(SEXP retlist, const double *bboxmat, const int dim, const int numsimplex) {
+static void build_simplex_grid(SEXP retlist, const double *bboxmat, const int dim, const int numsimplex) {
   // the bounds of the grid, and the number of cells per unit length in each dimension
   SEXP Sbounds = Rf_allocVector(REALSXP, 3 * dim);
   SET_VECTOR_ELT(retlist, 3, Sbounds);
@@ -954,7 +954,7 @@ static void buildsimplexgrid(SEXP retlist, const double *bboxmat, const int dim,
       inv[j] = hi[j] > lo[j] ? m / (hi[j] - lo[j]) : 0.0;
     nitems = 0;
     for (R_xlen_t s = 0; s < numsimplex && nitems <= maxitems; s++)
-      nitems += boxcells(bboxmat + s * 2 * dim, lo, inv, m, dim, c0, c1);
+      nitems += box_cells(bboxmat + s * 2 * dim, lo, inv, m, dim, c0, c1);
     if (m == 1 || nitems <= maxitems)
       break;
   }
@@ -972,11 +972,11 @@ static void buildsimplexgrid(SEXP retlist, const double *bboxmat, const int dim,
   // count the simplices of each cell
   memset(offsets, 0, (ncells + 1) * sizeof(int));
   for (R_xlen_t s = 0; s < numsimplex; s++) {
-    boxcells(bboxmat + s * 2 * dim, lo, inv, m, dim, c0, c1);
+    box_cells(bboxmat + s * 2 * dim, lo, inv, m, dim, c0, c1);
     memcpy(cc, c0, dim * sizeof(int));
     do {
-      offsets[cellindex(cc, m, dim) + 1]++;
-    } while (nextcell(cc, c0, c1, dim));
+      offsets[cell_index(cc, m, dim) + 1]++;
+    } while (next_cell(cc, c0, c1, dim));
   }
   for (R_xlen_t i = 0; i < ncells; i++)
     offsets[i + 1] += offsets[i];
@@ -985,11 +985,11 @@ static void buildsimplexgrid(SEXP retlist, const double *bboxmat, const int dim,
   int *next = (int *)R_alloc(ncells, sizeof(int));
   memcpy(next, offsets, ncells * sizeof(int));
   for (R_xlen_t s = 0; s < numsimplex; s++) {
-    boxcells(bboxmat + s * 2 * dim, lo, inv, m, dim, c0, c1);
+    box_cells(bboxmat + s * 2 * dim, lo, inv, m, dim, c0, c1);
     memcpy(cc, c0, dim * sizeof(int));
     do {
-      items[next[cellindex(cc, m, dim)]++] = (int)s;
-    } while (nextcell(cc, c0, c1, dim));
+      items[next[cell_index(cc, m, dim)]++] = (int)s;
+    } while (next_cell(cc, c0, c1, dim));
   }
 }
 
@@ -1043,13 +1043,13 @@ SEXP c_analyze_simplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
     F77_CALL(dgetrf)(&N, &N, lumat, &N, ipiv, &info);
   }
 
-  buildsimplexgrid(retlist, bboxmat, dim, numsimplex);
+  build_simplex_grid(retlist, bboxmat, dim, numsimplex);
 
   UNPROTECT(1);
   return retlist;
 }
 
-SEXP c_have_fftw(void) {
+SEXP c_has_fftw(void) {
 #ifdef HAVE_FFTW
   return Rf_ScalarLogical(TRUE);
 #else
@@ -1130,6 +1130,6 @@ SEXP c_eval_rbf(SEXP a, SEXP b, SEXP c) {
   Rf_error("method = \"crbf\" is not available because chebpol has no ALGLIB support.");
   return R_NilValue;
 }
-SEXP c_have_alglib(void) { return Rf_ScalarLogical(FALSE); }
+SEXP c_has_alglib(void) { return Rf_ScalarLogical(FALSE); }
 
 #endif

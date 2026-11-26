@@ -1,4 +1,4 @@
-rbf.alglib <- function(val, knots, rbase = 2, layers = 5, lambda = 0, ...) {
+ipol_crbf <- function(val, knots, rbase = 2, layers = 5, lambda = 0, ...) {
   if (is.null(dim(knots))) {
     dim(knots) <- c(1L, length(knots))
   }
@@ -22,4 +22,4 @@ rbf.alglib <- function(val, knots, rbase = 2, layers = 5, lambda = 0, ...) {
 #'
 #' @return Returns `TRUE` if ALGLIB is available. Otherwise `FALSE`.
 #' @export
-havealglib <- function() .Call(c_have_alglib)
+havealglib <- function() .Call(c_has_alglib)

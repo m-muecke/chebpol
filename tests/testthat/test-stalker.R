@@ -16,7 +16,7 @@ test_that("stalker splines reproduce values at the grid points", {
 })
 
 test_that("stalker splines reproduce values on a non-uniform grid", {
-  skip_if_not(havegsl())
+  skip_if_not(has_gsl())
   f <- function(x) exp(-sum(x^2))
   grid <- list(seq(-1, 1, length.out = 9), seq(-1, 1, length.out = 7)^3)
   pts <- grid_points(grid)
@@ -158,7 +158,7 @@ test_that("the stalker spline does not depend on the scale of the values or the 
 })
 
 test_that("the old stalker spline with a solved degree does not depend on the scale of the grid", {
-  skip_if_not(havegsl())
+  skip_if_not(has_gsl())
   f <- function(x) exp(2 * x) * sin(5 * x)
   grid <- c(0, 0.1, 0.35, 0.5, 0.8, 1)
   x <- seq(0, 1, length.out = 101)

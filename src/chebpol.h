@@ -28,21 +28,21 @@ SEXP c_fh(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP c_fh_weights(SEXP, SEXP, SEXP);
 SEXP c_eval_mlip(SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP c_eval_on_grid(SEXP, SEXP);
-SEXP c_have_fftw(void);
+SEXP c_has_fftw(void);
 SEXP c_sq_diffs(SEXP, SEXP, SEXP);
 SEXP c_phi_func(SEXP, SEXP, SEXP);
 SEXP c_make_rbf(SEXP, SEXP, SEXP, SEXP);
 SEXP c_eval_rbf(SEXP, SEXP, SEXP);
-SEXP c_have_alglib(void);
+SEXP c_has_alglib(void);
 SEXP c_eval_polyh(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP c_eval_sl(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP c_eval_stalker(SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP c_make_hyp(SEXP, SEXP);
-SEXP c_eval_hyp(SEXP, SEXP, SEXP, SEXP);
-SEXP c_make_stalk(SEXP, SEXP);
-SEXP c_eval_stalk(SEXP, SEXP, SEXP, SEXP);
+SEXP c_eval_oldstalker(SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP c_make_hstalker(SEXP, SEXP);
+SEXP c_eval_hstalker(SEXP, SEXP, SEXP, SEXP);
+SEXP c_make_stalker(SEXP, SEXP);
+SEXP c_eval_stalker(SEXP, SEXP, SEXP, SEXP);
 SEXP c_analyze_simplex(SEXP, SEXP, SEXP);
-SEXP c_have_gsl(void);
+SEXP c_has_gsl(void);
 
 // C entry points made available to other packages in init.c
 double eval_cheb(const double *cf, const double *x, const int *dims, const int rank);
@@ -73,7 +73,7 @@ static inline int find_interval(const double *xt, const int n, const double x) {
   return lo;
 }
 
-static inline double blendfun(double w, blend_type blend) {
+static inline double blend_fun(double w, blend_type blend) {
   // only the linear blend is defined outside [0, 1], where it extrapolates
   if (blend != BLEND_LINEAR)
     w = w < 0 ? 0 : (w > 1 ? 1 : w);

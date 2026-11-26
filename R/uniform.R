@@ -5,7 +5,7 @@
 
 ugm <- function(x, n) sinpi(0.5 * x * (1 - n) / n)
 
-ucappx.real <- function(val, intervals = NULL) {
+ipol_uniform <- function(val, intervals = NULL) {
   if (is.null(dim(val))) {
     dim(val) <- length(val)
   }
@@ -33,7 +33,7 @@ ucappx.real <- function(val, intervals = NULL) {
   new_interpolant(crate(fun, cf, map, arity), method = "uniform", arity = arity, domain = domain)
 }
 
-ucappxf.real <- function(fun, dims, intervals = NULL, ...) {
+ipol_uniform_fun <- function(fun, dims, intervals = NULL, ...) {
   if (is.numeric(intervals) && length(intervals) == 2L) {
     intervals <- list(intervals)
   }
@@ -48,5 +48,5 @@ ucappxf.real <- function(fun, dims, intervals = NULL, ...) {
     stop(sprintf("The function `val` must return a single number, not %d values.", dim(val)[1L]))
   }
   names(dim(val)) <- names(dims)
-  ucappx.real(val, intervals)
+  ipol_uniform(val, intervals)
 }

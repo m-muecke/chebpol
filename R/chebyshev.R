@@ -1,7 +1,7 @@
 # Chebyshev transformation.  I.e. coefficients for given function values in the knots.
 
 # The Chebyshev knots of order n on an interval
-chebknots1 <- function(n, interval = NULL) {
+cheb_knots_1d <- function(n, interval = NULL) {
   kn <- cospi((seq_len(n) - 0.5) / n)
   if (is.null(interval)) {
     return(kn)
@@ -35,7 +35,7 @@ chebknots1 <- function(n, interval = NULL) {
 #' head(expand.grid(chebknots(c(x = 3, y = 4, z = 5), list(c(1, 3), c(4, 6), c(800, 900)))))
 chebknots <- function(dims, intervals = NULL) {
   if (is.null(intervals)) {
-    res <- lapply(dims, chebknots1)
+    res <- lapply(dims, cheb_knots_1d)
   } else {
     if (length(dims) == 1L && is.numeric(intervals)) {
       intervals <- list(intervals)
@@ -43,7 +43,7 @@ chebknots <- function(dims, intervals = NULL) {
     if (!is.list(intervals)) {
       stop("`intervals` must be a list with one length-2 vector per dimension.")
     }
-    res <- Map(chebknots1, dims, intervals)
+    res <- Map(cheb_knots_1d, dims, intervals)
   }
 
   res
@@ -143,7 +143,7 @@ chebeval <- function(x, coef, intervals = NULL, threads = getOption("chebpol.thr
   .Call(c_eval_cheb, coef, (x - mid) * ispan, threads, NULL)
 }
 
-chebappx.real <- function(val, intervals = NULL) {
+ipol_chebyshev <- function(val, intervals = NULL) {
   if (is.null(dim(val))) {
     # allow for one-dimensional
     dim(val) <- length(val)
@@ -180,22 +180,22 @@ chebappx.real <- function(val, intervals = NULL) {
   new_interpolant(fun, method = "chebyshev", arity = d, domain = stats::setNames(domain, nms))
 }
 
-chebappxf.real <- function(fun, dims, intervals = NULL, ...) {
+ipol_chebyshev_fun <- function(fun, dims, intervals = NULL, ...) {
   val <- evalongrid(fun, dims, intervals, ...)
   if (length(dim(val)) != length(dims)) {
     stop(sprintf("The function `val` must return a single number, not %d values.", dim(val)[1L]))
   }
   names(dim(val)) <- names(dims)
-  chebappx.real(val, intervals)
+  ipol_chebyshev(val, intervals)
 }
 
 # Interpolate on a Cartesian grid that is not a Chebyshev grid. `val` holds the function values in the
 # order of expand.grid(grid), and each grid dimension, increasing or decreasing, is mapped onto the
 # Chebyshev knots in [-1, 1]. This may be less accurate than a Chebyshev interpolation. Without a `grid`,
 # `val` must be on a Chebyshev grid and carry its dimensions.
-chebappxg.real <- function(val, grid = NULL) {
+ipol_general <- function(val, grid = NULL) {
   if (is.null(grid)) {
-    return(chebappx.real(val))
+    return(ipol_chebyshev(val))
   }
   if (is.null(dim(val))) {
     dim(val) <- length(val)
@@ -237,11 +237,11 @@ chebappxg.real <- function(val, grid = NULL) {
   new_interpolant(crate(fun, cf, gridmap, arity), method = "general", arity = arity, domain = intervals)
 }
 
-chebappxgf.real <- function(fun, grid, ...) {
+ipol_general_fun <- function(fun, grid, ...) {
   if (!is.list(grid)) {
     grid <- list(grid)
   }
-  chebappxg.real(evalongrid(fun, ..., grid = grid), grid)
+  ipol_general(evalongrid(fun, ..., grid = grid), grid)
 }
 
 #' Check whether chebpol uses FFTW
@@ -253,4 +253,4 @@ chebappxgf.real <- function(fun, grid, ...) {
 #'
 #' @return Returns `TRUE` if chebpol uses FFTW. Otherwise `FALSE`.
 #' @export
-havefftw <- function() .Call(c_have_fftw)
+havefftw <- function() .Call(c_has_fftw)

@@ -29,6 +29,6 @@
     Code
       ipol(array(0, c(3, 4)), grid = grid, method = "fh")
     Condition
-      Error in `fhappx.real()`:
+      Error in `ipol_fh()`:
       ! `val` must have dimensions 4 x 3 to match `grid`, not 3 x 4.
 
