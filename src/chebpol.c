@@ -471,13 +471,13 @@ SEXP c_eval_polyharmonic(SEXP s_x, SEXP s_knots, SEXP s_weights, SEXP s_lweights
 }
 
 // an R-free evalongrid. Recursive
-static void eval_on_grid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, const double **grid,
-                         const int *dims, const int ndim, const int valuedim, double *result, void *userdata) {
+static void eval_on_grid(void (*fun)(double *x, double *y, int nval, void *ud), double *arg, const double **grid,
+                         const int *dims, const int ndim, const int nval, double *result, void *userdata) {
   int last = ndim - 1;
-  R_xlen_t stride = valuedim;
+  R_xlen_t stride = nval;
 
   if (ndim == 0) {
-    fun(arg, &result[0], valuedim, userdata);
+    fun(arg, &result[0], nval, userdata);
     return;
   }
 
@@ -485,7 +485,7 @@ static void eval_on_grid(void (*fun)(double *x, double *y, int valuedim, void *u
     stride *= dims[i];
   for (int i = 0; i < dims[last]; i++) {
     arg[last] = grid[last][i];
-    eval_on_grid(fun, arg, grid, dims, last, valuedim, &result[i * stride], userdata);
+    eval_on_grid(fun, arg, grid, dims, last, nval, &result[i * stride], userdata);
   }
 }
 
@@ -495,11 +495,11 @@ typedef struct {
   SEXP first;
 } grid_call;
 
-static void call_fun(double *x, double *y, const int valuedim, void *userdata) {
+static void call_fun(double *x, double *y, const int nval, void *userdata) {
   grid_call *gc = (grid_call *)userdata;
   // The first grid point was evaluated to find the length of the value, don't call the function there again
   if (gc->first != NULL) {
-    memcpy(y, REAL_RO(gc->first), valuedim * sizeof(double));
+    memcpy(y, REAL_RO(gc->first), nval * sizeof(double));
     gc->first = NULL;
     return;
   }
@@ -519,10 +519,10 @@ static void call_fun(double *x, double *y, const int valuedim, void *userdata) {
   PROTECT_WITH_INDEX(fv, &ipx);
   if (!Rf_isNumeric(fv))
     Rf_error("`fun` must return a numeric value.");
-  if (LENGTH(fv) != valuedim)
-    Rf_error("`fun` must return a value of length %d at every grid point, not %d.", valuedim, LENGTH(fv));
+  if (LENGTH(fv) != nval)
+    Rf_error("`fun` must return a value of length %d at every grid point, not %d.", nval, LENGTH(fv));
   REPROTECT(fv = Rf_coerceVector(fv, REALSXP), ipx);
-  memcpy(y, REAL_RO(fv), valuedim * sizeof(double));
+  memcpy(y, REAL_RO(fv), nval * sizeof(double));
   UNPROTECT(1);
 }
 
@@ -533,7 +533,7 @@ SEXP c_eval_on_grid(SEXP s_fun, SEXP s_grid) {
   if (ndim == 0)
     Rf_error("`grid` must have at least one dimension.");
   const double *grid[ndim];
-  R_xlen_t len = 1;
+  R_xlen_t ngrid = 1;
   SEXP s_dim = PROTECT(Rf_allocVector(INTSXP, ndim));
   int *dims = INTEGER(s_dim);
   for (int i = 0; i < ndim; i++) {
@@ -541,9 +541,9 @@ SEXP c_eval_on_grid(SEXP s_fun, SEXP s_grid) {
     dims[i] = LENGTH(VECTOR_ELT(s_grid, i));
     if (dims[i] == 0)
       Rf_error("`grid` dimension %d must have at least one point.", i + 1);
-    if (len > R_XLEN_T_MAX / dims[i])
+    if (ngrid > R_XLEN_T_MAX / dims[i])
       Rf_error("`grid` has too many points.");
-    len *= dims[i];
+    ngrid *= dims[i];
   }
 
   // Create a call to s_fun
@@ -558,23 +558,23 @@ SEXP c_eval_on_grid(SEXP s_fun, SEXP s_grid) {
   SEXP fv = PROTECT(Rf_eval(s_call, R_BaseEnv));
   if (!Rf_isNumeric(fv))
     Rf_error("`fun` must return a numeric value.");
-  const int valuedim = LENGTH(fv);
+  const int nval = LENGTH(fv);
   grid_call gc = {s_call, PROTECT(Rf_coerceVector(fv, REALSXP))};
-  if (valuedim > 0 && len > R_XLEN_T_MAX / valuedim)
+  if (nval > 0 && ngrid > R_XLEN_T_MAX / nval)
     Rf_error("`fun` returns too many values on `grid` to store them.");
 
   // Now, fill in the grid points one by one in a buffer, call_fun copies it into the call
-  SEXP out = PROTECT(Rf_allocVector(REALSXP, len * valuedim));
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, ngrid * nval));
   double *arg = (double *)R_alloc(ndim, sizeof(double));
-  eval_on_grid(call_fun, arg, grid, dims, ndim, valuedim, REAL(out), (void *)&gc);
+  eval_on_grid(call_fun, arg, grid, dims, ndim, nval, REAL(out), (void *)&gc);
 
   // Set the dim-attribute
-  if (valuedim == 1) {
+  if (nval == 1) {
     Rf_setAttrib(out, R_DimSymbol, s_dim);
   } else {
     SEXP s_new_dim = PROTECT(Rf_allocVector(INTSXP, ndim + 1));
     int *newdim = INTEGER(s_new_dim);
-    newdim[0] = valuedim;
+    newdim[0] = nval;
     memcpy(newdim + 1, dims, ndim * sizeof(int));
     Rf_setAttrib(out, R_DimSymbol, s_new_dim);
     UNPROTECT(1);

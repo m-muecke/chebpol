@@ -654,27 +654,27 @@ static double eval_oldstalker(const double *x, const int ndim, const int *dims, 
 SEXP c_make_stalker(SEXP s_val, SEXP s_grid) {
   const int ndim = LENGTH(s_grid);
   int dims[ndim];
-  R_xlen_t len = 1;
+  R_xlen_t ngrid = 1;
   for (int i = 0; i < ndim; i++) {
     dims[i] = LENGTH(VECTOR_ELT(s_grid, i));
     if (dims[i] < 2)
       Rf_error("`grid` dimension %d must have at least two points, not %d.", i + 1, dims[i]);
-    len *= dims[i];
+    ngrid *= dims[i];
   }
-  if (len != XLENGTH(s_val)) {
-    Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)len, (long long)XLENGTH(s_val));
+  if (ngrid != XLENGTH(s_val)) {
+    Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)ngrid, (long long)XLENGTH(s_val));
   }
-  if (len > INT_MAX) {
-    Rf_error("`grid` must have at most %d points, not %lld.", INT_MAX, (long long)len);
+  if (ngrid > INT_MAX) {
+    Rf_error("`grid` must have at most %d points, not %lld.", INT_MAX, (long long)ngrid);
   }
   const double *val = REAL_RO(s_val);
   const double *grid[ndim];
   for (int i = 0; i < ndim; i++)
     grid[i] = REAL_RO(VECTOR_ELT(s_grid, i));
   int point[ndim];
-  SEXP s_b = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
-  SEXP s_c = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
-  SEXP s_degree = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
+  SEXP s_b = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)ngrid));
+  SEXP s_c = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)ngrid));
+  SEXP s_degree = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)ngrid));
   const char *names[] = {"b", "c", "degree", "val", "grid", ""};
   SEXP out = PROTECT(Rf_mkNamed(VECSXP, names));
   SET_VECTOR_ELT(out, 0, s_b);
@@ -710,28 +710,28 @@ SEXP c_make_stalker(SEXP s_val, SEXP s_grid) {
 SEXP c_make_hstalker(SEXP s_val, SEXP s_grid) {
   const int ndim = LENGTH(s_grid);
   int dims[ndim];
-  R_xlen_t len = 1;
+  R_xlen_t ngrid = 1;
   for (int i = 0; i < ndim; i++) {
     dims[i] = LENGTH(VECTOR_ELT(s_grid, i));
     if (dims[i] < 2)
       Rf_error("`grid` dimension %d must have at least two points, not %d.", i + 1, dims[i]);
-    len *= dims[i];
+    ngrid *= dims[i];
   }
-  if (len != XLENGTH(s_val)) {
-    Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)len, (long long)XLENGTH(s_val));
+  if (ngrid != XLENGTH(s_val)) {
+    Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)ngrid, (long long)XLENGTH(s_val));
   }
-  if (len > INT_MAX) {
-    Rf_error("`grid` must have at most %d points, not %lld.", INT_MAX, (long long)len);
+  if (ngrid > INT_MAX) {
+    Rf_error("`grid` must have at most %d points, not %lld.", INT_MAX, (long long)ngrid);
   }
   const double *val = REAL_RO(s_val);
   const double *grid[ndim];
   for (int i = 0; i < ndim; i++)
     grid[i] = REAL_RO(VECTOR_ELT(s_grid, i));
   int point[ndim];
-  SEXP s_a = PROTECT(Rf_allocVector(REALSXP, len));
-  SEXP s_b = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
-  SEXP s_c = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
-  SEXP s_d = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
+  SEXP s_a = PROTECT(Rf_allocVector(REALSXP, ngrid));
+  SEXP s_b = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)ngrid));
+  SEXP s_c = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)ngrid));
+  SEXP s_d = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)ngrid));
   const char *names[] = {"a", "b", "c", "d", "val", "grid", ""};
   SEXP out = PROTECT(Rf_mkNamed(VECSXP, names));
   SET_VECTOR_ELT(out, 0, s_a);
@@ -837,15 +837,15 @@ SEXP c_eval_oldstalker(SEXP s_x, SEXP s_stalker, SEXP s_degree, SEXP s_blend, SE
     Rf_error("`x` must have %d rows, one per dimension, not %d.", ndim, nrows);
 
   int dims[ndim];
-  R_xlen_t len = 1;
+  R_xlen_t ngrid = 1;
   for (int i = 0; i < ndim; i++) {
     dims[i] = LENGTH(VECTOR_ELT(s_grid, i));
     if (dims[i] < 2)
       Rf_error("`grid` dimension %d must have at least two points, not %d.", i + 1, dims[i]);
-    len *= dims[i];
+    ngrid *= dims[i];
   }
-  if (len != XLENGTH(VECTOR_ELT(s_stalker, 0))) {
-    Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)len,
+  if (ngrid != XLENGTH(VECTOR_ELT(s_stalker, 0))) {
+    Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)ngrid,
              (long long)XLENGTH(VECTOR_ELT(s_stalker, 0)));
   }
   if (LENGTH(s_degree) != ndim) {
