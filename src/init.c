@@ -6,7 +6,7 @@
 
 static const R_CallMethodDef CallEntries[] = {
     {"c_eval_chebyshev", (DL_FUNC)&c_eval_chebyshev, 3},
-    {"c_cheb_coef", (DL_FUNC)&c_cheb_coef, 3},
+    {"c_chebyshev_coef", (DL_FUNC)&c_chebyshev_coef, 3},
     {"c_eval_fh", (DL_FUNC)&c_eval_fh, 5},
     {"c_fh_weights", (DL_FUNC)&c_fh_weights, 3},
     {"c_eval_multilinear", (DL_FUNC)&c_eval_multilinear, 5},

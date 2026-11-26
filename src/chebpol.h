@@ -23,7 +23,7 @@
 
 // .Call entry points, registered in init.c
 SEXP c_eval_chebyshev(SEXP, SEXP, SEXP);
-SEXP c_cheb_coef(SEXP, SEXP, SEXP);
+SEXP c_chebyshev_coef(SEXP, SEXP, SEXP);
 SEXP c_eval_fh(SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP c_fh_weights(SEXP, SEXP, SEXP);
 SEXP c_eval_multilinear(SEXP, SEXP, SEXP, SEXP, SEXP);

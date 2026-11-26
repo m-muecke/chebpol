@@ -126,7 +126,7 @@ static void dct_matrix(const double *x, const int *dims, const int ndim, const R
   }
 }
 
-static void cheb_coef(const double *x, const int *dims, const int ndim, double *F, bool dct, int threads) {
+static void chebyshev_coef(const double *x, const int *dims, const int ndim, double *F, bool dct, int threads) {
   R_xlen_t siz = 1;
   for (int i = 0; i < ndim; i++)
     siz *= dims[i];
@@ -151,7 +151,7 @@ static void cheb_coef(const double *x, const int *dims, const int ndim, double *
   }
 }
 
-SEXP c_cheb_coef(SEXP s_x, SEXP s_dct, SEXP s_threads) {
+SEXP c_chebyshev_coef(SEXP s_x, SEXP s_dct, SEXP s_threads) {
   int threads = Rf_asInteger(s_threads);
   bool dct = Rf_asLogical(s_dct);
   SEXP s_dim = Rf_getAttrib(s_x, R_DimSymbol);
@@ -174,7 +174,7 @@ SEXP c_cheb_coef(SEXP s_x, SEXP s_dct, SEXP s_threads) {
     Rf_error("`val` must have at least one element.");
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, siz));
-  cheb_coef(REAL_RO(s_x), dims, ndim, REAL(out), dct, threads);
+  chebyshev_coef(REAL_RO(s_x), dims, ndim, REAL(out), dct, threads);
   Rf_setAttrib(out, R_DimSymbol, s_dim);
   Rf_setAttrib(out, R_DimNamesSymbol, Rf_getAttrib(s_x, R_DimNamesSymbol));
   UNPROTECT(1);

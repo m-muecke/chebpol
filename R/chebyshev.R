@@ -1,7 +1,7 @@
 # Chebyshev transformation.  I.e. coefficients for given function values in the knots.
 
 # The Chebyshev knots of order n on an interval
-cheb_knots_1d <- function(n, interval = NULL) {
+chebyshev_knots_1d <- function(n, interval = NULL) {
   kn <- cospi((seq_len(n) - 0.5) / n)
   if (is.null(interval)) {
     return(kn)
@@ -35,7 +35,7 @@ cheb_knots_1d <- function(n, interval = NULL) {
 #' head(expand.grid(chebknots(c(x = 3, y = 4, z = 5), list(c(1, 3), c(4, 6), c(800, 900)))))
 chebknots <- function(dims, intervals = NULL) {
   if (is.null(intervals)) {
-    res <- lapply(dims, cheb_knots_1d)
+    res <- lapply(dims, chebyshev_knots_1d)
   } else {
     if (length(dims) == 1L && is.numeric(intervals)) {
       intervals <- list(intervals)
@@ -43,7 +43,7 @@ chebknots <- function(dims, intervals = NULL) {
     if (!is.list(intervals)) {
       stop("`intervals` must be a list with one length-2 vector per dimension.")
     }
-    res <- Map(cheb_knots_1d, dims, intervals)
+    res <- Map(chebyshev_knots_1d, dims, intervals)
   }
 
   res
@@ -84,7 +84,7 @@ chebcoef <- function(val, dct = FALSE) {
   if (is.integer(val) || is.logical(val)) {
     storage.mode(val) <- "double"
   }
-  .Call(c_cheb_coef, val, dct, getOption("chebpol.threads"))
+  .Call(c_chebyshev_coef, val, dct, getOption("chebpol.threads"))
 }
 
 #' Evaluate a Chebyshev interpolation in a point
