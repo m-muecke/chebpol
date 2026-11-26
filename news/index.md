@@ -214,6 +214,11 @@
   values do not match the grid lengths. Previously the interpolant read
   past the end of the grid and returned meaningless values.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "fh"` no longer depends on the scale of the grid. Previously
+  any point within 2e-15 of a grid point got the value at that grid
+  point, which made the interpolant inaccurate on grids spaced less than
+  about 1e-12 apart.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "uniform"` now accepts a one-dimensional `grid` given as a
   bare vector, as the other grid methods do. Previously the interpolant
   returned `NaN`s.
