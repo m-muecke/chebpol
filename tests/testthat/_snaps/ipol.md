@@ -29,17 +29,17 @@
     Code
       ipol(function(x) c(x, 1), dims = 3, method = "chebyshev")
     Condition
-      Error in `ipol_chebyshev_fun()`:
+      Error in `ipol_chebyshev()`:
       ! The function `val` must return a single number, not 2 values.
     Code
       ipol(function(x) c(x, 1), dims = c(3, 4), method = "uniform")
     Condition
-      Error in `ipol_uniform_fun()`:
+      Error in `ipol_uniform()`:
       ! The function `val` must return a single number, not 3 values.
     Code
       ipol(function(x) numeric(0), dims = 3, method = "chebyshev")
     Condition
-      Error in `ipol_chebyshev_fun()`:
+      Error in `ipol_chebyshev()`:
       ! The function `val` must return a single number, not 0 values.
 
 # ipol() errors when val is neither values nor a function

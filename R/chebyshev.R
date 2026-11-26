@@ -143,7 +143,14 @@ chebeval <- function(x, coef, intervals = NULL, threads = getOption("chebpol.thr
   .Call(c_eval_cheb, coef, (x - mid) * ispan, threads, NULL)
 }
 
-ipol_chebyshev <- function(val, intervals = NULL) {
+ipol_chebyshev <- function(val, dims = NULL, intervals = NULL, ...) {
+  if (is.function(val)) {
+    val <- evalongrid(val, dims, intervals, ...)
+    if (length(dim(val)) != length(dims)) {
+      stop(sprintf("The function `val` must return a single number, not %d values.", dim(val)[1L]))
+    }
+    names(dim(val)) <- names(dims)
+  }
   if (is.null(dim(val))) {
     # allow for one-dimensional
     dim(val) <- length(val)
@@ -180,22 +187,19 @@ ipol_chebyshev <- function(val, intervals = NULL) {
   new_interpolant(fun, method = "chebyshev", arity = d, domain = stats::setNames(domain, nms))
 }
 
-ipol_chebyshev_fun <- function(fun, dims, intervals = NULL, ...) {
-  val <- evalongrid(fun, dims, intervals, ...)
-  if (length(dim(val)) != length(dims)) {
-    stop(sprintf("The function `val` must return a single number, not %d values.", dim(val)[1L]))
-  }
-  names(dim(val)) <- names(dims)
-  ipol_chebyshev(val, intervals)
-}
-
 # Interpolate on a Cartesian grid that is not a Chebyshev grid. `val` holds the function values in the
 # order of expand.grid(grid), and each grid dimension, increasing or decreasing, is mapped onto the
 # Chebyshev knots in [-1, 1]. This may be less accurate than a Chebyshev interpolation. Without a `grid`,
 # `val` must be on a Chebyshev grid and carry its dimensions.
-ipol_general <- function(val, grid = NULL) {
+ipol_general <- function(val, grid = NULL, ...) {
   if (is.null(grid)) {
     return(ipol_chebyshev(val))
+  }
+  if (is.function(val)) {
+    if (!is.list(grid)) {
+      grid <- list(grid)
+    }
+    val <- evalongrid(val, ..., grid = grid)
   }
   if (is.null(dim(val))) {
     dim(val) <- length(val)
@@ -235,13 +239,6 @@ ipol_general <- function(val, grid = NULL) {
     .Call(c_eval_cheb, cf, gridmap(x), threads, NULL)
   }
   new_interpolant(crate(fun, cf, gridmap, arity), method = "general", arity = arity, domain = intervals)
-}
-
-ipol_general_fun <- function(fun, grid, ...) {
-  if (!is.list(grid)) {
-    grid <- list(grid)
-  }
-  ipol_general(evalongrid(fun, ..., grid = grid), grid)
 }
 
 #' Check whether chebpol uses FFTW

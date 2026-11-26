@@ -168,13 +168,10 @@ ipol <- function(
       if (is.function(val) && is.null(dims)) {
         stop("`dims` must be given when `val` is a function.")
       }
-      if (is.function(val)) {
-        return(ipol_chebyshev_fun(val, dims, intervals, ...))
-      }
-      if (is.null(dim(val)) && !is.null(dims)) {
+      if (!is.function(val) && is.null(dim(val)) && !is.null(dims)) {
         dim(val) <- dims
       }
-      ipol_chebyshev(val, intervals)
+      ipol_chebyshev(val, dims, intervals, ...)
     },
     multilinear = {
       if (is.null(grid)) {
@@ -222,13 +219,10 @@ ipol <- function(
         intervals <- lapply(grid, range)
         warning("`intervals` not given, using the range of `grid`.")
       }
-      if (is.function(val)) {
-        return(ipol_uniform_fun(val, dims, intervals, ...))
-      }
-      if (is.null(dim(val)) && !is.null(dims)) {
+      if (!is.function(val) && is.null(dim(val)) && !is.null(dims)) {
         dim(val) <- dims
       }
-      ipol_uniform(val, intervals)
+      ipol_uniform(val, dims, intervals, ...)
     },
     general = {
       if (is.null(grid)) {
@@ -238,10 +232,7 @@ ipol <- function(
         stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
       }
       grid <- lapply(grid, as.numeric)
-      if (is.function(val)) {
-        return(ipol_general_fun(val, grid, ...))
-      }
-      ipol_general(val, grid)
+      ipol_general(val, grid, ...)
     },
     polyharmonic = {
       if (is.null(knots) && is.null(grid)) {

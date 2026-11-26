@@ -5,12 +5,25 @@
 
 ugm <- function(x, n) sinpi(0.5 * x * (1 - n) / n)
 
-ipol_uniform <- function(val, intervals = NULL) {
-  if (is.null(dim(val))) {
-    dim(val) <- length(val)
-  }
+ipol_uniform <- function(val, dims = NULL, intervals = NULL, ...) {
   if (is.numeric(intervals) && length(intervals) == 2L) {
     intervals <- list(intervals)
+  }
+  if (is.function(val)) {
+    grid <- if (is.null(intervals)) {
+      lapply(dims, \(d) seq(-1, 1, length.out = d))
+    } else {
+      assert_intervals(intervals, length(dims))
+      Map(\(d, i) seq(i[1L], i[2L], length.out = d), dims, intervals)
+    }
+    val <- evalongrid(val, ..., grid = grid)
+    if (length(dim(val)) != length(dims)) {
+      stop(sprintf("The function `val` must return a single number, not %d values.", dim(val)[1L]))
+    }
+    names(dim(val)) <- names(dims)
+  }
+  if (is.null(dim(val))) {
+    dim(val) <- length(val)
   }
   dims <- dim(val)
   arity <- length(dims)
@@ -31,22 +44,4 @@ ipol_uniform <- function(val, intervals = NULL) {
   }
   domain <- stats::setNames(intervals %||% rep(list(c(-1, 1)), arity), names(intervals) %||% names(dims))
   new_interpolant(crate(fun, cf, map, arity), method = "uniform", arity = arity, domain = domain)
-}
-
-ipol_uniform_fun <- function(fun, dims, intervals = NULL, ...) {
-  if (is.numeric(intervals) && length(intervals) == 2L) {
-    intervals <- list(intervals)
-  }
-  grid <- if (is.null(intervals)) {
-    lapply(dims, \(d) seq(-1, 1, length.out = d))
-  } else {
-    assert_intervals(intervals, length(dims))
-    Map(\(d, i) seq(i[1L], i[2L], length.out = d), dims, intervals)
-  }
-  val <- evalongrid(fun, ..., grid = grid)
-  if (length(dim(val)) != length(dims)) {
-    stop(sprintf("The function `val` must return a single number, not %d values.", dim(val)[1L]))
-  }
-  names(dim(val)) <- names(dims)
-  ipol_uniform(val, intervals)
 }
