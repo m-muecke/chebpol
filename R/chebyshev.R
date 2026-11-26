@@ -155,7 +155,7 @@ ipol_chebyshev <- function(val, dims = NULL, intervals = NULL, ...) {
     # allow for one-dimensional
     dim(val) <- length(val)
   }
-  d <- length(dim(val))
+  n_dim <- length(dim(val))
   # allow for vector, e.g. intervals = c(0, 1), put it inside list
   if (is.numeric(intervals) && length(intervals) == 2L) {
     intervals <- list(intervals)
@@ -166,25 +166,25 @@ ipol_chebyshev <- function(val, dims = NULL, intervals = NULL, ...) {
   if (is.null(intervals)) {
     # it's [-1, 1] intervals, so drop transformation
     fun <- function(x, threads = getOption("chebpol.threads")) {
-      x <- as_points(x, d)
+      x <- as_points(x, n_dim)
       .Call(c_eval_chebyshev, x, cf, threads)
     }
-    fun <- crate(fun, cf, d)
-    domain <- rep(list(c(-1, 1)), d)
+    fun <- crate(fun, cf, n_dim)
+    domain <- rep(list(c(-1, 1)), n_dim)
   } else {
     # it's intervals, create mapping into [-1, 1]
-    assert_intervals(intervals, d)
+    assert_intervals(intervals, n_dim)
     ispan <- vapply(intervals, \(x) 2 / diff(x), numeric(1L))
     mid <- vapply(intervals, mean, numeric(1L))
 
     fun <- function(x, threads = getOption("chebpol.threads")) {
-      x <- as_points(x, d)
+      x <- as_points(x, n_dim)
       .Call(c_eval_chebyshev, (x - mid) * ispan, cf, threads)
     }
-    fun <- crate(fun, cf, mid, ispan, d)
+    fun <- crate(fun, cf, mid, ispan, n_dim)
     domain <- intervals
   }
-  new_interpolant(fun, method = "chebyshev", arity = d, domain = stats::setNames(domain, nms))
+  new_interpolant(fun, method = "chebyshev", arity = n_dim, domain = stats::setNames(domain, nms))
 }
 
 # Interpolate on a Cartesian grid that is not a Chebyshev grid. `val` holds the function values in the
@@ -233,10 +233,10 @@ ipol_general <- function(val, grid = NULL, ...) {
     gridmaps
   )
   cf <- chebcoef(val)
-  arity <- length(grid)
+  n_dim <- length(grid)
   fun <- function(x, threads = getOption("chebpol.threads")) {
-    x <- as_points(x, arity)
+    x <- as_points(x, n_dim)
     .Call(c_eval_chebyshev, gridmap(x), cf, threads)
   }
-  new_interpolant(crate(fun, cf, gridmap, arity), method = "general", arity = arity, domain = intervals)
+  new_interpolant(crate(fun, cf, gridmap, n_dim), method = "general", arity = n_dim, domain = intervals)
 }

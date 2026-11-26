@@ -18,20 +18,20 @@ ipol_simplexlinear <- function(val, knots, ..., blend = NULL) {
   # For fast evaluation: For each simplex, we precompute the LU-factorization
   # needed for transforming to barycentric coordinates. These are used for finding the right simplex.
   simplices <- .Call(c_make_simplexlinear, dtri, knots, getOption("chebpol.threads"))
-  arity <- nrow(knots)
+  n_dim <- nrow(knots)
   fun <- function(
     x,
     threads = getOption("chebpol.threads"),
     epol = FALSE,
     blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
   ) {
-    x <- as_points(x, arity)
+    x <- as_points(x, n_dim)
     if (!is_flag(epol)) {
       stop("`epol` must be `TRUE` or `FALSE`.")
     }
     blend <- blend_types[[match.arg(blend)]]
     .Call(c_eval_simplexlinear, x, knots, dtri, simplices, val, epol, blend, threads)
   }
-  fun <- crate(fun, knots, dtri, simplices, val, arity)
-  new_interpolant(set_default_blend(fun, blend), method = "simplexlinear", arity = arity, domain = knots_domain(knots))
+  fun <- crate(fun, knots, dtri, simplices, val, n_dim)
+  new_interpolant(set_default_blend(fun, blend), method = "simplexlinear", arity = n_dim, domain = knots_domain(knots))
 }

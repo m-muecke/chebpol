@@ -6,10 +6,10 @@ ipol_crbf <- function(val, knots, rbase = 2, layers = 5, lambda = 0, ...) {
     val <- apply(knots, 2L, val, ...)
   }
   model <- .Call(c_make_crbf, rbind(knots, val), layers, rbase, lambda)
-  arity <- nrow(knots)
+  n_dim <- nrow(knots)
   fun <- function(x, threads = getOption("chebpol.threads")) {
-    x <- as_points(x, arity)
+    x <- as_points(x, n_dim)
     .Call(c_eval_crbf, x, model, threads)
   }
-  new_interpolant(crate(fun, model, arity), method = "crbf", arity = arity, domain = knots_domain(knots))
+  new_interpolant(crate(fun, model, n_dim), method = "crbf", arity = n_dim, domain = knots_domain(knots))
 }

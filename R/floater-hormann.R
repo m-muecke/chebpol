@@ -21,10 +21,10 @@ ipol_fh <- function(val, grid = NULL, degree = 1L, ...) {
   degree <- rep_len(as.integer(degree), length(grid))
   # calculate weights, formula 18 in Floater & Hormann, in C, parallelized
   weights <- .Call(c_fh_weights, grid, degree, getOption("chebpol.threads"))
-  arity <- length(grid)
+  n_dim <- length(grid)
   fun <- function(x, threads = getOption("chebpol.threads")) {
-    x <- as_points(x, arity)
+    x <- as_points(x, n_dim)
     .Call(c_eval_fh, x, grid, val, weights, threads)
   }
-  new_interpolant(crate(fun, val, grid, weights, arity), method = "fh", arity = arity, domain = lapply(grid, range))
+  new_interpolant(crate(fun, val, grid, weights, n_dim), method = "fh", arity = n_dim, domain = lapply(grid, range))
 }

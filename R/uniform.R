@@ -26,22 +26,22 @@ ipol_uniform <- function(val, dims = NULL, intervals = NULL, ...) {
     dim(val) <- length(val)
   }
   dims <- dim(val)
-  arity <- length(dims)
+  n_dim <- length(dims)
   cf <- chebcoef(val)
   # the per-dimension vectors recycle down the columns of x
   if (is.null(intervals)) {
     map <- crate(function(x) uniform_to_chebyshev(x, dims), dims)
   } else {
-    assert_intervals(intervals, arity)
+    assert_intervals(intervals, n_dim)
     # precompute interval mid points and inverse lengths
     mid <- vapply(intervals, mean, numeric(1L))
     ispan <- vapply(intervals, \(i) 2 / diff(i), numeric(1L))
     map <- crate(function(x) uniform_to_chebyshev(ispan * (x - mid), dims), ispan, mid, dims)
   }
   fun <- function(x, threads = getOption("chebpol.threads")) {
-    x <- as_points(x, arity)
+    x <- as_points(x, n_dim)
     .Call(c_eval_chebyshev, map(x), cf, threads)
   }
-  domain <- stats::setNames(intervals %||% rep(list(c(-1, 1)), arity), names(intervals) %||% names(dims))
-  new_interpolant(crate(fun, cf, map, arity), method = "uniform", arity = arity, domain = domain)
+  domain <- stats::setNames(intervals %||% rep(list(c(-1, 1)), n_dim), names(intervals) %||% names(dims))
+  new_interpolant(crate(fun, cf, map, n_dim), method = "uniform", arity = n_dim, domain = domain)
 }

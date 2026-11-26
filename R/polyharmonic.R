@@ -12,10 +12,10 @@ ipol_polyharmonic <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE,
   if (is.function(val)) {
     val <- apply(knots, 2L, val, ...)
   }
-  N <- ncol(knots)
-  M <- nrow(knots)
-  if (length(val) != N) {
-    stop(sprintf("`val` must have one value per knot (%d), not %d.", N, length(val)))
+  n_knots <- ncol(knots)
+  n_dim <- nrow(knots)
+  if (length(val) != n_knots) {
+    stop(sprintf("`val` must have one value per knot (%d), not %d.", n_knots, length(val)))
   }
   domain <- knots_domain(knots)
   spans <- vapply(domain, diff, numeric(1L), USE.NAMES = FALSE)
@@ -41,11 +41,11 @@ ipol_polyharmonic <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE,
     if (ncol(normalize) != 2L) {
       stop("`normalize` must be a logical, a vector `c(a, b)`, or a two-column matrix.")
     }
-    if (M %% nrow(normalize) != 0L) {
+    if (n_dim %% nrow(normalize) != 0L) {
       stop(sprintf(
         "The number of rows of `normalize` (%d) must divide the number of dimensions (%d).",
         nrow(normalize),
-        M
+        n_dim
       ))
     }
     scale <- normalize[, 1L]
@@ -74,7 +74,7 @@ ipol_polyharmonic <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE,
   s <- svd(centered)
   # a direction is flat when the knots spread less along it than 1e-10 of their largest spread or than the rounding
   # of the coordinates it combines, so that a coordinate on a much smaller scale than the others still counts
-  size <- sqrt(N) * drop(crossprod(abs(s$u), apply(abs(knots), 1L, max)))
+  size <- sqrt(n_knots) * drop(crossprod(abs(s$u), apply(abs(knots), 1L, max)))
   flat <- pmax(1e-10 * pmin(s$d[1L], size), max(dim(knots)) * .Machine$double.eps * size)
   spread <- s$d > flat
   U <- s$u[, spread, drop = FALSE]
@@ -83,13 +83,13 @@ ipol_polyharmonic <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE,
   if (balance == 0) {
     balance <- 1
   }
-  B <- balance * rbind(1 / sqrt(N), t(s$v[, spread, drop = FALSE]))
+  B <- balance * rbind(1 / sqrt(n_knots), t(s$v[, spread, drop = FALSE]))
   L <- nrow(B)
-  n <- N + L
+  n <- n_knots + L
   mat <- matrix(0, n, n)
-  mat[seq_len(N), seq_len(N)] <- A
-  mat[N + seq_len(L), seq_len(N)] <- B
-  mat[seq_len(N), N + seq_len(L)] <- t(B)
+  mat[seq_len(n_knots), seq_len(n_knots)] <- A
+  mat[n_knots + seq_len(L), seq_len(n_knots)] <- B
+  mat[seq_len(n_knots), n_knots + seq_len(L)] <- t(B)
   # free the distance matrix before solve() makes its own copy of mat
   rm(A, B)
   rhs <- c(val, rep(0, L))
@@ -105,13 +105,13 @@ ipol_polyharmonic <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE,
     coefs <- stats::lm.fit(mat, rhs)$coefficients
     coefs[is.na(coefs)] <- 0
   }
-  w <- coefs[seq_len(N)]
-  basis_coef <- balance * coefs[N + seq_len(L)]
+  w <- coefs[seq_len(n_knots)]
+  basis_coef <- balance * coefs[n_knots + seq_len(L)]
   lin <- drop(U %*% (basis_coef[-1L] / s$d[spread]))
-  v <- c(basis_coef[1L] / sqrt(N) - sum(lin * mu), lin)
+  v <- c(basis_coef[1L] / sqrt(n_knots) - sum(lin * mu), lin)
   fun <- function(x, threads = getOption("chebpol.threads")) {
-    x <- as_points(x, M)
+    x <- as_points(x, n_dim)
     .Call(c_eval_polyharmonic, normfun(x), knots, w, v, k, threads)
   }
-  new_interpolant(crate(fun, normfun, knots, w, v, k, M), method = "polyharmonic", arity = M, domain = domain)
+  new_interpolant(crate(fun, normfun, knots, w, v, k, n_dim), method = "polyharmonic", arity = n_dim, domain = domain)
 }

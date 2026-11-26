@@ -38,14 +38,14 @@ ipol_oldstalker <- function(val, grid, degree = 2, ..., blend = NULL) {
     stop("`k = NA` on a non-uniform grid requires chebpol built with GSL.")
   }
 
-  arity <- length(grid)
+  n_dim <- length(grid)
   fun <- function(
     x,
     threads = getOption("chebpol.threads"),
     degree = default_degree,
     blend = c("linear", "cubic", "sigmoid", "parodic", "square")
   ) {
-    x <- as_points(x, arity)
+    x <- as_points(x, n_dim)
     blend <- blend_types[[match.arg(blend)]]
     if (!identical(degree, default_degree)) {
       degree <- rep_len(as.numeric(degree), length(grid))
@@ -56,8 +56,8 @@ ipol_oldstalker <- function(val, grid, degree = 2, ..., blend = NULL) {
     }
     .Call(c_eval_oldstalker, x, stalker, degree, blend, as.integer(threads))
   }
-  fun <- crate(fun, default_degree, grid, val, uniform, dmin, dplus, stalker, arity)
-  new_interpolant(set_default_blend(fun, blend), method = "oldstalker", arity = arity, domain = lapply(grid, range))
+  fun <- crate(fun, default_degree, grid, val, uniform, dmin, dplus, stalker, n_dim)
+  new_interpolant(set_default_blend(fun, blend), method = "oldstalker", arity = n_dim, domain = lapply(grid, range))
 }
 
 ipol_hstalker <- function(val, grid, ..., blend = NULL) {
@@ -75,18 +75,18 @@ ipol_hstalker <- function(val, grid, ..., blend = NULL) {
     val <- evalongrid(val, grid = grid, ...)
   }
   stalker <- .Call(c_make_hstalker, val, grid)
-  arity <- length(grid)
+  n_dim <- length(grid)
   fun <- function(
     x,
     threads = getOption("chebpol.threads"),
     blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
   ) {
-    x <- as_points(x, arity)
+    x <- as_points(x, n_dim)
     blend <- blend_types[[match.arg(blend)]]
     .Call(c_eval_hstalker, x, stalker, blend, as.integer(threads))
   }
-  fun <- crate(fun, stalker, arity)
-  new_interpolant(set_default_blend(fun, blend), method = "hstalker", arity = arity, domain = lapply(grid, range))
+  fun <- crate(fun, stalker, n_dim)
+  new_interpolant(set_default_blend(fun, blend), method = "hstalker", arity = n_dim, domain = lapply(grid, range))
 }
 
 ipol_stalker <- function(val, grid, ..., blend = NULL) {
@@ -104,16 +104,16 @@ ipol_stalker <- function(val, grid, ..., blend = NULL) {
     val <- evalongrid(val, grid = grid, ...)
   }
   stalker <- .Call(c_make_stalker, val, grid)
-  arity <- length(grid)
+  n_dim <- length(grid)
   fun <- function(
     x,
     threads = getOption("chebpol.threads"),
     blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
   ) {
-    x <- as_points(x, arity)
+    x <- as_points(x, n_dim)
     blend <- blend_types[[match.arg(blend)]]
     .Call(c_eval_stalker, x, stalker, blend, as.integer(threads))
   }
-  fun <- crate(fun, stalker, arity)
-  new_interpolant(set_default_blend(fun, blend), method = "stalker", arity = arity, domain = lapply(grid, range))
+  fun <- crate(fun, stalker, n_dim)
+  new_interpolant(set_default_blend(fun, blend), method = "stalker", arity = n_dim, domain = lapply(grid, range))
 }

@@ -11,39 +11,39 @@ knots_domain <- function(knots) {
 }
 
 # `sys.call(-1L)` would name a helper when `as_points()` is forced lazily inside it
-as_points <- function(x, arity, call = sys.call(sys.parent())) {
+as_points <- function(x, n_dim, call = sys.call(sys.parent())) {
   if (is.integer(x) || is.logical(x)) {
     storage.mode(x) <- "double"
   }
   if (is.matrix(x)) {
-    if (nrow(x) != arity) {
-      msg <- sprintf("`x` must have %d rows, one per dimension, not %d.", arity, nrow(x))
+    if (nrow(x) != n_dim) {
+      msg <- sprintf("`x` must have %d rows, one per dimension, not %d.", n_dim, nrow(x))
       stop(errorCondition(msg, call = call))
     }
     return(x)
   }
-  if (length(x) == arity) {
+  if (length(x) == n_dim) {
     return(x)
   }
-  if (arity == 1L) {
+  if (n_dim == 1L) {
     return(matrix(x, 1L))
   }
-  if (length(x) %% arity != 0L) {
-    msg <- sprintf("`x` must have length %d or be a matrix with %d rows, not length %d.", arity, arity, length(x))
+  if (length(x) %% n_dim != 0L) {
+    msg <- sprintf("`x` must have length %d or be a matrix with %d rows, not length %d.", n_dim, n_dim, length(x))
     stop(errorCondition(msg, call = call))
   }
-  n <- length(x) / arity
+  n <- length(x) / n_dim
   if (n > 1L) {
-    msg <- sprintf("Treating `x` of length %d as a %d x %d matrix, one point per column.", length(x), arity, n)
+    msg <- sprintf("Treating `x` of length %d as a %d x %d matrix, one point per column.", length(x), n_dim, n)
     warning(warningCondition(msg, call = call))
   }
-  dim(x) <- c(arity, n)
+  dim(x) <- c(n_dim, n)
   x
 }
 
-assert_intervals <- function(intervals, d, what = "val", call = sys.call(sys.parent())) {
-  if (!is.list(intervals) || length(intervals) != d || any(lengths(intervals) != 2L)) {
-    msg <- sprintf("`intervals` must be a list of %d `c(lower, upper)` pairs, one per dimension of `%s`.", d, what)
+assert_intervals <- function(intervals, n_dim, what = "val", call = sys.call(sys.parent())) {
+  if (!is.list(intervals) || length(intervals) != n_dim || any(lengths(intervals) != 2L)) {
+    msg <- sprintf("`intervals` must be a list of %d `c(lower, upper)` pairs, one per dimension of `%s`.", n_dim, what)
     stop(errorCondition(msg, call = call))
   }
 }

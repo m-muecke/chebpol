@@ -16,16 +16,16 @@ ipol_multilinear <- function(val, grid, ..., blend = NULL) {
     stop(sprintf("`val` must have one value per grid point (%d), not %d.", n, length(val)))
   }
   val <- as.numeric(val)
-  arity <- length(grid)
+  n_dim <- length(grid)
   fun <- function(
     x,
     threads = getOption("chebpol.threads"),
     blend = c("linear", "cubic", "sigmoid", "parodic", "square")
   ) {
-    x <- as_points(x, arity)
+    x <- as_points(x, n_dim)
     blend <- blend_types[[match.arg(blend)]]
     .Call(c_eval_multilinear, x, grid, val, blend, threads)
   }
-  fun <- crate(fun, grid, val, arity)
-  new_interpolant(set_default_blend(fun, blend), method = "multilinear", arity = arity, domain = lapply(grid, range))
+  fun <- crate(fun, grid, val, n_dim)
+  new_interpolant(set_default_blend(fun, blend), method = "multilinear", arity = n_dim, domain = lapply(grid, range))
 }
