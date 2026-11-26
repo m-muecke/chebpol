@@ -4,8 +4,9 @@
 #include <fftw3.h>
 #endif
 
+// The DCT-II of x with FFTW, scaled to Chebyshev coefficients unless dct. Returns false if FFTW can't plan it,
+// and always when chebpol is built without FFTW.
 #ifdef HAVE_FFTW
-// The DCT-II of x with FFTW, scaled to Chebyshev coefficients unless dct. Returns false if FFTW can't plan it.
 static bool dct_fftw(const double *x, const int *dims, const int rank, const R_xlen_t siz, double *F, bool dct,
                      int threads) {
   int rdims[rank];
@@ -58,6 +59,11 @@ static bool dct_fftw(const double *x, const int *dims, const int rank, const R_x
       F[i] *= isiz;
   }
   return true;
+}
+#else
+static bool dct_fftw(const double *x, const int *dims, const int rank, const R_xlen_t siz, double *F, bool dct,
+                     int threads) {
+  return false;
 }
 #endif
 
@@ -123,9 +129,7 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
   for (int i = 0; i < rank; i++)
     siz *= dims[i];
 
-#ifdef HAVE_FFTW
   if (!dct_fftw(x, dims, rank, siz, F, dct, threads))
-#endif
     dct_matrix(x, dims, rank, siz, F, dct);
 
   if (!dct) {
