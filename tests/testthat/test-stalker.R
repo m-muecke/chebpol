@@ -26,6 +26,17 @@ test_that("stalker splines reproduce values on a non-uniform grid", {
   }
 })
 
+test_that("the stalker spline lowers its degree next to a local extremum on a uniform grid", {
+  st <- ipol(c(1, 0, 0.1, 1), grid = list(1:4), method = "stalker")
+  expect_equal(st(2.25, blend = "square"), -0.45 * 0.25 + 0.55 * 0.25^(11 / 9))
+})
+
+test_that("the stalker spline warns about a non-uniform grid of any scale without GSL", {
+  skip_if(has_gsl())
+  expect_snapshot(st <- ipol(sin, grid = list(c(0, 1, 3) * 1e-6), method = "stalker"))
+  expect_no_warning(ipol(sin, grid = list(seq(0, 1e12, length.out = 7)), method = "stalker"))
+})
+
 test_that("stalker splines approximate a smooth function", {
   withr::local_seed(42)
   f <- function(x) exp(-sum(x^2))
@@ -144,7 +155,9 @@ test_that("the hyperbolic stalker does not depend on the scale of the values or 
 test_that("the stalker spline does not depend on the scale of the values or the grid", {
   f <- function(x) exp(2 * x) * sin(5 * x)
   x <- seq(0, 1, length.out = 101)
-  for (grid in list(seq(0, 1, length.out = 6), c(0, 0.1, 0.35, 0.5, 0.8, 1))) {
+  # a non-uniform grid warns without GSL
+  grids <- c(list(seq(0, 1, length.out = 6)), if (has_gsl()) list(c(0, 0.1, 0.35, 0.5, 0.8, 1)))
+  for (grid in grids) {
     expected <- ipol(f, grid = list(grid), method = "stalker")(x)
     for (scale in c(1e-150, 1e-7, 1e5, 1e150)) {
       values <- ipol(\(x) scale * f(x), grid = list(grid), method = "stalker")

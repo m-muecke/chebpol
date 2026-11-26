@@ -74,7 +74,10 @@ static double stalker_degree_root_fn(double degree, void *P) {
   const double ratio = p->ratio, vmin = p->vmin, vplus = p->vplus;
   return vplus * pow(-ratio, degree) - vmin - (vplus * ratio - vmin) * degree;
 }
+#endif
 
+// The largest degree up to 2 that keeps the stalker monotonic through a monotonic triple. Only a non-uniform
+// triple needs GSL to solve for it, without GSL it gets degree 2.
 static double stalker_degree(double hmin, double hplus, double vmin, double vplus) {
   double bn = (vplus * hmin * hmin - vmin * hplus * hplus);
   double ncn = vplus * hmin - vmin * hplus;
@@ -89,6 +92,7 @@ static double stalker_degree(double hmin, double hplus, double vmin, double vplu
     else if (ISNAN(degree) || degree > 2)
       degree = 2;
   } else {
+#ifdef HAVE_GSL
     // Find the largest degree which keeps it monotonic, i.e. derivative 0 in one
     // of the end points
     stalker_degree_params params;
@@ -116,10 +120,12 @@ static double stalker_degree(double hmin, double hplus, double vmin, double vplu
     } while (status == GSL_CONTINUE && iter < 50);
     // If the solver did not converge we keep its current estimate.
     gsl_root_fsolver_free(s);
+#else
+    degree = 2.0;
+#endif
   }
   return degree;
 }
-#endif
 
 // The hyperbolic basis function of the "oldstalker" method around a grid point, used when the degree is 0
 static double oldstalker_hyperbolic(double x, double vmin, double vplus, double dmin, double dplus) {
@@ -308,11 +314,7 @@ static void make_stalker(const int ndim, const int *dims, const double **grid, c
             if (ISNAN(deg) || deg > 2.0)
               deg = 2.0;
           } else {
-#ifdef HAVE_GSL
             deg = stalker_degree(hmin, hplus, vmin, vplus);
-#else
-            deg = 2.0;
-#endif
           }
         }
       } else {
@@ -320,11 +322,7 @@ static void make_stalker(const int ndim, const int *dims, const double **grid, c
         // At the outset, the degree is 2
         // But if we change sign on vmin, and the resulting monotonic triple
         // can't be handled by degree 2, we use the degree from there
-#ifdef HAVE_GSL
         deg = stalker_degree(hmin, hplus, -vmin, vplus);
-#else
-        deg = 2.0;
-#endif
       }
       degs[i] = deg;
       bb[i] = (vplus - vmin * pow(-hplus / hmin, deg)) / (hplus - hmin * pow(-hplus / hmin, deg));
@@ -685,13 +683,14 @@ SEXP c_make_stalker(SEXP s_val, SEXP s_grid) {
 #ifdef HAVE_GSL
   gsl_error_handler_t *gslh = gsl_set_error_handler_off();
 #else
-  // Check if grid is uniform, and warn once if not
+  // Check if grid is uniform, by the test make_stalker applies at each grid point, and warn once if not
   bool uniform = true;
   for (int i = 0; i < ndim && uniform; i++) {
     const double *gr = grid[i];
-    double df = gr[1] - gr[0];
-    for (int j = 2; j < dims[i] && uniform; j++)
-      uniform = fabs(gr[j] - gr[j - 1] - df) <= STALKER_EPS;
+    for (int j = 2; j < dims[i] && uniform; j++) {
+      const double hplus = gr[j] - gr[j - 1], hmin = gr[j - 2] - gr[j - 1];
+      uniform = fabs(hplus + hmin) < STALKER_EPS * hplus;
+    }
   }
   if (!uniform)
     Rf_warning("A non-uniform `grid` needs chebpol built with GSL, using degree 2 instead.");

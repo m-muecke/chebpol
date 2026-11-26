@@ -6,6 +6,14 @@
       Error in `st()`:
       ! `x` must have 2 rows, one per dimension, not 3.
 
+# the stalker spline warns about a non-uniform grid of any scale without GSL
+
+    Code
+      st <- ipol(sin, grid = list(c(0, 1, 3) * 1e-06), method = "stalker")
+    Condition
+      Warning in `ipol_stalker()`:
+      A non-uniform `grid` needs chebpol built with GSL, using degree 2 instead.
+
 # ipol() errors on invalid stalker input
 
     Code
