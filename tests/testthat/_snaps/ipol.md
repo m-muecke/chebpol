@@ -23,6 +23,13 @@
     Condition
       Error in `ipol()`:
       ! `grid` must not contain missing values.
+    Code
+      ipol(1:2, grid = c("a", "b"), method = "fh")
+    Condition
+      Warning in `lapply()`:
+      NAs introduced by coercion
+      Error in `ipol()`:
+      ! `grid` must not contain missing values.
 
 # ipol() errors when the function does not return a single number
 
