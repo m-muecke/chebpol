@@ -5,7 +5,6 @@ new_interpolant <- function(fun, method, arity, domain = NULL) {
     method = method,
     arity = arity,
     domain = as_domain(domain),
-    chebpol.version = utils::packageVersion("chebpol"),
     class = c("chebpol_interpolant", "function")
   )
 }

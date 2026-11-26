@@ -23,8 +23,7 @@ BugReports: https://github.com/m-muecke/chebpol/issues
 Depends:
     R (>= 4.1.0)
 Imports:
-    stats,
-    utils
+    stats
 Suggests:
     cubature,
     geometry,

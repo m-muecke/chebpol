@@ -4,6 +4,7 @@
 
 * chebpol now requires R >= 4.1.0.
 * `chebappx()`, `chebappxf()`, `chebappxg()`, `chebappxgf()`, `fhappx()`, `mlappx()`, `polyh()`, `slappx()`, `ucappx()` and `ucappxf()`, deprecated since version 1.7, have been removed. Use `ipol()` instead.
+* `ipol()` interpolants no longer have a `chebpol.version` attribute. Nothing in chebpol used it, and looking up the version took most of the time needed to create a small interpolant, which is now about four times faster.
 * geometry is now a suggested package instead of a required one, so installing chebpol no longer pulls in geometry and its dependencies. `ipol()` with `method = "simplexlinear"` needs it to build the triangulation and stops with an error when it is missing. Saved simplex linear interpolants can be evaluated without it.
 
 ## Minor improvements
@@ -34,7 +35,7 @@
 * `evalongrid()` and `ipol()` now stop with an error when `grid` has more points than R can store, e.g. four dimensions of 65,536 points each. Previously the number of points overflowed and R could crash.
 * `evalongrid()` and `ipol()` now stop with an error when `grid` has no dimensions, e.g. `grid = list()`. Previously `ipol()` returned an interpolant without variables for several methods, and other methods failed with "'dim' cannot be of length 0".
 * `evalongrid()` and `ipol()` now accept functions that return integer or logical values, and stop with an error when the length of the returned value changes between grid points.
-* `ipol()` interpolants created with an explicit `blend` now keep their `arity`, `domain` and `chebpol.version` attributes. Previously setting the default blend dropped them.
+* `ipol()` interpolants created with an explicit `blend` now keep their `arity` and `domain` attributes. Previously setting the default blend dropped them.
 * `ipol()` now stops with an error when `grid` contains missing values. Previously these failed with "missing value where TRUE/FALSE needed".
 * `ipol()` with `method = "chebyshev"` or `"uniform"` now stops with an error when the function does not return a single number. Previously a function returning a vector gave an interpolant with one variable too many, treating the position in the returned vector as an extra dimension.
 * `ipol()` now stops with an error when `val` is neither numeric values nor a function, such as a function name given as a string. Previously such input failed with unrelated errors, and a list of values was accepted by some methods.
