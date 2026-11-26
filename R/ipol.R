@@ -159,6 +159,9 @@ ipol <- function(
   if (!is.null(grid) && length(grid) == 0L) {
     stop("`grid` must have at least one dimension.")
   }
+  if (anyNA(grid, recursive = TRUE)) {
+    stop("`grid` must not contain missing values.")
+  }
   switch(
     method,
     chebyshev = {

@@ -91,6 +91,13 @@ test_that("ipol() errors on a grid without dimensions", {
   })
 })
 
+test_that("ipol() errors on a grid with missing values", {
+  expect_snapshot(error = TRUE, {
+    ipol(1:3, grid = c(0, NA, 1), method = "multilinear")
+    ipol(sum, grid = list(0:2, c(0, NaN, 1)), method = "fh")
+  })
+})
+
 test_that("ipol() errors when val is neither values nor a function", {
   grid <- list(1:3, 1:2)
   expect_snapshot(error = TRUE, {
