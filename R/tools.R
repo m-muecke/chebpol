@@ -65,6 +65,10 @@ as_points <- function(x, arity, call = sys.call(sys.parent())) {
   x
 }
 
+is_flag <- function(x) {
+  is.logical(x) && length(x) == 1L && !is.na(x)
+}
+
 grid_knots <- function(grid) {
   knots <- t(expand.grid(lapply(grid, as.numeric)))
   rownames(knots) <- names(grid)

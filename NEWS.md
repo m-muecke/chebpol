@@ -55,11 +55,13 @@
 * `ipol()` with `method = "polyharmonic"` now fits knots on a line or plane, such as a single knot or knots sharing a coordinate, and knots with a large offset or with coordinates on very different scales. Previously these returned `NaN` or fell back to an inaccurate least squares fit with a warning.
 * `ipol()` with `method = "polyharmonic"` now fits a spline with a single knot. Previously it failed with "invalid 'nrow' value".
 * `ipol()` with `method = "polyharmonic"` now stops with an error when `k` is zero, missing or not a single number. Previously `k = 0` silently fitted a spline with a logarithmic kernel that could be far off between the knots, and the other cases failed with "missing value where TRUE/FALSE needed" or "the condition has length > 1".
+* `ipol()` with `method = "polyharmonic"` now stops with an error when `nowarn` is not `TRUE` or `FALSE`. Previously `nowarn = NA` failed with "missing value where TRUE/FALSE needed", and only when the fit fell back to least squares.
 * `ipol()` with `method = "polyharmonic"` now stops with an error when the number of values differs from the number of knots. Previously it warned about falling back to a least squares fit and suggested `normalize = TRUE`.
 * `ipol()` with `method = "stalker"`, `"hstalker"` or `"oldstalker"` now stops with an error when a grid dimension has a single point. Previously the spline read past the end of the values and the grid.
 * `ipol()` interpolants created with `method = "hstalker"` no longer return `NaN` at a grid point with `blend = "mean"` when two neighboring values are equal.
 * `ipol()` with `method = "hstalker"` no longer depends on the scale of the values or of the grid. Previously small differences between neighboring values were treated as constant or linear, and could produce a narrow spike between grid points.
 * `ipol()` with `method = "stalker"` no longer depends on the scale of the values. Previously small differences between neighboring values were treated as constant or linear, so interpolating small values, e.g. `1e-6 * f`, gave a different curve than interpolating `f` and scaling the result.
+* `ipol()` interpolants created with `method = "simplexlinear"` now stop with an error when `epol` is not `TRUE` or `FALSE`. Previously `epol = NA` extrapolated as if it were `TRUE`.
 * `ipol()` interpolants created with `method = "stalker"`, `"hstalker"` or `"simplexlinear"` now stop with an error when given a matrix with the wrong number of rows. Previously they returned values silently, and could read past the end of the input.
 * `ipol()` interpolants created with `method = "oldstalker"` now report both ranks when given input of the wrong dimension.
 

@@ -11,6 +11,14 @@
       Error:
       ! The number of rows of `normalize` (3) must divide the number of dimensions (2).
 
+# ipol() errors when nowarn is not TRUE or FALSE
+
+    Code
+      ipol(sum, knots = knots, method = "polyharmonic", nowarn = NA)
+    Condition
+      Error:
+      ! `nowarn` must be `TRUE` or `FALSE`.
+
 # ipol() errors on an invalid polyharmonic k
 
     Code

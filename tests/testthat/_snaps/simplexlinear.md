@@ -1,3 +1,16 @@
+# simplex linear interpolants error when epol is not TRUE or FALSE
+
+    Code
+      sl(c(2, 2), epol = NA)
+    Condition
+      Error in `sl()`:
+      ! `epol` must be `TRUE` or `FALSE`.
+    Code
+      sl(c(2, 2), epol = "yes")
+    Condition
+      Error in `sl()`:
+      ! `epol` must be `TRUE` or `FALSE`.
+
 # ipol() errors without knots for simplex linear interpolation
 
     Code

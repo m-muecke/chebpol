@@ -38,6 +38,15 @@ test_that("simplex linear interpolation only extrapolates when asked", {
   expect_equal(sl(outside, epol = TRUE), f(outside))
 })
 
+test_that("simplex linear interpolants error when epol is not TRUE or FALSE", {
+  skip_if_not_installed("geometry")
+  sl <- ipol(sum, knots = cbind(c(0, 0), c(1, 0), c(0, 1)), method = "simplexlinear")
+  expect_snapshot(error = TRUE, {
+    sl(c(2, 2), epol = NA)
+    sl(c(2, 2), epol = "yes")
+  })
+})
+
 test_that("simplex linear interpolation builds knots from a grid", {
   skip_if_not_installed("geometry")
   f <- function(x) exp(-sum(x^2))

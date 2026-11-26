@@ -3,6 +3,9 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   # k = 2 yields thin-plate splines.
   # k < 0 yields Gaussian kernel splines, with sigma^2 = -1 / k
   # we compute r^2, so powers etc. are adjusted for that case
+  if (!is_flag(nowarn)) {
+    stop("`nowarn` must be `TRUE` or `FALSE`.")
+  }
   if (is.null(dim(knots))) {
     dim(knots) <- c(1L, length(knots))
   }

@@ -23,6 +23,9 @@ slappx.real <- function(val, knots, ..., blend = NULL) {
     blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
   ) {
     x <- as_points(x, arity)
+    if (!is_flag(epol)) {
+      stop("`epol` must be `TRUE` or `FALSE`.")
+    }
     blend <- blend_types[[match.arg(blend)]]
     .Call(C_evalsl, x, knots, dtri, adata, val, epol, threads, blend)
   }

@@ -69,6 +69,11 @@ test_that("ipol() errors on a malformed normalize", {
   })
 })
 
+test_that("ipol() errors when nowarn is not TRUE or FALSE", {
+  knots <- matrix(seq(0, 1, length.out = 20), 2L)
+  expect_snapshot(ipol(sum, knots = knots, method = "polyharmonic", nowarn = NA), error = TRUE)
+})
+
 test_that("ipol() errors on an invalid polyharmonic k", {
   knots <- matrix(seq(0.05, 0.95, length.out = 20), 2)
   f <- function(x) sum(x)
