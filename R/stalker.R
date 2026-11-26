@@ -26,7 +26,8 @@ oldstalkerappx <- function(val, grid, r = 2, ..., blend = NULL) {
   }
 
   r <- rep_len(as.numeric(r), length(grid))
-  uniform <- vapply(grid, \(g) all(abs(diff(g, differences = 2L)) < 1e-8), logical(1L))
+  # relative to the extent of the grid, so that it does not depend on its scale
+  uniform <- vapply(grid, \(g) all(abs(diff(g, differences = 2L)) < 1e-8 * diff(range(g))), logical(1L))
   # precompute distance between grid points
   dmin <- lapply(grid, \(gr) c(NaN, diff(gr)))
   dplus <- lapply(dmin, \(dd) c(dd[-1L], NaN))

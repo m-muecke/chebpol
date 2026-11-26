@@ -71,6 +71,7 @@
 * `ipol()` interpolants created with `method = "hstalker"` no longer return `NaN` at a grid point with `blend = "mean"` when two neighboring values are equal.
 * `ipol()` with `method = "hstalker"` no longer depends on the scale of the values or of the grid. Previously small differences between neighboring values were treated as constant or linear, and could produce a narrow spike between grid points.
 * `ipol()` with `method = "stalker"` no longer depends on the scale of the values. Previously small differences between neighboring values were treated as constant or linear, so interpolating small values, e.g. `1e-6 * f`, gave a different curve than interpolating `f` and scaling the result.
+* `ipol()` with `method = "oldstalker"` and `k = NA` no longer depends on the scale of the grid. Previously a non-uniform grid spaced less than about 1e-8 apart was treated as uniform, and the interpolant could overshoot the data by orders of magnitude.
 * `ipol()` interpolants created with `method = "simplexlinear"` now stop with an error when `epol` is not `TRUE` or `FALSE`. Previously `epol = NA` extrapolated as if it were `TRUE`.
 * `ipol()` interpolants created with `method = "stalker"`, `"hstalker"` or `"simplexlinear"` now stop with an error when given a matrix with the wrong number of rows. Previously they returned values silently, and could read past the end of the input.
 * `ipol()` interpolants created with `method = "oldstalker"` now report both ranks when given input of the wrong dimension.
