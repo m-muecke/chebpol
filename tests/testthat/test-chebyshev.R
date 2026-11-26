@@ -77,6 +77,14 @@ test_that("general grid interpolation maps each dimension of a matrix of points"
   expect_equal(ch(m[, 1L, drop = FALSE]), ch(m[, 1L]))
 })
 
+test_that("general grid interpolation is constant along a dimension with a single grid point", {
+  f <- function(x) x[1]^2 + x[2]
+  grid <- list(c(0, 0.3, 1), 5)
+  ch <- ipol(f, grid = grid, method = "general")
+  expect_equal(ch(c(0.3, 5)), f(c(0.3, 5)))
+  expect_equal(ch(cbind(c(0.3, 5), c(1, 7))), c(f(c(0.3, 5)), f(c(1, 5))))
+})
+
 test_that("chebcoef() and chebeval() accept integer input", {
   values <- array(seq_len(20), c(5L, 4L))
   coef <- chebcoef(values + 0)

@@ -209,8 +209,13 @@ chebappxg.real <- function(val, grid = NULL) {
   dim(val) <- lengths(grid)
 
   intervals <- lapply(grid, range)
-  # create monotone splines with splinefun, method hyman
-  gridmaps <- Map(stats::splinefun, grid, chebknots(dim(val)), MoreArgs = list(method = "hyman"))
+  # create monotone splines with splinefun, method hyman, which gives NA for a single grid point. That point maps
+  # onto the single Chebyshev knot, 0.
+  gridmaps <- Map(
+    \(g, knots) if (length(g) == 1L) \(x) 0 * x else stats::splinefun(g, knots, method = "hyman"),
+    grid,
+    chebknots(dim(val))
+  )
   gridmap <- crate(
     function(x) {
       if (!is.matrix(x)) {
