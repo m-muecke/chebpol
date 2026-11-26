@@ -48,15 +48,15 @@ ipol_polyharmonic <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE,
         M
       ))
     }
-    wa <- normalize[, 1L]
-    wb <- normalize[, 2L]
-    normfun <- crate(function(x) wa * (x - wb), wa, wb)
+    scale <- normalize[, 1L]
+    offset <- normalize[, 2L]
+    normfun <- crate(function(x) scale * (x - offset), scale, offset)
     knots <- normfun(knots)
     normalize <- TRUE
   } else if (normalize) {
-    wa <- 1 / ifelse(spans > 0, spans, 1)
-    wb <- apply(knots, 1L, min)
-    normfun <- crate(function(x) wa * (x - wb), wa, wb)
+    scale <- 1 / ifelse(spans > 0, spans, 1)
+    offset <- apply(knots, 1L, min)
+    normfun <- crate(function(x) scale * (x - offset), scale, offset)
     knots <- normfun(knots)
     normalize <- TRUE
   } else {
@@ -93,8 +93,8 @@ ipol_polyharmonic <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE,
   # free the distance matrix before solve() makes its own copy of mat
   rm(A, B)
   rhs <- c(val, rep(0, L))
-  wv <- try(solve(mat, rhs), silent = TRUE)
-  if (inherits(wv, "try-error")) {
+  coefs <- try(solve(mat, rhs), silent = TRUE)
+  if (inherits(coefs, "try-error")) {
     if (!nowarn) {
       msg <- paste0(
         "Can't fit the spline exactly, falling back to a least squares fit.",
@@ -102,13 +102,13 @@ ipol_polyharmonic <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE,
       )
       warning(warningCondition(msg, call = sys.call(sys.parent())))
     }
-    wv <- stats::lm.fit(mat, rhs)$coefficients
-    wv[is.na(wv)] <- 0
+    coefs <- stats::lm.fit(mat, rhs)$coefficients
+    coefs[is.na(coefs)] <- 0
   }
-  w <- wv[seq_len(N)]
-  coef <- balance * wv[N + seq_len(L)]
-  lin <- drop(U %*% (coef[-1L] / s$d[spread]))
-  v <- c(coef[1L] / sqrt(N) - sum(lin * mu), lin)
+  w <- coefs[seq_len(N)]
+  basis_coef <- balance * coefs[N + seq_len(L)]
+  lin <- drop(U %*% (basis_coef[-1L] / s$d[spread]))
+  v <- c(basis_coef[1L] / sqrt(N) - sum(lin * mu), lin)
   fun <- function(x, threads = getOption("chebpol.threads")) {
     x <- as_points(x, M)
     .Call(c_eval_polyharmonic, normfun(x), knots, w, v, k, threads, NULL)
