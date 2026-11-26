@@ -88,6 +88,8 @@
 <li>
 <code><a href="../reference/chebcoef.html">chebcoef()</a></code> now stops with an error when <code>dct</code> is <code>NA</code> or not a single logical. Previously <code>dct = NA</code> was treated as <code>TRUE</code>.</li>
 <li>
+<code><a href="../reference/chebeval.html">chebeval()</a></code> and <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "uniform"</code> now stop with an error when <code>intervals</code> is not a list with one <code>c(lower, upper)</code> pair per dimension, as <code>method = "chebyshev"</code> does. Previously a list of the wrong length was silently recycled, which mapped the points wrongly or gave an interpolant that could not be evaluated.</li>
+<li>
 <code><a href="../reference/chebeval.html">chebeval()</a></code> now treats coefficients without a <code>dim</code> attribute, such as <code>c(1, 0.5, 0.25)</code> or <code>as.numeric(chebcoef(val))</code>, as one-dimensional. Previously it failed with “INTEGER() can only be applied to a ‘integer’, not a ‘NULL’”.</li>
 <li>
 <code><a href="../reference/chebeval.html">chebeval()</a></code> now errors when <code>coef</code> is empty. Previously it could crash R.</li>
@@ -106,6 +108,10 @@
 <code><a href="../reference/evalongrid.html">evalongrid()</a></code> and <code><a href="../reference/ipol.html">ipol()</a></code> now accept functions that return integer or logical values, and stop with an error when the length of the returned value changes between grid points.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with an explicit <code>blend</code> now keep their <code>arity</code>, <code>domain</code> and <code>chebpol.version</code> attributes. Previously setting the default blend dropped them.</li>
+<li>
+<code><a href="../reference/ipol.html">ipol()</a></code> now stops with an error when <code>grid</code> contains missing values. Previously these failed with “missing value where TRUE/FALSE needed”.</li>
+<li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "chebyshev"</code> or <code>"uniform"</code> now stops with an error when the function does not return a single number. Previously a function returning a vector gave an interpolant with one variable too many, treating the position in the returned vector as an extra dimension.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> now stops with an error when <code>val</code> is neither numeric values nor a function, such as a function name given as a string. Previously such input failed with unrelated errors, and a list of values was accepted by some methods.</li>
 <li>
@@ -149,6 +155,8 @@
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now stops with an error when <code>k</code> is zero, missing or not a single number. Previously <code>k = 0</code> silently fitted a spline with a logarithmic kernel that could be far off between the knots, and the other cases failed with “missing value where TRUE/FALSE needed” or “the condition has length &gt; 1”.</li>
 <li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now stops with an error when <code>nowarn</code> is not <code>TRUE</code> or <code>FALSE</code>. Previously <code>nowarn = NA</code> failed with “missing value where TRUE/FALSE needed”, and only when the fit fell back to least squares.</li>
+<li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now stops with an error when the number of values differs from the number of knots. Previously it warned about falling back to a least squares fit and suggested <code>normalize = TRUE</code>.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "stalker"</code>, <code>"hstalker"</code> or <code>"oldstalker"</code> now stops with an error when a grid dimension has a single point. Previously the spline read past the end of the values and the grid.</li>
@@ -158,6 +166,8 @@
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "hstalker"</code> no longer depends on the scale of the values or of the grid. Previously small differences between neighboring values were treated as constant or linear, and could produce a narrow spike between grid points.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "stalker"</code> no longer depends on the scale of the values. Previously small differences between neighboring values were treated as constant or linear, so interpolating small values, e.g. <code>1e-6 * f</code>, gave a different curve than interpolating <code>f</code> and scaling the result.</li>
+<li>
+<code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "simplexlinear"</code> now stop with an error when <code>epol</code> is not <code>TRUE</code> or <code>FALSE</code>. Previously <code>epol = NA</code> extrapolated as if it were <code>TRUE</code>.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "stalker"</code>, <code>"hstalker"</code> or <code>"simplexlinear"</code> now stop with an error when given a matrix with the wrong number of rows. Previously they returned values silently, and could read past the end of the input.</li>
 <li>

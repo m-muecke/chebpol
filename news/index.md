@@ -87,6 +87,13 @@
   now stops with an error when `dct` is `NA` or not a single logical.
   Previously `dct = NA` was treated as `TRUE`.
 - [`chebeval()`](https://m-muecke.github.io/chebpol/reference/chebeval.md)
+  and [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  with `method = "uniform"` now stop with an error when `intervals` is
+  not a list with one `c(lower, upper)` pair per dimension, as
+  `method = "chebyshev"` does. Previously a list of the wrong length was
+  silently recycled, which mapped the points wrongly or gave an
+  interpolant that could not be evaluated.
+- [`chebeval()`](https://m-muecke.github.io/chebpol/reference/chebeval.md)
   now treats coefficients without a `dim` attribute, such as
   `c(1, 0.5, 0.25)` or `as.numeric(chebcoef(val))`, as one-dimensional.
   Previously it failed with “INTEGER() can only be applied to a
@@ -132,6 +139,14 @@
   interpolants created with an explicit `blend` now keep their `arity`,
   `domain` and `chebpol.version` attributes. Previously setting the
   default blend dropped them.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) now
+  stops with an error when `grid` contains missing values. Previously
+  these failed with “missing value where TRUE/FALSE needed”.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "chebyshev"` or `"uniform"` now stops with an error when the
+  function does not return a single number. Previously a function
+  returning a vector gave an interpolant with one variable too many,
+  treating the position in the returned vector as an extra dimension.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) now
   stops with an error when `val` is neither numeric values nor a
   function, such as a function name given as a string. Previously such
@@ -228,6 +243,11 @@
   knots, and the other cases failed with “missing value where TRUE/FALSE
   needed” or “the condition has length \> 1”.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "polyharmonic"` now stops with an error when `nowarn` is not
+  `TRUE` or `FALSE`. Previously `nowarn = NA` failed with “missing value
+  where TRUE/FALSE needed”, and only when the fit fell back to least
+  squares.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "polyharmonic"` now stops with an error when the number of
   values differs from the number of knots. Previously it warned about
   falling back to a least squares fit and suggested `normalize = TRUE`.
@@ -249,6 +269,10 @@
   Previously small differences between neighboring values were treated
   as constant or linear, so interpolating small values, e.g. `1e-6 * f`,
   gave a different curve than interpolating `f` and scaling the result.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  interpolants created with `method = "simplexlinear"` now stop with an
+  error when `epol` is not `TRUE` or `FALSE`. Previously `epol = NA`
+  extrapolated as if it were `TRUE`.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   interpolants created with `method = "stalker"`, `"hstalker"` or
   `"simplexlinear"` now stop with an error when given a matrix with the
