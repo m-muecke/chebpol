@@ -127,12 +127,12 @@ static double stalkhyp(double x, double vmin, double vplus, double dmin, double 
     return vmin;
   // hyperbolic function
   // a+bx-a/(cx+1)
-  if (fabs(vplus * dmin + vmin * dplus) < 1e3 * DBL_EPSILON * dmin * dplus)
+  // The special cases are detected relative to the size of the terms that cancel, so that they do not depend on
+  // the scale of the values or of the grid
+  if (fabs(vplus * dmin + vmin * dplus) <= 1e3 * DBL_EPSILON * (fabs(vplus) * dmin + fabs(vmin) * dplus))
     return x * (vplus - vmin) / (dplus + dmin); // linear
   if (vplus * vmin < 0) {
     // monotonic, set b=0
-    if (fabs(vmin - vplus) < 1e3 * DBL_EPSILON)
-      return 0;
     const double c = (vmin * dplus + vplus * dmin) / (dmin * dplus * (vmin - vplus));
     const double a = vplus + vplus / (c * dplus);
     return a - a / (1 + c * x);
@@ -140,7 +140,7 @@ static double stalkhyp(double x, double vmin, double vplus, double dmin, double 
     // non-monotonic
     const double D = dplus * dplus * vmin - dmin * dmin * vplus;
 
-    if (fabs(D) < 1e3 * DBL_EPSILON) {
+    if (fabs(D) <= 1e3 * DBL_EPSILON * (dplus * dplus * fabs(vmin) + dmin * dmin * fabs(vplus))) {
       // if c==0, it's a parabola y = a*x^2
       // we have (0,0), (-dmin,vmin), and (dplus,vplus)
       // vmin = a*dmin^2

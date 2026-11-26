@@ -169,6 +169,19 @@ test_that("the old stalker spline with a solved degree does not depend on the sc
   }
 })
 
+test_that("the old hyperbolic stalker spline does not depend on the scale of the values or the grid", {
+  f <- function(x) exp(2 * x) * sin(5 * x)
+  grid <- c(0, 0.1, 0.35, 0.5, 0.8, 1)
+  x <- seq(0, 1, length.out = 101)
+  expected <- ipol(f, grid = list(grid), method = "oldstalker", k = 0)(x)
+  for (scale in c(1e-12, 1e-6, 1e6, 1e12)) {
+    values <- ipol(\(x) scale * f(x), grid = list(grid), method = "oldstalker", k = 0)
+    expect_equal(values(x) / scale, expected)
+    stretched <- ipol(\(x) f(x / scale), grid = list(grid * scale), method = "oldstalker", k = 0)
+    expect_equal(stretched(x * scale), expected)
+  }
+})
+
 test_that("the hyperbolic stalker has no pole next to a nearly flat neighbor", {
   hst <- ipol(c(1e-6, 0, 1, 2), grid = list(c(-1, 0, 1, 2)), method = "hstalker")
   x <- c(0.999997, 0.999998, 0.999999)
