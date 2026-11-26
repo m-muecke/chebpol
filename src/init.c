@@ -33,9 +33,6 @@ void attribute_visible R_init_chebpol(DllInfo *dll) {
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
   R_forceSymbols(dll, TRUE);
-  R_RegisterCCallable("chebpol", "evalcheb", (DL_FUNC)&eval_chebyshev);
-  R_RegisterCCallable("chebpol", "evalmlip", (DL_FUNC)&eval_multilinear);
-  R_RegisterCCallable("chebpol", "evalongrid", (DL_FUNC)&eval_on_grid);
 }
 
 #ifdef HAVE_FFTW

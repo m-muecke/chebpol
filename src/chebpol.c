@@ -321,7 +321,7 @@ SEXP c_fh_weights(SEXP s_grid, SEXP s_d, SEXP s_threads) {
   return out;
 }
 
-double eval_chebyshev(const double *cf, const double *x, const int *dims, const int ndim) {
+static double eval_chebyshev(const double *cf, const double *x, const int *dims, const int ndim) {
   if (ndim == 0)
     return cf[0];
   // Otherwise, use the Clenshaw algorithm
@@ -469,8 +469,8 @@ SEXP c_eval_polyharmonic(SEXP s_x, SEXP s_knots, SEXP s_weights, SEXP s_lweights
 }
 
 // an R-free evalongrid. Recursive
-void eval_on_grid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, const double **grid,
-                  const int *dims, const int ndim, const int valuedim, double *result, void *userdata) {
+static void eval_on_grid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, const double **grid,
+                         const int *dims, const int ndim, const int valuedim, double *result, void *userdata) {
   int last = ndim - 1;
   R_xlen_t stride = valuedim;
 
@@ -581,8 +581,8 @@ SEXP c_eval_on_grid(SEXP s_fun, SEXP s_grid) {
   return out;
 }
 
-double eval_multilinear(const int ndim, const double *x, const double **grid, const int *dims, const double *values,
-                        int blend) {
+static double eval_multilinear(const int ndim, const double *x, const double **grid, const int *dims,
+                               const double *values, const blend_type blend) {
 
   // the blended weights of the lower and upper end of the interval in each dimension
   double wlo[ndim], wup[ndim];

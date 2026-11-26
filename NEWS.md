@@ -5,6 +5,7 @@
 * chebpol now requires R >= 4.1.0.
 * `chebappx()`, `chebappxf()`, `chebappxg()`, `chebappxgf()`, `fhappx()`, `mlappx()`, `polyh()`, `slappx()`, `ucappx()` and `ucappxf()`, deprecated since version 1.7, have been removed. Use `ipol()` instead.
 * `ipol()` interpolants no longer have a `chebpol.version` attribute. Nothing in chebpol used it, and looking up the version took most of the time needed to create a small interpolant, which is now about four times faster.
+* The C routines `evalcheb`, `evalmlip` and `evalongrid`, registered for other packages to call through `R_GetCCallable()`, have been removed. They were undocumented, had no header file, and no known package used them.
 * geometry is now a suggested package instead of a required one, so installing chebpol no longer pulls in geometry and its dependencies. `ipol()` with `method = "simplexlinear"` needs it to build the triangulation and stops with an error when it is missing. Saved simplex linear interpolants can be evaluated without it.
 
 ## Minor improvements
