@@ -11,6 +11,9 @@ slappx.real <- function(val, knots, ..., blend = NULL) {
   if (length(val) != ncol(knots)) {
     stop(sprintf("`val` must have one value per knot (%d), not %d.", ncol(knots), length(val)))
   }
+  if (is.integer(val) || is.logical(val)) {
+    storage.mode(val) <- "double"
+  }
   dtri <- t(geometry::delaunayn(t(knots), options = "Qt Pp"))
   # For fast evaluation: For each simplex, we precompute the LU-factorization
   # needed for transforming to barycentric coordinates. These are used for finding the right simplex.

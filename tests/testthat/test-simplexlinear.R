@@ -103,6 +103,16 @@ test_that("simplex linear interpolation forwards extra arguments to the function
   expect_equal(sl(knots), apply(knots, 2L, f, a = 3))
 })
 
+test_that("simplex linear interpolation accepts a function returning integer or logical values", {
+  skip_if_not_installed("geometry")
+  withr::local_seed(42)
+  knots <- matrix(runif(200, -1, 1), 2L)
+  sl <- ipol(\(x) x[1L] > 0, knots = knots, method = "simplexlinear")
+  expect_equal(sl(knots), as.numeric(knots[1L, ] > 0))
+  sl <- ipol(\(x) 2L, knots = knots, method = "simplexlinear")
+  expect_equal(sl(c(0, 0)), 2)
+})
+
 test_that("simplex linear blends reproduce values at the knots", {
   skip_if_not_installed("geometry")
   withr::local_seed(42)
