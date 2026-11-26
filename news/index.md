@@ -311,6 +311,11 @@
   Previously small differences between neighboring values were treated
   as constant or linear, so interpolating small values, e.g. `1e-6 * f`,
   gave a different curve than interpolating `f` and scaling the result.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "oldstalker"` and `k = NA` no longer depends on the scale of
+  the grid. Previously a non-uniform grid spaced less than about 1e-8
+  apart was treated as uniform, and the interpolant could overshoot the
+  data by orders of magnitude.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   interpolants created with `method = "simplexlinear"` now stop with an
   error when `epol` is not `TRUE` or `FALSE`. Previously `epol = NA`

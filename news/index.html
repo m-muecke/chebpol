@@ -181,6 +181,8 @@
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "stalker"</code> no longer depends on the scale of the values. Previously small differences between neighboring values were treated as constant or linear, so interpolating small values, e.g. <code>1e-6 * f</code>, gave a different curve than interpolating <code>f</code> and scaling the result.</li>
 <li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "oldstalker"</code> and <code>k = NA</code> no longer depends on the scale of the grid. Previously a non-uniform grid spaced less than about 1e-8 apart was treated as uniform, and the interpolant could overshoot the data by orders of magnitude.</li>
+<li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "simplexlinear"</code> now stop with an error when <code>epol</code> is not <code>TRUE</code> or <code>FALSE</code>. Previously <code>epol = NA</code> extrapolated as if it were <code>TRUE</code>.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "stalker"</code>, <code>"hstalker"</code> or <code>"simplexlinear"</code> now stop with an error when given a matrix with the wrong number of rows. Previously they returned values silently, and could read past the end of the input.</li>
