@@ -71,5 +71,5 @@
 #' # evaluate in some random points in R3
 #' m <- matrix(runif(15, -1, 1), 3)
 #' rbind(true = apply(m, 2, f), cheb = ch(m), fh = fh(m))
-#' @useDynLib chebpol, .registration=TRUE, .fixes='C_'
+#' @useDynLib chebpol, .registration = TRUE
 "_PACKAGE"

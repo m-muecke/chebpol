@@ -236,15 +236,15 @@ static double stalk1(double x, double vmin, double v0, double vplus, double dmin
   }
 }
 
-static void makestalk(const int nrank, const int *dims, const double **grid, const double *val, double *b, double *c,
-                      double *r, int depth, int *point) {
+static void make_stalk(const int nrank, const int *dims, const double **grid, const double *val, double *b, double *c,
+                       double *r, int depth, int *point) {
   // Loop over every grid point
   // In each grid point, find the function living there, i.e. b, c and r for each dimension.
   // Recurse over the dimensions to visit every grid point
   if (depth < nrank) {
     for (int i = 0; i < dims[depth]; i++) {
       point[depth] = i;
-      makestalk(nrank, dims, grid, val, b, c, r, depth + 1, point);
+      make_stalk(nrank, dims, grid, val, b, c, r, depth + 1, point);
     }
     return;
   }
@@ -330,8 +330,8 @@ static void makestalk(const int nrank, const int *dims, const double **grid, con
     stride *= dims[i];
   }
 }
-static double evalstalk(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
-                        blend_type blend, const double *b, const double *c, const double *r) {
+static double eval_stalk(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
+                         blend_type blend, const double *b, const double *c, const double *r) {
   // loop over the corners of the hypercube surrounding x.
   // For each corner, evaluate the function there.
   // Make weighted sum.
@@ -406,8 +406,8 @@ static double evalstalk(const double *x, const int nrank, const int *dims, const
 
 // Find the parameters for the hyperbolic stalker in each grid point
 // use normalized coordinates as in the formulas, f(0) = 0
-static void makehyp(const int nrank, const int *dims, const double **grid, const double *val, double *a, double *b,
-                    double *c, double *d, int depth, int *point) {
+static void make_hyp(const int nrank, const int *dims, const double **grid, const double *val, double *a, double *b,
+                     double *c, double *d, int depth, int *point) {
   // Loop over every grid point
   // In each grid point, find the function living there, i.e. an a,
   // and b,c,d for each dimension.
@@ -415,7 +415,7 @@ static void makehyp(const int nrank, const int *dims, const double **grid, const
   if (depth < nrank) {
     for (int i = 0; i < dims[depth]; i++) {
       point[depth] = i;
-      makehyp(nrank, dims, grid, val, a, b, c, d, depth + 1, point);
+      make_hyp(nrank, dims, grid, val, a, b, c, d, depth + 1, point);
     }
     return;
   }
@@ -506,8 +506,8 @@ static void makehyp(const int nrank, const int *dims, const double **grid, const
   }
 }
 
-static double evalhyp(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
-                      blend_type blend, const double *a, const double *b, const double *c, const double *d) {
+static double eval_hyp(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
+                       blend_type blend, const double *a, const double *b, const double *c, const double *d) {
   // loop over the corners of the hypercube surrounding x.
   // For each corner, evaluate the function there.
   // Make weighted sum.
@@ -581,8 +581,8 @@ static double evalhyp(const double *x, const int nrank, const int *dims, const d
   return V / sumw;
 }
 
-static double evalstalker(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
-                          blend_type blend, const double *degree, precomp *pcomp) {
+static double eval_stalker(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
+                           blend_type blend, const double *degree, precomp *pcomp) {
 
   if (nrank == 0)
     return val[0];
@@ -606,11 +606,11 @@ static double evalstalker(const double *x, const int nrank, const int *dims, con
   double v1 = NA_REAL, v2, v3, v4 = NA_REAL;
   if (newrank > 0) {
     if (imin > 0)
-      v1 = evalstalker(x, newrank, dims, grid, val + (imin - 1) * stride, blend, degree, pcomp);
-    v2 = evalstalker(x, newrank, dims, grid, val + imin * stride, blend, degree, pcomp);
-    v3 = evalstalker(x, newrank, dims, grid, val + (imin + 1) * stride, blend, degree, pcomp);
+      v1 = eval_stalker(x, newrank, dims, grid, val + (imin - 1) * stride, blend, degree, pcomp);
+    v2 = eval_stalker(x, newrank, dims, grid, val + imin * stride, blend, degree, pcomp);
+    v3 = eval_stalker(x, newrank, dims, grid, val + (imin + 1) * stride, blend, degree, pcomp);
     if (imin < N - 2)
-      v4 = evalstalker(x, newrank, dims, grid, val + (imin + 2) * stride, blend, degree, pcomp);
+      v4 = eval_stalker(x, newrank, dims, grid, val + (imin + 2) * stride, blend, degree, pcomp);
   } else {
     // save a recursion step
     if (imin > 0)
@@ -647,7 +647,7 @@ static double evalstalker(const double *x, const int nrank, const int *dims, con
   return w * low + (1 - w) * high;
 }
 
-SEXP R_makestalk(SEXP Sval, SEXP Sgrid) {
+SEXP c_make_stalk(SEXP Sval, SEXP Sgrid) {
   const int nrank = LENGTH(Sgrid);
   int dims[nrank];
   R_xlen_t len = 1;
@@ -691,7 +691,7 @@ SEXP R_makestalk(SEXP Sval, SEXP Sgrid) {
   }
 #endif
 
-  makestalk(nrank, dims, grid, val, REAL(Sb), REAL(Sc), REAL(Sr), 0, point);
+  make_stalk(nrank, dims, grid, val, REAL(Sb), REAL(Sc), REAL(Sr), 0, point);
 
 #ifdef HAVE_GSL
   gsl_set_error_handler(gslh);
@@ -701,7 +701,7 @@ SEXP R_makestalk(SEXP Sval, SEXP Sgrid) {
   return ret;
 }
 
-SEXP R_makehyp(SEXP Sval, SEXP Sgrid) {
+SEXP c_make_hyp(SEXP Sval, SEXP Sgrid) {
   const int nrank = LENGTH(Sgrid);
   int dims[nrank];
   R_xlen_t len = 1;
@@ -735,12 +735,12 @@ SEXP R_makehyp(SEXP Sval, SEXP Sgrid) {
   SET_VECTOR_ELT(ret, 4, Sval);
   SET_VECTOR_ELT(ret, 5, Sgrid);
 
-  makehyp(nrank, dims, grid, val, REAL(Sa), REAL(Sb), REAL(Sc), REAL(Sd), 0, point);
+  make_hyp(nrank, dims, grid, val, REAL(Sa), REAL(Sb), REAL(Sc), REAL(Sd), 0, point);
   UNPROTECT(5);
   return ret;
 }
 
-SEXP R_evalstalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
+SEXP c_eval_stalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   const double *x = REAL_RO(Sx);
   const int N = Rf_ncols(Sx);
   blend_type blend = (blend_type)Rf_asInteger(Sblend);
@@ -769,14 +769,14 @@ SEXP R_evalstalk(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
 #pragma omp parallel for num_threads(threads) schedule(guided) if (N > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < N; i++) {
-    out[i] = evalstalk(x + i * nrank, nrank, dims, grid, val, blend, b, c, r);
+    out[i] = eval_stalk(x + i * nrank, nrank, dims, grid, val, blend, b, c, r);
   }
 
   UNPROTECT(1);
   return ret;
 }
 
-SEXP R_evalhyp(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
+SEXP c_eval_hyp(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
   const double *x = REAL_RO(Sx);
   const int N = Rf_ncols(Sx);
   blend_type blend = (blend_type)Rf_asInteger(Sblend);
@@ -805,14 +805,14 @@ SEXP R_evalhyp(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
 #pragma omp parallel for num_threads(threads) schedule(guided) if (N > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < N; i++) {
-    out[i] = evalhyp(x + i * nrank, nrank, dims, grid, val, blend, a, b, c, d);
+    out[i] = eval_hyp(x + i * nrank, nrank, dims, grid, val, blend, a, b, c, d);
   }
 
   UNPROTECT(1);
   return ret;
 }
 
-SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthreads) {
+SEXP c_eval_stalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthreads) {
   const double *x = REAL_RO(Sx);
   const int K = Rf_nrows(Sx);
   const int N = Rf_ncols(Sx);
@@ -870,7 +870,7 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
 #pragma omp parallel for num_threads(threads) schedule(guided) if (N > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < N; i++) {
-    out[i] = evalstalker(x + i * nrank, nrank, dims, grid, val, blend, degree, pcomp);
+    out[i] = eval_stalker(x + i * nrank, nrank, dims, grid, val, blend, degree, pcomp);
   }
 #ifdef HAVE_GSL
   gsl_set_error_handler(gslh);
@@ -879,7 +879,7 @@ SEXP R_evalstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthrea
   return ret;
 }
 
-SEXP havegsl(void) {
+SEXP c_have_gsl(void) {
 #ifdef HAVE_GSL
   return Rf_ScalarLogical(TRUE);
 #else

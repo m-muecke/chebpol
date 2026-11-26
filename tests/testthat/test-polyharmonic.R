@@ -9,7 +9,7 @@ test_that("polyharmonic splines reproduce values at the knots", {
 test_that("sqdiffs gives the squared distances between the columns of two matrices", {
   x1 <- cbind(c(0, 0), c(1, 0))
   x2 <- cbind(c(0, 0), c(3, 0), c(0, 5))
-  expect_equal(.Call(C_sqdiffs, x1, x2, 1L), rbind(c(0, 9, 25), c(1, 4, 26)))
+  expect_equal(.Call(c_sq_diffs, x1, x2, 1L), rbind(c(0, 9, 25), c(1, 4, 26)))
 })
 
 test_that("polyharmonic splines approximate a smooth function", {

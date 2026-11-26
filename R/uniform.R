@@ -27,7 +27,7 @@ ucappx.real <- function(val, intervals = NULL) {
   }
   fun <- function(x, threads = getOption("chebpol.threads")) {
     x <- as_points(x, arity)
-    .Call(C_evalcheb, cf, map(x), threads, NULL)
+    .Call(c_eval_cheb, cf, map(x), threads, NULL)
   }
   domain <- stats::setNames(intervals %||% rep(list(c(-1, 1)), arity), names(intervals) %||% names(dims))
   new_interpolant(crate(fun, cf, map, arity), method = "uniform", arity = arity, domain = domain)

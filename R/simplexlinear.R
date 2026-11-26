@@ -17,7 +17,7 @@ slappx.real <- function(val, knots, ..., blend = NULL) {
   dtri <- t(geometry::delaunayn(t(knots), options = "Qt Pp"))
   # For fast evaluation: For each simplex, we precompute the LU-factorization
   # needed for transforming to barycentric coordinates. These are used for finding the right simplex.
-  adata <- .Call(C_analyzesimplex, dtri, knots, getOption("chebpol.threads"))
+  adata <- .Call(c_analyze_simplex, dtri, knots, getOption("chebpol.threads"))
   arity <- nrow(knots)
   fun <- function(
     x,
@@ -30,7 +30,7 @@ slappx.real <- function(val, knots, ..., blend = NULL) {
       stop("`epol` must be `TRUE` or `FALSE`.")
     }
     blend <- blend_types[[match.arg(blend)]]
-    .Call(C_evalsl, x, knots, dtri, adata, val, epol, threads, blend)
+    .Call(c_eval_sl, x, knots, dtri, adata, val, epol, threads, blend)
   }
   fun <- crate(fun, knots, dtri, adata, val, arity)
   new_interpolant(set_default_blend(fun, blend), method = "simplexlinear", arity = arity, domain = knots_domain(knots))

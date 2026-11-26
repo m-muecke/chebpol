@@ -54,7 +54,7 @@ oldstalkerappx <- function(val, grid, r = 2, ..., blend = NULL) {
       }
       stalker <- c(list(val = val, grid = grid), stalkercontext(dmin, dplus, degree), uniform = list(uniform))
     }
-    .Call(C_evalstalker, x, stalker, degree, blend, as.integer(threads))
+    .Call(c_eval_stalker, x, stalker, degree, blend, as.integer(threads))
   }
   fun <- crate(fun, r, grid, val, uniform, dmin, dplus, stalker, arity)
   new_interpolant(set_default_blend(fun, blend), method = "oldstalker", arity = arity, domain = lapply(grid, range))
@@ -74,7 +74,7 @@ hstalkerappx <- function(val, grid, ..., blend = NULL) {
   if (is.function(val)) {
     val <- evalongrid(val, grid = grid, ...)
   }
-  stalker <- .Call(C_makehyp, val, grid)
+  stalker <- .Call(c_make_hyp, val, grid)
   arity <- length(grid)
   fun <- function(
     x,
@@ -83,7 +83,7 @@ hstalkerappx <- function(val, grid, ..., blend = NULL) {
   ) {
     x <- as_points(x, arity)
     blend <- blend_types[[match.arg(blend)]]
-    .Call(C_evalhyp, x, stalker, blend, as.integer(threads))
+    .Call(c_eval_hyp, x, stalker, blend, as.integer(threads))
   }
   fun <- crate(fun, stalker, arity)
   new_interpolant(set_default_blend(fun, blend), method = "hstalker", arity = arity, domain = lapply(grid, range))
@@ -103,7 +103,7 @@ stalkerappx <- function(val, grid, ..., blend = NULL) {
   if (is.function(val)) {
     val <- evalongrid(val, grid = grid, ...)
   }
-  stalker <- .Call(C_makestalk, val, grid)
+  stalker <- .Call(c_make_stalk, val, grid)
   arity <- length(grid)
   fun <- function(
     x,
@@ -112,10 +112,10 @@ stalkerappx <- function(val, grid, ..., blend = NULL) {
   ) {
     x <- as_points(x, arity)
     blend <- blend_types[[match.arg(blend)]]
-    .Call(C_evalstalk, x, stalker, blend, as.integer(threads))
+    .Call(c_eval_stalk, x, stalker, blend, as.integer(threads))
   }
   fun <- crate(fun, stalker, arity)
   new_interpolant(set_default_blend(fun, blend), method = "stalker", arity = arity, domain = lapply(grid, range))
 }
 
-havegsl <- function() .Call(C_havegsl)
+havegsl <- function() .Call(c_have_gsl)

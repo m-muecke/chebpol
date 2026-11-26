@@ -22,33 +22,33 @@
 #endif
 
 // .Call entry points, registered in init.c
-SEXP R_evalcheb(SEXP, SEXP, SEXP, SEXP);
-SEXP R_chebcoef(SEXP, SEXP, SEXP);
-SEXP R_FH(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP R_fhweights(SEXP, SEXP, SEXP);
-SEXP R_evalmlip(SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP R_evalongrid(SEXP, SEXP);
-SEXP R_havefftw(void);
-SEXP R_sqdiffs(SEXP, SEXP, SEXP);
-SEXP R_phifunc(SEXP, SEXP, SEXP);
-SEXP R_makerbf(SEXP, SEXP, SEXP, SEXP);
-SEXP R_evalrbf(SEXP, SEXP, SEXP);
-SEXP R_havealglib(void);
-SEXP R_evalpolyh(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP R_evalsl(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP R_evalstalker(SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP R_makehyp(SEXP, SEXP);
-SEXP R_evalhyp(SEXP, SEXP, SEXP, SEXP);
-SEXP R_makestalk(SEXP, SEXP);
-SEXP R_evalstalk(SEXP, SEXP, SEXP, SEXP);
-SEXP R_analyzesimplex(SEXP, SEXP, SEXP);
-SEXP havegsl(void);
+SEXP c_eval_cheb(SEXP, SEXP, SEXP, SEXP);
+SEXP c_cheb_coef(SEXP, SEXP, SEXP);
+SEXP c_fh(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP c_fh_weights(SEXP, SEXP, SEXP);
+SEXP c_eval_mlip(SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP c_eval_on_grid(SEXP, SEXP);
+SEXP c_have_fftw(void);
+SEXP c_sq_diffs(SEXP, SEXP, SEXP);
+SEXP c_phi_func(SEXP, SEXP, SEXP);
+SEXP c_make_rbf(SEXP, SEXP, SEXP, SEXP);
+SEXP c_eval_rbf(SEXP, SEXP, SEXP);
+SEXP c_have_alglib(void);
+SEXP c_eval_polyh(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP c_eval_sl(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP c_eval_stalker(SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP c_make_hyp(SEXP, SEXP);
+SEXP c_eval_hyp(SEXP, SEXP, SEXP, SEXP);
+SEXP c_make_stalk(SEXP, SEXP);
+SEXP c_eval_stalk(SEXP, SEXP, SEXP, SEXP);
+SEXP c_analyze_simplex(SEXP, SEXP, SEXP);
+SEXP c_have_gsl(void);
 
 // C entry points made available to other packages in init.c
-double C_evalcheb(const double *cf, const double *x, const int *dims, const int rank);
-double C_evalmlip(const int rank, const double *x, const double **grid, const int *dims, const double *values,
-                  int blend);
-void C_evalongrid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, const double **grid,
+double eval_cheb(const double *cf, const double *x, const int *dims, const int rank);
+double eval_mlip(const int rank, const double *x, const double **grid, const int *dims, const double *values,
+                 int blend);
+void eval_on_grid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, const double **grid,
                   const int *dims, const int rank, const int valuedim, double *result, void *userdata);
 
 typedef enum {

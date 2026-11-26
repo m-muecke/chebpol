@@ -84,7 +84,7 @@ chebcoef <- function(val, dct = FALSE) {
   if (is.integer(val) || is.logical(val)) {
     storage.mode(val) <- "double"
   }
-  .Call(C_chebcoef, val, dct, getOption("chebpol.threads"))
+  .Call(c_cheb_coef, val, dct, getOption("chebpol.threads"))
 }
 
 #' Evaluate a Chebyshev interpolation in a point
@@ -132,7 +132,7 @@ chebeval <- function(x, coef, intervals = NULL, threads = getOption("chebpol.thr
     dim(coef) <- length(coef)
   }
   if (is.null(intervals)) {
-    return(.Call(C_evalcheb, coef, x, threads, NULL))
+    return(.Call(c_eval_cheb, coef, x, threads, NULL))
   }
   if (is.numeric(intervals) && length(intervals) == 2L) {
     intervals <- list(intervals)
@@ -140,7 +140,7 @@ chebeval <- function(x, coef, intervals = NULL, threads = getOption("chebpol.thr
   assert_intervals(intervals, length(dim(coef)), what = "coef")
   ispan <- vapply(intervals, \(i) 2 / diff(i), numeric(1L))
   mid <- vapply(intervals, mean, numeric(1L))
-  .Call(C_evalcheb, coef, (x - mid) * ispan, threads, NULL)
+  .Call(c_eval_cheb, coef, (x - mid) * ispan, threads, NULL)
 }
 
 chebappx.real <- function(val, intervals = NULL) {
@@ -160,7 +160,7 @@ chebappx.real <- function(val, intervals = NULL) {
     # it's [-1, 1] intervals, so drop transformation
     fun <- function(x, threads = getOption("chebpol.threads")) {
       x <- as_points(x, d)
-      .Call(C_evalcheb, cf, x, threads, NULL)
+      .Call(c_eval_cheb, cf, x, threads, NULL)
     }
     fun <- crate(fun, cf, d)
     domain <- rep(list(c(-1, 1)), d)
@@ -172,7 +172,7 @@ chebappx.real <- function(val, intervals = NULL) {
 
     fun <- function(x, threads = getOption("chebpol.threads")) {
       x <- as_points(x, d)
-      .Call(C_evalcheb, cf, (x - mid) * ispan, threads, NULL)
+      .Call(c_eval_cheb, cf, (x - mid) * ispan, threads, NULL)
     }
     fun <- crate(fun, cf, mid, ispan, d)
     domain <- intervals
@@ -232,7 +232,7 @@ chebappxg.real <- function(val, grid = NULL) {
   arity <- length(grid)
   fun <- function(x, threads = getOption("chebpol.threads")) {
     x <- as_points(x, arity)
-    .Call(C_evalcheb, cf, gridmap(x), threads, NULL)
+    .Call(c_eval_cheb, cf, gridmap(x), threads, NULL)
   }
   new_interpolant(crate(fun, cf, gridmap, arity), method = "general", arity = arity, domain = intervals)
 }
@@ -253,4 +253,4 @@ chebappxgf.real <- function(fun, grid, ...) {
 #'
 #' @return Returns `TRUE` if chebpol uses FFTW. Otherwise `FALSE`.
 #' @export
-havefftw <- function() .Call(C_havefftw)
+havefftw <- function() .Call(c_have_fftw)

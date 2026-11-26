@@ -65,7 +65,7 @@ evalongrid <- function(fun, dims, intervals = NULL, ..., grid = NULL) {
   }
   grid <- grid %||% chebknots(dims, intervals)
   fun <- match.fun(fun)
-  .Call(C_evalongrid, \(x) fun(x, ...), lapply(grid, as.numeric))
+  .Call(c_eval_on_grid, \(x) fun(x, ...), lapply(grid, as.numeric))
 }
 
 #' @rdname evalongrid

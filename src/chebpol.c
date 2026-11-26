@@ -124,7 +124,7 @@ static void dct_matrix(const double *x, const int *dims, const int rank, const R
   }
 }
 
-static void chebcoef(const double *x, const int *dims, const int rank, double *F, bool dct, int threads) {
+static void cheb_coef(const double *x, const int *dims, const int rank, double *F, bool dct, int threads) {
   R_xlen_t siz = 1;
   for (int i = 0; i < rank; i++)
     siz *= dims[i];
@@ -149,7 +149,7 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
   }
 }
 
-SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
+SEXP c_cheb_coef(SEXP x, SEXP sdct, SEXP Sthreads) {
   int threads = Rf_asInteger(Sthreads);
   bool dct = Rf_asLogical(sdct);
   SEXP dim = Rf_getAttrib(x, R_DimSymbol);
@@ -172,7 +172,7 @@ SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
     Rf_error("`val` must have at least one element.");
 
   SEXP resvec = PROTECT(Rf_allocVector(REALSXP, siz));
-  chebcoef(REAL_RO(x), dims, rank, REAL(resvec), dct, threads);
+  cheb_coef(REAL_RO(x), dims, rank, REAL(resvec), dct, threads);
   Rf_setAttrib(resvec, R_DimSymbol, dim);
   Rf_setAttrib(resvec, R_DimNamesSymbol, Rf_getAttrib(x, R_DimNamesSymbol));
   UNPROTECT(1);
@@ -180,7 +180,7 @@ SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
   return resvec;
 }
 
-static double FH(const double *fv, const double *x, const double **knots, const int *dims, const int rank,
+static double fh(const double *fv, const double *x, const double **knots, const int *dims, const int rank,
                  const double **weights) {
   if (rank == 0)
     return fv[0];
@@ -198,7 +198,7 @@ static double FH(const double *fv, const double *x, const double **knots, const 
   const double tol = 10.0 * DBL_EPSILON * fabs(kn[N - 1] - kn[0]);
   for (int i = 0; i < N; i++) {
     if (fabs(xx - kn[i]) <= tol)
-      return FH(&fv[i * siz], x, knots, dims, newrank, weights);
+      return fh(&fv[i * siz], x, knots, dims, newrank, weights);
   }
 
   // save a recursion step
@@ -212,7 +212,7 @@ static double FH(const double *fv, const double *x, const double **knots, const 
     return num / denom;
   }
   for (int i = 0; i < N; i++) {
-    const double val = FH(&fv[i * siz], x, knots, dims, newrank, weights);
+    const double val = fh(&fv[i * siz], x, knots, dims, newrank, weights);
     double pole = w[i] / (xx - kn[i]);
     num += pole * val;
     denom += pole;
@@ -220,7 +220,7 @@ static double FH(const double *fv, const double *x, const double **knots, const 
   return num / denom;
 }
 
-SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spare) {
+SEXP c_fh(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spare) {
   R_xlen_t siz = 1;
   const double *val = REAL_RO(vals);
 #ifdef _OPENMP
@@ -264,13 +264,13 @@ SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spa
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < numvec; i++) {
-    out[i] = FH(val, xp + i * rank, knots, dims, rank, weights);
+    out[i] = fh(val, xp + i * rank, knots, dims, rank, weights);
   }
   UNPROTECT(1);
   return resvec;
 }
 
-static void fhweights(const int n, const double *grid, const int d, double *w, int threads) {
+static void fh_weights(const int n, const double *grid, const int d, double *w, int threads) {
 #ifdef _OPENMP
 #pragma omp parallel for schedule(static) num_threads(threads) if (threads > 1)
 #endif
@@ -291,7 +291,7 @@ static void fhweights(const int n, const double *grid, const int d, double *w, i
 }
 
 // Compute the weights for Floater-Hormann. Formula (18) of the FH-paper
-SEXP R_fhweights(SEXP Sgrid, SEXP Sd, SEXP Sthreads) {
+SEXP c_fh_weights(SEXP Sgrid, SEXP Sd, SEXP Sthreads) {
   if (LENGTH(Sgrid) != LENGTH(Sd))
     Rf_error("Length of grid (%d) should equal length of d (%d)", LENGTH(Sgrid), LENGTH(Sd));
 
@@ -314,14 +314,14 @@ SEXP R_fhweights(SEXP Sgrid, SEXP Sd, SEXP Sthreads) {
   int threads = Rf_asInteger(Sthreads);
   for (int r = 0; r < rank; r++) {
     // The paper use index from 0 to n, i.e. n+1 knots in each dimension. Therefore dims[r]-1
-    fhweights(dims[r] - 1, grid[r], dd[r], wlist[r], threads);
+    fh_weights(dims[r] - 1, grid[r], dd[r], wlist[r], threads);
   }
 
   UNPROTECT(2);
   return ret;
 }
 
-double C_evalcheb(const double *cf, const double *x, const int *dims, const int rank) {
+double eval_cheb(const double *cf, const double *x, const int *dims, const int rank) {
   if (rank == 0)
     return cf[0];
   // Otherwise, use the Clenshaw algorithm
@@ -344,12 +344,12 @@ double C_evalcheb(const double *cf, const double *x, const int *dims, const int 
   for (int i = N - 1; i >= 0; i--) {
     bn2 = bn1;
     bn1 = bn;
-    bn = x2 * bn1 - bn2 + C_evalcheb(&cf[i * siz], x, dims, newrank);
+    bn = x2 * bn1 - bn2 + eval_cheb(&cf[i * siz], x, dims, newrank);
   }
   return bn - x[newrank] * bn1;
 }
 
-SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
+SEXP c_eval_cheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
   if (XLENGTH(coef) == 0)
     Rf_error("`coef` must have at least one element.");
   R_xlen_t siz = 1;
@@ -384,14 +384,14 @@ SEXP R_evalcheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < numvec; i++) {
-    out[i] = C_evalcheb(cf, xp + i * rank, dims, rank);
+    out[i] = eval_cheb(cf, xp + i * rank, dims, rank);
   }
   UNPROTECT(1);
   return resvec;
 }
 
-static double C_evalpolyh(const double *x, const double *knots, const double *weights, const double *lweights,
-                          const int rank, const int nknots, const double k) {
+static double eval_polyh(const double *x, const double *knots, const double *weights, const double *lweights,
+                         const int rank, const int nknots, const double k) {
   // Find squared distance to each knot
   int ki = (int)k;
   double wsum = 0.0;
@@ -430,7 +430,7 @@ static double C_evalpolyh(const double *x, const double *knots, const double *we
     wsum += lweights[i + 1] * x[i];
   return wsum;
 }
-SEXP R_evalpolyh(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, SEXP Sthreads, SEXP spare) {
+SEXP c_eval_polyh(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, SEXP Sthreads, SEXP spare) {
   const double *x = REAL_RO(inx);
   const double *knots = REAL_RO(Sknots);
   const double *w = REAL_RO(weights);
@@ -461,14 +461,14 @@ SEXP R_evalpolyh(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, SE
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < numvec; i++) {
-    out[i] = C_evalpolyh(x + i * rank, knots, w, lw, rank, nknots, k);
+    out[i] = eval_polyh(x + i * rank, knots, w, lw, rank, nknots, k);
   }
   UNPROTECT(1);
   return res;
 }
 
 // an R-free evalongrid. Recursive
-void C_evalongrid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, const double **grid,
+void eval_on_grid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, const double **grid,
                   const int *dims, const int rank, const int valuedim, double *result, void *userdata) {
   int mrank = rank - 1;
   R_xlen_t stride = valuedim;
@@ -482,7 +482,7 @@ void C_evalongrid(void (*fun)(double *x, double *y, int valuedim, void *ud), dou
     stride *= dims[i];
   for (int i = 0; i < dims[mrank]; i++) {
     arg[mrank] = grid[mrank][i];
-    C_evalongrid(fun, arg, grid, dims, mrank, valuedim, &result[i * stride], userdata);
+    eval_on_grid(fun, arg, grid, dims, mrank, valuedim, &result[i * stride], userdata);
   }
 }
 
@@ -492,7 +492,7 @@ typedef struct {
   SEXP first;
 } gridcall;
 
-static void C_call(double *x, double *y, const int valuedim, void *userdata) {
+static void call_fun(double *x, double *y, const int valuedim, void *userdata) {
   gridcall *gc = (gridcall *)userdata;
   // The first grid point was evaluated to find the length of the value, don't call the function there again
   if (gc->first != NULL) {
@@ -523,7 +523,7 @@ static void C_call(double *x, double *y, const int valuedim, void *userdata) {
   UNPROTECT(1);
 }
 
-SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
+SEXP c_eval_on_grid(SEXP fun, SEXP sgrid) {
   if (!Rf_isFunction(fun))
     Rf_error("`fun` must be a function.");
   const int rank = LENGTH(sgrid);
@@ -560,10 +560,10 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
   if (valuedim > 0 && len > R_XLEN_T_MAX / valuedim)
     Rf_error("`fun` returns too many values on `grid` to store them.");
 
-  // Now, fill in the grid points one by one in a buffer, C_call copies it into the call
+  // Now, fill in the grid points one by one in a buffer, call_fun copies it into the call
   SEXP resvec = PROTECT(Rf_allocVector(REALSXP, len * valuedim));
   double *arg = (double *)R_alloc(rank, sizeof(double));
-  C_evalongrid(C_call, arg, grid, dims, rank, valuedim, REAL(resvec), (void *)&gc);
+  eval_on_grid(call_fun, arg, grid, dims, rank, valuedim, REAL(resvec), (void *)&gc);
 
   // Set the dim-attribute
   if (valuedim == 1) {
@@ -580,8 +580,8 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
   return resvec;
 }
 
-double C_evalmlip(const int rank, const double *x, const double **grid, const int *dims, const double *values,
-                  int blend) {
+double eval_mlip(const int rank, const double *x, const double **grid, const int *dims, const double *values,
+                 int blend) {
 
   // the blended weights of the lower and upper end of the interval in each dimension
   double wlo[rank], wup[rank];
@@ -628,7 +628,7 @@ double C_evalmlip(const int rank, const double *x, const double **grid, const in
   return ipval / wsum;
 }
 
-SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
+SEXP c_eval_mlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   const int rank = LENGTH(sgrid);
   R_xlen_t gridsize = 1;
   int dims[rank];
@@ -665,13 +665,13 @@ SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < numvec; i++) {
-    out[i] = C_evalmlip(rank, xp + i * rank, grid, dims, val, blend);
+    out[i] = eval_mlip(rank, xp + i * rank, grid, dims, val, blend);
   }
   UNPROTECT(1);
   return resvec;
 }
 
-SEXP R_sqdiffs(SEXP x1, SEXP x2, SEXP Sthreads) {
+SEXP c_sq_diffs(SEXP x1, SEXP x2, SEXP Sthreads) {
   // The squared distance from each column of x1 to each column of x2, with one row per column of x1
   const int r1 = Rf_nrows(x1), c1 = Rf_ncols(x1), r2 = Rf_nrows(x2), c2 = Rf_ncols(x2);
   const R_xlen_t N = (R_xlen_t)c1 * c2;
@@ -836,7 +836,7 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
   return NA_REAL;
 }
 
-SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extrapolate, SEXP Sthreads, SEXP Sblend) {
+SEXP c_eval_sl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extrapolate, SEXP Sthreads, SEXP Sblend) {
   const int *dtri = INTEGER_RO(Sdtri);
   const int numsimplex = Rf_ncols(Sdtri);
   const double *lumats = REAL_RO(VECTOR_ELT(adata, 0));
@@ -993,7 +993,7 @@ static void buildsimplexgrid(SEXP retlist, const double *bboxmat, const int dim,
   }
 }
 
-SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
+SEXP c_analyze_simplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
 #ifdef _OPENMP
   int threads = Rf_asInteger(Sthreads);
 #endif
@@ -1049,7 +1049,7 @@ SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
   return retlist;
 }
 
-SEXP R_havefftw(void) {
+SEXP c_have_fftw(void) {
 #ifdef HAVE_FFTW
   return Rf_ScalarLogical(TRUE);
 #else
@@ -1058,7 +1058,7 @@ SEXP R_havefftw(void) {
 }
 
 // inplace to save memory, do repeated multiplication instead of pow(). It's faster.
-SEXP R_phifunc(SEXP Sx, SEXP Sk, SEXP Sthreads) {
+SEXP c_phi_func(SEXP Sx, SEXP Sk, SEXP Sthreads) {
   double k = Rf_asReal(Sk);
   double *x = REAL(Sx);
   const R_xlen_t n = XLENGTH(Sx);
@@ -1115,7 +1115,7 @@ SEXP R_phifunc(SEXP Sx, SEXP Sk, SEXP Sthreads) {
   return res;
 }
 #ifndef HAVE_ALGLIB
-SEXP R_makerbf(SEXP a, SEXP b, SEXP c, SEXP d) {
+SEXP c_make_rbf(SEXP a, SEXP b, SEXP c, SEXP d) {
   UNUSED(a);
   UNUSED(b);
   UNUSED(c);
@@ -1123,13 +1123,13 @@ SEXP R_makerbf(SEXP a, SEXP b, SEXP c, SEXP d) {
   Rf_error("method = \"crbf\" is not available because chebpol has no ALGLIB support.");
   return R_NilValue;
 }
-SEXP R_evalrbf(SEXP a, SEXP b, SEXP c) {
+SEXP c_eval_rbf(SEXP a, SEXP b, SEXP c) {
   UNUSED(a);
   UNUSED(b);
   UNUSED(c);
   Rf_error("method = \"crbf\" is not available because chebpol has no ALGLIB support.");
   return R_NilValue;
 }
-SEXP R_havealglib(void) { return Rf_ScalarLogical(FALSE); }
+SEXP c_have_alglib(void) { return Rf_ScalarLogical(FALSE); }
 
 #endif

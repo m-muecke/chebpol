@@ -5,11 +5,11 @@ rbf.alglib <- function(val, knots, rbase = 2, layers = 5, lambda = 0, ...) {
   if (is.function(val)) {
     val <- apply(knots, 2L, val, ...)
   }
-  model <- .Call(C_makerbf, rbind(knots, val), layers, rbase, lambda)
+  model <- .Call(c_make_rbf, rbind(knots, val), layers, rbase, lambda)
   arity <- nrow(knots)
   fun <- function(x, threads = getOption("chebpol.threads")) {
     x <- as_points(x, arity)
-    .Call(C_evalrbf, model, x, threads)
+    .Call(c_eval_rbf, model, x, threads)
   }
   new_interpolant(crate(fun, model, arity), method = "crbf", arity = arity, domain = knots_domain(knots))
 }
@@ -22,4 +22,4 @@ rbf.alglib <- function(val, knots, rbase = 2, layers = 5, lambda = 0, ...) {
 #'
 #' @return Returns `TRUE` if ALGLIB is available. Otherwise `FALSE`.
 #' @export
-havealglib <- function() .Call(C_havealglib)
+havealglib <- function() .Call(c_have_alglib)
