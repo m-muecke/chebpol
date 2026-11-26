@@ -450,7 +450,7 @@ system.time(sin(a))
 ```
 
     ##    user  system elapsed 
-    ##   0.006   0.003   0.010
+    ##   0.012   0.000   0.012
 
 ``` r
 
@@ -458,7 +458,7 @@ system.time(f(a, threads = 8))
 ```
 
     ##    user  system elapsed 
-    ##   0.073   0.004   0.022
+    ##   0.089   0.005   0.028
 
 ## References
 
