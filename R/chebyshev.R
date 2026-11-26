@@ -34,19 +34,17 @@ chebyshev_knots_1d <- function(n, interval = NULL) {
 #' # Multivariate grid
 #' head(expand.grid(chebknots(c(x = 3, y = 4, z = 5), list(c(1, 3), c(4, 6), c(800, 900)))))
 chebknots <- function(dims, intervals = NULL) {
-  if (is.null(intervals)) {
-    res <- lapply(dims, chebyshev_knots_1d)
-  } else {
-    if (length(dims) == 1L && is.numeric(intervals)) {
-      intervals <- list(intervals)
-    }
-    if (!is.list(intervals)) {
-      stop("`intervals` must be a list with one length-2 vector per dimension.")
-    }
-    res <- Map(chebyshev_knots_1d, dims, intervals)
+  if (!is.numeric(dims) || anyNA(dims) || any(dims < 0 | dims != trunc(dims))) {
+    stop("`dims` must be non-negative whole numbers.")
   }
-
-  res
+  if (is.null(intervals)) {
+    return(lapply(dims, chebyshev_knots_1d))
+  }
+  if (length(dims) == 1L && is.numeric(intervals)) {
+    intervals <- list(intervals)
+  }
+  assert_intervals(intervals, length(dims), what = "dims")
+  Map(chebyshev_knots_1d, dims, intervals)
 }
 
 #' Compute Chebyshev-coefficients given values on a Chebyshev grid

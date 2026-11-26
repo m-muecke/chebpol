@@ -5,6 +5,15 @@ test_that("chebknots() returns Chebyshev knots", {
   expect_equal(range(chebknots(4, c(2, 3))[[1]]), 2.5 + c(-0.5, 0.5) * cospi(1 / 8))
 })
 
+test_that("chebknots() errors on malformed dims and intervals", {
+  expect_snapshot(error = TRUE, {
+    chebknots(2.5)
+    chebknots(c(2, 2), list(c(0, 1)))
+    chebknots(2, list(c(0, 1), c(5, 6)))
+    chebknots(3, c(0, 1, 2))
+  })
+})
+
 test_that("chebcoef() keeps dimensions and scales the constant term", {
   withr::local_seed(42)
   a <- array(rnorm(24), c(2, 3, 4))
@@ -109,6 +118,8 @@ test_that("ipol() errors on malformed Chebyshev intervals", {
     ipol(val, intervals = "a", method = "chebyshev")
     ipol(val, intervals = list(c(0, 1)), method = "chebyshev")
     ipol(val, intervals = list(c(0, 1), c(0, 1, 2)), method = "chebyshev")
+    ipol(sum, dims = 3, intervals = list(c(0, 1), c(0, 2)), method = "chebyshev")
+    ipol(sin, dims = 2.5, method = "chebyshev")
   })
 })
 

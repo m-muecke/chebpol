@@ -1,3 +1,26 @@
+# chebknots() errors on malformed dims and intervals
+
+    Code
+      chebknots(2.5)
+    Condition
+      Error in `chebknots()`:
+      ! `dims` must be non-negative whole numbers.
+    Code
+      chebknots(c(2, 2), list(c(0, 1)))
+    Condition
+      Error in `chebknots()`:
+      ! `intervals` must be a list of 2 `c(lower, upper)` pairs, one per dimension of `dims`.
+    Code
+      chebknots(2, list(c(0, 1), c(5, 6)))
+    Condition
+      Error in `chebknots()`:
+      ! `intervals` must be a list of 1 `c(lower, upper)` pairs, one per dimension of `dims`.
+    Code
+      chebknots(3, c(0, 1, 2))
+    Condition
+      Error in `chebknots()`:
+      ! `intervals` must be a list of 1 `c(lower, upper)` pairs, one per dimension of `dims`.
+
 # chebcoef() errors when dct is not TRUE or FALSE
 
     Code
@@ -28,6 +51,16 @@
     Condition
       Error in `ipol_chebyshev()`:
       ! `intervals` must be a list of 2 `c(lower, upper)` pairs, one per dimension of `val`.
+    Code
+      ipol(sum, dims = 3, intervals = list(c(0, 1), c(0, 2)), method = "chebyshev")
+    Condition
+      Error in `chebknots()`:
+      ! `intervals` must be a list of 1 `c(lower, upper)` pairs, one per dimension of `dims`.
+    Code
+      ipol(sin, dims = 2.5, method = "chebyshev")
+    Condition
+      Error in `chebknots()`:
+      ! `dims` must be non-negative whole numbers.
 
 # chebeval() errors on malformed intervals
 
