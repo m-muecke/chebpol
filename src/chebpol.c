@@ -194,9 +194,10 @@ static double FH(const double *fv, const double *x, const double **knots, const 
     siz *= dims[i];
   double num = 0, denom = 0;
 
-  // x lies on a knot
+  // x lies on a knot, to within the rounding of a grid of this extent
+  const double tol = 10.0 * DBL_EPSILON * fabs(kn[N - 1] - kn[0]);
   for (int i = 0; i < N; i++) {
-    if (fabs(xx - kn[i]) < 10.0 * DBL_EPSILON)
+    if (fabs(xx - kn[i]) <= tol)
       return FH(&fv[i * siz], x, knots, dims, newrank, weights);
   }
 

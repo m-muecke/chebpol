@@ -17,6 +17,24 @@ test_that("Floater-Hormann interpolation is continuous at the grid points", {
   expect_equal(fh(p + 1e-9), f(p), tolerance = 1e-7)
 })
 
+test_that("Floater-Hormann interpolation does not depend on the scale of the grid", {
+  f <- function(x) sin(3 * x)
+  grid <- seq(0, 1, length.out = 9)
+  x <- seq(0, 1, length.out = 101)
+  expected <- ipol(f, grid = list(grid), method = "fh")(x)
+  for (scale in c(1e-14, 1e-7, 1e5, 1e14)) {
+    stretched <- ipol(\(x) f(x / scale), grid = list(grid * scale), method = "fh")
+    expect_equal(stretched(x * scale), expected)
+  }
+})
+
+test_that("Floater-Hormann interpolation is finite at the smallest distances from a grid point", {
+  fh <- ipol(c(7, 1, 4, 9, 16), grid = list(0:4), method = "fh", k = 2)
+  expect_equal(fh(c(4.9e-324, 1e-310, -1e-310)), c(7, 7, 7))
+  fh2 <- ipol(\(x) 7 + sum(x), grid = list(0:4, 0:4), method = "fh", k = 2)
+  expect_equal(fh2(cbind(c(1e-310, 2), c(3, -1e-310), c(1e-310, 1e-310))), c(9, 10, 7))
+})
+
 test_that("Floater-Hormann interpolation forwards extra arguments to the function", {
   f <- function(x, a) a * sum(x^2)
   grid <- list(seq(0, 1, length.out = 6), seq(0, 1, length.out = 6))

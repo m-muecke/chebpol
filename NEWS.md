@@ -49,6 +49,7 @@
 * `ipol()` with `method = "fh"` now stops with an error when `k` has neither length 1 nor one value per grid dimension. Previously a shorter `k` was silently repeated, or failed with "Length of grid (3) should equal length of d (2)".
 * `ipol()` with `method = "fh"` now forwards extra arguments in `...` to the function being interpolated.
 * `ipol()` with `method = "fh"` now stops with an error when the dimensions of the values do not match the grid lengths. Previously the interpolant read past the end of the grid and returned meaningless values.
+* `ipol()` with `method = "fh"` no longer depends on the scale of the grid. Previously any point within 2e-15 of a grid point got the value at that grid point, which made the interpolant inaccurate on grids spaced less than about 1e-12 apart.
 * `ipol()` with `method = "uniform"` now accepts a one-dimensional `grid` given as a bare vector, as the other grid methods do. Previously the interpolant returned `NaN`s.
 * `ipol()` with `method = "uniform"` now handles a reversed interval such as `c(1, 0)` when given a function. Previously the interpolant was silently wrong.
 * `ipol()` with `method = "uniform"` now accepts a single interval given as a vector `c(a, b)` together with values. It already did when given a function.
