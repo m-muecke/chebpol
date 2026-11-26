@@ -75,6 +75,10 @@
   [`chebeval()`](https://m-muecke.github.io/chebpol/reference/chebeval.md).
   Previously most of these failed with “REAL() can only be applied to a
   ‘numeric’”.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "fh"`, `"stalker"` or `"hstalker"` now accepts logical
+  values, as the other methods do. Previously these failed with “REAL()
+  can only be applied to a ‘numeric’, not a ‘logical’”.
 - [`chebeval()`](https://m-muecke.github.io/chebpol/reference/chebeval.md)
   now works with `intervals` for a matrix of points, and for a single
   interval given as a vector `c(a, b)`. Before, only a single point in
@@ -184,6 +188,10 @@
   values differs from the number of knots. Previously the interpolant
   read past the end of the values and returned meaningless values or
   `NA`.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "simplexlinear"` now accepts one-dimensional knots given as
+  a vector, as `method = "polyharmonic"` does. Previously it failed with
+  “argument is of length zero”.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "polyharmonic"` accepts `normalize` as a vector `c(a, b)` or
   a two-column matrix again. Both forms failed with “the condition has

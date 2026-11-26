@@ -82,6 +82,8 @@
 <li>Error messages are now consistent across interpolation methods and report the value that was given, e.g. “<code>x</code> must have 2 rows, not 3.” instead of four differently worded messages for the same mistake.</li>
 <li>Integer input is now accepted everywhere a number is expected: the points passed to an interpolant, the values, grids and knots passed to <code><a href="../reference/ipol.html">ipol()</a></code>, the grid in <code><a href="../reference/evalongrid.html">evalongrid()</a></code>, and the arguments of <code><a href="../reference/chebcoef.html">chebcoef()</a></code> and <code><a href="../reference/chebeval.html">chebeval()</a></code>. Previously most of these failed with “REAL() can only be applied to a ‘numeric’”.</li>
 <li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "fh"</code>, <code>"stalker"</code> or <code>"hstalker"</code> now accepts logical values, as the other methods do. Previously these failed with “REAL() can only be applied to a ‘numeric’, not a ‘logical’”.</li>
+<li>
 <code><a href="../reference/chebeval.html">chebeval()</a></code> now works with <code>intervals</code> for a matrix of points, and for a single interval given as a vector <code>c(a, b)</code>. Before, only a single point in two or more dimensions was mapped correctly.</li>
 <li>
 <code><a href="../reference/chebcoef.html">chebcoef()</a></code> now stops with an error when <code>dct</code> is <code>NA</code> or not a single logical. Previously <code>dct = NA</code> was treated as <code>TRUE</code>.</li>
@@ -130,6 +132,8 @@
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "simplexlinear"</code> now forwards extra arguments in <code>...</code> to the function being interpolated.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "simplexlinear"</code> now stops with an error when the number of values differs from the number of knots. Previously the interpolant read past the end of the values and returned meaningless values or <code>NA</code>.</li>
+<li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "simplexlinear"</code> now accepts one-dimensional knots given as a vector, as <code>method = "polyharmonic"</code> does. Previously it failed with “argument is of length zero”.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> accepts <code>normalize</code> as a vector <code>c(a, b)</code> or a two-column matrix again. Both forms failed with “the condition has length &gt; 1” on R &gt;= 4.2, and the knots were never transformed, so the fit did not match the evaluation.</li>
 <li>
