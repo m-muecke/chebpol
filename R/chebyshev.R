@@ -160,16 +160,16 @@ ipol_chebyshev <- function(val, dims = NULL, intervals = NULL, ...) {
   if (is.numeric(intervals) && length(intervals) == 2L) {
     intervals <- list(intervals)
   }
-  cf <- chebcoef(val)
+  coef <- chebcoef(val)
   nms <- names(intervals) %||% names(dim(val))
 
   if (is.null(intervals)) {
     # it's [-1, 1] intervals, so drop transformation
     fun <- function(x, threads = getOption("chebpol.threads")) {
       x <- as_points(x, n_dim)
-      .Call(c_eval_chebyshev, x, cf, threads)
+      .Call(c_eval_chebyshev, x, coef, threads)
     }
-    fun <- crate(fun, cf, n_dim)
+    fun <- crate(fun, coef, n_dim)
     domain <- rep(list(c(-1, 1)), n_dim)
   } else {
     # it's intervals, create mapping into [-1, 1]
@@ -179,9 +179,9 @@ ipol_chebyshev <- function(val, dims = NULL, intervals = NULL, ...) {
 
     fun <- function(x, threads = getOption("chebpol.threads")) {
       x <- as_points(x, n_dim)
-      .Call(c_eval_chebyshev, (x - mid) * ispan, cf, threads)
+      .Call(c_eval_chebyshev, (x - mid) * ispan, coef, threads)
     }
-    fun <- crate(fun, cf, mid, ispan, n_dim)
+    fun <- crate(fun, coef, mid, ispan, n_dim)
     domain <- intervals
   }
   new_interpolant(fun, method = "chebyshev", arity = n_dim, domain = stats::setNames(domain, nms))
@@ -232,11 +232,11 @@ ipol_general <- function(val, grid = NULL, ...) {
     },
     gridmaps
   )
-  cf <- chebcoef(val)
+  coef <- chebcoef(val)
   n_dim <- length(grid)
   fun <- function(x, threads = getOption("chebpol.threads")) {
     x <- as_points(x, n_dim)
-    .Call(c_eval_chebyshev, gridmap(x), cf, threads)
+    .Call(c_eval_chebyshev, gridmap(x), coef, threads)
   }
-  new_interpolant(crate(fun, cf, gridmap, n_dim), method = "general", arity = n_dim, domain = intervals)
+  new_interpolant(crate(fun, coef, gridmap, n_dim), method = "general", arity = n_dim, domain = intervals)
 }
