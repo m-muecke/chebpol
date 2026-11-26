@@ -146,7 +146,7 @@ ipol <- function(
   if (!is.function(val) && !is.numeric(val) && !is.logical(val)) {
     stop(sprintf("`val` must be numeric values or a function, not a %s.", class(val)[1L]))
   }
-  if (is.integer(val)) {
+  if (is.integer(val) || is.logical(val)) {
     storage.mode(val) <- "double"
   }
   if (is.integer(knots)) {

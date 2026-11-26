@@ -39,6 +39,14 @@ test_that("ipol() accepts integer values", {
   }
 })
 
+test_that("ipol() accepts logical values", {
+  values <- c(TRUE, FALSE, TRUE, TRUE, FALSE)
+  grid <- list(seq(0, 4))
+  for (method in c("general", "multilinear", "fh", "stalker", "hstalker", "oldstalker")) {
+    expect_equal(ipol(values, grid = grid, method = method)(1.5), ipol(values + 0, grid = grid, method = method)(1.5))
+  }
+})
+
 test_that("ipol() accepts integer grids and knots", {
   f <- function(x) sum(x^2)
   grid <- list(0:4, 0:3)

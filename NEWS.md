@@ -21,6 +21,7 @@
 * chebpol compiles again with current versions of R. FFTW is now found when it is installed outside the default include path.
 * Error messages are now consistent across interpolation methods and report the value that was given, e.g. "`x` must have 2 rows, not 3." instead of four differently worded messages for the same mistake.
 * Integer input is now accepted everywhere a number is expected: the points passed to an interpolant, the values, grids and knots passed to `ipol()`, the grid in `evalongrid()`, and the arguments of `chebcoef()` and `chebeval()`. Previously most of these failed with "REAL() can only be applied to a 'numeric'".
+* `ipol()` with `method = "fh"`, `"stalker"` or `"hstalker"` now accepts logical values, as the other methods do. Previously these failed with "REAL() can only be applied to a 'numeric', not a 'logical'".
 * `chebeval()` now works with `intervals` for a matrix of points, and for a single interval given as a vector `c(a, b)`. Before, only a single point in two or more dimensions was mapped correctly.
 * `chebcoef()` now stops with an error when `dct` is `NA` or not a single logical. Previously `dct = NA` was treated as `TRUE`.
 * `chebeval()` now treats coefficients without a `dim` attribute, such as `c(1, 0.5, 0.25)` or `as.numeric(chebcoef(val))`, as one-dimensional. Previously it failed with "INTEGER() can only be applied to a 'integer', not a 'NULL'".
