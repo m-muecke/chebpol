@@ -16,6 +16,9 @@ polyh.real <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE, ...) {
   }
   domain <- knots_domain(knots)
   spans <- vapply(domain, diff, numeric(1L), USE.NAMES = FALSE)
+  if (!is.numeric(k) || length(k) != 1L || is.na(k) || k == 0) {
+    stop("`k` must be a positive whole number or a negative number.")
+  }
   if (k > 0) {
     if (abs(round(k) - k) > sqrt(.Machine$double.eps)) {
       stop(sprintf("A positive `k` must be a whole number, not %s.", format(k)))

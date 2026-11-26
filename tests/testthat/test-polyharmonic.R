@@ -69,6 +69,17 @@ test_that("ipol() errors on a malformed normalize", {
   })
 })
 
+test_that("ipol() errors on an invalid polyharmonic k", {
+  knots <- matrix(seq(0.05, 0.95, length.out = 20), 2)
+  f <- function(x) sum(x)
+  expect_snapshot(error = TRUE, {
+    ipol(f, knots = knots, k = 0, method = "polyharmonic")
+    ipol(f, knots = knots, k = NA, method = "polyharmonic")
+    ipol(f, knots = knots, k = c(2, 3), method = "polyharmonic")
+    ipol(f, knots = knots, k = 2.5, method = "polyharmonic")
+  })
+})
+
 test_that("ipol() errors when values and knots differ in number", {
   knots <- matrix(seq(0, 1, length.out = 20), 2L)
   expect_snapshot(error = TRUE, {

@@ -11,6 +11,29 @@
       Error:
       ! The number of rows of `normalize` (3) must divide the number of dimensions (2).
 
+# ipol() errors on an invalid polyharmonic k
+
+    Code
+      ipol(f, knots = knots, k = 0, method = "polyharmonic")
+    Condition
+      Error:
+      ! `k` must be a positive whole number or a negative number.
+    Code
+      ipol(f, knots = knots, k = NA, method = "polyharmonic")
+    Condition
+      Error:
+      ! `k` must be a positive whole number or a negative number.
+    Code
+      ipol(f, knots = knots, k = c(2, 3), method = "polyharmonic")
+    Condition
+      Error:
+      ! `k` must be a positive whole number or a negative number.
+    Code
+      ipol(f, knots = knots, k = 2.5, method = "polyharmonic")
+    Condition
+      Error:
+      ! A positive `k` must be a whole number, not 2.5.
+
 # ipol() errors when values and knots differ in number
 
     Code
