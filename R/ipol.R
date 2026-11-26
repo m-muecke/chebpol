@@ -162,6 +162,9 @@ ipol <- function(
   if (anyNA(grid, recursive = TRUE)) {
     stop("`grid` must not contain missing values.")
   }
+  if (!is.null(grid)) {
+    grid <- lapply(grid, as.numeric)
+  }
   switch(
     method,
     chebyshev = {
@@ -174,16 +177,7 @@ ipol <- function(
       ipol_chebyshev(val, dims, intervals, ...)
     },
     multilinear = {
-      if (is.null(grid)) {
-        stop("`grid` must be given for method = \"multilinear\".")
-      }
-      if (any(lengths(grid) < 2L)) {
-        stop("Each `grid` dimension must have at least two points for method = \"multilinear\".")
-      }
-      grid <- lapply(grid, as.numeric)
-      if (is_unsorted_grid(grid)) {
-        stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
-      }
+      assert_grid(grid, "multilinear", min_points = 2L)
       ipol_multilinear(val, grid, ...)
     },
     simplexlinear = {
@@ -194,13 +188,7 @@ ipol <- function(
       ipol_simplexlinear(val, knots, ...)
     },
     fh = {
-      if (is.null(grid)) {
-        stop("`grid` must be given for method = \"fh\".")
-      }
-      if (is_unsorted_grid(grid)) {
-        stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
-      }
-      grid <- lapply(grid, as.numeric)
+      assert_grid(grid, "fh")
       k <- k %||% pmin(4L, lengths(grid) - 1L)
       if (!length(k) %in% c(1L, length(grid))) {
         stop(sprintf("`k` must have length 1 or %d, not %d.", length(grid), length(k)))
@@ -225,13 +213,7 @@ ipol <- function(
       ipol_uniform(val, dims, intervals, ...)
     },
     general = {
-      if (is.null(grid)) {
-        stop("`grid` must be given for method = \"general\".")
-      }
-      if (is_unsorted_grid(grid)) {
-        stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
-      }
-      grid <- lapply(grid, as.numeric)
+      assert_grid(grid, "general")
       ipol_general(val, grid, ...)
     },
     polyharmonic = {
@@ -249,43 +231,16 @@ ipol <- function(
       do.call(ipol_polyharmonic, c(list(val, knots, k, normalize, nowarn), rest))
     },
     oldstalker = {
-      if (is.null(grid)) {
-        stop("`grid` must be given for method = \"oldstalker\".")
-      }
-      if (any(lengths(grid) < 2L)) {
-        stop("Each `grid` dimension must have at least two points for method = \"oldstalker\".")
-      }
-      if (is_unsorted_grid(grid)) {
-        stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
-      }
-      grid <- lapply(grid, as.numeric)
+      assert_grid(grid, "oldstalker", min_points = 2L)
       k <- k %||% 2
       ipol_oldstalker(val, grid, r = k, ...)
     },
     hstalker = {
-      if (is.null(grid)) {
-        stop("`grid` must be given for method = \"hstalker\".")
-      }
-      if (any(lengths(grid) < 2L)) {
-        stop("Each `grid` dimension must have at least two points for method = \"hstalker\".")
-      }
-      if (is_unsorted_grid(grid)) {
-        stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
-      }
-      grid <- lapply(grid, as.numeric)
+      assert_grid(grid, "hstalker", min_points = 2L)
       ipol_hstalker(val, grid, ...)
     },
     stalker = {
-      if (is.null(grid)) {
-        stop("`grid` must be given for method = \"stalker\".")
-      }
-      if (any(lengths(grid) < 2L)) {
-        stop("Each `grid` dimension must have at least two points for method = \"stalker\".")
-      }
-      if (is_unsorted_grid(grid)) {
-        stop("Each `grid` dimension must be strictly increasing or strictly decreasing.")
-      }
-      grid <- lapply(grid, as.numeric)
+      assert_grid(grid, "stalker", min_points = 2L)
       ipol_stalker(val, grid, ...)
     },
     crbf = {
@@ -304,8 +259,4 @@ ipol <- function(
       do.call(ipol_crbf, c(list(val, knots, rbase, layers, lambda), rest))
     }
   )
-}
-
-is_unsorted_grid <- function(g) {
-  any(vapply(g, \(s) is.unsorted(s, strictly = TRUE) && is.unsorted(-s, strictly = TRUE), logical(1L)))
 }

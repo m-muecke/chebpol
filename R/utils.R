@@ -48,6 +48,25 @@ assert_intervals <- function(intervals, d, what = "val", call = sys.call(sys.par
   }
 }
 
+assert_grid <- function(grid, method, min_points = 1L, call = sys.call(sys.parent())) {
+  if (is.null(grid)) {
+    msg <- sprintf("`grid` must be given for method = \"%s\".", method)
+    stop(errorCondition(msg, call = call))
+  }
+  if (any(lengths(grid) < min_points)) {
+    msg <- sprintf(
+      "Each `grid` dimension must have at least %s points for method = \"%s\".",
+      c("one", "two")[min_points],
+      method
+    )
+    stop(errorCondition(msg, call = call))
+  }
+  unsorted <- vapply(grid, \(g) is.unsorted(g, strictly = TRUE) && is.unsorted(-g, strictly = TRUE), logical(1L))
+  if (any(unsorted)) {
+    stop(errorCondition("Each `grid` dimension must be strictly increasing or strictly decreasing.", call = call))
+  }
+}
+
 is_flag <- function(x) {
   is.logical(x) && length(x) == 1L && !is.na(x)
 }

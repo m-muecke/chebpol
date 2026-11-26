@@ -43,6 +43,14 @@ test_that("ipol() sets the default blend of a simplex linear interpolant", {
   expect_equal(sl(c(0.3, 0.6)), sl(c(0.3, 0.6), blend = "sigmoid"))
 })
 
+test_that("ipol() checks the grid of the grid methods", {
+  expect_snapshot(error = TRUE, {
+    ipol(sum, method = "fh")
+    ipol(sum, grid = list(1), method = "multilinear")
+    ipol(sum, grid = c(0, 2, 1), method = "general")
+  })
+})
+
 test_that("crate() keeps only the named objects in the environment of a function", {
   a <- 1
   unused <- 2
