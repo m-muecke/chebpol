@@ -35,6 +35,7 @@
 * `evalongrid()` and `ipol()` now accept functions that return integer or logical values, and stop with an error when the length of the returned value changes between grid points.
 * `ipol()` interpolants created with an explicit `blend` now keep their `arity`, `domain` and `chebpol.version` attributes. Previously setting the default blend dropped them.
 * `ipol()` now stops with an error when `grid` contains missing values. Previously these failed with "missing value where TRUE/FALSE needed".
+* `ipol()` with `method = "chebyshev"` or `"uniform"` now stops with an error when the function does not return a single number. Previously a function returning a vector gave an interpolant with one variable too many, treating the position in the returned vector as an extra dimension.
 * `ipol()` now stops with an error when `val` is neither numeric values nor a function, such as a function name given as a string. Previously such input failed with unrelated errors, and a list of values was accepted by some methods.
 * `ipol()` now stops with an error when `blend` is not supported by the chosen method. Previously `blend = "mean"` was accepted for `method = "multilinear"` and `"oldstalker"` and silently treated as linear blending.
 * `ipol()` interpolants created with `method = "multilinear"` now return `NA` for `NA` or `NaN` input. Previously the evaluation never returned. `ipol()` also stops with an error for a multilinear grid dimension with a single point, which was read out of bounds.

@@ -24,6 +24,24 @@
       Error in `ipol()`:
       ! `grid` must not contain missing values.
 
+# ipol() errors when the function does not return a single number
+
+    Code
+      ipol(function(x) c(x, 1), dims = 3, method = "chebyshev")
+    Condition
+      Error in `chebappxf.real()`:
+      ! The function `val` must return a single number, not 2 values.
+    Code
+      ipol(function(x) c(x, 1), dims = c(3, 4), method = "uniform")
+    Condition
+      Error in `ucappxf.real()`:
+      ! The function `val` must return a single number, not 3 values.
+    Code
+      ipol(function(x) numeric(0), dims = 3, method = "chebyshev")
+    Condition
+      Error in `chebappxf.real()`:
+      ! The function `val` must return a single number, not 0 values.
+
 # ipol() errors when val is neither values nor a function
 
     Code

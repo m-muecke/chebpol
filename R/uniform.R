@@ -42,8 +42,9 @@ ucappxf.real <- function(fun, dims, intervals = NULL, ...) {
     Map(\(d, i) seq(i[1L], i[2L], length.out = d), dims, intervals)
   }
   val <- evalongrid(fun, ..., grid = grid)
-  if (length(dim(val)) == length(dims)) {
-    names(dim(val)) <- names(dims)
+  if (length(dim(val)) != length(dims)) {
+    stop(sprintf("The function `val` must return a single number, not %d values.", dim(val)[1L]))
   }
+  names(dim(val)) <- names(dims)
   ucappx.real(val, intervals)
 }

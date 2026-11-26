@@ -98,6 +98,14 @@ test_that("ipol() errors on a grid with missing values", {
   })
 })
 
+test_that("ipol() errors when the function does not return a single number", {
+  expect_snapshot(error = TRUE, {
+    ipol(\(x) c(x, 1), dims = 3, method = "chebyshev")
+    ipol(\(x) c(x, 1), dims = c(3, 4), method = "uniform")
+    ipol(\(x) numeric(0), dims = 3, method = "chebyshev")
+  })
+})
+
 test_that("ipol() errors when val is neither values nor a function", {
   grid <- list(1:3, 1:2)
   expect_snapshot(error = TRUE, {

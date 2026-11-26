@@ -183,9 +183,10 @@ chebappx.real <- function(val, intervals = NULL) {
 
 chebappxf.real <- function(fun, dims, intervals = NULL, ...) {
   val <- evalongrid(fun, dims, intervals, ...)
-  if (length(dim(val)) == length(dims)) {
-    names(dim(val)) <- names(dims)
+  if (length(dim(val)) != length(dims)) {
+    stop(sprintf("The function `val` must return a single number, not %d values.", dim(val)[1L]))
   }
+  names(dim(val)) <- names(dims)
   chebappx.real(val, intervals)
 }
 
