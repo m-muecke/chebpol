@@ -869,6 +869,117 @@ SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extr
   return ret;
 }
 
+// The cells c0[j] .. c1[j] of the grid that a bounding box overlaps in each dimension, and how many cells that is
+static inline R_xlen_t boxcells(const double *box, const double *lo, const double *inv, const int m, const int dim,
+                                int *c0, int *c1) {
+  R_xlen_t ncells = 1;
+  for (int j = 0; j < dim; j++) {
+    c0[j] = gridcell(box[2 * j], lo[j], inv[j], m);
+    c1[j] = gridcell(box[2 * j + 1], lo[j], inv[j], m);
+    ncells *= c1[j] - c0[j] + 1;
+  }
+  return ncells;
+}
+
+// The position of the cell with coordinates cc in the list of cells
+static inline R_xlen_t cellindex(const int *cc, const int m, const int dim) {
+  R_xlen_t cell = 0, stride = 1;
+  for (int j = 0; j < dim; j++) {
+    cell += stride * cc[j];
+    stride *= m;
+  }
+  return cell;
+}
+
+// Step cc to the next cell in c0 .. c1. Returns false after the last one.
+static inline bool nextcell(int *cc, const int *c0, const int *c1, const int dim) {
+  for (int j = 0; j < dim; j++) {
+    if (cc[j] < c1[j]) {
+      cc[j]++;
+      return true;
+    }
+    cc[j] = c0[j];
+  }
+  return false;
+}
+
+// Index the simplices by a uniform grid over the knots, so that evaluation need not scan all of them.
+// Fills in elements 3 to 6 of retlist: the bounds, the cells per dimension, and the offsets and items of the cell
+// lists.
+static void buildsimplexgrid(SEXP retlist, const double *bboxmat, const int dim, const int numsimplex) {
+  // the bounds of the grid, and the number of cells per unit length in each dimension
+  SEXP Sbounds = Rf_allocVector(REALSXP, 3 * dim);
+  SET_VECTOR_ELT(retlist, 3, Sbounds);
+  double *lo = REAL(Sbounds), *hi = lo + dim, *inv = lo + 2 * dim;
+  for (int j = 0; j < dim; j++) {
+    lo[j] = INFINITY;
+    hi[j] = -INFINITY;
+  }
+  for (R_xlen_t s = 0; s < numsimplex; s++) {
+    const double *box = bboxmat + s * 2 * dim;
+    for (int j = 0; j < dim; j++) {
+      if (box[2 * j] < lo[j])
+        lo[j] = box[2 * j];
+      if (box[2 * j + 1] > hi[j])
+        hi[j] = box[2 * j + 1];
+    }
+  }
+
+  // About one cell per simplex, with m cells in each dimension. Halve m while the simplices overlap too
+  // many cells, as they do in high dimensions. A single cell is a scan of all simplices.
+  int *c0 = (int *)R_alloc(dim, sizeof(int)), *c1 = (int *)R_alloc(dim, sizeof(int));
+  int *cc = (int *)R_alloc(dim, sizeof(int));
+  // the lists of all cells together hold at most 16 entries per simplex
+  const R_xlen_t maxitems = numsimplex < INT_MAX / 16 ? 16 * (R_xlen_t)numsimplex : INT_MAX;
+  int m = numsimplex > 0 ? (int)floor(pow((double)numsimplex, 1.0 / dim)) : 1;
+  if (m < 1)
+    m = 1;
+  R_xlen_t nitems;
+  for (;; m /= 2) {
+    for (int j = 0; j < dim; j++)
+      inv[j] = hi[j] > lo[j] ? m / (hi[j] - lo[j]) : 0.0;
+    nitems = 0;
+    for (R_xlen_t s = 0; s < numsimplex && nitems <= maxitems; s++)
+      nitems += boxcells(bboxmat + s * 2 * dim, lo, inv, m, dim, c0, c1);
+    if (m == 1 || nitems <= maxitems)
+      break;
+  }
+  R_xlen_t ncells = 1;
+  for (int j = 0; j < dim; j++)
+    ncells *= m;
+  SET_VECTOR_ELT(retlist, 4, Rf_ScalarInteger(m));
+
+  // Cell i lists the simplices items[offsets[i]] .. items[offsets[i + 1] - 1]
+  SEXP Soffsets = Rf_allocVector(INTSXP, ncells + 1);
+  SET_VECTOR_ELT(retlist, 5, Soffsets);
+  SEXP Sitems = Rf_allocVector(INTSXP, nitems);
+  SET_VECTOR_ELT(retlist, 6, Sitems);
+  int *offsets = INTEGER(Soffsets), *items = INTEGER(Sitems);
+
+  // count the simplices of each cell
+  memset(offsets, 0, (ncells + 1) * sizeof(int));
+  for (R_xlen_t s = 0; s < numsimplex; s++) {
+    boxcells(bboxmat + s * 2 * dim, lo, inv, m, dim, c0, c1);
+    memcpy(cc, c0, dim * sizeof(int));
+    do {
+      offsets[cellindex(cc, m, dim) + 1]++;
+    } while (nextcell(cc, c0, c1, dim));
+  }
+  for (R_xlen_t i = 0; i < ncells; i++)
+    offsets[i + 1] += offsets[i];
+
+  // fill in the simplices in increasing order, next[i] is the free position in the list of cell i
+  int *next = (int *)R_alloc(ncells, sizeof(int));
+  memcpy(next, offsets, ncells * sizeof(int));
+  for (R_xlen_t s = 0; s < numsimplex; s++) {
+    boxcells(bboxmat + s * 2 * dim, lo, inv, m, dim, c0, c1);
+    memcpy(cc, c0, dim * sizeof(int));
+    do {
+      items[next[cellindex(cc, m, dim)]++] = (int)s;
+    } while (nextcell(cc, c0, c1, dim));
+  }
+}
+
 SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
 #ifdef _OPENMP
   int threads = Rf_asInteger(Sthreads);
@@ -878,6 +989,7 @@ SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
   const int dim = Rf_nrows(Sknots);
   const int numsimplex = Rf_ncols(Sdtri);
   int N = dim + 1;
+  // The LU factors, pivots and bounding boxes of the simplices, then the grid that indexes them
   SEXP retlist = PROTECT(Rf_allocVector(VECSXP, 7));
   // Allocate everything before parallel for
   SET_VECTOR_ELT(retlist, 0, Rf_allocVector(REALSXP, (R_xlen_t)numsimplex * N * N));
@@ -918,96 +1030,7 @@ SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
     F77_CALL(dgetrf)(&N, &N, lumat, &N, ipiv, &info);
   }
 
-  // Index the simplices by a uniform grid over the knots, so that evaluation need not scan all of them
-  SEXP Sbounds = Rf_allocVector(REALSXP, 3 * dim);
-  SET_VECTOR_ELT(retlist, 3, Sbounds);
-  double *lo = REAL(Sbounds), *hi = lo + dim, *inv = lo + 2 * dim;
-  for (int j = 0; j < dim; j++) {
-    lo[j] = INFINITY;
-    hi[j] = -INFINITY;
-  }
-  for (R_xlen_t s = 0; s < numsimplex; s++) {
-    const double *box = bboxmat + s * 2 * dim;
-    for (int j = 0; j < dim; j++) {
-      if (box[2 * j] < lo[j])
-        lo[j] = box[2 * j];
-      if (box[2 * j + 1] > hi[j])
-        hi[j] = box[2 * j + 1];
-    }
-  }
-  // About one cell per simplex, with fewer cells per dimension while a simplex overlaps too many of them
-  int m = numsimplex > 0 ? (int)floor(pow((double)numsimplex, 1.0 / dim)) : 1;
-  if (m < 1)
-    m = 1;
-  int *c0 = (int *)R_alloc(dim, sizeof(int)), *c1 = (int *)R_alloc(dim, sizeof(int));
-  int *cc = (int *)R_alloc(dim, sizeof(int));
-  // the lists of all cells together hold at most 16 entries per simplex
-  const R_xlen_t maxpairs = numsimplex < INT_MAX / 16 ? 16 * (R_xlen_t)numsimplex : INT_MAX;
-  R_xlen_t ncells, npairs;
-  for (;;) {
-    ncells = 1;
-    for (int j = 0; j < dim; j++) {
-      inv[j] = hi[j] > lo[j] ? m / (hi[j] - lo[j]) : 0.0;
-      ncells *= m;
-    }
-    npairs = 0;
-    for (R_xlen_t s = 0; s < numsimplex && npairs <= maxpairs; s++) {
-      const double *box = bboxmat + s * 2 * dim;
-      R_xlen_t span = 1;
-      for (int j = 0; j < dim; j++)
-        span *= gridcell(box[2 * j + 1], lo[j], inv[j], m) - gridcell(box[2 * j], lo[j], inv[j], m) + 1;
-      npairs += span;
-    }
-    if (m == 1 || npairs <= maxpairs)
-      break;
-    m /= 2;
-  }
-  SET_VECTOR_ELT(retlist, 4, Rf_ScalarInteger(m));
-  SEXP Soffsets = Rf_allocVector(INTSXP, ncells + 1);
-  SET_VECTOR_ELT(retlist, 5, Soffsets);
-  SEXP Sitems = Rf_allocVector(INTSXP, npairs);
-  SET_VECTOR_ELT(retlist, 6, Sitems);
-  int *offsets = INTEGER(Soffsets), *items = INTEGER(Sitems);
-  memset(offsets, 0, (ncells + 1) * sizeof(int));
-  // count the simplices of each cell, then fill them in increasing order
-  for (int pass = 0; pass < 2; pass++) {
-    for (R_xlen_t s = 0; s < numsimplex; s++) {
-      const double *box = bboxmat + s * 2 * dim;
-      for (int j = 0; j < dim; j++) {
-        c0[j] = gridcell(box[2 * j], lo[j], inv[j], m);
-        c1[j] = gridcell(box[2 * j + 1], lo[j], inv[j], m);
-        cc[j] = c0[j];
-      }
-      for (;;) {
-        R_xlen_t cell = 0, stride = 1;
-        for (int j = 0; j < dim; j++) {
-          cell += stride * cc[j];
-          stride *= m;
-        }
-        if (pass == 0)
-          offsets[cell + 1]++;
-        else
-          items[offsets[cell]++] = (int)s;
-        int j = 0;
-        while (j < dim && cc[j] == c1[j]) {
-          cc[j] = c0[j];
-          j++;
-        }
-        if (j == dim)
-          break;
-        cc[j]++;
-      }
-    }
-    if (pass == 0) {
-      for (R_xlen_t i = 0; i < ncells; i++)
-        offsets[i + 1] += offsets[i];
-    } else {
-      // filling advanced each offset to the start of the next cell
-      for (R_xlen_t i = ncells; i > 0; i--)
-        offsets[i] = offsets[i - 1];
-      offsets[0] = 0;
-    }
-  }
+  buildsimplexgrid(retlist, bboxmat, dim, numsimplex);
 
   UNPROTECT(1);
   return retlist;
