@@ -161,7 +161,7 @@ ch2 <- ipol(f, dims = c(10, 10, 10), intervals = list(0:1, 0:1, 0:1), method = "
 knots <- matrix(runif(3 * 1000), 3)
 ph2 <- ipol(f, knots = knots, k = 2, method = "polyharmonic")
 # my alglib is a bit slow, so stick to 100 knots
-if (havealglib()) {
+if (has_alglib()) {
   crb <- ipol(f, knots = knots[, 1:100], method = "crbf", rbase = 2, layers = 5, lambda = 0)
 }
 # make 7 points in R3 to test them on
@@ -173,7 +173,7 @@ rbind(
   cheb = ch2(m),
   poly = ph2(m),
   hst = hst(m),
-  crbf = if (havealglib()) crb(m) else NULL
+  crbf = if (has_alglib()) crb(m) else NULL
 )
 #>          [,1]      [,2]     [,3]      [,4]      [,5]      [,6]      [,7]
 #> true 1.798658 0.5777646 2.575931 0.7834249 0.8153359 0.6138369 1.0000857

@@ -11,10 +11,10 @@
 <url><loc>https://m-muecke.github.io/chebpol/reference/chebcoef.html</loc></url>
 <url><loc>https://m-muecke.github.io/chebpol/reference/chebeval.html</loc></url>
 <url><loc>https://m-muecke.github.io/chebpol/reference/chebknots.html</loc></url>
+<url><loc>https://m-muecke.github.io/chebpol/reference/chebpol-deprecated.html</loc></url>
 <url><loc>https://m-muecke.github.io/chebpol/reference/chebpol-package.html</loc></url>
 <url><loc>https://m-muecke.github.io/chebpol/reference/evalongrid.html</loc></url>
-<url><loc>https://m-muecke.github.io/chebpol/reference/havealglib.html</loc></url>
-<url><loc>https://m-muecke.github.io/chebpol/reference/havefftw.html</loc></url>
+<url><loc>https://m-muecke.github.io/chebpol/reference/has_fftw.html</loc></url>
 <url><loc>https://m-muecke.github.io/chebpol/reference/index.html</loc></url>
 <url><loc>https://m-muecke.github.io/chebpol/reference/interpolant.html</loc></url>
 <url><loc>https://m-muecke.github.io/chebpol/reference/ipol.html</loc></url>

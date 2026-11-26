@@ -40,7 +40,7 @@ grids may be slow and memory-demanding.
 
 ## See also
 
-[`havefftw()`](https://m-muecke.github.io/chebpol/reference/havefftw.md)
+[`has_fftw()`](https://m-muecke.github.io/chebpol/reference/has_fftw.md)
 
 ## Examples
 

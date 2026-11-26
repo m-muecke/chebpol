@@ -59,7 +59,13 @@
 <code>chebappx()</code>, <code>chebappxf()</code>, <code>chebappxg()</code>, <code>chebappxgf()</code>, <code>fhappx()</code>, <code>mlappx()</code>, <code>polyh()</code>, <code>slappx()</code>, <code>ucappx()</code> and <code>ucappxf()</code>, deprecated since version 1.7, have been removed. Use <code><a href="../reference/ipol.html">ipol()</a></code> instead.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants no longer have a <code>chebpol.version</code> attribute. Nothing in chebpol used it, and looking up the version took most of the time needed to create a small interpolant, which is now about four times faster.</li>
+<li>The C routines <code>evalcheb</code>, <code>evalmlip</code> and <code>evalongrid</code>, registered for other packages to call through <code>R_GetCCallable()</code>, have been removed. They were undocumented, had no header file, and no known package used them.</li>
 <li>geometry is now a suggested package instead of a required one, so installing chebpol no longer pulls in geometry and its dependencies. <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "simplexlinear"</code> needs it to build the triangulation and stops with an error when it is missing. Saved simplex linear interpolants can be evaluated without it.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="lifecycle-changes-development-version">Lifecycle changes<a class="anchor" aria-label="anchor" href="#lifecycle-changes-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/chebpol-deprecated.html">havefftw()</a></code> and <code><a href="../reference/chebpol-deprecated.html">havealglib()</a></code> are deprecated in favor of <code><a href="../reference/has_fftw.html">has_fftw()</a></code> and <code><a href="../reference/has_fftw.html">has_alglib()</a></code>. The new <code><a href="../reference/has_fftw.html">has_gsl()</a></code> reports whether chebpol was built with GSL, which the stalker methods need to solve for the degree on a non-uniform grid.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-development-version">Minor improvements<a class="anchor" aria-label="anchor" href="#minor-improvements-development-version"></a></h3>

@@ -152,10 +152,16 @@ for the stalker splines.
 - [`chebpol`](https://m-muecke.github.io/chebpol/reference/chebpol-package.md)
   [`chebpol-package`](https://m-muecke.github.io/chebpol/reference/chebpol-package.md)
   : Methods for creating multivariate interpolations on hypercubes
-- [`havefftw()`](https://m-muecke.github.io/chebpol/reference/havefftw.md)
-  : Check whether chebpol uses FFTW
-- [`havealglib()`](https://m-muecke.github.io/chebpol/reference/havealglib.md)
-  : Check whether chebpol has the ALGLIB library
+- [`has_fftw()`](https://m-muecke.github.io/chebpol/reference/has_fftw.md)
+  [`has_alglib()`](https://m-muecke.github.io/chebpol/reference/has_fftw.md)
+  [`has_gsl()`](https://m-muecke.github.io/chebpol/reference/has_fftw.md)
+  : Check which optional libraries chebpol was built with
+
+### Deprecated
+
+- [`havefftw()`](https://m-muecke.github.io/chebpol/reference/chebpol-deprecated.md)
+  [`havealglib()`](https://m-muecke.github.io/chebpol/reference/chebpol-deprecated.md)
+  : Deprecated functions
 
 # Articles
 

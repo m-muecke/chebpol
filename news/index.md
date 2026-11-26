@@ -15,12 +15,30 @@
   chebpol used it, and looking up the version took most of the time
   needed to create a small interpolant, which is now about four times
   faster.
+- The C routines `evalcheb`, `evalmlip` and `evalongrid`, registered for
+  other packages to call through `R_GetCCallable()`, have been removed.
+  They were undocumented, had no header file, and no known package used
+  them.
 - geometry is now a suggested package instead of a required one, so
   installing chebpol no longer pulls in geometry and its dependencies.
   [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "simplexlinear"` needs it to build the triangulation and
   stops with an error when it is missing. Saved simplex linear
   interpolants can be evaluated without it.
+
+### Lifecycle changes
+
+- [`havefftw()`](https://m-muecke.github.io/chebpol/reference/chebpol-deprecated.md)
+  and
+  [`havealglib()`](https://m-muecke.github.io/chebpol/reference/chebpol-deprecated.md)
+  are deprecated in favor of
+  [`has_fftw()`](https://m-muecke.github.io/chebpol/reference/has_fftw.md)
+  and
+  [`has_alglib()`](https://m-muecke.github.io/chebpol/reference/has_fftw.md).
+  The new
+  [`has_gsl()`](https://m-muecke.github.io/chebpol/reference/has_fftw.md)
+  reports whether chebpol was built with GSL, which the stalker methods
+  need to solve for the degree on a non-uniform grid.
 
 ### Minor improvements
 
