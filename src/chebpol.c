@@ -569,7 +569,8 @@ SEXP R_evalongrid(SEXP fun, SEXP sgrid) {
 double C_evalmlip(const int rank, const double *x, const double **grid, const int *dims, const double *values,
                   int blend) {
 
-  double weight[rank];
+  // the blended weights of the lower and upper end of the interval in each dimension
+  double wlo[rank], wup[rank];
   R_xlen_t valpos = 0;
   double ipval = 0;
   // For each dimension, find the grid interval holding x and the weight within it, and accumulate the
@@ -582,7 +583,9 @@ double C_evalmlip(const int rank, const double *x, const double **grid, const in
     const double *gdvec = grid[i];
     // upper end of the grid interval holding x[i]
     const int gp = find_interval(gdvec, dims[i], x[i]) + 1;
-    weight[i] = (x[i] - gdvec[gp - 1]) / (gdvec[gp] - gdvec[gp - 1]);
+    const double weight = (x[i] - gdvec[gp - 1]) / (gdvec[gp] - gdvec[gp - 1]);
+    wup[i] = blendfun(weight, blend);
+    wlo[i] = blendfun(1 - weight, blend);
     valpos += stride * gp;
     stride *= dims[i];
   }
@@ -598,9 +601,9 @@ double C_evalmlip(const int rank, const double *x, const double **grid, const in
     double cw = 1;
     for (int g = 0; g < rank; g++) {
       if ((1 << g) & i) {
-        cw *= blendfun(weight[g], blend);
+        cw *= wup[g];
       } else {
-        cw *= blendfun(1 - weight[g], blend);
+        cw *= wlo[g];
         vpos -= stride;
       }
       stride *= dims[g];

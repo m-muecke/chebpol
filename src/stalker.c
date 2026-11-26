@@ -337,7 +337,8 @@ static double evalstalk(const double *x, const int nrank, const int *dims, const
   // Make weighted sum.
 
   R_xlen_t stride = 1;
-  double weight[nrank];
+  // the blended weights of the lower and upper end of the interval in each dimension
+  double wlo[nrank], wup[nrank];
   int gbase[nrank];
   R_xlen_t llcorner = 0;
   // Find the lower left corner for each dimension, store it in gbase
@@ -346,12 +347,14 @@ static double evalstalk(const double *x, const int nrank, const int *dims, const
     int gp = find_interval(gr, dims[g], x[g]);
     // gp is below x
     gbase[g] = gp;
-    weight[g] = 1 - (x[g] - gr[gbase[g]]) / (gr[gbase[g] + 1] - gr[gbase[g]]);
+    double weight = 1 - (x[g] - gr[gbase[g]]) / (gr[gbase[g] + 1] - gr[gbase[g]]);
     // This ensures extrapolation is linear
-    if (weight[g] < 0)
-      weight[g] = 0;
-    if (weight[g] > 1)
-      weight[g] = 1;
+    if (weight < 0)
+      weight = 0;
+    if (weight > 1)
+      weight = 1;
+    wlo[g] = blendfun(weight, blend);
+    wup[g] = blendfun(1 - weight, blend);
     llcorner += stride * gp;
     stride *= dims[g];
   }
@@ -369,13 +372,13 @@ static double evalstalk(const double *x, const int nrank, const int *dims, const
     for (int g = 0; g < nrank; g++) {
       const double *gr = grid[g];
       if (i & (1 << g)) {
-        cw *= blendfun(1 - weight[g], blend);
+        cw *= wup[g];
         corner += stride;
         // zero based in this corner
         zx[g] = x[g] - gr[gbase[g] + 1];
       } else {
         zx[g] = x[g] - gr[gbase[g]];
-        cw *= blendfun(weight[g], blend);
+        cw *= wlo[g];
       }
       stride *= dims[g];
     }
@@ -510,7 +513,8 @@ static double evalhyp(const double *x, const int nrank, const int *dims, const d
   // Make weighted sum.
 
   R_xlen_t stride = 1;
-  double weight[nrank];
+  // the blended weights of the lower and upper end of the interval in each dimension
+  double wlo[nrank], wup[nrank];
   int gbase[nrank];
   R_xlen_t llcorner = 0;
   // Find the lower left corner for each dimension, store it in gbase
@@ -519,12 +523,14 @@ static double evalhyp(const double *x, const int nrank, const int *dims, const d
     int gp = find_interval(gr, dims[g], x[g]);
     // gp is below x
     gbase[g] = gp;
-    weight[g] = 1 - (x[g] - gr[gbase[g]]) / (gr[gbase[g] + 1] - gr[gbase[g]]);
+    double weight = 1 - (x[g] - gr[gbase[g]]) / (gr[gbase[g] + 1] - gr[gbase[g]]);
     // This ensures extrapolation is linear
-    if (weight[g] < 0)
-      weight[g] = 0;
-    if (weight[g] > 1)
-      weight[g] = 1;
+    if (weight < 0)
+      weight = 0;
+    if (weight > 1)
+      weight = 1;
+    wlo[g] = blendfun(weight, blend);
+    wup[g] = blendfun(1 - weight, blend);
     llcorner += stride * gp;
     stride *= dims[g];
   }
@@ -542,13 +548,13 @@ static double evalhyp(const double *x, const int nrank, const int *dims, const d
     for (int g = 0; g < nrank; g++) {
       const double *gr = grid[g];
       if (i & (1 << g)) {
-        cw *= blendfun(1 - weight[g], blend);
+        cw *= wup[g];
         corner += stride;
         // zero based in this corner
         zx[g] = x[g] - gr[gbase[g] + 1];
       } else {
         zx[g] = x[g] - gr[gbase[g]];
-        cw *= blendfun(weight[g], blend);
+        cw *= wlo[g];
       }
       stride *= dims[g];
     }

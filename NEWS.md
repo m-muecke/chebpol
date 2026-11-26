@@ -10,6 +10,7 @@
 ## Minor improvements
 
 * `ipol()` with `method = "polyharmonic"` now reports the warning about falling back to a least squares fit for the `ipol()` call. Previously it showed the source of an internal function, e.g. "In (function (val, knots, k = 2, ...".
+* `ipol()` interpolants created with `method = "multilinear"`, `"stalker"` or `"hstalker"` evaluate faster in several dimensions with a blend other than `"linear"`, e.g. about four times faster for `"multilinear"` and twice as fast for the stalker methods with `blend = "sigmoid"` in five dimensions. The blending weights are now computed once per dimension instead of once per corner of the grid cell.
 * `ipol()` interpolants created with `method = "simplexlinear"` evaluate much faster with many knots, e.g. about 200 times faster with 10,000 knots in two or three dimensions. The simplex holding a point is now looked up in a grid instead of by scanning all simplices, so the time per point no longer grows with the number of knots in up to three dimensions. The gain is smaller in higher dimensions.
 * `ipol()` interpolants created with `method = "simplexlinear"` now record the range of their knots in the `domain` attribute, as polyharmonic interpolants do.
 * `ipol()` interpolants now have class `chebpol_interpolant` and a `method` attribute. Printing one shows the method, the number of variables, the domain and the defaults of extra arguments such as `blend`, instead of the source code of the function.
