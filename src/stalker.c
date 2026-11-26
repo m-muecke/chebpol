@@ -29,7 +29,7 @@ static double rfun(double r, void *P) {
     return vmin * pow(dplus, r) - vplus * pow(dmin, r) + r * pow(dmin, r - 1) * (vmin * dplus + vplus * dmin);
 }
 
-static inline double findmonor(double dmin, double dplus, double vmin, double vplus) {
+static double findmonor(double dmin, double dplus, double vmin, double vplus) {
   double D2 = (vmin * dplus * dplus - vplus * dmin * dmin) / (vplus * dmin + dplus * vmin);
   double r;
   if (D2 > 2 * dplus || D2 < -2 * dmin) {
@@ -73,7 +73,7 @@ static double rfunnew(double r, void *P) {
   return vplus * pow(-kq, r) - vmin - (vplus * kq - vmin) * r;
 }
 
-static inline double solver(double kmin, double kplus, double vmin, double vplus) {
+static double solver(double kmin, double kplus, double vmin, double vplus) {
   double bn = (vplus * kmin * kmin - vmin * kplus * kplus);
   double ncn = vplus * kmin - vmin * kplus;
   double r;
@@ -120,7 +120,7 @@ static inline double solver(double kmin, double kplus, double vmin, double vplus
 #endif
 
 // hyperbolic stalker
-static inline double stalkhyp(double x, double vmin, double vplus, double dmin, double dplus) {
+static double stalkhyp(double x, double vmin, double vplus, double dmin, double dplus) {
   if (fabs(x - dplus) < 1e3 * DBL_EPSILON * dplus)
     return vplus;
   if (fabs(x + dmin) < 1e3 * DBL_EPSILON * dmin)
@@ -156,8 +156,8 @@ static inline double stalkhyp(double x, double vmin, double vplus, double dmin, 
 }
 
 // Variable degree stalker spline
-static inline double stalk1(double x, double vmin, double v0, double vplus, double dmin, double dplus, double r,
-                            double iD, double powmin, double powplus, bool uniform) {
+static double stalk1(double x, double vmin, double v0, double vplus, double dmin, double dplus, double r, double iD,
+                     double powmin, double powplus, bool uniform) {
   // Do linear end points
 
   if (ISNAN(vmin))

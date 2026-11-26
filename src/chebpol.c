@@ -269,7 +269,7 @@ SEXP R_FH(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spa
   return resvec;
 }
 
-static inline void fhweights(const int n, const double *grid, const int d, double *w, int threads) {
+static void fhweights(const int n, const double *grid, const int d, double *w, int threads) {
 #ifdef _OPENMP
 #pragma omp parallel for schedule(static) num_threads(threads) if (threads > 1)
 #endif
@@ -711,14 +711,14 @@ typedef struct {
   const int *offsets, *items;
 } simplexgrid;
 
-static inline int gridcell(const double v, const double lo, const double inv, const int m) {
+static int gridcell(const double v, const double lo, const double inv, const int m) {
   const int c = (int)((v - lo) * inv);
   return c < 0 ? 0 : (c >= m ? m - 1 : c);
 }
 
 // Whether simplex holds x. If so, vec has the barycentric coordinates of x.
-static inline bool insimplex(const double *x, const R_xlen_t simplex, const double *lumats, const int *ipivs,
-                             const double *bbox, const int dim, double *vec) {
+static bool insimplex(const double *x, const R_xlen_t simplex, const double *lumats, const int *ipivs,
+                      const double *bbox, const int dim, double *vec) {
   // x must be in the bounding box
   const double *box = bbox + simplex * 2 * dim;
   for (int i = 0; i < dim; i++) {
@@ -738,8 +738,7 @@ static inline bool insimplex(const double *x, const R_xlen_t simplex, const doub
 }
 
 // The blended value in a simplex with vertices tri, at barycentric coordinates vec
-static inline double simplexvalue(const double *vec, const int *tri, const double *val, const int N,
-                                  const blend_type blend) {
+static double simplexvalue(const double *vec, const int *tri, const double *val, const int N, const blend_type blend) {
   if (blend == BLEND_SQUARE) {
     // the value at the vertex with the largest barycentric coordinate
     int largest = 0;
@@ -886,8 +885,8 @@ SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extr
 }
 
 // The cells c0[j] .. c1[j] of the grid that a bounding box overlaps in each dimension, and how many cells that is
-static inline R_xlen_t boxcells(const double *box, const double *lo, const double *inv, const int m, const int dim,
-                                int *c0, int *c1) {
+static R_xlen_t boxcells(const double *box, const double *lo, const double *inv, const int m, const int dim, int *c0,
+                         int *c1) {
   R_xlen_t ncells = 1;
   for (int j = 0; j < dim; j++) {
     c0[j] = gridcell(box[2 * j], lo[j], inv[j], m);
@@ -898,7 +897,7 @@ static inline R_xlen_t boxcells(const double *box, const double *lo, const doubl
 }
 
 // The position of the cell with coordinates cc in the list of cells
-static inline R_xlen_t cellindex(const int *cc, const int m, const int dim) {
+static R_xlen_t cellindex(const int *cc, const int m, const int dim) {
   R_xlen_t cell = 0, stride = 1;
   for (int j = 0; j < dim; j++) {
     cell += stride * cc[j];
@@ -908,7 +907,7 @@ static inline R_xlen_t cellindex(const int *cc, const int m, const int dim) {
 }
 
 // Step cc to the next cell in c0 .. c1. Returns false after the last one.
-static inline bool nextcell(int *cc, const int *c0, const int *c1, const int dim) {
+static bool nextcell(int *cc, const int *c0, const int *c1, const int dim) {
   for (int j = 0; j < dim; j++) {
     if (cc[j] < c1[j]) {
       cc[j]++;
