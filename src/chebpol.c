@@ -443,7 +443,8 @@ SEXP c_eval_polyharmonic(SEXP s_x, SEXP s_knots, SEXP s_weights, SEXP s_lweights
   const int ndim = Rf_nrows(s_knots);
   UNUSED(s_spare);
   if (LENGTH(s_lweights) != ndim + 1)
-    Rf_error("linear weights (%d) should be one longer than rank(%d)", LENGTH(s_lweights), ndim);
+    Rf_error("The linear weights must have length %d, one more than the number of dimensions, not %d.", ndim + 1,
+             LENGTH(s_lweights));
   if (LENGTH(s_weights) != Rf_ncols(s_knots))
     Rf_error("number of weights (%d) should equal number of knots (%d)", LENGTH(s_weights), Rf_ncols(s_knots));
   if (Rf_isMatrix(s_x)) {
