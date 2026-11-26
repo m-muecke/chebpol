@@ -74,6 +74,9 @@ static inline int find_interval(const double *xt, const int n, const double x) {
 }
 
 static inline double blendfun(double w, blend_type blend) {
+  // only the linear blend is defined outside [0, 1], where it extrapolates
+  if (blend != BLEND_LINEAR)
+    w = w < 0 ? 0 : (w > 1 ? 1 : w);
   switch (blend) {
   case BLEND_LINEAR:
     break;

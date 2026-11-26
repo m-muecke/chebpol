@@ -46,3 +46,14 @@ test_that("multilinear interpolation returns NA for missing input", {
 test_that("ipol() rejects a multilinear grid dimension with a single point", {
   expect_snapshot(ipol(c(1, 2, 3), grid = list(5, c(1, 2, 3)), method = "multilinear"), error = TRUE)
 })
+
+test_that("multilinear interpolation with a non-linear blend uses the nearest value outside the grid", {
+  grid <- seq(0, 1, length.out = 6)
+  x <- c(-0.5, -0.01, 1.01, 1.5)
+  for (blend in c("cubic", "sigmoid", "parodic", "square")) {
+    ml <- ipol(sin, grid = grid, method = "multilinear", blend = blend)
+    expect_equal(ml(x), sin(c(0, 0, 1, 1)))
+  }
+  ml <- ipol(sin, grid = grid, method = "multilinear")
+  expect_equal(ml(x), c(sin(0.2) * x[1:2] / 0.2, sin(1) + (sin(1) - sin(0.8)) * (x[3:4] - 1) / 0.2))
+})

@@ -77,6 +77,16 @@ test_that("interpolating blends reproduce values at the grid points", {
   }
 })
 
+test_that("oldstalker interpolation with a non-linear blend is linear outside the grid", {
+  grid <- seq(0, 1, length.out = 6)
+  x <- c(-0.5, -0.01, 1.01, 1.5)
+  expected <- c(sin(0.2) * x[1:2] / 0.2, sin(1) + (sin(1) - sin(0.8)) * (x[3:4] - 1) / 0.2)
+  for (blend in c("cubic", "sigmoid", "parodic", "square")) {
+    st <- ipol(sin, grid = grid, method = "oldstalker", blend = blend)
+    expect_equal(st(x), expected)
+  }
+})
+
 test_that("ipol() errors on invalid stalker input", {
   f <- function(x) exp(-sum(x^2))
   grid <- list(seq(-1, 1, length.out = 9))
