@@ -197,7 +197,7 @@ ipol <- function(
       if (anyNA(k) || any(k < 0 | k > lengths(grid) - 1L)) {
         stop("`k` must be between 0 and one less than the number of grid points in each dimension.")
       }
-      ipol_fh(val, grid, d = k, ...)
+      ipol_fh(val, grid, degree = k, ...)
     },
     uniform = {
       if (is.function(val) && is.null(dims)) {
@@ -233,7 +233,7 @@ ipol <- function(
     oldstalker = {
       assert_grid(grid, "oldstalker", min_points = 2L)
       k <- k %||% 2
-      ipol_oldstalker(val, grid, r = k, ...)
+      ipol_oldstalker(val, grid, degree = k, ...)
     },
     hstalker = {
       assert_grid(grid, "hstalker", min_points = 2L)

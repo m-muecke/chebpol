@@ -1,6 +1,6 @@
 # General grids, Floater-Hormann
 
-ipol_fh <- function(val, grid = NULL, d = 1L, ...) {
+ipol_fh <- function(val, grid = NULL, degree = 1L, ...) {
   if (!is.list(grid)) {
     grid <- list(grid)
   }
@@ -18,9 +18,9 @@ ipol_fh <- function(val, grid = NULL, d = 1L, ...) {
       paste(dim(val), collapse = " x ")
     ))
   }
-  dd <- rep_len(as.integer(d), length(grid))
+  degree <- rep_len(as.integer(degree), length(grid))
   # calculate weights, formula 18 in Floater & Hormann, in C, parallelized
-  weights <- .Call(c_fh_weights, grid, dd, getOption("chebpol.threads"))
+  weights <- .Call(c_fh_weights, grid, degree, getOption("chebpol.threads"))
   arity <- length(grid)
   fun <- function(x, threads = getOption("chebpol.threads")) {
     x <- as_points(x, arity)

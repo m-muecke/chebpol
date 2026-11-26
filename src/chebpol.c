@@ -273,30 +273,30 @@ SEXP c_eval_fh(SEXP s_x, SEXP s_grid, SEXP s_val, SEXP s_weights, SEXP s_threads
   return out;
 }
 
-static void fh_weights(const int n, const double *grid, const int d, double *w, int threads) {
+static void fh_weights(const int n, const double *grid, const int degree, double *w, int threads) {
 #ifdef _OPENMP
 #pragma omp parallel for schedule(static) num_threads(threads) if (threads > 1)
 #endif
   for (int k = 0; k <= n; k++) {
-    const int start = (k < d) ? 0 : k - d, end = (k < n - d) ? k : n - d;
+    const int start = (k < degree) ? 0 : k - degree, end = (k < n - degree) ? k : n - degree;
     double sum = 0.0;
     for (int i = start; i <= end; i++) {
       double prod = 1.0;
-      for (int j = i; j <= i + d; j++) {
+      for (int j = i; j <= i + degree; j++) {
         if (j == k)
           continue;
         prod *= grid[k] - grid[j];
       }
       sum += 1.0 / fabs(prod);
     }
-    w[k] = sum * ((k % 2 != d % 2) ? -1.0 : 1.0);
+    w[k] = sum * ((k % 2 != degree % 2) ? -1.0 : 1.0);
   }
 }
 
 // Compute the weights for Floater-Hormann. Formula (18) of the FH-paper
-SEXP c_fh_weights(SEXP s_grid, SEXP s_d, SEXP s_threads) {
-  if (LENGTH(s_grid) != LENGTH(s_d))
-    Rf_error("`d` must have length %d, one per dimension of `grid`, not %d.", LENGTH(s_grid), LENGTH(s_d));
+SEXP c_fh_weights(SEXP s_grid, SEXP s_degree, SEXP s_threads) {
+  if (LENGTH(s_grid) != LENGTH(s_degree))
+    Rf_error("`degree` must have length %d, one per dimension of `grid`, not %d.", LENGTH(s_grid), LENGTH(s_degree));
 
   const int ndim = LENGTH(s_grid);
   const double *grid[ndim];
@@ -312,12 +312,12 @@ SEXP c_fh_weights(SEXP s_grid, SEXP s_d, SEXP s_threads) {
     wlist[i] = REAL(VECTOR_ELT(out, i));
   }
 
-  SEXP s_dd = PROTECT(Rf_coerceVector(s_d, INTSXP));
-  const int *dd = INTEGER_RO(s_dd);
+  SEXP s_degree_int = PROTECT(Rf_coerceVector(s_degree, INTSXP));
+  const int *degree = INTEGER_RO(s_degree_int);
   int threads = Rf_asInteger(s_threads);
   for (int r = 0; r < ndim; r++) {
     // The paper use index from 0 to n, i.e. n+1 knots in each dimension. Therefore dims[r]-1
-    fh_weights(dims[r] - 1, grid[r], dd[r], wlist[r], threads);
+    fh_weights(dims[r] - 1, grid[r], degree[r], wlist[r], threads);
   }
 
   UNPROTECT(2);

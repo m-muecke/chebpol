@@ -1,12 +1,12 @@
 # Precompute some values used in the stalker evaluation
-stalker_context <- function(dmin, dplus, r) {
-  powmin <- Map(`^`, dmin, r)
-  powplus <- Map(`^`, dplus, r)
+stalker_context <- function(dmin, dplus, degree) {
+  powmin <- Map(`^`, dmin, degree)
+  powplus <- Map(`^`, dplus, degree)
   det <- Map(\(dm, dp, pm, pp) 1 / (dm * pp + dp * pm), dmin, dplus, powmin, powplus)
   list(det = det, pmin = powmin, pplus = powplus)
 }
 
-ipol_oldstalker <- function(val, grid, r = 2, ..., blend = NULL) {
+ipol_oldstalker <- function(val, grid, degree = 2, ..., blend = NULL) {
   if (!is.list(grid)) {
     grid <- list(grid)
   }
@@ -25,16 +25,16 @@ ipol_oldstalker <- function(val, grid, r = 2, ..., blend = NULL) {
     stop(sprintf("`val` must have one value per grid point (%d), not %d.", n, length(val)))
   }
 
-  r <- rep_len(as.numeric(r), length(grid))
+  default_degree <- rep_len(as.numeric(degree), length(grid))
   # relative to the extent of the grid, so that it does not depend on its scale
   uniform <- vapply(grid, \(g) all(abs(diff(g, differences = 2L)) < 1e-8 * diff(range(g))), logical(1L))
   # precompute distance between grid points
   dmin <- lapply(grid, \(gr) c(NaN, diff(gr)))
   dplus <- lapply(dmin, \(dd) c(dd[-1L], NaN))
   val <- as.numeric(val)
-  stalker <- c(list(val = val, grid = grid), stalker_context(dmin, dplus, r), uniform = list(uniform))
+  stalker <- c(list(val = val, grid = grid), stalker_context(dmin, dplus, default_degree), uniform = list(uniform))
 
-  if (!has_gsl() && any(is.na(r) & !uniform)) {
+  if (!has_gsl() && any(is.na(default_degree) & !uniform)) {
     stop("`k = NA` on a non-uniform grid requires chebpol built with GSL.")
   }
 
@@ -42,12 +42,12 @@ ipol_oldstalker <- function(val, grid, r = 2, ..., blend = NULL) {
   fun <- function(
     x,
     threads = getOption("chebpol.threads"),
-    degree = r,
+    degree = default_degree,
     blend = c("linear", "cubic", "sigmoid", "parodic", "square")
   ) {
     x <- as_points(x, arity)
     blend <- blend_types[[match.arg(blend)]]
-    if (!identical(degree, r)) {
+    if (!identical(degree, default_degree)) {
       degree <- rep_len(as.numeric(degree), length(grid))
       if (!has_gsl() && any(is.na(degree) & !uniform)) {
         stop("`degree = NA` on a non-uniform grid requires chebpol built with GSL.")
@@ -56,7 +56,7 @@ ipol_oldstalker <- function(val, grid, r = 2, ..., blend = NULL) {
     }
     .Call(c_eval_oldstalker, x, stalker, degree, blend, as.integer(threads))
   }
-  fun <- crate(fun, r, grid, val, uniform, dmin, dplus, stalker, arity)
+  fun <- crate(fun, default_degree, grid, val, uniform, dmin, dplus, stalker, arity)
   new_interpolant(set_default_blend(fun, blend), method = "oldstalker", arity = arity, domain = lapply(grid, range))
 }
 
