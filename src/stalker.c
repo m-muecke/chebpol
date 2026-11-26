@@ -11,7 +11,7 @@ typedef struct {
   int pos;
 } oldstalker_degree_params;
 typedef struct {
-  double kq, vmin, vplus;
+  double ratio, vmin, vplus;
 } stalker_degree_params;
 typedef struct {
   const double *det, *pmin, *pplus;
@@ -19,26 +19,28 @@ typedef struct {
 } oldstalker_precomp;
 
 #ifdef HAVE_GSL
-static double oldstalker_degree_root_fn(double r, void *P) {
+static double oldstalker_degree_root_fn(double degree, void *P) {
   oldstalker_degree_params *p = (oldstalker_degree_params *)P;
   const double dmin = p->dmin, dplus = p->dplus, vmin = p->vmin, vplus = p->vplus;
   int pos = p->pos;
   if (pos)
-    return vmin * pow(dplus, r) - vplus * pow(dmin, r) - r * pow(dplus, r - 1) * (vmin * dplus + vplus * dmin);
+    return vmin * pow(dplus, degree) - vplus * pow(dmin, degree) -
+           degree * pow(dplus, degree - 1) * (vmin * dplus + vplus * dmin);
   else
-    return vmin * pow(dplus, r) - vplus * pow(dmin, r) + r * pow(dmin, r - 1) * (vmin * dplus + vplus * dmin);
+    return vmin * pow(dplus, degree) - vplus * pow(dmin, degree) +
+           degree * pow(dmin, degree - 1) * (vmin * dplus + vplus * dmin);
 }
 
 static double oldstalker_degree(double dmin, double dplus, double vmin, double vplus) {
   double D2 = (vmin * dplus * dplus - vplus * dmin * dmin) / (vplus * dmin + dplus * vmin);
-  double r;
+  double degree;
   if (D2 > 2 * dplus || D2 < -2 * dmin) {
-    r = 2.0;
+    degree = 2.0;
   } else if (fabs(dplus - dmin) < STALKER_EPS * dplus) {
     // uniform grid
-    r = fabs((vplus - vmin) / (vplus + vmin));
+    degree = fabs((vplus - vmin) / (vplus + vmin));
   } else {
-    // Find the largest r which keeps it monotonic, i.e. derivative 0 in one
+    // Find the largest degree which keeps it monotonic, i.e. derivative 0 in one
     // of the end points
     oldstalker_degree_params params = {dmin, dplus, vmin, vplus, 1};
     if (oldstalker_degree_root_fn(1, &params) * oldstalker_degree_root_fn(2, &params) > 0)
@@ -57,46 +59,46 @@ static double oldstalker_degree(double dmin, double dplus, double vmin, double v
     } while (status == GSL_CONTINUE && iter < 50);
     // Err on the low side, this will ensure that we do not
     // overshoot due to numerical inaccuracy in the solution
-    r = lo;
-    if (r < 1)
-      r = 1;
+    degree = lo;
+    if (degree < 1)
+      degree = 1;
     // If the solver did not converge we keep the current bracket: we may be inside an
     // OpenMP region, so we cannot signal an R error from here.
     gsl_root_fsolver_free(s);
   }
-  return r;
+  return degree;
 }
 
-static double stalker_degree_root_fn(double r, void *P) {
+static double stalker_degree_root_fn(double degree, void *P) {
   stalker_degree_params *p = (stalker_degree_params *)P;
-  const double kq = p->kq, vmin = p->vmin, vplus = p->vplus;
-  return vplus * pow(-kq, r) - vmin - (vplus * kq - vmin) * r;
+  const double ratio = p->ratio, vmin = p->vmin, vplus = p->vplus;
+  return vplus * pow(-ratio, degree) - vmin - (vplus * ratio - vmin) * degree;
 }
 
-static double stalker_degree(double kmin, double kplus, double vmin, double vplus) {
-  double bn = (vplus * kmin * kmin - vmin * kplus * kplus);
-  double ncn = vplus * kmin - vmin * kplus;
-  double r;
-  if (bn / ncn <= 2 * kmin || bn / ncn >= 2 * kplus) {
-    r = 2.0;
-  } else if (fabs(kplus + kmin) < STALKER_EPS * kplus) {
+static double stalker_degree(double hmin, double hplus, double vmin, double vplus) {
+  double bn = (vplus * hmin * hmin - vmin * hplus * hplus);
+  double ncn = vplus * hmin - vmin * hplus;
+  double degree;
+  if (bn / ncn <= 2 * hmin || bn / ncn >= 2 * hplus) {
+    degree = 2.0;
+  } else if (fabs(hplus + hmin) < STALKER_EPS * hplus) {
     // uniform grid
-    r = fabs((vplus - vmin) / (vplus + vmin));
-    if (r < 1)
-      r = 1;
-    else if (ISNAN(r) || r > 2)
-      r = 2;
+    degree = fabs((vplus - vmin) / (vplus + vmin));
+    if (degree < 1)
+      degree = 1;
+    else if (ISNAN(degree) || degree > 2)
+      degree = 2;
   } else {
-    // Find the largest r which keeps it monotonic, i.e. derivative 0 in one
+    // Find the largest degree which keeps it monotonic, i.e. derivative 0 in one
     // of the end points
     stalker_degree_params params;
     int eq1 = (vplus > 0 && ncn > 0) || (vplus < 0 && ncn < 0);
     if (eq1) {
-      params.kq = kmin / kplus;
+      params.ratio = hmin / hplus;
       params.vmin = vmin;
       params.vplus = vplus;
     } else {
-      params.kq = kplus / kmin;
+      params.ratio = hplus / hmin;
       params.vmin = vplus;
       params.vplus = vmin;
     }
@@ -107,7 +109,7 @@ static double stalker_degree(double kmin, double kplus, double vmin, double vplu
     do {
       iter++;
       gsl_root_fsolver_iterate(s);
-      r = gsl_root_fsolver_root(s);
+      degree = gsl_root_fsolver_root(s);
       double lo = gsl_root_fsolver_x_lower(s);
       double hi = gsl_root_fsolver_x_upper(s);
       status = gsl_root_test_interval(lo, hi, 0, 1e-8);
@@ -115,7 +117,7 @@ static double stalker_degree(double kmin, double kplus, double vmin, double vplu
     // If the solver did not converge we keep its current estimate.
     gsl_root_fsolver_free(s);
   }
-  return r;
+  return degree;
 }
 #endif
 
@@ -155,8 +157,8 @@ static double oldstalker_hyperbolic(double x, double vmin, double vplus, double 
   }
 }
 
-// The basis function of the "oldstalker" method around a grid point in one dimension, with variable degree r
-static double oldstalker_basis(double x, double vmin, double v0, double vplus, double dmin, double dplus, double r,
+// The basis function of the "oldstalker" method around a grid point in one dimension, with variable degree
+static double oldstalker_basis(double x, double vmin, double v0, double vplus, double dmin, double dplus, double degree,
                                double iD, double powmin, double powplus, bool uniform) {
   // Do linear end points
 
@@ -166,20 +168,20 @@ static double oldstalker_basis(double x, double vmin, double v0, double vplus, d
     return v0 + x / dmin * (v0 - vmin);
   vmin -= v0;
   vplus -= v0;
-  if (r == 0)
+  if (degree == 0)
     return v0 + oldstalker_hyperbolic(x, vmin, vplus, dmin, dplus);
-  if (!ISNAN(r)) {
+  if (!ISNAN(degree)) {
     // use precomputed degree
     const double b = (vplus * powmin - vmin * powplus) * iD;
     const double c = (vplus * dmin + vmin * dplus) * iD;
-    return v0 + b * x + c * pow(fabs(x), r);
+    return v0 + b * x + c * pow(fabs(x), degree);
   } else {
-    // Compute r for this basis function
+    // Compute degree for this basis function
 #ifdef HAVE_GSL
     if (uniform) {
 #endif
       // Uniform grid
-      // This works when dplus==dmin, otherwise we must solve an equation for r.
+      // This works when dplus==dmin, otherwise we must solve an equation for degree.
       x /= dplus;
       const double b = 0.5 * (vplus - vmin);
       const double c = 0.5 * (vplus + vmin);
@@ -191,60 +193,60 @@ static double oldstalker_basis(double x, double vmin, double v0, double vplus, d
       double ac = fabs(c), ab = fabs(b);
       if (vplus * vmin <= 0) {
         // monotonic
-        r = (ab < 2.0 * ac) ? ab / ac : 2.0;
+        degree = (ab < 2.0 * ac) ? ab / ac : 2.0;
       } else {
         // non-monotonic
-        // pretend sign change of vplus for computation of r, that is, interchange |b| and |c|
-        r = (ac < 2.0 * ab) ? ac / ab : 2.0;
+        // pretend sign change of vplus for computation of degree, that is, interchange |b| and |c|
+        degree = (ac < 2.0 * ab) ? ac / ab : 2.0;
       }
 
-      if (r == 2.0) {
+      if (degree == 2.0) {
         return v0 + b * x + c * x * x;
-      } else if (r != 1.0) {
-        return v0 + b * x + c * pow(fabs(x), r);
+      } else if (degree != 1.0) {
+        return v0 + b * x + c * pow(fabs(x), degree);
       } else {
         return v0 + b * x + c * fabs(x);
       }
 #ifdef HAVE_GSL
     } else {
 
-      // We must solve for r:
+      // We must solve for degree:
       double b, c;
       if (vmin * vplus < 0) {
         // monotonic
-        r = oldstalker_degree(dmin, dplus, vmin, vplus);
+        degree = oldstalker_degree(dmin, dplus, vmin, vplus);
       } else {
         // non-monotonic, should we keep f'(0) = 0? No, won't work.
-        // We can use r=2, but if we just precisely is non-monotonic
-        // we should use a smaller r to avoid overshoot. But which?
+        // We can use degree=2, but if we just precisely is non-monotonic
+        // we should use a smaller degree to avoid overshoot. But which?
         // Keep it in some way "symmetric" with the monotonic case?  How?
-        // Change sign on one of the values, compute the r which
+        // Change sign on one of the values, compute the degree which
         // fits these monotonic points.
-        r = oldstalker_degree(dmin, dplus, -vmin, vplus);
+        degree = oldstalker_degree(dmin, dplus, -vmin, vplus);
       }
-      if (ISNAN(r)) {
+      if (ISNAN(degree)) {
         c = 0;
         b = vplus / dplus;
       } else {
-        c = (dplus * vmin + dmin * vplus) / (pow(dmin, r) * dplus + pow(dplus, r) * dmin);
-        b = (vplus - c * pow(dplus, r)) / dplus;
+        c = (dplus * vmin + dmin * vplus) / (pow(dmin, degree) * dplus + pow(dplus, degree) * dmin);
+        b = (vplus - c * pow(dplus, degree)) / dplus;
       }
 
-      return v0 + b * x + c * pow(fabs(x), r);
+      return v0 + b * x + c * pow(fabs(x), degree);
     }
 #endif
   }
 }
 
 static void make_stalker(const int ndim, const int *dims, const double **grid, const double *val, double *b, double *c,
-                         double *r, int depth, int *point) {
+                         double *degree, int depth, int *point) {
   // Loop over every grid point
-  // In each grid point, find the function living there, i.e. b, c and r for each dimension.
+  // In each grid point, find the function living there, i.e. b, c and degree for each dimension.
   // Recurse over the dimensions to visit every grid point
   if (depth < ndim) {
     for (int i = 0; i < dims[depth]; i++) {
       point[depth] = i;
-      make_stalker(ndim, dims, grid, val, b, c, r, depth + 1, point);
+      make_stalker(ndim, dims, grid, val, b, c, degree, depth + 1, point);
     }
     return;
   }
@@ -258,8 +260,8 @@ static void make_stalker(const int ndim, const int *dims, const double **grid, c
   }
 
   // Inner loop, we have a grid point in 'point'
-  // loop over the dimensions, collecting b, c and r
-  double *bb = &b[ndim * index], *cc = &c[ndim * index], *rr = &r[ndim * index];
+  // loop over the dimensions, collecting b, c and degree
+  double *bb = &b[ndim * index], *cc = &c[ndim * index], *degs = &degree[ndim * index];
   stride = 1;
 
   for (int i = 0; i < ndim; i++) {
@@ -270,68 +272,69 @@ static void make_stalker(const int ndim, const int *dims, const double **grid, c
     if (idx == 0) {
       // Nothing below us, we are linear upwards
       bb[i] = (val[index + stride] - val[index]) / (gr[idx + 1] - gr[idx]);
-      cc[i] = rr[i] = 0.0;
+      cc[i] = degs[i] = 0.0;
 
     } else if (idx == dims[i] - 1) {
       // Nothing above us, linear downwards
       bb[i] = (val[index - stride] - val[index]) / (gr[idx - 1] - gr[idx]);
-      cc[i] = rr[i] = 0.0;
+      cc[i] = degs[i] = 0.0;
     } else {
       // interior grid point
       double v0 = val[index];
       double vplus = val[index + stride] - v0;
       double vmin = val[index - stride] - v0;
-      double kplus = gr[idx + 1] - gr[idx];
-      double kmin = gr[idx - 1] - gr[idx];
-      bool uniform = fabs(kplus + kmin) < STALKER_EPS * kplus;
-      double r;
+      // the signed steps to the neighboring grid points, hmin < 0 < hplus
+      double hplus = gr[idx + 1] - gr[idx];
+      double hmin = gr[idx - 1] - gr[idx];
+      bool uniform = fabs(hplus + hmin) < STALKER_EPS * hplus;
+      double deg;
 
-      // If non-monotonic, simulate monotonic by changing sign on vmin when computing r
+      // If non-monotonic, simulate monotonic by changing sign on vmin when computing the degree
       if (vplus * vmin <= 0) {
         // monotonic
         // relative tests, independent of the scale of the values
         if (vplus == 0 && vmin == 0) {
           // constant zero
-          r = 2.0;
-        } else if (fabs(kmin * vplus - kplus * vmin) <= STALKER_EPS * (fabs(kmin * vplus) + fabs(kplus * vmin))) {
+          deg = 2.0;
+        } else if (fabs(hmin * vplus - hplus * vmin) <= STALKER_EPS * (fabs(hmin * vplus) + fabs(hplus * vmin))) {
           // Linear
-          r = 2.0;
+          deg = 2.0;
         } else {
           // general
           if (uniform) {
-            r = fabs((vplus - vmin) / (vplus + vmin));
-            if (r < 1)
-              r = 1;
-            if (ISNAN(r) || r > 2.0)
-              r = 2.0;
+            deg = fabs((vplus - vmin) / (vplus + vmin));
+            if (deg < 1)
+              deg = 1;
+            if (ISNAN(deg) || deg > 2.0)
+              deg = 2.0;
           } else {
 #ifdef HAVE_GSL
-            r = stalker_degree(kmin, kplus, vmin, vplus);
+            deg = stalker_degree(hmin, hplus, vmin, vplus);
 #else
-            r = 2.0;
+            deg = 2.0;
 #endif
           }
         }
       } else {
         // non-monotonic
-        // At the outset, r = 2.0
+        // At the outset, the degree is 2
         // But if we change sign on vmin, and the resulting monotonic triple
-        // can't be handled by r=2, we use the r from there
+        // can't be handled by degree 2, we use the degree from there
 #ifdef HAVE_GSL
-        r = stalker_degree(kmin, kplus, -vmin, vplus);
+        deg = stalker_degree(hmin, hplus, -vmin, vplus);
 #else
-        r = 2.0;
+        deg = 2.0;
 #endif
       }
-      rr[i] = r;
-      bb[i] = (vplus - vmin * pow(-kplus / kmin, r)) / (kplus - kmin * pow(-kplus / kmin, r));
-      cc[i] = (kplus * vmin - kmin * vplus) / (kplus * pow(-kmin, r) - kmin * pow(kplus, r));
+      degs[i] = deg;
+      bb[i] = (vplus - vmin * pow(-hplus / hmin, deg)) / (hplus - hmin * pow(-hplus / hmin, deg));
+      cc[i] = (hplus * vmin - hmin * vplus) / (hplus * pow(-hmin, deg) - hmin * pow(hplus, deg));
     }
     stride *= dims[i];
   }
 }
 static double eval_stalker(const double *x, const int ndim, const int *dims, const double **grid, const double *val,
-                           blend_type blend, const double *b, const double *c, const double *r) {
+                           blend_type blend, const double *b, const double *c, const double *degree) {
   // loop over the corners of the hypercube surrounding x.
   // For each corner, evaluate the function there.
   // Make weighted sum.
@@ -384,8 +387,8 @@ static double eval_stalker(const double *x, const int ndim, const int *dims, con
     }
     if (cw == 0.0)
       continue;
-    // Find b, c, and r for the corner. These have stride 'ndim'
-    const double *bb = &b[ndim * corner], *cc = &c[ndim * corner], *rr = &r[ndim * corner];
+    // Find b, c, and degree for the corner. These have stride 'ndim'
+    const double *bb = &b[ndim * corner], *cc = &c[ndim * corner], *degs = &degree[ndim * corner];
     // These are for a zero-based function, i.e. based on the corner being 0,
     // and f(0)=0
     // Compute the stalker in x
@@ -395,7 +398,7 @@ static double eval_stalker(const double *x, const int ndim, const int *dims, con
       if (cc[j] == 0) {
         fval += bb[j] * zx[j];
       } else {
-        fval += bb[j] * zx[j] + cc[j] * pow(fabs(zx[j]), rr[j]);
+        fval += bb[j] * zx[j] + cc[j] * pow(fabs(zx[j]), degs[j]);
       }
     }
     sumw += cw;
@@ -454,9 +457,10 @@ static void make_hstalker(const int ndim, const int *dims, const double **grid, 
       double v0 = val[index];
       double vplus = val[index + stride] - v0;
       double vmin = val[index - stride] - v0;
-      double kplus = gr[idx + 1] - gr[idx];
-      double kmin = gr[idx - 1] - gr[idx];
-      // Work in normalized coordinates, x / kplus and f / vscale, so that the special cases
+      // the signed steps to the neighboring grid points, hmin < 0 < hplus
+      double hplus = gr[idx + 1] - gr[idx];
+      double hmin = gr[idx - 1] - gr[idx];
+      // Work in normalized coordinates, x / hplus and f / vscale, so that the special cases
       // and the intermediate products do not depend on the scale of the values or of the grid.
       const double vscale = fmax(fabs(vplus), fabs(vmin));
       if (vscale == 0) {
@@ -465,9 +469,9 @@ static void make_hstalker(const int ndim, const int *dims, const double **grid, 
       } else {
         const double p = vplus / vscale;
         const double m = vmin / vscale;
-        const double k = kmin / kplus;
-        const double D = k * p - m;
-        const double D2 = k * k * p - m;
+        const double ratio = hmin / hplus;
+        const double D = ratio * p - m;
+        const double D2 = ratio * ratio * p - m;
         // The special cases are detected relative to the size of the terms that cancel
         if (fabs(p) <= 4 * DBL_EPSILON || fabs(m) <= 4 * DBL_EPSILON) {
           // Flat towards one neighbor. The hyperbola degenerates to zero with its pole on the
@@ -475,28 +479,28 @@ static void make_hstalker(const int ndim, const int *dims, const double **grid, 
           bb[i] = cc[i] = dd[i] = 0.0;
         } else if (p * m <= 0) {
           // Monotonic
-          if (fabs(D) <= STALKER_EPS * (fabs(k * p) + fabs(m))) {
+          if (fabs(D) <= STALKER_EPS * (fabs(ratio * p) + fabs(m))) {
             // Linear
-            bb[i] = vplus / kplus;
+            bb[i] = vplus / hplus;
             cc[i] = dd[i] = 0.0;
           } else {
             // general
             bb[i] = 0.0;
-            cc[i] = -D / (k * (p - m)) / kplus;
-            dd[i] = -p * m * (k - 1) / D * vscale;
+            cc[i] = -D / (ratio * (p - m)) / hplus;
+            dd[i] = -p * m * (ratio - 1) / D * vscale;
           }
         } else {
           // Non-monotonic
-          if (fabs(D2) <= STALKER_EPS * (fabs(k * k * p) + fabs(m))) {
+          if (fabs(D2) <= STALKER_EPS * (fabs(ratio * ratio * p) + fabs(m))) {
             // Parabola
-            bb[i] = vplus / kplus / kplus;
+            bb[i] = vplus / hplus / hplus;
             dd[i] = 0.0;
             cc[i] = NA_REAL; // signals parabola
           } else {
             // general
-            bb[i] = p * m * (k - 1) / D2 * vscale / kplus;
-            cc[i] = -D2 / (k * D) / kplus;
-            dd[i] = -k * p * m * (k - 1) * D / (D2 * D2) * vscale;
+            bb[i] = p * m * (ratio - 1) / D2 * vscale / hplus;
+            cc[i] = -D2 / (ratio * D) / hplus;
+            dd[i] = -ratio * p * m * (ratio - 1) * D / (D2 * D2) * vscale;
           }
         }
       }
@@ -593,8 +597,8 @@ static double eval_oldstalker(const double *x, const int ndim, const int *dims, 
   const double *rdet = pcomp[last].det, *rpmin = pcomp[last].pmin, *rpplus = pcomp[last].pplus;
   bool uniform = pcomp[last].uniform;
   R_xlen_t stride = 1;
-  for (int r = 0; r < last; r++)
-    stride *= dims[r];
+  for (int i = 0; i < last; i++)
+    stride *= dims[i];
   // Find the interval of the last coordinate
   const int imin = find_interval(gr, N, xx);
 
@@ -651,11 +655,11 @@ SEXP c_make_stalker(SEXP s_val, SEXP s_grid) {
   const int ndim = LENGTH(s_grid);
   int dims[ndim];
   R_xlen_t len = 1;
-  for (int r = 0; r < ndim; r++) {
-    dims[r] = LENGTH(VECTOR_ELT(s_grid, r));
-    if (dims[r] < 2)
-      Rf_error("`grid` dimension %d must have at least two points, not %d.", r + 1, dims[r]);
-    len *= dims[r];
+  for (int i = 0; i < ndim; i++) {
+    dims[i] = LENGTH(VECTOR_ELT(s_grid, i));
+    if (dims[i] < 2)
+      Rf_error("`grid` dimension %d must have at least two points, not %d.", i + 1, dims[i]);
+    len *= dims[i];
   }
   if (len != XLENGTH(s_val)) {
     Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)len, (long long)XLENGTH(s_val));
@@ -670,12 +674,12 @@ SEXP c_make_stalker(SEXP s_val, SEXP s_grid) {
   int point[ndim];
   SEXP s_b = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
   SEXP s_c = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
-  SEXP s_r = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
-  const char *names[] = {"b", "c", "r", "val", "grid", ""};
+  SEXP s_degree = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
+  const char *names[] = {"b", "c", "degree", "val", "grid", ""};
   SEXP out = PROTECT(Rf_mkNamed(VECSXP, names));
   SET_VECTOR_ELT(out, 0, s_b);
   SET_VECTOR_ELT(out, 1, s_c);
-  SET_VECTOR_ELT(out, 2, s_r);
+  SET_VECTOR_ELT(out, 2, s_degree);
   SET_VECTOR_ELT(out, 3, s_val);
   SET_VECTOR_ELT(out, 4, s_grid);
 #ifdef HAVE_GSL
@@ -693,7 +697,7 @@ SEXP c_make_stalker(SEXP s_val, SEXP s_grid) {
     Rf_warning("A non-uniform `grid` needs chebpol built with GSL, using degree 2 instead.");
 #endif
 
-  make_stalker(ndim, dims, grid, val, REAL(s_b), REAL(s_c), REAL(s_r), 0, point);
+  make_stalker(ndim, dims, grid, val, REAL(s_b), REAL(s_c), REAL(s_degree), 0, point);
 
 #ifdef HAVE_GSL
   gsl_set_error_handler(gslh);
@@ -707,11 +711,11 @@ SEXP c_make_hstalker(SEXP s_val, SEXP s_grid) {
   const int ndim = LENGTH(s_grid);
   int dims[ndim];
   R_xlen_t len = 1;
-  for (int r = 0; r < ndim; r++) {
-    dims[r] = LENGTH(VECTOR_ELT(s_grid, r));
-    if (dims[r] < 2)
-      Rf_error("`grid` dimension %d must have at least two points, not %d.", r + 1, dims[r]);
-    len *= dims[r];
+  for (int i = 0; i < ndim; i++) {
+    dims[i] = LENGTH(VECTOR_ELT(s_grid, i));
+    if (dims[i] < 2)
+      Rf_error("`grid` dimension %d must have at least two points, not %d.", i + 1, dims[i]);
+    len *= dims[i];
   }
   if (len != XLENGTH(s_val)) {
     Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)len, (long long)XLENGTH(s_val));
@@ -751,7 +755,7 @@ SEXP c_eval_stalker(SEXP s_x, SEXP s_stalker, SEXP s_blend, SEXP s_threads) {
 #endif
   const double *b = REAL_RO(VECTOR_ELT(s_stalker, 0));
   const double *c = REAL_RO(VECTOR_ELT(s_stalker, 1));
-  const double *r = REAL_RO(VECTOR_ELT(s_stalker, 2));
+  const double *degree = REAL_RO(VECTOR_ELT(s_stalker, 2));
   const double *val = REAL_RO(VECTOR_ELT(s_stalker, 3));
   SEXP s_grid = VECTOR_ELT(s_stalker, 4);
   const int ndim = LENGTH(s_grid);
@@ -761,8 +765,8 @@ SEXP c_eval_stalker(SEXP s_x, SEXP s_stalker, SEXP s_blend, SEXP s_threads) {
   for (int i = 0; i < ndim; i++)
     grid[i] = REAL_RO(VECTOR_ELT(s_grid, i));
   int dims[ndim];
-  for (int r = 0; r < ndim; r++)
-    dims[r] = LENGTH(VECTOR_ELT(s_grid, r));
+  for (int i = 0; i < ndim; i++)
+    dims[i] = LENGTH(VECTOR_ELT(s_grid, i));
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, n_points));
   double *p_out = REAL(out);
@@ -771,7 +775,7 @@ SEXP c_eval_stalker(SEXP s_x, SEXP s_stalker, SEXP s_blend, SEXP s_threads) {
 #pragma omp parallel for num_threads(threads) schedule(guided) if (n_points > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < n_points; i++) {
-    p_out[i] = eval_stalker(x + i * ndim, ndim, dims, grid, val, blend, b, c, r);
+    p_out[i] = eval_stalker(x + i * ndim, ndim, dims, grid, val, blend, b, c, degree);
   }
 
   UNPROTECT(1);
@@ -798,8 +802,8 @@ SEXP c_eval_hstalker(SEXP s_x, SEXP s_stalker, SEXP s_blend, SEXP s_threads) {
   for (int i = 0; i < ndim; i++)
     grid[i] = REAL_RO(VECTOR_ELT(s_grid, i));
   int dims[ndim];
-  for (int r = 0; r < ndim; r++)
-    dims[r] = LENGTH(VECTOR_ELT(s_grid, r));
+  for (int i = 0; i < ndim; i++)
+    dims[i] = LENGTH(VECTOR_ELT(s_grid, i));
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, n_points));
   double *p_out = REAL(out);
@@ -834,11 +838,11 @@ SEXP c_eval_oldstalker(SEXP s_x, SEXP s_stalker, SEXP s_degree, SEXP s_blend, SE
 
   int dims[ndim];
   R_xlen_t len = 1;
-  for (int r = 0; r < ndim; r++) {
-    dims[r] = LENGTH(VECTOR_ELT(s_grid, r));
-    if (dims[r] < 2)
-      Rf_error("`grid` dimension %d must have at least two points, not %d.", r + 1, dims[r]);
-    len *= dims[r];
+  for (int i = 0; i < ndim; i++) {
+    dims[i] = LENGTH(VECTOR_ELT(s_grid, i));
+    if (dims[i] < 2)
+      Rf_error("`grid` dimension %d must have at least two points, not %d.", i + 1, dims[i]);
+    len *= dims[i];
   }
   if (len != XLENGTH(VECTOR_ELT(s_stalker, 0))) {
     Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)len,

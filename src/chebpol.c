@@ -315,9 +315,9 @@ SEXP c_fh_weights(SEXP s_grid, SEXP s_degree, SEXP s_threads) {
   SEXP s_degree_int = PROTECT(Rf_coerceVector(s_degree, INTSXP));
   const int *degree = INTEGER_RO(s_degree_int);
   int threads = Rf_asInteger(s_threads);
-  for (int r = 0; r < ndim; r++) {
-    // The paper use index from 0 to n, i.e. n+1 knots in each dimension. Therefore dims[r]-1
-    fh_weights(dims[r] - 1, grid[r], degree[r], wlist[r], threads);
+  for (int i = 0; i < ndim; i++) {
+    // The paper use index from 0 to n, i.e. n+1 knots in each dimension. Therefore dims[i]-1
+    fh_weights(dims[i] - 1, grid[i], degree[i], wlist[i], threads);
   }
 
   UNPROTECT(2);
