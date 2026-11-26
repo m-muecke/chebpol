@@ -31,6 +31,13 @@
   Previously it showed the source of an internal function, e.g. “In
   (function (val, knots, k = 2, …”.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  interpolants created with `method = "multilinear"`, `"stalker"` or
+  `"hstalker"` evaluate faster in several dimensions with a blend other
+  than `"linear"`, e.g. about four times faster for `"multilinear"` and
+  twice as fast for the stalker methods with `blend = "sigmoid"` in five
+  dimensions. The blending weights are now computed once per dimension
+  instead of once per corner of the grid cell.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   interpolants created with `method = "simplexlinear"` evaluate much
   faster with many knots, e.g. about 200 times faster with 10,000 knots
   in two or three dimensions. The simplex holding a point is now looked
