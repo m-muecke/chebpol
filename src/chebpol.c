@@ -182,15 +182,15 @@ SEXP c_chebyshev_coef(SEXP s_x, SEXP s_dct, SEXP s_threads) {
   return out;
 }
 
-static double eval_fh(const double *fv, const double *x, const double **knots, const int *dims, const int ndim,
+static double eval_fh(const double *x, const int ndim, const int *dims, const double **grid, const double *val,
                       const double **weights) {
   if (ndim == 0)
-    return fv[0];
+    return val[0];
   R_xlen_t siz = 1;
   const int last = ndim - 1;
   const int N = dims[last];
   const double xx = x[last];
-  const double *kn = knots[last];
+  const double *kn = grid[last];
   const double *w = weights[last];
   for (int i = 0; i < last; i++)
     siz *= dims[i];
@@ -200,23 +200,23 @@ static double eval_fh(const double *fv, const double *x, const double **knots, c
   const double tol = 10.0 * DBL_EPSILON * fabs(kn[N - 1] - kn[0]);
   for (int i = 0; i < N; i++) {
     if (fabs(xx - kn[i]) <= tol)
-      return eval_fh(&fv[i * siz], x, knots, dims, last, weights);
+      return eval_fh(x, last, dims, grid, &val[i * siz], weights);
   }
 
   // save a recursion step
   if (last == 0) {
     for (int i = 0; i < N; i++) {
-      const double val = fv[i];
+      const double v = val[i];
       double pole = w[i] / (xx - kn[i]);
-      num += pole * val;
+      num += pole * v;
       denom += pole;
     }
     return num / denom;
   }
   for (int i = 0; i < N; i++) {
-    const double val = eval_fh(&fv[i * siz], x, knots, dims, last, weights);
+    const double v = eval_fh(x, last, dims, grid, &val[i * siz], weights);
     double pole = w[i] / (xx - kn[i]);
-    num += pole * val;
+    num += pole * v;
     denom += pole;
   }
   return num / denom;
@@ -249,14 +249,14 @@ SEXP c_eval_fh(SEXP s_x, SEXP s_grid, SEXP s_val, SEXP s_weights, SEXP s_threads
   if (LENGTH(s_grid) != ndim || LENGTH(s_weights) != ndim)
     Rf_error("`grid` and the weights must have %d dimensions, one per dimension of `val`, not %d and %d.", ndim,
              LENGTH(s_grid), LENGTH(s_weights));
-  const double **knots = (const double **)R_alloc(ndim, sizeof(double *));
+  const double **grid = (const double **)R_alloc(ndim, sizeof(double *));
   const double **weights = (const double **)R_alloc(ndim, sizeof(double *));
   for (int i = 0; i < ndim; i++) {
     SEXP axis = VECTOR_ELT(s_grid, i), w = VECTOR_ELT(s_weights, i);
     if (XLENGTH(axis) != dims[i] || XLENGTH(w) != dims[i])
       Rf_error("`grid` dimension %d and its weights must have %d points, one per value along it, not %lld and %lld.",
                i + 1, dims[i], (long long)XLENGTH(axis), (long long)XLENGTH(w));
-    knots[i] = REAL_RO(axis);
+    grid[i] = REAL_RO(axis);
     weights[i] = REAL_RO(w);
   }
   const double *x = REAL_RO(s_x);
@@ -267,7 +267,7 @@ SEXP c_eval_fh(SEXP s_x, SEXP s_grid, SEXP s_val, SEXP s_weights, SEXP s_threads
 #pragma omp parallel for num_threads(threads) schedule(static) if (npoints > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < npoints; i++) {
-    p_out[i] = eval_fh(val, x + i * ndim, knots, dims, ndim, weights);
+    p_out[i] = eval_fh(x + i * ndim, ndim, dims, grid, val, weights);
   }
   UNPROTECT(1);
   return out;
@@ -324,9 +324,9 @@ SEXP c_fh_weights(SEXP s_grid, SEXP s_degree, SEXP s_threads) {
   return out;
 }
 
-static double eval_chebyshev(const double *cf, const double *x, const int *dims, const int ndim) {
+static double eval_chebyshev(const double *x, const int ndim, const int *dims, const double *coef) {
   if (ndim == 0)
-    return cf[0];
+    return coef[0];
   // Otherwise, use the Clenshaw algorithm
   R_xlen_t siz = 1;
   const int last = ndim - 1;
@@ -338,16 +338,16 @@ static double eval_chebyshev(const double *cf, const double *x, const int *dims,
     for (int i = N - 1; i > 0; i--) {
       bn2 = bn1;
       bn1 = bn;
-      bn = x2 * bn1 - bn2 + cf[i];
+      bn = x2 * bn1 - bn2 + coef[i];
     }
-    return x[0] * bn - bn1 + cf[0];
+    return x[0] * bn - bn1 + coef[0];
   }
   for (int i = 0; i < last; i++)
     siz *= dims[i];
   for (int i = N - 1; i >= 0; i--) {
     bn2 = bn1;
     bn1 = bn;
-    bn = x2 * bn1 - bn2 + eval_chebyshev(&cf[i * siz], x, dims, last);
+    bn = x2 * bn1 - bn2 + eval_chebyshev(x, last, dims, &coef[i * siz]);
   }
   return bn - x[last] * bn1;
 }
@@ -356,7 +356,7 @@ SEXP c_eval_chebyshev(SEXP s_x, SEXP s_coef, SEXP s_threads) {
   if (XLENGTH(s_coef) == 0)
     Rf_error("`coef` must have at least one element.");
   R_xlen_t siz = 1;
-  const double *cf = REAL_RO(s_coef);
+  const double *coef = REAL_RO(s_coef);
 #ifdef _OPENMP
   int threads = Rf_asInteger(s_threads);
 #endif
@@ -387,7 +387,7 @@ SEXP c_eval_chebyshev(SEXP s_x, SEXP s_coef, SEXP s_threads) {
 #pragma omp parallel for num_threads(threads) schedule(static) if (npoints > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < npoints; i++) {
-    p_out[i] = eval_chebyshev(cf, x + i * ndim, dims, ndim);
+    p_out[i] = eval_chebyshev(x + i * ndim, ndim, dims, coef);
   }
   UNPROTECT(1);
   return out;
@@ -583,8 +583,8 @@ SEXP c_eval_on_grid(SEXP s_fun, SEXP s_grid) {
   return out;
 }
 
-static double eval_multilinear(const int ndim, const double *x, const double **grid, const int *dims,
-                               const double *values, const blend_type blend) {
+static double eval_multilinear(const double *x, const int ndim, const int *dims, const double **grid, const double *val,
+                               const blend_type blend) {
 
   // the blended weights of the lower and upper end of the interval in each dimension
   double wlo[ndim], wup[ndim];
@@ -626,7 +626,7 @@ static double eval_multilinear(const int ndim, const double *x, const double **g
       stride *= dims[g];
     }
     wsum += cw;
-    ipval += cw * values[vpos];
+    ipval += cw * val[vpos];
   }
   return ipval / wsum;
 }
@@ -669,7 +669,7 @@ SEXP c_eval_multilinear(SEXP s_x, SEXP s_grid, SEXP s_val, SEXP s_blend, SEXP s_
 #pragma omp parallel for num_threads(threads) schedule(static) if (npoints > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < npoints; i++) {
-    p_out[i] = eval_multilinear(ndim, x + i * ndim, grid, dims, val, blend);
+    p_out[i] = eval_multilinear(x + i * ndim, ndim, dims, grid, val, blend);
   }
   UNPROTECT(1);
   return out;
