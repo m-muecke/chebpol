@@ -260,13 +260,13 @@ SEXP c_eval_fh(SEXP s_x, SEXP s_grid, SEXP s_val, SEXP s_weights, SEXP s_threads
     weights[i] = REAL_RO(w);
   }
   const double *x = REAL_RO(s_x);
-  const int n_points = Rf_isMatrix(s_x) ? Rf_ncols(s_x) : 1;
-  SEXP out = PROTECT(Rf_allocVector(REALSXP, n_points));
+  const int npoints = Rf_isMatrix(s_x) ? Rf_ncols(s_x) : 1;
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, npoints));
   double *p_out = REAL(out);
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(threads) schedule(static) if (n_points > 1 && threads > 1)
+#pragma omp parallel for num_threads(threads) schedule(static) if (npoints > 1 && threads > 1)
 #endif
-  for (R_xlen_t i = 0; i < n_points; i++) {
+  for (R_xlen_t i = 0; i < npoints; i++) {
     p_out[i] = eval_fh(val, x + i * ndim, knots, dims, ndim, weights);
   }
   UNPROTECT(1);
@@ -380,13 +380,13 @@ SEXP c_eval_chebyshev(SEXP s_x, SEXP s_coef, SEXP s_threads) {
              (long long)XLENGTH(s_coef));
 
   const double *x = REAL_RO(s_x);
-  const int n_points = Rf_isMatrix(s_x) ? Rf_ncols(s_x) : 1;
-  SEXP out = PROTECT(Rf_allocVector(REALSXP, n_points));
+  const int npoints = Rf_isMatrix(s_x) ? Rf_ncols(s_x) : 1;
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, npoints));
   double *p_out = REAL(out);
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(threads) schedule(static) if (n_points > 1 && threads > 1)
+#pragma omp parallel for num_threads(threads) schedule(static) if (npoints > 1 && threads > 1)
 #endif
-  for (R_xlen_t i = 0; i < n_points; i++) {
+  for (R_xlen_t i = 0; i < npoints; i++) {
     p_out[i] = eval_chebyshev(cf, x + i * ndim, dims, ndim);
   }
   UNPROTECT(1);
@@ -455,15 +455,15 @@ SEXP c_eval_polyharmonic(SEXP s_x, SEXP s_knots, SEXP s_weights, SEXP s_lweights
     if (Rf_length(s_x) != Rf_nrows(s_knots))
       Rf_error("`x` must have length %d, one per dimension, not %d.", Rf_nrows(s_knots), Rf_length(s_x));
   }
-  const int n_points = Rf_isMatrix(s_x) ? Rf_ncols(s_x) : 1;
-  SEXP out = PROTECT(Rf_allocVector(REALSXP, n_points));
+  const int npoints = Rf_isMatrix(s_x) ? Rf_ncols(s_x) : 1;
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, npoints));
   double *p_out = REAL(out);
   const int nknots = Rf_ncols(s_knots);
 
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(threads) schedule(static) if (n_points > 1 && threads > 1)
+#pragma omp parallel for num_threads(threads) schedule(static) if (npoints > 1 && threads > 1)
 #endif
-  for (R_xlen_t i = 0; i < n_points; i++) {
+  for (R_xlen_t i = 0; i < npoints; i++) {
     p_out[i] = eval_polyharmonic(x + i * ndim, knots, w, lw, ndim, nknots, k);
   }
   UNPROTECT(1);
@@ -660,15 +660,15 @@ SEXP c_eval_multilinear(SEXP s_x, SEXP s_grid, SEXP s_val, SEXP s_blend, SEXP s_
              (long long)XLENGTH(s_val));
   if (!Rf_isNull(s_blend))
     blend = (blend_type)Rf_asInteger(s_blend);
-  const int n_points = Rf_isMatrix(s_x) ? Rf_ncols(s_x) : 1;
+  const int npoints = Rf_isMatrix(s_x) ? Rf_ncols(s_x) : 1;
   const double *x = REAL_RO(s_x);
-  SEXP out = PROTECT(Rf_allocVector(REALSXP, n_points));
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, npoints));
   double *p_out = REAL(out);
   const double *val = REAL_RO(s_val);
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(threads) schedule(static) if (n_points > 1 && threads > 1)
+#pragma omp parallel for num_threads(threads) schedule(static) if (npoints > 1 && threads > 1)
 #endif
-  for (R_xlen_t i = 0; i < n_points; i++) {
+  for (R_xlen_t i = 0; i < npoints; i++) {
     p_out[i] = eval_multilinear(ndim, x + i * ndim, grid, dims, val, blend);
   }
   UNPROTECT(1);
@@ -767,7 +767,7 @@ static double simplex_value(const double *vec, const int *tri, const double *val
 
 static double eval_simplexlinear(const double *x, const double *knots, const int *dtri, const double *lumats,
                                  const int *pivots, const double *bbox, bool epol, const double *val, const int ndim,
-                                 const int numsimplex, int nknots, blend_type blend, const simplex_grid *sg) {
+                                 const int nsimplex, int nknots, blend_type blend, const simplex_grid *sg) {
 
   for (int i = 0; i < ndim; i++)
     if (ISNAN(x[i]))
@@ -778,7 +778,7 @@ static double eval_simplexlinear(const double *x, const double *knots, const int
   // Only the simplices whose bounding box overlaps the grid cell of x can hold it. They are listed in
   // increasing order, so the first hit is the same simplex a scan of all of them finds.
   const int *cand = NULL;
-  int ncand = numsimplex;
+  int ncand = nsimplex;
   if (sg != NULL) {
     R_xlen_t cell = 0, stride = 1;
     for (int i = 0; i < ndim; i++) {
@@ -813,7 +813,7 @@ static double eval_simplexlinear(const double *x, const double *knots, const int
     }
 
     R_xlen_t nearest = -1;
-    for (R_xlen_t simplex = 0; simplex < numsimplex; simplex++) {
+    for (R_xlen_t simplex = 0; simplex < nsimplex; simplex++) {
       for (int j = 0; j < N; j++)
         if (dtri[simplex * N + j] == nearknot + 1) {
           nearest = simplex;
@@ -842,13 +842,13 @@ static double eval_simplexlinear(const double *x, const double *knots, const int
 SEXP c_eval_simplexlinear(SEXP s_x, SEXP s_knots, SEXP s_dtri, SEXP s_simplices, SEXP s_val, SEXP s_epol, SEXP s_blend,
                           SEXP s_threads) {
   const int *dtri = INTEGER_RO(s_dtri);
-  const int numsimplex = Rf_ncols(s_dtri);
+  const int nsimplex = Rf_ncols(s_dtri);
   const double *lumats = REAL_RO(VECTOR_ELT(s_simplices, 0));
   const int *pivots = INTEGER_RO(VECTOR_ELT(s_simplices, 1));
   const double *bboxmat = REAL_RO(VECTOR_ELT(s_simplices, 2));
   const double *x = REAL_RO(s_x);
   const int ndim = Rf_nrows(s_knots);
-  const int n_points = Rf_ncols(s_x);
+  const int npoints = Rf_ncols(s_x);
   if (Rf_nrows(s_x) != ndim)
     Rf_error("`x` must have %d rows, one per dimension, not %d.", ndim, Rf_nrows(s_x));
   const int nknots = Rf_ncols(s_knots);
@@ -879,11 +879,11 @@ SEXP c_eval_simplexlinear(SEXP s_x, SEXP s_knots, SEXP s_dtri, SEXP s_simplices,
   }
 
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(threads) schedule(guided) if (threads > 1 && n_points > 1)
+#pragma omp parallel for num_threads(threads) schedule(guided) if (threads > 1 && npoints > 1)
 #endif
-  for (R_xlen_t i = 0; i < n_points; i++) {
-    p_out[i] = eval_simplexlinear(x + i * ndim, knots, dtri, lumats, pivots, bboxmat, epol, val, ndim, numsimplex,
-                                  nknots, blend, sg);
+  for (R_xlen_t i = 0; i < npoints; i++) {
+    p_out[i] = eval_simplexlinear(x + i * ndim, knots, dtri, lumats, pivots, bboxmat, epol, val, ndim, nsimplex, nknots,
+                                  blend, sg);
   }
   UNPROTECT(1);
   return out;
@@ -925,7 +925,7 @@ static bool next_cell(int *cc, const int *c0, const int *c1, const int ndim) {
 
 // Index the simplices by a uniform grid over the knots. Fills in elements 3 to 6 of out: the bounds, the
 // cells per dimension, and the offsets and items of the cell lists.
-static void build_simplex_grid(SEXP out, const double *bboxmat, const int ndim, const int numsimplex) {
+static void build_simplex_grid(SEXP out, const double *bboxmat, const int ndim, const int nsimplex) {
   // the bounds of the grid, and the number of cells per unit length in each dimension
   SEXP s_bounds = Rf_allocVector(REALSXP, 3 * ndim);
   SET_VECTOR_ELT(out, 3, s_bounds);
@@ -934,7 +934,7 @@ static void build_simplex_grid(SEXP out, const double *bboxmat, const int ndim, 
     lo[j] = INFINITY;
     hi[j] = -INFINITY;
   }
-  for (R_xlen_t s = 0; s < numsimplex; s++) {
+  for (R_xlen_t s = 0; s < nsimplex; s++) {
     const double *box = bboxmat + s * 2 * ndim;
     for (int j = 0; j < ndim; j++) {
       if (box[2 * j] < lo[j])
@@ -948,8 +948,8 @@ static void build_simplex_grid(SEXP out, const double *bboxmat, const int ndim, 
   int *c0 = (int *)R_alloc(ndim, sizeof(int)), *c1 = (int *)R_alloc(ndim, sizeof(int));
   int *cc = (int *)R_alloc(ndim, sizeof(int));
   // the lists of all cells together hold at most 16 entries per simplex
-  const R_xlen_t maxitems = numsimplex < INT_MAX / 16 ? 16 * (R_xlen_t)numsimplex : INT_MAX;
-  int m = numsimplex > 0 ? (int)floor(pow((double)numsimplex, 1.0 / ndim)) : 1;
+  const R_xlen_t maxitems = nsimplex < INT_MAX / 16 ? 16 * (R_xlen_t)nsimplex : INT_MAX;
+  int m = nsimplex > 0 ? (int)floor(pow((double)nsimplex, 1.0 / ndim)) : 1;
   if (m < 1)
     m = 1;
   R_xlen_t nitems;
@@ -957,7 +957,7 @@ static void build_simplex_grid(SEXP out, const double *bboxmat, const int ndim, 
     for (int j = 0; j < ndim; j++)
       inv[j] = hi[j] > lo[j] ? m / (hi[j] - lo[j]) : 0.0;
     nitems = 0;
-    for (R_xlen_t s = 0; s < numsimplex && nitems <= maxitems; s++)
+    for (R_xlen_t s = 0; s < nsimplex && nitems <= maxitems; s++)
       nitems += box_cells(bboxmat + s * 2 * ndim, lo, inv, m, ndim, c0, c1);
     if (m == 1 || nitems <= maxitems)
       break;
@@ -975,7 +975,7 @@ static void build_simplex_grid(SEXP out, const double *bboxmat, const int ndim, 
 
   // count the simplices of each cell
   memset(offsets, 0, (ncells + 1) * sizeof(int));
-  for (R_xlen_t s = 0; s < numsimplex; s++) {
+  for (R_xlen_t s = 0; s < nsimplex; s++) {
     box_cells(bboxmat + s * 2 * ndim, lo, inv, m, ndim, c0, c1);
     memcpy(cc, c0, ndim * sizeof(int));
     do {
@@ -988,7 +988,7 @@ static void build_simplex_grid(SEXP out, const double *bboxmat, const int ndim, 
   // fill in the simplices in increasing order, next[i] is the free position in the list of cell i
   int *next = (int *)R_alloc(ncells, sizeof(int));
   memcpy(next, offsets, ncells * sizeof(int));
-  for (R_xlen_t s = 0; s < numsimplex; s++) {
+  for (R_xlen_t s = 0; s < nsimplex; s++) {
     box_cells(bboxmat + s * 2 * ndim, lo, inv, m, ndim, c0, c1);
     memcpy(cc, c0, ndim * sizeof(int));
     do {
@@ -1004,22 +1004,22 @@ SEXP c_make_simplexlinear(SEXP s_dtri, SEXP s_knots, SEXP s_threads) {
   const int *dtri = INTEGER_RO(s_dtri);
   const double *knots = REAL_RO(s_knots);
   const int ndim = Rf_nrows(s_knots);
-  const int numsimplex = Rf_ncols(s_dtri);
+  const int nsimplex = Rf_ncols(s_dtri);
   int N = ndim + 1;
   // The LU factors, pivots and bounding boxes of the simplices, then the grid that indexes them
   SEXP out = PROTECT(Rf_allocVector(VECSXP, 7));
   // Allocate everything before parallel for
-  SET_VECTOR_ELT(out, 0, Rf_allocVector(REALSXP, (R_xlen_t)numsimplex * N * N));
-  SET_VECTOR_ELT(out, 1, Rf_allocVector(INTSXP, (R_xlen_t)numsimplex * N));
-  SET_VECTOR_ELT(out, 2, Rf_allocMatrix(REALSXP, 2 * ndim, numsimplex));
+  SET_VECTOR_ELT(out, 0, Rf_allocVector(REALSXP, (R_xlen_t)nsimplex * N * N));
+  SET_VECTOR_ELT(out, 1, Rf_allocVector(INTSXP, (R_xlen_t)nsimplex * N));
+  SET_VECTOR_ELT(out, 2, Rf_allocMatrix(REALSXP, 2 * ndim, nsimplex));
   double *lumats = REAL(VECTOR_ELT(out, 0));
   int *pivots = INTEGER(VECTOR_ELT(out, 1));
   double *bboxmat = REAL(VECTOR_ELT(out, 2));
 
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(threads) schedule(static) if (threads > 1 && numsimplex > 1)
+#pragma omp parallel for num_threads(threads) schedule(static) if (threads > 1 && nsimplex > 1)
 #endif
-  for (R_xlen_t simplex = 0; simplex < numsimplex; simplex++) {
+  for (R_xlen_t simplex = 0; simplex < nsimplex; simplex++) {
     const int *tri = dtri + simplex * (ndim + 1);
     int *pivot = pivots + simplex * N;
     for (int j = 0; j < N; j++)
@@ -1047,7 +1047,7 @@ SEXP c_make_simplexlinear(SEXP s_dtri, SEXP s_knots, SEXP s_threads) {
     F77_CALL(dgetrf)(&N, &N, lumat, &N, pivot, &info);
   }
 
-  build_simplex_grid(out, bboxmat, ndim, numsimplex);
+  build_simplex_grid(out, bboxmat, ndim, nsimplex);
 
   UNPROTECT(1);
   return out;
