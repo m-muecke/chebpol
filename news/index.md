@@ -10,6 +10,11 @@
   `ucappxf()`, deprecated since version 1.7, have been removed. Use
   [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   instead.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  interpolants no longer have a `chebpol.version` attribute. Nothing in
+  chebpol used it, and looking up the version took most of the time
+  needed to create a small interpolant, which is now about four times
+  faster.
 - geometry is now a suggested package instead of a required one, so
   installing chebpol no longer pulls in geometry and its dependencies.
   [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
@@ -136,9 +141,9 @@
   with an error when the length of the returned value changes between
   grid points.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
-  interpolants created with an explicit `blend` now keep their `arity`,
-  `domain` and `chebpol.version` attributes. Previously setting the
-  default blend dropped them.
+  interpolants created with an explicit `blend` now keep their `arity`
+  and `domain` attributes. Previously setting the default blend dropped
+  them.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) now
   stops with an error when `grid` contains missing values. Previously
   these failed with “missing value where TRUE/FALSE needed”.
