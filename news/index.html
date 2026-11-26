@@ -141,6 +141,8 @@
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "uniform"</code> now accepts a one-dimensional <code>grid</code> given as a bare vector, as the other grid methods do. Previously the interpolant returned <code>NaN</code>s.</li>
 <li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "general"</code> now handles a grid dimension with a single point, along which the interpolant is constant, as <code>method = "fh"</code> does. Previously the interpolant returned <code>NA</code> everywhere.</li>
+<li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "uniform"</code> now handles a reversed interval such as <code>c(1, 0)</code> when given a function. Previously the interpolant was silently wrong.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "uniform"</code> now accepts a single interval given as a vector <code>c(a, b)</code> together with values. It already did when given a function.</li>

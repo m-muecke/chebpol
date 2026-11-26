@@ -223,6 +223,10 @@
   bare vector, as the other grid methods do. Previously the interpolant
   returned `NaN`s.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "general"` now handles a grid dimension with a single point,
+  along which the interpolant is constant, as `method = "fh"` does.
+  Previously the interpolant returned `NA` everywhere.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "uniform"` now handles a reversed interval such as `c(1, 0)`
   when given a function. Previously the interpolant was silently wrong.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
