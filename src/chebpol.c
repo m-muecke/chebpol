@@ -171,13 +171,13 @@ SEXP c_cheb_coef(SEXP s_x, SEXP s_dct, SEXP s_threads) {
   if (siz == 0)
     Rf_error("`val` must have at least one element.");
 
-  SEXP s_out = PROTECT(Rf_allocVector(REALSXP, siz));
-  cheb_coef(REAL_RO(s_x), dims, ndim, REAL(s_out), dct, threads);
-  Rf_setAttrib(s_out, R_DimSymbol, s_dim);
-  Rf_setAttrib(s_out, R_DimNamesSymbol, Rf_getAttrib(s_x, R_DimNamesSymbol));
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, siz));
+  cheb_coef(REAL_RO(s_x), dims, ndim, REAL(out), dct, threads);
+  Rf_setAttrib(out, R_DimSymbol, s_dim);
+  Rf_setAttrib(out, R_DimNamesSymbol, Rf_getAttrib(s_x, R_DimNamesSymbol));
   UNPROTECT(1);
 
-  return s_out;
+  return out;
 }
 
 static double eval_fh(const double *fv, const double *x, const double **knots, const int *dims, const int ndim,
@@ -258,16 +258,16 @@ SEXP c_eval_fh(SEXP s_x, SEXP s_val, SEXP s_grid, SEXP s_weights, SEXP s_threads
   }
   const double *x = REAL_RO(s_x);
   const int n_points = Rf_isMatrix(s_x) ? Rf_ncols(s_x) : 1;
-  SEXP s_out = PROTECT(Rf_allocVector(REALSXP, n_points));
-  double *out = REAL(s_out);
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, n_points));
+  double *p_out = REAL(out);
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (n_points > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < n_points; i++) {
-    out[i] = eval_fh(val, x + i * ndim, knots, dims, ndim, weights);
+    p_out[i] = eval_fh(val, x + i * ndim, knots, dims, ndim, weights);
   }
   UNPROTECT(1);
-  return s_out;
+  return out;
 }
 
 static void fh_weights(const int n, const double *grid, const int d, double *w, int threads) {
@@ -303,10 +303,10 @@ SEXP c_fh_weights(SEXP s_grid, SEXP s_d, SEXP s_threads) {
     dims[i] = LENGTH(VECTOR_ELT(s_grid, i));
   }
   double *wlist[ndim];
-  SEXP s_out = PROTECT(Rf_allocVector(VECSXP, ndim));
+  SEXP out = PROTECT(Rf_allocVector(VECSXP, ndim));
   for (int i = 0; i < ndim; i++) {
-    SET_VECTOR_ELT(s_out, i, Rf_allocVector(REALSXP, dims[i]));
-    wlist[i] = REAL(VECTOR_ELT(s_out, i));
+    SET_VECTOR_ELT(out, i, Rf_allocVector(REALSXP, dims[i]));
+    wlist[i] = REAL(VECTOR_ELT(out, i));
   }
 
   SEXP s_dd = PROTECT(Rf_coerceVector(s_d, INTSXP));
@@ -318,7 +318,7 @@ SEXP c_fh_weights(SEXP s_grid, SEXP s_d, SEXP s_threads) {
   }
 
   UNPROTECT(2);
-  return s_out;
+  return out;
 }
 
 double eval_chebyshev(const double *cf, const double *x, const int *dims, const int ndim) {
@@ -378,16 +378,16 @@ SEXP c_eval_chebyshev(SEXP s_coef, SEXP s_x, SEXP s_threads, SEXP s_spare) {
 
   const double *x = REAL_RO(s_x);
   const int n_points = Rf_isMatrix(s_x) ? Rf_ncols(s_x) : 1;
-  SEXP s_out = PROTECT(Rf_allocVector(REALSXP, n_points));
-  double *out = REAL(s_out);
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, n_points));
+  double *p_out = REAL(out);
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (n_points > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < n_points; i++) {
-    out[i] = eval_chebyshev(cf, x + i * ndim, dims, ndim);
+    p_out[i] = eval_chebyshev(cf, x + i * ndim, dims, ndim);
   }
   UNPROTECT(1);
-  return s_out;
+  return out;
 }
 
 static double eval_polyharmonic(const double *x, const double *knots, const double *weights, const double *lweights,
@@ -454,18 +454,18 @@ SEXP c_eval_polyharmonic(SEXP s_x, SEXP s_knots, SEXP s_weights, SEXP s_lweights
       Rf_error("`x` must have length %d, one per dimension, not %d.", Rf_nrows(s_knots), Rf_length(s_x));
   }
   const int n_points = Rf_isMatrix(s_x) ? Rf_ncols(s_x) : 1;
-  SEXP s_out = PROTECT(Rf_allocVector(REALSXP, n_points));
-  double *out = REAL(s_out);
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, n_points));
+  double *p_out = REAL(out);
   const int nknots = Rf_ncols(s_knots);
 
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (n_points > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < n_points; i++) {
-    out[i] = eval_polyharmonic(x + i * ndim, knots, w, lw, ndim, nknots, k);
+    p_out[i] = eval_polyharmonic(x + i * ndim, knots, w, lw, ndim, nknots, k);
   }
   UNPROTECT(1);
-  return s_out;
+  return out;
 }
 
 // an R-free evalongrid. Recursive
@@ -562,23 +562,23 @@ SEXP c_eval_on_grid(SEXP s_fun, SEXP s_grid) {
     Rf_error("`fun` returns too many values on `grid` to store them.");
 
   // Now, fill in the grid points one by one in a buffer, call_fun copies it into the call
-  SEXP s_out = PROTECT(Rf_allocVector(REALSXP, len * valuedim));
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, len * valuedim));
   double *arg = (double *)R_alloc(ndim, sizeof(double));
-  eval_on_grid(call_fun, arg, grid, dims, ndim, valuedim, REAL(s_out), (void *)&gc);
+  eval_on_grid(call_fun, arg, grid, dims, ndim, valuedim, REAL(out), (void *)&gc);
 
   // Set the dim-attribute
   if (valuedim == 1) {
-    Rf_setAttrib(s_out, R_DimSymbol, s_dim);
+    Rf_setAttrib(out, R_DimSymbol, s_dim);
   } else {
     SEXP s_new_dim = PROTECT(Rf_allocVector(INTSXP, ndim + 1));
     int *newdim = INTEGER(s_new_dim);
     newdim[0] = valuedim;
     memcpy(newdim + 1, dims, ndim * sizeof(int));
-    Rf_setAttrib(s_out, R_DimSymbol, s_new_dim);
+    Rf_setAttrib(out, R_DimSymbol, s_new_dim);
     UNPROTECT(1);
   }
   UNPROTECT(6);
-  return s_out;
+  return out;
 }
 
 double eval_multilinear(const int ndim, const double *x, const double **grid, const int *dims, const double *values,
@@ -659,17 +659,17 @@ SEXP c_eval_multilinear(SEXP s_grid, SEXP s_val, SEXP s_x, SEXP s_threads, SEXP 
     blend = (blend_type)Rf_asInteger(s_blend);
   const int n_points = Rf_isMatrix(s_x) ? Rf_ncols(s_x) : 1;
   const double *x = REAL_RO(s_x);
-  SEXP s_out = PROTECT(Rf_allocVector(REALSXP, n_points));
-  double *out = REAL(s_out);
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, n_points));
+  double *p_out = REAL(out);
   const double *val = REAL_RO(s_val);
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (n_points > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < n_points; i++) {
-    out[i] = eval_multilinear(ndim, x + i * ndim, grid, dims, val, blend);
+    p_out[i] = eval_multilinear(ndim, x + i * ndim, grid, dims, val, blend);
   }
   UNPROTECT(1);
-  return s_out;
+  return out;
 }
 
 SEXP c_sq_diffs(SEXP s_x1, SEXP s_x2, SEXP s_threads) {
@@ -679,9 +679,8 @@ SEXP c_sq_diffs(SEXP s_x1, SEXP s_x2, SEXP s_threads) {
 #ifdef _OPENMP
   int threads = Rf_asInteger(s_threads);
 #endif
-  SEXP s_out = PROTECT(Rf_allocVector(REALSXP, N));
-  double *out = REAL(s_out);
-  double *np = out;
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, N));
+  double *p_out = REAL(out);
   const double *x1 = REAL_RO(s_x1), *x2 = REAL_RO(s_x2);
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (threads > 1 && c2 > 1)
@@ -694,15 +693,15 @@ SEXP c_sq_diffs(SEXP s_x1, SEXP s_x2, SEXP s_threads) {
       for (int k = 0; k < r1; k++) {
         csum += (x1p[k] - x2p[k]) * (x1p[k] - x2p[k]);
       }
-      np[i + j * c1] = csum;
+      p_out[i + j * c1] = csum;
     }
   }
   SEXP s_new_dim = PROTECT(Rf_allocVector(INTSXP, 2));
   INTEGER(s_new_dim)[0] = c1;
   INTEGER(s_new_dim)[1] = c2;
-  Rf_setAttrib(s_out, R_DimSymbol, s_new_dim);
+  Rf_setAttrib(out, R_DimSymbol, s_new_dim);
   UNPROTECT(2);
-  return s_out;
+  return out;
 }
 
 // A uniform grid over the knots. Cell i lists the simplices items[offsets[i]] .. items[offsets[i + 1] - 1]
@@ -857,8 +856,8 @@ SEXP c_eval_simplexlinear(SEXP s_x, SEXP s_knots, SEXP s_dtri, SEXP s_adata, SEX
 #ifdef _OPENMP
   int threads = Rf_asInteger(s_threads);
 #endif
-  SEXP s_out = PROTECT(Rf_allocVector(REALSXP, Rf_ncols(s_x)));
-  double *out = REAL(s_out);
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, Rf_ncols(s_x)));
+  double *p_out = REAL(out);
   bool epol = Rf_asLogical(s_extrapolate);
   blend_type blend = BLEND_LINEAR;
   if (!Rf_isNull(s_blend))
@@ -880,11 +879,11 @@ SEXP c_eval_simplexlinear(SEXP s_x, SEXP s_knots, SEXP s_dtri, SEXP s_adata, SEX
 #pragma omp parallel for num_threads(threads) schedule(guided) if (threads > 1 && n_points > 1)
 #endif
   for (R_xlen_t i = 0; i < n_points; i++) {
-    out[i] = eval_simplexlinear(x + i * ndim, knots, dtri, lumats, pivots, bboxmat, epol, val, ndim, numsimplex, nknots,
-                                blend, sg);
+    p_out[i] = eval_simplexlinear(x + i * ndim, knots, dtri, lumats, pivots, bboxmat, epol, val, ndim, numsimplex,
+                                  nknots, blend, sg);
   }
   UNPROTECT(1);
-  return s_out;
+  return out;
 }
 
 // The cells c0[j] .. c1[j] of the grid that a bounding box overlaps in each dimension, and how many cells that is
@@ -921,12 +920,12 @@ static bool next_cell(int *cc, const int *c0, const int *c1, const int ndim) {
   return false;
 }
 
-// Index the simplices by a uniform grid over the knots. Fills in elements 3 to 6 of s_out: the bounds, the
+// Index the simplices by a uniform grid over the knots. Fills in elements 3 to 6 of out: the bounds, the
 // cells per dimension, and the offsets and items of the cell lists.
-static void build_simplex_grid(SEXP s_out, const double *bboxmat, const int ndim, const int numsimplex) {
+static void build_simplex_grid(SEXP out, const double *bboxmat, const int ndim, const int numsimplex) {
   // the bounds of the grid, and the number of cells per unit length in each dimension
   SEXP s_bounds = Rf_allocVector(REALSXP, 3 * ndim);
-  SET_VECTOR_ELT(s_out, 3, s_bounds);
+  SET_VECTOR_ELT(out, 3, s_bounds);
   double *lo = REAL(s_bounds), *hi = lo + ndim, *inv = lo + 2 * ndim;
   for (int j = 0; j < ndim; j++) {
     lo[j] = INFINITY;
@@ -963,12 +962,12 @@ static void build_simplex_grid(SEXP s_out, const double *bboxmat, const int ndim
   R_xlen_t ncells = 1;
   for (int j = 0; j < ndim; j++)
     ncells *= m;
-  SET_VECTOR_ELT(s_out, 4, Rf_ScalarInteger(m));
+  SET_VECTOR_ELT(out, 4, Rf_ScalarInteger(m));
 
   SEXP s_offsets = Rf_allocVector(INTSXP, ncells + 1);
-  SET_VECTOR_ELT(s_out, 5, s_offsets);
+  SET_VECTOR_ELT(out, 5, s_offsets);
   SEXP s_items = Rf_allocVector(INTSXP, nitems);
-  SET_VECTOR_ELT(s_out, 6, s_items);
+  SET_VECTOR_ELT(out, 6, s_items);
   int *offsets = INTEGER(s_offsets), *items = INTEGER(s_items);
 
   // count the simplices of each cell
@@ -1005,14 +1004,14 @@ SEXP c_analyze_simplex(SEXP s_dtri, SEXP s_knots, SEXP s_threads) {
   const int numsimplex = Rf_ncols(s_dtri);
   int N = ndim + 1;
   // The LU factors, pivots and bounding boxes of the simplices, then the grid that indexes them
-  SEXP s_out = PROTECT(Rf_allocVector(VECSXP, 7));
+  SEXP out = PROTECT(Rf_allocVector(VECSXP, 7));
   // Allocate everything before parallel for
-  SET_VECTOR_ELT(s_out, 0, Rf_allocVector(REALSXP, (R_xlen_t)numsimplex * N * N));
-  SET_VECTOR_ELT(s_out, 1, Rf_allocVector(INTSXP, (R_xlen_t)numsimplex * N));
-  SET_VECTOR_ELT(s_out, 2, Rf_allocMatrix(REALSXP, 2 * ndim, numsimplex));
-  double *lumats = REAL(VECTOR_ELT(s_out, 0));
-  int *pivots = INTEGER(VECTOR_ELT(s_out, 1));
-  double *bboxmat = REAL(VECTOR_ELT(s_out, 2));
+  SET_VECTOR_ELT(out, 0, Rf_allocVector(REALSXP, (R_xlen_t)numsimplex * N * N));
+  SET_VECTOR_ELT(out, 1, Rf_allocVector(INTSXP, (R_xlen_t)numsimplex * N));
+  SET_VECTOR_ELT(out, 2, Rf_allocMatrix(REALSXP, 2 * ndim, numsimplex));
+  double *lumats = REAL(VECTOR_ELT(out, 0));
+  int *pivots = INTEGER(VECTOR_ELT(out, 1));
+  double *bboxmat = REAL(VECTOR_ELT(out, 2));
 
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(static) if (threads > 1 && numsimplex > 1)
@@ -1045,10 +1044,10 @@ SEXP c_analyze_simplex(SEXP s_dtri, SEXP s_knots, SEXP s_threads) {
     F77_CALL(dgetrf)(&N, &N, lumat, &N, ipiv, &info);
   }
 
-  build_simplex_grid(s_out, bboxmat, ndim, numsimplex);
+  build_simplex_grid(out, bboxmat, ndim, numsimplex);
 
   UNPROTECT(1);
-  return s_out;
+  return out;
 }
 
 SEXP c_has_fftw(void) {
@@ -1068,13 +1067,13 @@ SEXP c_phi_func(SEXP s_x, SEXP s_k, SEXP s_threads) {
   int threads = Rf_asInteger(s_threads);
 #endif
   double *y;
-  SEXP s_out;
+  SEXP out;
   if (MAYBE_REFERENCED(s_x)) {
-    s_out = PROTECT(Rf_allocVector(REALSXP, n));
-    Rf_setAttrib(s_out, R_DimSymbol, Rf_getAttrib(s_x, R_DimSymbol));
-    y = REAL(s_out);
+    out = PROTECT(Rf_allocVector(REALSXP, n));
+    Rf_setAttrib(out, R_DimSymbol, Rf_getAttrib(s_x, R_DimSymbol));
+    y = REAL(out);
   } else {
-    s_out = s_x;
+    out = s_x;
     y = x;
   }
 
@@ -1114,7 +1113,7 @@ SEXP c_phi_func(SEXP s_x, SEXP s_k, SEXP s_threads) {
   }
   if (y != x)
     UNPROTECT(1);
-  return s_out;
+  return out;
 }
 #ifndef HAVE_ALGLIB
 SEXP c_make_crbf(SEXP s_data, SEXP s_layers, SEXP s_rbase, SEXP s_lambda) {

@@ -672,12 +672,12 @@ SEXP c_make_stalker(SEXP s_val, SEXP s_grid) {
   SEXP s_c = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
   SEXP s_r = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
   const char *names[] = {"b", "c", "r", "val", "grid", ""};
-  SEXP s_out = PROTECT(Rf_mkNamed(VECSXP, names));
-  SET_VECTOR_ELT(s_out, 0, s_b);
-  SET_VECTOR_ELT(s_out, 1, s_c);
-  SET_VECTOR_ELT(s_out, 2, s_r);
-  SET_VECTOR_ELT(s_out, 3, s_val);
-  SET_VECTOR_ELT(s_out, 4, s_grid);
+  SEXP out = PROTECT(Rf_mkNamed(VECSXP, names));
+  SET_VECTOR_ELT(out, 0, s_b);
+  SET_VECTOR_ELT(out, 1, s_c);
+  SET_VECTOR_ELT(out, 2, s_r);
+  SET_VECTOR_ELT(out, 3, s_val);
+  SET_VECTOR_ELT(out, 4, s_grid);
 #ifdef HAVE_GSL
   gsl_error_handler_t *gslh = gsl_set_error_handler_off();
 #else
@@ -698,7 +698,7 @@ SEXP c_make_stalker(SEXP s_val, SEXP s_grid) {
 #endif
 
   UNPROTECT(4);
-  return s_out;
+  return out;
 }
 
 SEXP c_make_hstalker(SEXP s_val, SEXP s_grid) {
@@ -727,17 +727,17 @@ SEXP c_make_hstalker(SEXP s_val, SEXP s_grid) {
   SEXP s_c = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
   SEXP s_d = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
   const char *names[] = {"a", "b", "c", "d", "val", "grid", ""};
-  SEXP s_out = PROTECT(Rf_mkNamed(VECSXP, names));
-  SET_VECTOR_ELT(s_out, 0, s_a);
-  SET_VECTOR_ELT(s_out, 1, s_b);
-  SET_VECTOR_ELT(s_out, 2, s_c);
-  SET_VECTOR_ELT(s_out, 3, s_d);
-  SET_VECTOR_ELT(s_out, 4, s_val);
-  SET_VECTOR_ELT(s_out, 5, s_grid);
+  SEXP out = PROTECT(Rf_mkNamed(VECSXP, names));
+  SET_VECTOR_ELT(out, 0, s_a);
+  SET_VECTOR_ELT(out, 1, s_b);
+  SET_VECTOR_ELT(out, 2, s_c);
+  SET_VECTOR_ELT(out, 3, s_d);
+  SET_VECTOR_ELT(out, 4, s_val);
+  SET_VECTOR_ELT(out, 5, s_grid);
 
   make_hstalker(ndim, dims, grid, val, REAL(s_a), REAL(s_b), REAL(s_c), REAL(s_d), 0, point);
   UNPROTECT(5);
-  return s_out;
+  return out;
 }
 
 SEXP c_eval_stalker(SEXP s_x, SEXP s_stalker, SEXP s_blend, SEXP s_threads) {
@@ -762,18 +762,18 @@ SEXP c_eval_stalker(SEXP s_x, SEXP s_stalker, SEXP s_blend, SEXP s_threads) {
   for (int r = 0; r < ndim; r++)
     dims[r] = LENGTH(VECTOR_ELT(s_grid, r));
 
-  SEXP s_out = PROTECT(Rf_allocVector(REALSXP, n_points));
-  double *out = REAL(s_out);
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, n_points));
+  double *p_out = REAL(out);
 
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(guided) if (n_points > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < n_points; i++) {
-    out[i] = eval_stalker(x + i * ndim, ndim, dims, grid, val, blend, b, c, r);
+    p_out[i] = eval_stalker(x + i * ndim, ndim, dims, grid, val, blend, b, c, r);
   }
 
   UNPROTECT(1);
-  return s_out;
+  return out;
 }
 
 SEXP c_eval_hstalker(SEXP s_x, SEXP s_stalker, SEXP s_blend, SEXP s_threads) {
@@ -799,17 +799,17 @@ SEXP c_eval_hstalker(SEXP s_x, SEXP s_stalker, SEXP s_blend, SEXP s_threads) {
   for (int r = 0; r < ndim; r++)
     dims[r] = LENGTH(VECTOR_ELT(s_grid, r));
 
-  SEXP s_out = PROTECT(Rf_allocVector(REALSXP, n_points));
-  double *out = REAL(s_out);
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, n_points));
+  double *p_out = REAL(out);
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(guided) if (n_points > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < n_points; i++) {
-    out[i] = eval_hstalker(x + i * ndim, ndim, dims, grid, val, blend, a, b, c, d);
+    p_out[i] = eval_hstalker(x + i * ndim, ndim, dims, grid, val, blend, a, b, c, d);
   }
 
   UNPROTECT(1);
-  return s_out;
+  return out;
 }
 
 SEXP c_eval_oldstalker(SEXP s_x, SEXP s_stalker, SEXP s_degree, SEXP s_blend, SEXP s_threads) {
@@ -864,19 +864,19 @@ SEXP c_eval_oldstalker(SEXP s_x, SEXP s_stalker, SEXP s_degree, SEXP s_blend, SE
 #ifdef HAVE_GSL
   gsl_error_handler_t *gslh = gsl_set_error_handler_off();
 #endif
-  SEXP s_out = PROTECT(Rf_allocVector(REALSXP, n_points));
-  double *out = REAL(s_out);
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, n_points));
+  double *p_out = REAL(out);
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(guided) if (n_points > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < n_points; i++) {
-    out[i] = eval_oldstalker(x + i * ndim, ndim, dims, grid, val, blend, degree, pcomp);
+    p_out[i] = eval_oldstalker(x + i * ndim, ndim, dims, grid, val, blend, degree, pcomp);
   }
 #ifdef HAVE_GSL
   gsl_set_error_handler(gslh);
 #endif
   UNPROTECT(2);
-  return s_out;
+  return out;
 }
 
 SEXP c_has_gsl(void) {
