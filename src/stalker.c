@@ -9,18 +9,18 @@ static const double STALKER_EPS = 1e3 * 0x1p-26; // 1e3 * sqrt(DBL_EPSILON)
 typedef struct {
   double dmin, dplus, vmin, vplus;
   int pos;
-} r_block;
+} oldstalker_degree_params;
 typedef struct {
   double kq, vmin, vplus;
-} s_block;
+} stalker_degree_params;
 typedef struct {
   const double *det, *pmin, *pplus;
   bool uniform;
-} precomp;
+} oldstalker_precomp;
 
 #ifdef HAVE_GSL
-static double r_fun(double r, void *P) {
-  r_block *p = (r_block *)P;
+static double oldstalker_degree_root_fn(double r, void *P) {
+  oldstalker_degree_params *p = (oldstalker_degree_params *)P;
   const double dmin = p->dmin, dplus = p->dplus, vmin = p->vmin, vplus = p->vplus;
   int pos = p->pos;
   if (pos)
@@ -29,7 +29,7 @@ static double r_fun(double r, void *P) {
     return vmin * pow(dplus, r) - vplus * pow(dmin, r) + r * pow(dmin, r - 1) * (vmin * dplus + vplus * dmin);
 }
 
-static double find_mono_r(double dmin, double dplus, double vmin, double vplus) {
+static double oldstalker_degree(double dmin, double dplus, double vmin, double vplus) {
   double D2 = (vmin * dplus * dplus - vplus * dmin * dmin) / (vplus * dmin + dplus * vmin);
   double r;
   if (D2 > 2 * dplus || D2 < -2 * dmin) {
@@ -40,10 +40,10 @@ static double find_mono_r(double dmin, double dplus, double vmin, double vplus) 
   } else {
     // Find the largest r which keeps it monotonic, i.e. derivative 0 in one
     // of the end points
-    r_block rb = {dmin, dplus, vmin, vplus, 1};
-    if (r_fun(1, &rb) * r_fun(2, &rb) > 0)
-      rb.pos = 0;
-    gsl_function F = {.function = &r_fun, .params = &rb};
+    oldstalker_degree_params params = {dmin, dplus, vmin, vplus, 1};
+    if (oldstalker_degree_root_fn(1, &params) * oldstalker_degree_root_fn(2, &params) > 0)
+      params.pos = 0;
+    gsl_function F = {.function = &oldstalker_degree_root_fn, .params = &params};
     gsl_root_fsolver *s = gsl_root_fsolver_alloc(gsl_root_fsolver_brent);
     gsl_root_fsolver_set(s, &F, 1, 2);
     int status, iter = 0;
@@ -67,13 +67,13 @@ static double find_mono_r(double dmin, double dplus, double vmin, double vplus) 
   return r;
 }
 
-static double r_fun_new(double r, void *P) {
-  s_block *p = (s_block *)P;
+static double stalker_degree_root_fn(double r, void *P) {
+  stalker_degree_params *p = (stalker_degree_params *)P;
   const double kq = p->kq, vmin = p->vmin, vplus = p->vplus;
   return vplus * pow(-kq, r) - vmin - (vplus * kq - vmin) * r;
 }
 
-static double solver(double kmin, double kplus, double vmin, double vplus) {
+static double stalker_degree(double kmin, double kplus, double vmin, double vplus) {
   double bn = (vplus * kmin * kmin - vmin * kplus * kplus);
   double ncn = vplus * kmin - vmin * kplus;
   double r;
@@ -89,18 +89,18 @@ static double solver(double kmin, double kplus, double vmin, double vplus) {
   } else {
     // Find the largest r which keeps it monotonic, i.e. derivative 0 in one
     // of the end points
-    s_block rb;
+    stalker_degree_params params;
     int eq1 = (vplus > 0 && ncn > 0) || (vplus < 0 && ncn < 0);
     if (eq1) {
-      rb.kq = kmin / kplus;
-      rb.vmin = vmin;
-      rb.vplus = vplus;
+      params.kq = kmin / kplus;
+      params.vmin = vmin;
+      params.vplus = vplus;
     } else {
-      rb.kq = kplus / kmin;
-      rb.vmin = vplus;
-      rb.vplus = vmin;
+      params.kq = kplus / kmin;
+      params.vmin = vplus;
+      params.vplus = vmin;
     }
-    gsl_function F = {.function = &r_fun_new, .params = &rb};
+    gsl_function F = {.function = &stalker_degree_root_fn, .params = &params};
     gsl_root_fsolver *s = gsl_root_fsolver_alloc(gsl_root_fsolver_brent);
     gsl_root_fsolver_set(s, &F, 1, 2);
     int status, iter = 0;
@@ -119,8 +119,8 @@ static double solver(double kmin, double kplus, double vmin, double vplus) {
 }
 #endif
 
-// hyperbolic stalker
-static double stalk_hyp(double x, double vmin, double vplus, double dmin, double dplus) {
+// The hyperbolic basis function of the "oldstalker" method around a grid point, used when the degree is 0
+static double oldstalker_hyperbolic(double x, double vmin, double vplus, double dmin, double dplus) {
   if (fabs(x - dplus) < 1e3 * DBL_EPSILON * dplus)
     return vplus;
   if (fabs(x + dmin) < 1e3 * DBL_EPSILON * dmin)
@@ -155,9 +155,9 @@ static double stalk_hyp(double x, double vmin, double vplus, double dmin, double
   }
 }
 
-// Variable degree stalker spline
-static double stalk_1(double x, double vmin, double v0, double vplus, double dmin, double dplus, double r, double iD,
-                      double powmin, double powplus, bool uniform) {
+// The basis function of the "oldstalker" method around a grid point in one dimension, with variable degree r
+static double oldstalker_basis(double x, double vmin, double v0, double vplus, double dmin, double dplus, double r,
+                               double iD, double powmin, double powplus, bool uniform) {
   // Do linear end points
 
   if (ISNAN(vmin))
@@ -167,7 +167,7 @@ static double stalk_1(double x, double vmin, double v0, double vplus, double dmi
   vmin -= v0;
   vplus -= v0;
   if (r == 0)
-    return v0 + stalk_hyp(x, vmin, vplus, dmin, dplus);
+    return v0 + oldstalker_hyperbolic(x, vmin, vplus, dmin, dplus);
   if (!ISNAN(r)) {
     // use precomputed degree
     const double b = (vplus * powmin - vmin * powplus) * iD;
@@ -212,7 +212,7 @@ static double stalk_1(double x, double vmin, double v0, double vplus, double dmi
       double b, c;
       if (vmin * vplus < 0) {
         // monotonic
-        r = find_mono_r(dmin, dplus, vmin, vplus);
+        r = oldstalker_degree(dmin, dplus, vmin, vplus);
       } else {
         // non-monotonic, should we keep f'(0) = 0? No, won't work.
         // We can use r=2, but if we just precisely is non-monotonic
@@ -220,7 +220,7 @@ static double stalk_1(double x, double vmin, double v0, double vplus, double dmi
         // Keep it in some way "symmetric" with the monotonic case?  How?
         // Change sign on one of the values, compute the r which
         // fits these monotonic points.
-        r = find_mono_r(dmin, dplus, -vmin, vplus);
+        r = oldstalker_degree(dmin, dplus, -vmin, vplus);
       }
       if (ISNAN(r)) {
         c = 0;
@@ -306,7 +306,7 @@ static void make_stalker(const int ndim, const int *dims, const double **grid, c
               r = 2.0;
           } else {
 #ifdef HAVE_GSL
-            r = solver(kmin, kplus, vmin, vplus);
+            r = stalker_degree(kmin, kplus, vmin, vplus);
 #else
             r = 2.0;
 #endif
@@ -318,7 +318,7 @@ static void make_stalker(const int ndim, const int *dims, const double **grid, c
         // But if we change sign on vmin, and the resulting monotonic triple
         // can't be handled by r=2, we use the r from there
 #ifdef HAVE_GSL
-        r = solver(kmin, kplus, -vmin, vplus);
+        r = stalker_degree(kmin, kplus, -vmin, vplus);
 #else
         r = 2.0;
 #endif
@@ -582,7 +582,7 @@ static double eval_hstalker(const double *x, const int ndim, const int *dims, co
 }
 
 static double eval_oldstalker(const double *x, const int ndim, const int *dims, const double **grid, const double *val,
-                              blend_type blend, const double *degree, precomp *pcomp) {
+                              blend_type blend, const double *degree, oldstalker_precomp *pcomp) {
 
   if (ndim == 0)
     return val[0];
@@ -624,15 +624,15 @@ static double eval_oldstalker(const double *x, const int ndim, const int *dims, 
   if (imin > 0)
     dmin = gr[imin] - gr[imin - 1];
   double dplus = gr[imin + 1] - gr[imin];
-  const double low =
-      stalk_1(xx - gr[imin], v1, v2, v3, dmin, dplus, degree[last], rdet[imin], rpmin[imin], rpplus[imin], uniform);
+  const double low = oldstalker_basis(xx - gr[imin], v1, v2, v3, dmin, dplus, degree[last], rdet[imin], rpmin[imin],
+                                      rpplus[imin], uniform);
   dmin = dplus;
   if (imin < N - 2)
     dplus = gr[imin + 2] - gr[imin + 1];
   else
     dplus = NA_REAL;
-  const double high = stalk_1(xx - gr[imin + 1], v2, v3, v4, dmin, dplus, degree[last], rdet[imin + 1], rpmin[imin + 1],
-                              rpplus[imin + 1], uniform);
+  const double high = oldstalker_basis(xx - gr[imin + 1], v2, v3, v4, dmin, dplus, degree[last], rdet[imin + 1],
+                                       rpmin[imin + 1], rpplus[imin + 1], uniform);
 
   // combine the basis functions
   // map into normalized coordinates
@@ -850,7 +850,7 @@ SEXP c_eval_oldstalker(SEXP s_x, SEXP s_stalker, SEXP s_degree, SEXP s_blend, SE
   const double *grid[ndim];
   for (int i = 0; i < ndim; i++)
     grid[i] = REAL_RO(VECTOR_ELT(s_grid, i));
-  precomp pcomp[ndim];
+  oldstalker_precomp pcomp[ndim];
   for (int i = 0; i < ndim; i++) {
     pcomp[i].det = REAL_RO(VECTOR_ELT(s_det, i));
     pcomp[i].pmin = REAL_RO(VECTOR_ELT(s_pmin, i));

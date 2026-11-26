@@ -3,7 +3,7 @@
 # map into the n grid points. These have distance 2 / (n - 1), starting in -1, ending in 1
 # so they are -1 + 2 * j / (n - 1). After some manipulation, the function is:
 
-ugm <- function(x, n) sinpi(0.5 * x * (1 - n) / n)
+uniform_to_chebyshev <- function(x, n) sinpi(0.5 * x * (1 - n) / n)
 
 ipol_uniform <- function(val, dims = NULL, intervals = NULL, ...) {
   if (is.numeric(intervals) && length(intervals) == 2L) {
@@ -30,13 +30,13 @@ ipol_uniform <- function(val, dims = NULL, intervals = NULL, ...) {
   cf <- chebcoef(val)
   # the per-dimension vectors recycle down the columns of x
   if (is.null(intervals)) {
-    map <- crate(function(x) ugm(x, dims), dims)
+    map <- crate(function(x) uniform_to_chebyshev(x, dims), dims)
   } else {
     assert_intervals(intervals, arity)
     # precompute interval mid points and inverse lengths
     mid <- vapply(intervals, mean, numeric(1L))
     ispan <- vapply(intervals, \(i) 2 / diff(i), numeric(1L))
-    map <- crate(function(x) ugm(ispan * (x - mid), dims), ispan, mid, dims)
+    map <- crate(function(x) uniform_to_chebyshev(ispan * (x - mid), dims), ispan, mid, dims)
   }
   fun <- function(x, threads = getOption("chebpol.threads")) {
     x <- as_points(x, arity)

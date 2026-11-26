@@ -6,7 +6,7 @@ test_that("uniform grid interpolation reproduces values at the grid points", {
 })
 
 test_that("the uniform grid mapping is exact at integer and half-integer phases", {
-  expect_identical(ugm(c(-4, -2, 0, 2, 4), 2), c(0, 1, 0, -1, 0))
+  expect_identical(uniform_to_chebyshev(c(-4, -2, 0, 2, 4), 2), c(0, 1, 0, -1, 0))
 })
 
 test_that("uniform grid interpolation is the same from values and from a function", {
