@@ -222,6 +222,12 @@
   `method = "polyharmonic"` now fits a spline with a single knot.
   Previously it failed with “invalid ‘nrow’ value”.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "polyharmonic"` now stops with an error when `k` is zero,
+  missing or not a single number. Previously `k = 0` silently fitted a
+  spline with a logarithmic kernel that could be far off between the
+  knots, and the other cases failed with “missing value where TRUE/FALSE
+  needed” or “the condition has length \> 1”.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "polyharmonic"` now stops with an error when the number of
   values differs from the number of knots. Previously it warned about
   falling back to a least squares fit and suggested `normalize = TRUE`.
@@ -238,6 +244,11 @@
   of the grid. Previously small differences between neighboring values
   were treated as constant or linear, and could produce a narrow spike
   between grid points.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "stalker"` no longer depends on the scale of the values.
+  Previously small differences between neighboring values were treated
+  as constant or linear, so interpolating small values, e.g. `1e-6 * f`,
+  gave a different curve than interpolating `f` and scaling the result.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   interpolants created with `method = "stalker"`, `"hstalker"` or
   `"simplexlinear"` now stop with an error when given a matrix with the

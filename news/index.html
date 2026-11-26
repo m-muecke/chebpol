@@ -147,6 +147,8 @@
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now fits a spline with a single knot. Previously it failed with “invalid ‘nrow’ value”.</li>
 <li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now stops with an error when <code>k</code> is zero, missing or not a single number. Previously <code>k = 0</code> silently fitted a spline with a logarithmic kernel that could be far off between the knots, and the other cases failed with “missing value where TRUE/FALSE needed” or “the condition has length &gt; 1”.</li>
+<li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now stops with an error when the number of values differs from the number of knots. Previously it warned about falling back to a least squares fit and suggested <code>normalize = TRUE</code>.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "stalker"</code>, <code>"hstalker"</code> or <code>"oldstalker"</code> now stops with an error when a grid dimension has a single point. Previously the spline read past the end of the values and the grid.</li>
@@ -154,6 +156,8 @@
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "hstalker"</code> no longer return <code>NaN</code> at a grid point with <code>blend = "mean"</code> when two neighboring values are equal.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "hstalker"</code> no longer depends on the scale of the values or of the grid. Previously small differences between neighboring values were treated as constant or linear, and could produce a narrow spike between grid points.</li>
+<li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "stalker"</code> no longer depends on the scale of the values. Previously small differences between neighboring values were treated as constant or linear, so interpolating small values, e.g. <code>1e-6 * f</code>, gave a different curve than interpolating <code>f</code> and scaling the result.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "stalker"</code>, <code>"hstalker"</code> or <code>"simplexlinear"</code> now stop with an error when given a matrix with the wrong number of rows. Previously they returned values silently, and could read past the end of the input.</li>
 <li>
