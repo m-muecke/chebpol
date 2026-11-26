@@ -24,6 +24,7 @@
 * `ipol()` with `method = "fh"`, `"stalker"` or `"hstalker"` now accepts logical values, as the other methods do. Previously these failed with "REAL() can only be applied to a 'numeric', not a 'logical'".
 * `chebeval()` now works with `intervals` for a matrix of points, and for a single interval given as a vector `c(a, b)`. Before, only a single point in two or more dimensions was mapped correctly.
 * `chebcoef()` now stops with an error when `dct` is `NA` or not a single logical. Previously `dct = NA` was treated as `TRUE`.
+* `chebeval()` and `ipol()` with `method = "uniform"` now stop with an error when `intervals` is not a list with one `c(lower, upper)` pair per dimension, as `method = "chebyshev"` does. Previously a list of the wrong length was silently recycled, which mapped the points wrongly or gave an interpolant that could not be evaluated.
 * `chebeval()` now treats coefficients without a `dim` attribute, such as `c(1, 0.5, 0.25)` or `as.numeric(chebcoef(val))`, as one-dimensional. Previously it failed with "INTEGER() can only be applied to a 'integer', not a 'NULL'".
 * `chebeval()` now errors when `coef` is empty. Previously it could crash R.
 * Loading chebpol no longer overwrites the `chebpol.threads` option when it is already set, for example in `.Rprofile`. The `CHEBPOL_THREADS` environment variable is only used when the option is unset.

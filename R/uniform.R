@@ -19,6 +19,7 @@ ucappx.real <- function(val, intervals = NULL) {
   if (is.null(intervals)) {
     map <- crate(function(x) ugm(x, dims), dims)
   } else {
+    assert_intervals(intervals, arity)
     # precompute interval mid points and inverse lengths
     mid <- vapply(intervals, mean, numeric(1L))
     ispan <- vapply(intervals, \(i) 2 / diff(i), numeric(1L))
@@ -39,6 +40,7 @@ ucappxf.real <- function(fun, dims, intervals = NULL, ...) {
   grid <- if (is.null(intervals)) {
     lapply(dims, \(d) seq(-1, 1, length.out = d))
   } else {
+    assert_intervals(intervals, length(dims))
     Map(\(d, i) seq(i[1L], i[2L], length.out = d), dims, intervals)
   }
   val <- evalongrid(fun, ..., grid = grid)

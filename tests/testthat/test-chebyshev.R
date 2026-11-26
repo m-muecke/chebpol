@@ -104,6 +104,14 @@ test_that("ipol() errors on malformed Chebyshev intervals", {
   })
 })
 
+test_that("chebeval() errors on malformed intervals", {
+  coef <- chebcoef(matrix(1:9, 3))
+  expect_snapshot(error = TRUE, {
+    chebeval(c(0.1, 0.2), coef, intervals = list(c(0, 1)))
+    chebeval(c(0.1, 0.2), coef, intervals = list(c(0, 1), c(0, 1, 2)))
+  })
+})
+
 test_that("chebeval() accepts a single interval as a vector", {
   f <- function(x) exp(-x^2)
   coef <- chebcoef(evalongrid(f, 12, c(0, 2)))

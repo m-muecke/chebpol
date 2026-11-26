@@ -65,6 +65,13 @@ as_points <- function(x, arity, call = sys.call(sys.parent())) {
   x
 }
 
+assert_intervals <- function(intervals, d, what = "val", call = sys.call(sys.parent())) {
+  if (!is.list(intervals) || length(intervals) != d || any(lengths(intervals) != 2L)) {
+    msg <- sprintf("`intervals` must be a list of %d `c(lower, upper)` pairs, one per dimension of `%s`.", d, what)
+    stop(errorCondition(msg, call = call))
+  }
+}
+
 is_flag <- function(x) {
   is.logical(x) && length(x) == 1L && !is.na(x)
 }

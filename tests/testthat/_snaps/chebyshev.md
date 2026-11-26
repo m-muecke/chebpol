@@ -29,6 +29,19 @@
       Error in `chebappx.real()`:
       ! `intervals` must be a list of 2 `c(lower, upper)` pairs, one per dimension of `val`.
 
+# chebeval() errors on malformed intervals
+
+    Code
+      chebeval(c(0.1, 0.2), coef, intervals = list(c(0, 1)))
+    Condition
+      Error in `chebeval()`:
+      ! `intervals` must be a list of 2 `c(lower, upper)` pairs, one per dimension of `coef`.
+    Code
+      chebeval(c(0.1, 0.2), coef, intervals = list(c(0, 1), c(0, 1, 2)))
+    Condition
+      Error in `chebeval()`:
+      ! `intervals` must be a list of 2 `c(lower, upper)` pairs, one per dimension of `coef`.
+
 # chebeval() errors on empty coefficients
 
     Code

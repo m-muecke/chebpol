@@ -137,6 +137,7 @@ chebeval <- function(x, coef, intervals = NULL, threads = getOption("chebpol.thr
   if (is.numeric(intervals) && length(intervals) == 2L) {
     intervals <- list(intervals)
   }
+  assert_intervals(intervals, length(dim(coef)), what = "coef")
   ispan <- vapply(intervals, \(i) 2 / diff(i), numeric(1L))
   mid <- vapply(intervals, mean, numeric(1L))
   .Call(C_evalcheb, coef, (x - mid) * ispan, threads, NULL)
@@ -165,9 +166,7 @@ chebappx.real <- function(val, intervals = NULL) {
     domain <- rep(list(c(-1, 1)), d)
   } else {
     # it's intervals, create mapping into [-1, 1]
-    if (!is.list(intervals) || length(intervals) != d || any(lengths(intervals) != 2L)) {
-      stop(sprintf("`intervals` must be a list of %d `c(lower, upper)` pairs, one per dimension of `val`.", d))
-    }
+    assert_intervals(intervals, d)
     ispan <- vapply(intervals, \(x) 2 / diff(x), numeric(1L))
     mid <- vapply(intervals, mean, numeric(1L))
 

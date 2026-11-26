@@ -46,3 +46,13 @@ test_that("uniform grid interpolation works on a reversed interval", {
   uc <- ipol(exp, dims = 8, intervals = c(1, 0), method = "uniform")
   expect_equal(uc(0.2), ipol(exp, dims = 8, intervals = c(0, 1), method = "uniform")(0.2))
 })
+
+test_that("ipol() errors on malformed uniform intervals", {
+  f <- function(x) sum(x)
+  expect_snapshot(error = TRUE, {
+    ipol(f, dims = c(5, 5), intervals = list(c(0, 1)), method = "uniform")
+    ipol(f, dims = c(5, 5), intervals = list(c(0, 1), c(0, 2), c(0, 3)), method = "uniform")
+    ipol(array(0, c(3, 4)), intervals = list(c(0, 1)), method = "uniform")
+    ipol(array(0, c(3, 4)), intervals = "a", method = "uniform")
+  })
+})
