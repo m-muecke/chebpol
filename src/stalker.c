@@ -236,15 +236,15 @@ static double stalk_1(double x, double vmin, double v0, double vplus, double dmi
   }
 }
 
-static void make_stalker(const int nrank, const int *dims, const double **grid, const double *val, double *b, double *c,
+static void make_stalker(const int ndim, const int *dims, const double **grid, const double *val, double *b, double *c,
                          double *r, int depth, int *point) {
   // Loop over every grid point
   // In each grid point, find the function living there, i.e. b, c and r for each dimension.
   // Recurse over the dimensions to visit every grid point
-  if (depth < nrank) {
+  if (depth < ndim) {
     for (int i = 0; i < dims[depth]; i++) {
       point[depth] = i;
-      make_stalker(nrank, dims, grid, val, b, c, r, depth + 1, point);
+      make_stalker(ndim, dims, grid, val, b, c, r, depth + 1, point);
     }
     return;
   }
@@ -252,17 +252,17 @@ static void make_stalker(const int nrank, const int *dims, const double **grid, 
   // What is the index of the point?  (We could do this in the recursion as well).
   R_xlen_t index = 0, stride = 1;
 
-  for (int i = 0; i < nrank; i++) {
+  for (int i = 0; i < ndim; i++) {
     index += point[i] * stride;
     stride *= dims[i];
   }
 
   // Inner loop, we have a grid point in 'point'
   // loop over the dimensions, collecting b, c and r
-  double *bb = &b[nrank * index], *cc = &c[nrank * index], *rr = &r[nrank * index];
+  double *bb = &b[ndim * index], *cc = &c[ndim * index], *rr = &r[ndim * index];
   stride = 1;
 
-  for (int i = 0; i < nrank; i++) {
+  for (int i = 0; i < ndim; i++) {
     const double *gr = grid[i];
     int idx = point[i];
 
@@ -330,7 +330,7 @@ static void make_stalker(const int nrank, const int *dims, const double **grid, 
     stride *= dims[i];
   }
 }
-static double eval_stalker(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
+static double eval_stalker(const double *x, const int ndim, const int *dims, const double **grid, const double *val,
                            blend_type blend, const double *b, const double *c, const double *r) {
   // loop over the corners of the hypercube surrounding x.
   // For each corner, evaluate the function there.
@@ -338,11 +338,11 @@ static double eval_stalker(const double *x, const int nrank, const int *dims, co
 
   R_xlen_t stride = 1;
   // the blended weights of the lower and upper end of the interval in each dimension
-  double wlo[nrank], wup[nrank];
-  int gbase[nrank];
+  double wlo[ndim], wup[ndim];
+  int gbase[ndim];
   R_xlen_t llcorner = 0;
   // Find the lower left corner for each dimension, store it in gbase
-  for (int g = 0; g < nrank; g++) {
+  for (int g = 0; g < ndim; g++) {
     const double *gr = grid[g];
     int gp = find_interval(gr, dims[g], x[g]);
     // gp is below x
@@ -360,16 +360,16 @@ static double eval_stalker(const double *x, const int nrank, const int *dims, co
   }
 
   double V = 0.0;
-  double zx[nrank];
+  double zx[ndim];
   double sumw = 0.0;
-  for (int i = 0; i < (1 << nrank); i++) {
-    // i is a corner represented as nrank bits
+  for (int i = 0; i < (1 << ndim); i++) {
+    // i is a corner represented as ndim bits
     // bit j is 1 if above in dimension j, 0 if below
     // Find the position and weight of the corner
     R_xlen_t stride = 1;
     R_xlen_t corner = llcorner;
     double cw = 1.0;
-    for (int g = 0; g < nrank; g++) {
+    for (int g = 0; g < ndim; g++) {
       const double *gr = grid[g];
       if (i & (1 << g)) {
         cw *= wup[g];
@@ -384,14 +384,14 @@ static double eval_stalker(const double *x, const int nrank, const int *dims, co
     }
     if (cw == 0.0)
       continue;
-    // Find b, c, and r for the corner. These have stride 'nrank'
-    const double *bb = &b[nrank * corner], *cc = &c[nrank * corner], *rr = &r[nrank * corner];
+    // Find b, c, and r for the corner. These have stride 'ndim'
+    const double *bb = &b[ndim * corner], *cc = &c[ndim * corner], *rr = &r[ndim * corner];
     // These are for a zero-based function, i.e. based on the corner being 0,
     // and f(0)=0
     // Compute the stalker in x
     // The zero-based x is in zx
     double fval = val[corner];
-    for (int j = 0; j < nrank; j++) {
+    for (int j = 0; j < ndim; j++) {
       if (cc[j] == 0) {
         fval += bb[j] * zx[j];
       } else {
@@ -406,16 +406,16 @@ static double eval_stalker(const double *x, const int nrank, const int *dims, co
 
 // Find the parameters for the hyperbolic stalker in each grid point
 // use normalized coordinates as in the formulas, f(0) = 0
-static void make_hstalker(const int nrank, const int *dims, const double **grid, const double *val, double *a,
-                          double *b, double *c, double *d, int depth, int *point) {
+static void make_hstalker(const int ndim, const int *dims, const double **grid, const double *val, double *a, double *b,
+                          double *c, double *d, int depth, int *point) {
   // Loop over every grid point
   // In each grid point, find the function living there, i.e. an a,
   // and b,c,d for each dimension.
   // Recurse over the dimensions to visit every grid point
-  if (depth < nrank) {
+  if (depth < ndim) {
     for (int i = 0; i < dims[depth]; i++) {
       point[depth] = i;
-      make_hstalker(nrank, dims, grid, val, a, b, c, d, depth + 1, point);
+      make_hstalker(ndim, dims, grid, val, a, b, c, d, depth + 1, point);
     }
     return;
   }
@@ -423,7 +423,7 @@ static void make_hstalker(const int nrank, const int *dims, const double **grid,
   // What is the index of the point?  (We could do this in the recursion as well).
   R_xlen_t index = 0, stride = 1;
 
-  for (int i = 0; i < nrank; i++) {
+  for (int i = 0; i < ndim; i++) {
     index += point[i] * stride;
     stride *= dims[i];
   }
@@ -431,10 +431,10 @@ static void make_hstalker(const int nrank, const int *dims, const double **grid,
   // Inner loop, we have a grid point in 'point'
   // loop over the dimensions, collecting b, c, and d
 
-  double *bb = &b[nrank * index], *cc = &c[nrank * index], *dd = &d[nrank * index];
+  double *bb = &b[ndim * index], *cc = &c[ndim * index], *dd = &d[ndim * index];
   a[index] = 0.0;
   stride = 1;
-  for (int i = 0; i < nrank; i++) {
+  for (int i = 0; i < ndim; i++) {
     const double *gr = grid[i];
     int idx = point[i];
 
@@ -506,7 +506,7 @@ static void make_hstalker(const int nrank, const int *dims, const double **grid,
   }
 }
 
-static double eval_hstalker(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
+static double eval_hstalker(const double *x, const int ndim, const int *dims, const double **grid, const double *val,
                             blend_type blend, const double *a, const double *b, const double *c, const double *d) {
   // loop over the corners of the hypercube surrounding x.
   // For each corner, evaluate the function there.
@@ -514,11 +514,11 @@ static double eval_hstalker(const double *x, const int nrank, const int *dims, c
 
   R_xlen_t stride = 1;
   // the blended weights of the lower and upper end of the interval in each dimension
-  double wlo[nrank], wup[nrank];
-  int gbase[nrank];
+  double wlo[ndim], wup[ndim];
+  int gbase[ndim];
   R_xlen_t llcorner = 0;
   // Find the lower left corner for each dimension, store it in gbase
-  for (int g = 0; g < nrank; g++) {
+  for (int g = 0; g < ndim; g++) {
     const double *gr = grid[g];
     int gp = find_interval(gr, dims[g], x[g]);
     // gp is below x
@@ -536,16 +536,16 @@ static double eval_hstalker(const double *x, const int nrank, const int *dims, c
   }
 
   double V = 0.0;
-  double zx[nrank];
+  double zx[ndim];
   double sumw = 0.0;
-  for (int i = 0; i < (1 << nrank); i++) {
-    // i is a corner represented as nrank bits
+  for (int i = 0; i < (1 << ndim); i++) {
+    // i is a corner represented as ndim bits
     // bit j is 1 if above in dimension j, 0 if below
     // Find the position and weight of the corner
     R_xlen_t stride = 1;
     R_xlen_t corner = llcorner;
     double cw = 1.0;
-    for (int g = 0; g < nrank; g++) {
+    for (int g = 0; g < ndim; g++) {
       const double *gr = grid[g];
       if (i & (1 << g)) {
         cw *= wup[g];
@@ -560,14 +560,14 @@ static double eval_hstalker(const double *x, const int nrank, const int *dims, c
     }
     if (cw == 0.0)
       continue;
-    // Find b, c, and d for the corner. These have stride 'nrank'
-    const double *bb = &b[nrank * corner], *cc = &c[nrank * corner], *dd = &d[nrank * corner];
+    // Find b, c, and d for the corner. These have stride 'ndim'
+    const double *bb = &b[ndim * corner], *cc = &c[ndim * corner], *dd = &d[ndim * corner];
     // These are for a zero-based function, i.e. based on the corner being 0,
     // and f(0)=0
     // Compute the hyperbolic stalker in x
     // The zero-based x is in zx
     double fval = val[corner] + a[corner];
-    for (int j = 0; j < nrank; j++) {
+    for (int j = 0; j < ndim; j++) {
       // It might be a parabola, but typically a hyperbola
       if (!ISNAN(cc[j])) {
         fval += bb[j] * zx[j] + dd[j] / (1.0 + cc[j] * zx[j]);
@@ -581,19 +581,19 @@ static double eval_hstalker(const double *x, const int nrank, const int *dims, c
   return V / sumw;
 }
 
-static double eval_oldstalker(const double *x, const int nrank, const int *dims, const double **grid, const double *val,
+static double eval_oldstalker(const double *x, const int ndim, const int *dims, const double **grid, const double *val,
                               blend_type blend, const double *degree, precomp *pcomp) {
 
-  if (nrank == 0)
+  if (ndim == 0)
     return val[0];
-  const int newrank = nrank - 1;
-  const double *gr = grid[newrank];
-  const int N = dims[newrank];
-  const double xx = x[newrank];
-  const double *rdet = pcomp[newrank].det, *rpmin = pcomp[newrank].pmin, *rpplus = pcomp[newrank].pplus;
-  bool uniform = pcomp[newrank].uniform;
+  const int last = ndim - 1;
+  const double *gr = grid[last];
+  const int N = dims[last];
+  const double xx = x[last];
+  const double *rdet = pcomp[last].det, *rpmin = pcomp[last].pmin, *rpplus = pcomp[last].pplus;
+  bool uniform = pcomp[last].uniform;
   R_xlen_t stride = 1;
-  for (int r = 0; r < newrank; r++)
+  for (int r = 0; r < last; r++)
     stride *= dims[r];
   // Find the interval of the last coordinate
   const int imin = find_interval(gr, N, xx);
@@ -604,13 +604,13 @@ static double eval_oldstalker(const double *x, const int nrank, const int *dims,
 
   // values of the lower dimensional spline
   double v1 = NA_REAL, v2, v3, v4 = NA_REAL;
-  if (newrank > 0) {
+  if (last > 0) {
     if (imin > 0)
-      v1 = eval_oldstalker(x, newrank, dims, grid, val + (imin - 1) * stride, blend, degree, pcomp);
-    v2 = eval_oldstalker(x, newrank, dims, grid, val + imin * stride, blend, degree, pcomp);
-    v3 = eval_oldstalker(x, newrank, dims, grid, val + (imin + 1) * stride, blend, degree, pcomp);
+      v1 = eval_oldstalker(x, last, dims, grid, val + (imin - 1) * stride, blend, degree, pcomp);
+    v2 = eval_oldstalker(x, last, dims, grid, val + imin * stride, blend, degree, pcomp);
+    v3 = eval_oldstalker(x, last, dims, grid, val + (imin + 1) * stride, blend, degree, pcomp);
     if (imin < N - 2)
-      v4 = eval_oldstalker(x, newrank, dims, grid, val + (imin + 2) * stride, blend, degree, pcomp);
+      v4 = eval_oldstalker(x, last, dims, grid, val + (imin + 2) * stride, blend, degree, pcomp);
   } else {
     // save a recursion step
     if (imin > 0)
@@ -625,14 +625,14 @@ static double eval_oldstalker(const double *x, const int nrank, const int *dims,
     dmin = gr[imin] - gr[imin - 1];
   double dplus = gr[imin + 1] - gr[imin];
   const double low =
-      stalk_1(xx - gr[imin], v1, v2, v3, dmin, dplus, degree[newrank], rdet[imin], rpmin[imin], rpplus[imin], uniform);
+      stalk_1(xx - gr[imin], v1, v2, v3, dmin, dplus, degree[last], rdet[imin], rpmin[imin], rpplus[imin], uniform);
   dmin = dplus;
   if (imin < N - 2)
     dplus = gr[imin + 2] - gr[imin + 1];
   else
     dplus = NA_REAL;
-  const double high = stalk_1(xx - gr[imin + 1], v2, v3, v4, dmin, dplus, degree[newrank], rdet[imin + 1],
-                              rpmin[imin + 1], rpplus[imin + 1], uniform);
+  const double high = stalk_1(xx - gr[imin + 1], v2, v3, v4, dmin, dplus, degree[last], rdet[imin + 1], rpmin[imin + 1],
+                              rpplus[imin + 1], uniform);
 
   // combine the basis functions
   // map into normalized coordinates
@@ -647,42 +647,42 @@ static double eval_oldstalker(const double *x, const int nrank, const int *dims,
   return w * low + (1 - w) * high;
 }
 
-SEXP c_make_stalker(SEXP Sval, SEXP Sgrid) {
-  const int nrank = LENGTH(Sgrid);
-  int dims[nrank];
+SEXP c_make_stalker(SEXP s_val, SEXP s_grid) {
+  const int ndim = LENGTH(s_grid);
+  int dims[ndim];
   R_xlen_t len = 1;
-  for (int r = 0; r < nrank; r++) {
-    dims[r] = LENGTH(VECTOR_ELT(Sgrid, r));
+  for (int r = 0; r < ndim; r++) {
+    dims[r] = LENGTH(VECTOR_ELT(s_grid, r));
     if (dims[r] < 2)
       Rf_error("`grid` dimension %d must have at least two points, not %d.", r + 1, dims[r]);
     len *= dims[r];
   }
-  if (len != XLENGTH(Sval)) {
-    Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)len, (long long)XLENGTH(Sval));
+  if (len != XLENGTH(s_val)) {
+    Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)len, (long long)XLENGTH(s_val));
   }
   if (len > INT_MAX) {
     Rf_error("grid size (%lld) is too large", (long long)len);
   }
-  const double *val = REAL_RO(Sval);
-  const double *grid[nrank];
-  for (int i = 0; i < nrank; i++)
-    grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
-  int point[nrank];
-  SEXP Sb = PROTECT(Rf_allocMatrix(REALSXP, nrank, (int)len));
-  SEXP Sc = PROTECT(Rf_allocMatrix(REALSXP, nrank, (int)len));
-  SEXP Sr = PROTECT(Rf_allocMatrix(REALSXP, nrank, (int)len));
+  const double *val = REAL_RO(s_val);
+  const double *grid[ndim];
+  for (int i = 0; i < ndim; i++)
+    grid[i] = REAL_RO(VECTOR_ELT(s_grid, i));
+  int point[ndim];
+  SEXP s_b = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
+  SEXP s_c = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
+  SEXP s_r = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
   const char *names[] = {"b", "c", "r", "val", "grid", ""};
-  SEXP ret = PROTECT(Rf_mkNamed(VECSXP, names));
-  SET_VECTOR_ELT(ret, 0, Sb);
-  SET_VECTOR_ELT(ret, 1, Sc);
-  SET_VECTOR_ELT(ret, 2, Sr);
-  SET_VECTOR_ELT(ret, 3, Sval);
-  SET_VECTOR_ELT(ret, 4, Sgrid);
+  SEXP s_out = PROTECT(Rf_mkNamed(VECSXP, names));
+  SET_VECTOR_ELT(s_out, 0, s_b);
+  SET_VECTOR_ELT(s_out, 1, s_c);
+  SET_VECTOR_ELT(s_out, 2, s_r);
+  SET_VECTOR_ELT(s_out, 3, s_val);
+  SET_VECTOR_ELT(s_out, 4, s_grid);
 #ifdef HAVE_GSL
   gsl_error_handler_t *gslh = gsl_set_error_handler_off();
 #else
   // Check if grid is uniform
-  for (int i = 0; i < nrank; i++) {
+  for (int i = 0; i < ndim; i++) {
     const double *gr = grid[i];
     double df = gr[1] - gr[0];
     for (int j = 2; j < dims[i]; j++)
@@ -691,171 +691,171 @@ SEXP c_make_stalker(SEXP Sval, SEXP Sgrid) {
   }
 #endif
 
-  make_stalker(nrank, dims, grid, val, REAL(Sb), REAL(Sc), REAL(Sr), 0, point);
+  make_stalker(ndim, dims, grid, val, REAL(s_b), REAL(s_c), REAL(s_r), 0, point);
 
 #ifdef HAVE_GSL
   gsl_set_error_handler(gslh);
 #endif
 
   UNPROTECT(4);
-  return ret;
+  return s_out;
 }
 
-SEXP c_make_hstalker(SEXP Sval, SEXP Sgrid) {
-  const int nrank = LENGTH(Sgrid);
-  int dims[nrank];
+SEXP c_make_hstalker(SEXP s_val, SEXP s_grid) {
+  const int ndim = LENGTH(s_grid);
+  int dims[ndim];
   R_xlen_t len = 1;
-  for (int r = 0; r < nrank; r++) {
-    dims[r] = LENGTH(VECTOR_ELT(Sgrid, r));
+  for (int r = 0; r < ndim; r++) {
+    dims[r] = LENGTH(VECTOR_ELT(s_grid, r));
     if (dims[r] < 2)
       Rf_error("`grid` dimension %d must have at least two points, not %d.", r + 1, dims[r]);
     len *= dims[r];
   }
-  if (len != XLENGTH(Sval)) {
-    Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)len, (long long)XLENGTH(Sval));
+  if (len != XLENGTH(s_val)) {
+    Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)len, (long long)XLENGTH(s_val));
   }
   if (len > INT_MAX) {
     Rf_error("grid size (%lld) is too large", (long long)len);
   }
-  const double *val = REAL_RO(Sval);
-  const double *grid[nrank];
-  for (int i = 0; i < nrank; i++)
-    grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
-  int point[nrank];
-  SEXP Sa = PROTECT(Rf_allocVector(REALSXP, len));
-  SEXP Sb = PROTECT(Rf_allocMatrix(REALSXP, nrank, (int)len));
-  SEXP Sc = PROTECT(Rf_allocMatrix(REALSXP, nrank, (int)len));
-  SEXP Sd = PROTECT(Rf_allocMatrix(REALSXP, nrank, (int)len));
+  const double *val = REAL_RO(s_val);
+  const double *grid[ndim];
+  for (int i = 0; i < ndim; i++)
+    grid[i] = REAL_RO(VECTOR_ELT(s_grid, i));
+  int point[ndim];
+  SEXP s_a = PROTECT(Rf_allocVector(REALSXP, len));
+  SEXP s_b = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
+  SEXP s_c = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
+  SEXP s_d = PROTECT(Rf_allocMatrix(REALSXP, ndim, (int)len));
   const char *names[] = {"a", "b", "c", "d", "val", "grid", ""};
-  SEXP ret = PROTECT(Rf_mkNamed(VECSXP, names));
-  SET_VECTOR_ELT(ret, 0, Sa);
-  SET_VECTOR_ELT(ret, 1, Sb);
-  SET_VECTOR_ELT(ret, 2, Sc);
-  SET_VECTOR_ELT(ret, 3, Sd);
-  SET_VECTOR_ELT(ret, 4, Sval);
-  SET_VECTOR_ELT(ret, 5, Sgrid);
+  SEXP s_out = PROTECT(Rf_mkNamed(VECSXP, names));
+  SET_VECTOR_ELT(s_out, 0, s_a);
+  SET_VECTOR_ELT(s_out, 1, s_b);
+  SET_VECTOR_ELT(s_out, 2, s_c);
+  SET_VECTOR_ELT(s_out, 3, s_d);
+  SET_VECTOR_ELT(s_out, 4, s_val);
+  SET_VECTOR_ELT(s_out, 5, s_grid);
 
-  make_hstalker(nrank, dims, grid, val, REAL(Sa), REAL(Sb), REAL(Sc), REAL(Sd), 0, point);
+  make_hstalker(ndim, dims, grid, val, REAL(s_a), REAL(s_b), REAL(s_c), REAL(s_d), 0, point);
   UNPROTECT(5);
-  return ret;
+  return s_out;
 }
 
-SEXP c_eval_stalker(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
-  const double *x = REAL_RO(Sx);
-  const int N = Rf_ncols(Sx);
-  blend_type blend = (blend_type)Rf_asInteger(Sblend);
+SEXP c_eval_stalker(SEXP s_x, SEXP s_stalker, SEXP s_blend, SEXP s_threads) {
+  const double *x = REAL_RO(s_x);
+  const int n_points = Rf_ncols(s_x);
+  blend_type blend = (blend_type)Rf_asInteger(s_blend);
 #ifdef _OPENMP
-  int threads = Rf_asInteger(Sthreads);
+  int threads = Rf_asInteger(s_threads);
 #endif
-  const double *b = REAL_RO(VECTOR_ELT(stalker, 0));
-  const double *c = REAL_RO(VECTOR_ELT(stalker, 1));
-  const double *r = REAL_RO(VECTOR_ELT(stalker, 2));
-  const double *val = REAL_RO(VECTOR_ELT(stalker, 3));
-  SEXP Sgrid = VECTOR_ELT(stalker, 4);
-  const int nrank = LENGTH(Sgrid);
-  if (Rf_nrows(Sx) != nrank)
-    Rf_error("`x` must have %d rows, one per dimension, not %d.", nrank, Rf_nrows(Sx));
-  const double *grid[nrank];
-  for (int i = 0; i < nrank; i++)
-    grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
-  int dims[nrank];
-  for (int r = 0; r < nrank; r++)
-    dims[r] = LENGTH(VECTOR_ELT(Sgrid, r));
+  const double *b = REAL_RO(VECTOR_ELT(s_stalker, 0));
+  const double *c = REAL_RO(VECTOR_ELT(s_stalker, 1));
+  const double *r = REAL_RO(VECTOR_ELT(s_stalker, 2));
+  const double *val = REAL_RO(VECTOR_ELT(s_stalker, 3));
+  SEXP s_grid = VECTOR_ELT(s_stalker, 4);
+  const int ndim = LENGTH(s_grid);
+  if (Rf_nrows(s_x) != ndim)
+    Rf_error("`x` must have %d rows, one per dimension, not %d.", ndim, Rf_nrows(s_x));
+  const double *grid[ndim];
+  for (int i = 0; i < ndim; i++)
+    grid[i] = REAL_RO(VECTOR_ELT(s_grid, i));
+  int dims[ndim];
+  for (int r = 0; r < ndim; r++)
+    dims[r] = LENGTH(VECTOR_ELT(s_grid, r));
 
-  SEXP ret = PROTECT(Rf_allocVector(REALSXP, N));
-  double *out = REAL(ret);
+  SEXP s_out = PROTECT(Rf_allocVector(REALSXP, n_points));
+  double *out = REAL(s_out);
 
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(threads) schedule(guided) if (N > 1 && threads > 1)
+#pragma omp parallel for num_threads(threads) schedule(guided) if (n_points > 1 && threads > 1)
 #endif
-  for (R_xlen_t i = 0; i < N; i++) {
-    out[i] = eval_stalker(x + i * nrank, nrank, dims, grid, val, blend, b, c, r);
+  for (R_xlen_t i = 0; i < n_points; i++) {
+    out[i] = eval_stalker(x + i * ndim, ndim, dims, grid, val, blend, b, c, r);
   }
 
   UNPROTECT(1);
-  return ret;
+  return s_out;
 }
 
-SEXP c_eval_hstalker(SEXP Sx, SEXP stalker, SEXP Sblend, SEXP Sthreads) {
-  const double *x = REAL_RO(Sx);
-  const int N = Rf_ncols(Sx);
-  blend_type blend = (blend_type)Rf_asInteger(Sblend);
+SEXP c_eval_hstalker(SEXP s_x, SEXP s_stalker, SEXP s_blend, SEXP s_threads) {
+  const double *x = REAL_RO(s_x);
+  const int n_points = Rf_ncols(s_x);
+  blend_type blend = (blend_type)Rf_asInteger(s_blend);
 #ifdef _OPENMP
-  int threads = Rf_asInteger(Sthreads);
+  int threads = Rf_asInteger(s_threads);
 #endif
-  const double *a = REAL_RO(VECTOR_ELT(stalker, 0));
-  const double *b = REAL_RO(VECTOR_ELT(stalker, 1));
-  const double *c = REAL_RO(VECTOR_ELT(stalker, 2));
-  const double *d = REAL_RO(VECTOR_ELT(stalker, 3));
-  const double *val = REAL_RO(VECTOR_ELT(stalker, 4));
-  SEXP Sgrid = VECTOR_ELT(stalker, 5);
-  const int nrank = LENGTH(Sgrid);
-  if (Rf_nrows(Sx) != nrank)
-    Rf_error("`x` must have %d rows, one per dimension, not %d.", nrank, Rf_nrows(Sx));
-  const double *grid[nrank];
-  for (int i = 0; i < nrank; i++)
-    grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
-  int dims[nrank];
-  for (int r = 0; r < nrank; r++)
-    dims[r] = LENGTH(VECTOR_ELT(Sgrid, r));
+  const double *a = REAL_RO(VECTOR_ELT(s_stalker, 0));
+  const double *b = REAL_RO(VECTOR_ELT(s_stalker, 1));
+  const double *c = REAL_RO(VECTOR_ELT(s_stalker, 2));
+  const double *d = REAL_RO(VECTOR_ELT(s_stalker, 3));
+  const double *val = REAL_RO(VECTOR_ELT(s_stalker, 4));
+  SEXP s_grid = VECTOR_ELT(s_stalker, 5);
+  const int ndim = LENGTH(s_grid);
+  if (Rf_nrows(s_x) != ndim)
+    Rf_error("`x` must have %d rows, one per dimension, not %d.", ndim, Rf_nrows(s_x));
+  const double *grid[ndim];
+  for (int i = 0; i < ndim; i++)
+    grid[i] = REAL_RO(VECTOR_ELT(s_grid, i));
+  int dims[ndim];
+  for (int r = 0; r < ndim; r++)
+    dims[r] = LENGTH(VECTOR_ELT(s_grid, r));
 
-  SEXP ret = PROTECT(Rf_allocVector(REALSXP, N));
-  double *out = REAL(ret);
+  SEXP s_out = PROTECT(Rf_allocVector(REALSXP, n_points));
+  double *out = REAL(s_out);
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(threads) schedule(guided) if (N > 1 && threads > 1)
+#pragma omp parallel for num_threads(threads) schedule(guided) if (n_points > 1 && threads > 1)
 #endif
-  for (R_xlen_t i = 0; i < N; i++) {
-    out[i] = eval_hstalker(x + i * nrank, nrank, dims, grid, val, blend, a, b, c, d);
+  for (R_xlen_t i = 0; i < n_points; i++) {
+    out[i] = eval_hstalker(x + i * ndim, ndim, dims, grid, val, blend, a, b, c, d);
   }
 
   UNPROTECT(1);
-  return ret;
+  return s_out;
 }
 
-SEXP c_eval_oldstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP Sthreads) {
-  const double *x = REAL_RO(Sx);
-  const int K = Rf_nrows(Sx);
-  const int N = Rf_ncols(Sx);
+SEXP c_eval_oldstalker(SEXP s_x, SEXP s_stalker, SEXP s_degree, SEXP s_blend, SEXP s_threads) {
+  const double *x = REAL_RO(s_x);
+  const int n_rows = Rf_nrows(s_x);
+  const int n_points = Rf_ncols(s_x);
 #ifdef _OPENMP
-  int threads = Rf_asInteger(Sthreads);
+  int threads = Rf_asInteger(s_threads);
 #endif
-  const double *val = REAL_RO(VECTOR_ELT(stalker, 0));
-  SEXP Sgrid = VECTOR_ELT(stalker, 1);
-  SEXP Sdet = VECTOR_ELT(stalker, 2);
-  SEXP Spmin = VECTOR_ELT(stalker, 3);
-  SEXP Spplus = VECTOR_ELT(stalker, 4);
-  SEXP Suniform = VECTOR_ELT(stalker, 5);
-  blend_type blend = (blend_type)Rf_asInteger(Sblend);
-  const int nrank = LENGTH(Sgrid);
-  if (K != nrank)
-    Rf_error("`x` must have %d rows, one per dimension, not %d.", nrank, K);
+  const double *val = REAL_RO(VECTOR_ELT(s_stalker, 0));
+  SEXP s_grid = VECTOR_ELT(s_stalker, 1);
+  SEXP s_det = VECTOR_ELT(s_stalker, 2);
+  SEXP s_pmin = VECTOR_ELT(s_stalker, 3);
+  SEXP s_pplus = VECTOR_ELT(s_stalker, 4);
+  SEXP s_uniform = VECTOR_ELT(s_stalker, 5);
+  blend_type blend = (blend_type)Rf_asInteger(s_blend);
+  const int ndim = LENGTH(s_grid);
+  if (n_rows != ndim)
+    Rf_error("`x` must have %d rows, one per dimension, not %d.", ndim, n_rows);
 
-  int dims[nrank];
+  int dims[ndim];
   R_xlen_t len = 1;
-  for (int r = 0; r < nrank; r++) {
-    dims[r] = LENGTH(VECTOR_ELT(Sgrid, r));
+  for (int r = 0; r < ndim; r++) {
+    dims[r] = LENGTH(VECTOR_ELT(s_grid, r));
     if (dims[r] < 2)
       Rf_error("`grid` dimension %d must have at least two points, not %d.", r + 1, dims[r]);
     len *= dims[r];
   }
-  if (len != XLENGTH(VECTOR_ELT(stalker, 0))) {
-    Rf_error("number of values (%lld) does not match grid size (%lld)", (long long)XLENGTH(VECTOR_ELT(stalker, 0)),
+  if (len != XLENGTH(VECTOR_ELT(s_stalker, 0))) {
+    Rf_error("number of values (%lld) does not match grid size (%lld)", (long long)XLENGTH(VECTOR_ELT(s_stalker, 0)),
              (long long)len);
   }
-  if (LENGTH(Sdegree) != nrank) {
-    Rf_error("degree length must match dimension (%d)", nrank);
+  if (LENGTH(s_degree) != ndim) {
+    Rf_error("degree length must match dimension (%d)", ndim);
   }
-  SEXP Sdeg = PROTECT(Rf_coerceVector(Sdegree, REALSXP));
-  const double *degree = REAL_RO(Sdeg);
-  const double *grid[nrank];
-  for (int i = 0; i < nrank; i++)
-    grid[i] = REAL_RO(VECTOR_ELT(Sgrid, i));
-  precomp pcomp[nrank];
-  for (int i = 0; i < nrank; i++) {
-    pcomp[i].det = REAL_RO(VECTOR_ELT(Sdet, i));
-    pcomp[i].pmin = REAL_RO(VECTOR_ELT(Spmin, i));
-    pcomp[i].pplus = REAL_RO(VECTOR_ELT(Spplus, i));
-    pcomp[i].uniform = LOGICAL_RO(Suniform)[i];
+  SEXP s_deg = PROTECT(Rf_coerceVector(s_degree, REALSXP));
+  const double *degree = REAL_RO(s_deg);
+  const double *grid[ndim];
+  for (int i = 0; i < ndim; i++)
+    grid[i] = REAL_RO(VECTOR_ELT(s_grid, i));
+  precomp pcomp[ndim];
+  for (int i = 0; i < ndim; i++) {
+    pcomp[i].det = REAL_RO(VECTOR_ELT(s_det, i));
+    pcomp[i].pmin = REAL_RO(VECTOR_ELT(s_pmin, i));
+    pcomp[i].pplus = REAL_RO(VECTOR_ELT(s_pplus, i));
+    pcomp[i].uniform = LOGICAL_RO(s_uniform)[i];
 #ifndef HAVE_GSL
     if (!pcomp[i].uniform && ISNAN(degree[i]))
       Rf_error("`degree = NA` on a non-uniform grid requires chebpol built with GSL.");
@@ -864,19 +864,19 @@ SEXP c_eval_oldstalker(SEXP Sx, SEXP stalker, SEXP Sdegree, SEXP Sblend, SEXP St
 #ifdef HAVE_GSL
   gsl_error_handler_t *gslh = gsl_set_error_handler_off();
 #endif
-  SEXP ret = PROTECT(Rf_allocVector(REALSXP, N));
-  double *out = REAL(ret);
+  SEXP s_out = PROTECT(Rf_allocVector(REALSXP, n_points));
+  double *out = REAL(s_out);
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(threads) schedule(guided) if (N > 1 && threads > 1)
+#pragma omp parallel for num_threads(threads) schedule(guided) if (n_points > 1 && threads > 1)
 #endif
-  for (R_xlen_t i = 0; i < N; i++) {
-    out[i] = eval_oldstalker(x + i * nrank, nrank, dims, grid, val, blend, degree, pcomp);
+  for (R_xlen_t i = 0; i < n_points; i++) {
+    out[i] = eval_oldstalker(x + i * ndim, ndim, dims, grid, val, blend, degree, pcomp);
   }
 #ifdef HAVE_GSL
   gsl_set_error_handler(gslh);
 #endif
   UNPROTECT(2);
-  return ret;
+  return s_out;
 }
 
 SEXP c_has_gsl(void) {

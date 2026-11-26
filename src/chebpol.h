@@ -45,11 +45,11 @@ SEXP c_analyze_simplex(SEXP, SEXP, SEXP);
 SEXP c_has_gsl(void);
 
 // C entry points made available to other packages in init.c
-double eval_chebyshev(const double *cf, const double *x, const int *dims, const int rank);
-double eval_multilinear(const int rank, const double *x, const double **grid, const int *dims, const double *values,
+double eval_chebyshev(const double *cf, const double *x, const int *dims, const int ndim);
+double eval_multilinear(const int ndim, const double *x, const double **grid, const int *dims, const double *values,
                         int blend);
 void eval_on_grid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, const double **grid,
-                  const int *dims, const int rank, const int valuedim, double *result, void *userdata);
+                  const int *dims, const int ndim, const int valuedim, double *result, void *userdata);
 
 typedef enum {
   BLEND_LINEAR = 0,
