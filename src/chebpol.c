@@ -721,7 +721,7 @@ static int grid_cell(const double v, const double lo, const double inv, const in
 }
 
 // Whether simplex holds x. If so, vec has the barycentric coordinates of x.
-static bool in_simplex(const double *x, const R_xlen_t simplex, const double *lumats, const int *ipivs,
+static bool in_simplex(const double *x, const R_xlen_t simplex, const double *lumats, const int *pivots,
                        const double *bbox, const int ndim, double *vec) {
   // x must be in the bounding box
   const double *box = bbox + simplex * 2 * ndim;
@@ -734,7 +734,7 @@ static bool in_simplex(const double *x, const R_xlen_t simplex, const double *lu
   int N = ndim + 1, one = 1, info;
   memcpy(vec, x, ndim * sizeof(double));
   vec[ndim] = 1.0;
-  F77_CALL(dgetrs)("N", &N, &one, lumats + simplex * N * N, &N, ipivs + simplex * N, vec, &N, &info FCONE);
+  F77_CALL(dgetrs)("N", &N, &one, lumats + simplex * N * N, &N, pivots + simplex * N, vec, &N, &info FCONE);
   for (int d = 0; d < N; d++)
     if (vec[d] < -1e-10)
       return false;
@@ -766,7 +766,7 @@ static double simplex_value(const double *vec, const int *tri, const double *val
 }
 
 static double eval_simplexlinear(const double *x, const double *knots, const int *dtri, const double *lumats,
-                                 const int *ipivs, const double *bbox, bool epol, const double *val, const int ndim,
+                                 const int *pivots, const double *bbox, bool epol, const double *val, const int ndim,
                                  const int numsimplex, int nknots, blend_type blend, const simplex_grid *sg) {
 
   for (int i = 0; i < ndim; i++)
@@ -794,7 +794,7 @@ static double eval_simplexlinear(const double *x, const double *knots, const int
   }
   for (int c = 0; c < ncand; c++) {
     const R_xlen_t simplex = cand != NULL ? cand[c] : c;
-    if (in_simplex(x, simplex, lumats, ipivs, bbox, ndim, vec))
+    if (in_simplex(x, simplex, lumats, pivots, bbox, ndim, vec))
       return simplex_value(vec, dtri + simplex * N, val, N, blend);
   }
 
@@ -826,11 +826,11 @@ static double eval_simplexlinear(const double *x, const double *knots, const int
     if (nearest == -1)
       return NA_REAL;
     const double *lumat = lumats + nearest * N * N;
-    const int *ipiv = ipivs + nearest * N;
+    const int *pivot = pivots + nearest * N;
     const int *tri = dtri + nearest * (ndim + 1);
     memcpy(vec, x, ndim * sizeof(double));
     vec[ndim] = 1.0;
-    F77_CALL(dgetrs)("N", &N, &one, lumat, &N, ipiv, vec, &N, &info FCONE);
+    F77_CALL(dgetrs)("N", &N, &one, lumat, &N, pivot, vec, &N, &info FCONE);
     double sum = 0;
     for (int d = 0; d <= ndim; d++)
       sum += vec[d] * val[tri[d] - 1];
@@ -839,13 +839,13 @@ static double eval_simplexlinear(const double *x, const double *knots, const int
   return NA_REAL;
 }
 
-SEXP c_eval_simplexlinear(SEXP s_x, SEXP s_knots, SEXP s_dtri, SEXP s_adata, SEXP s_val, SEXP s_extrapolate,
-                          SEXP s_blend, SEXP s_threads) {
+SEXP c_eval_simplexlinear(SEXP s_x, SEXP s_knots, SEXP s_dtri, SEXP s_simplices, SEXP s_val, SEXP s_epol, SEXP s_blend,
+                          SEXP s_threads) {
   const int *dtri = INTEGER_RO(s_dtri);
   const int numsimplex = Rf_ncols(s_dtri);
-  const double *lumats = REAL_RO(VECTOR_ELT(s_adata, 0));
-  const int *pivots = INTEGER_RO(VECTOR_ELT(s_adata, 1));
-  const double *bboxmat = REAL_RO(VECTOR_ELT(s_adata, 2));
+  const double *lumats = REAL_RO(VECTOR_ELT(s_simplices, 0));
+  const int *pivots = INTEGER_RO(VECTOR_ELT(s_simplices, 1));
+  const double *bboxmat = REAL_RO(VECTOR_ELT(s_simplices, 2));
   const double *x = REAL_RO(s_x);
   const int ndim = Rf_nrows(s_knots);
   const int n_points = Rf_ncols(s_x);
@@ -861,20 +861,20 @@ SEXP c_eval_simplexlinear(SEXP s_x, SEXP s_knots, SEXP s_dtri, SEXP s_adata, SEX
 #endif
   SEXP out = PROTECT(Rf_allocVector(REALSXP, Rf_ncols(s_x)));
   double *p_out = REAL(out);
-  bool epol = Rf_asLogical(s_extrapolate);
+  bool epol = Rf_asLogical(s_epol);
   blend_type blend = BLEND_LINEAR;
   if (!Rf_isNull(s_blend))
     blend = (blend_type)Rf_asInteger(s_blend);
   // interpolants saved by earlier versions have no grid and scan all simplices
   simplex_grid grid, *sg = NULL;
-  if (LENGTH(s_adata) >= 7) {
-    const double *bounds = REAL_RO(VECTOR_ELT(s_adata, 3));
+  if (LENGTH(s_simplices) >= 7) {
+    const double *bounds = REAL_RO(VECTOR_ELT(s_simplices, 3));
     grid.lo = bounds;
     grid.hi = bounds + ndim;
     grid.inv = bounds + 2 * ndim;
-    grid.m = Rf_asInteger(VECTOR_ELT(s_adata, 4));
-    grid.offsets = INTEGER_RO(VECTOR_ELT(s_adata, 5));
-    grid.items = INTEGER_RO(VECTOR_ELT(s_adata, 6));
+    grid.m = Rf_asInteger(VECTOR_ELT(s_simplices, 4));
+    grid.offsets = INTEGER_RO(VECTOR_ELT(s_simplices, 5));
+    grid.items = INTEGER_RO(VECTOR_ELT(s_simplices, 6));
     sg = &grid;
   }
 
@@ -997,7 +997,7 @@ static void build_simplex_grid(SEXP out, const double *bboxmat, const int ndim, 
   }
 }
 
-SEXP c_analyze_simplex(SEXP s_dtri, SEXP s_knots, SEXP s_threads) {
+SEXP c_make_simplexlinear(SEXP s_dtri, SEXP s_knots, SEXP s_threads) {
 #ifdef _OPENMP
   int threads = Rf_asInteger(s_threads);
 #endif
@@ -1021,9 +1021,9 @@ SEXP c_analyze_simplex(SEXP s_dtri, SEXP s_knots, SEXP s_threads) {
 #endif
   for (R_xlen_t simplex = 0; simplex < numsimplex; simplex++) {
     const int *tri = dtri + simplex * (ndim + 1);
-    int *ipiv = pivots + simplex * N;
+    int *pivot = pivots + simplex * N;
     for (int j = 0; j < N; j++)
-      ipiv[j] = j + 1;
+      pivot[j] = j + 1;
     double *lumat = lumats + simplex * N * N;
     int info;
     double *m = bboxmat + simplex * 2 * ndim;
@@ -1044,7 +1044,7 @@ SEXP c_analyze_simplex(SEXP s_dtri, SEXP s_knots, SEXP s_threads) {
       }
       lumat[v * (ndim + 1) + ndim] = 1.0;
     }
-    F77_CALL(dgetrf)(&N, &N, lumat, &N, ipiv, &info);
+    F77_CALL(dgetrf)(&N, &N, lumat, &N, pivot, &info);
   }
 
   build_simplex_grid(out, bboxmat, ndim, numsimplex);

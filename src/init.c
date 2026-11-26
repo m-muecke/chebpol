@@ -24,7 +24,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"c_eval_hstalker", (DL_FUNC)&c_eval_hstalker, 4},
     {"c_make_stalker", (DL_FUNC)&c_make_stalker, 2},
     {"c_eval_stalker", (DL_FUNC)&c_eval_stalker, 4},
-    {"c_analyze_simplex", (DL_FUNC)&c_analyze_simplex, 3},
+    {"c_make_simplexlinear", (DL_FUNC)&c_make_simplexlinear, 3},
     {"c_has_gsl", (DL_FUNC)&c_has_gsl, 0},
     {NULL, NULL, 0},
 };

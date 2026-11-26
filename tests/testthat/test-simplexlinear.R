@@ -56,7 +56,7 @@ test_that("simplex linear interpolation finds the same simplices with and withou
     # without the index, as in interpolants saved by earlier versions, all simplices are scanned
     scan <- sl
     environment(scan) <- list2env(as.list(environment(sl)), parent = parent.env(environment(sl)))
-    environment(scan)$adata <- environment(scan)$adata[1:3]
+    environment(scan)$simplices <- environment(scan)$simplices[1:3]
     x <- matrix(runif(d * 500, -0.1, 1.1), d)
     expect_identical(sl(x), scan(x))
     expect_identical(sl(x, epol = TRUE), scan(x, epol = TRUE))

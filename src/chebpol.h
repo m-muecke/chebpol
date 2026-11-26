@@ -41,7 +41,7 @@ SEXP c_make_hstalker(SEXP, SEXP);
 SEXP c_eval_hstalker(SEXP, SEXP, SEXP, SEXP);
 SEXP c_make_stalker(SEXP, SEXP);
 SEXP c_eval_stalker(SEXP, SEXP, SEXP, SEXP);
-SEXP c_analyze_simplex(SEXP, SEXP, SEXP);
+SEXP c_make_simplexlinear(SEXP, SEXP, SEXP);
 SEXP c_has_gsl(void);
 
 typedef enum {
