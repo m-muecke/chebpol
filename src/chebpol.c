@@ -222,13 +222,12 @@ static double eval_fh(const double *fv, const double *x, const double **knots, c
   return num / denom;
 }
 
-SEXP c_eval_fh(SEXP s_x, SEXP s_val, SEXP s_grid, SEXP s_weights, SEXP s_threads, SEXP s_spare) {
+SEXP c_eval_fh(SEXP s_x, SEXP s_grid, SEXP s_val, SEXP s_weights, SEXP s_threads) {
   R_xlen_t siz = 1;
   const double *val = REAL_RO(s_val);
 #ifdef _OPENMP
   int threads = Rf_asInteger(s_threads);
 #endif
-  UNUSED(s_spare);
   SEXP s_dim = Rf_getAttrib(s_val, R_DimSymbol);
   const int *dims = INTEGER_RO(s_dim);
   const int ndim = LENGTH(s_dim);
@@ -353,7 +352,7 @@ static double eval_chebyshev(const double *cf, const double *x, const int *dims,
   return bn - x[last] * bn1;
 }
 
-SEXP c_eval_chebyshev(SEXP s_coef, SEXP s_x, SEXP s_threads, SEXP s_spare) {
+SEXP c_eval_chebyshev(SEXP s_x, SEXP s_coef, SEXP s_threads) {
   if (XLENGTH(s_coef) == 0)
     Rf_error("`coef` must have at least one element.");
   R_xlen_t siz = 1;
@@ -361,7 +360,6 @@ SEXP c_eval_chebyshev(SEXP s_coef, SEXP s_x, SEXP s_threads, SEXP s_spare) {
 #ifdef _OPENMP
   int threads = Rf_asInteger(s_threads);
 #endif
-  UNUSED(s_spare);
   SEXP s_dim = Rf_getAttrib(s_coef, R_DimSymbol);
   const int *dims = INTEGER_RO(s_dim);
   const int ndim = LENGTH(s_dim);
@@ -435,8 +433,7 @@ static double eval_polyharmonic(const double *x, const double *knots, const doub
     wsum += lweights[i + 1] * x[i];
   return wsum;
 }
-SEXP c_eval_polyharmonic(SEXP s_x, SEXP s_knots, SEXP s_weights, SEXP s_lweights, SEXP s_k, SEXP s_threads,
-                         SEXP s_spare) {
+SEXP c_eval_polyharmonic(SEXP s_x, SEXP s_knots, SEXP s_weights, SEXP s_lweights, SEXP s_k, SEXP s_threads) {
   const double *x = REAL_RO(s_x);
   const double *knots = REAL_RO(s_knots);
   const double *w = REAL_RO(s_weights);
@@ -446,7 +443,6 @@ SEXP c_eval_polyharmonic(SEXP s_x, SEXP s_knots, SEXP s_weights, SEXP s_lweights
   int threads = Rf_asInteger(s_threads);
 #endif
   const int ndim = Rf_nrows(s_knots);
-  UNUSED(s_spare);
   if (LENGTH(s_lweights) != ndim + 1)
     Rf_error("The linear weights must have length %d, one more than the number of dimensions, not %d.", ndim + 1,
              LENGTH(s_lweights));
@@ -635,7 +631,7 @@ static double eval_multilinear(const int ndim, const double *x, const double **g
   return ipval / wsum;
 }
 
-SEXP c_eval_multilinear(SEXP s_grid, SEXP s_val, SEXP s_x, SEXP s_threads, SEXP s_blend) {
+SEXP c_eval_multilinear(SEXP s_x, SEXP s_grid, SEXP s_val, SEXP s_blend, SEXP s_threads) {
   const int ndim = LENGTH(s_grid);
   R_xlen_t gridsize = 1;
   int dims[ndim];
@@ -844,7 +840,7 @@ static double eval_simplexlinear(const double *x, const double *knots, const int
 }
 
 SEXP c_eval_simplexlinear(SEXP s_x, SEXP s_knots, SEXP s_dtri, SEXP s_adata, SEXP s_val, SEXP s_extrapolate,
-                          SEXP s_threads, SEXP s_blend) {
+                          SEXP s_blend, SEXP s_threads) {
   const int *dtri = INTEGER_RO(s_dtri);
   const int numsimplex = Rf_ncols(s_dtri);
   const double *lumats = REAL_RO(VECTOR_ELT(s_adata, 0));
@@ -1131,9 +1127,9 @@ SEXP c_make_crbf(SEXP s_data, SEXP s_layers, SEXP s_rbase, SEXP s_lambda) {
   Rf_error("method = \"crbf\" is not available because chebpol has no ALGLIB support.");
   return R_NilValue;
 }
-SEXP c_eval_crbf(SEXP s_model, SEXP s_x, SEXP s_threads) {
-  UNUSED(s_model);
+SEXP c_eval_crbf(SEXP s_x, SEXP s_model, SEXP s_threads) {
   UNUSED(s_x);
+  UNUSED(s_model);
   UNUSED(s_threads);
   Rf_error("method = \"crbf\" is not available because chebpol has no ALGLIB support.");
   return R_NilValue;

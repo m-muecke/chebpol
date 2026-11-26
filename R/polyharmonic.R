@@ -111,7 +111,7 @@ ipol_polyharmonic <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE,
   v <- c(basis_coef[1L] / sqrt(N) - sum(lin * mu), lin)
   fun <- function(x, threads = getOption("chebpol.threads")) {
     x <- as_points(x, M)
-    .Call(c_eval_polyharmonic, normfun(x), knots, w, v, k, threads, NULL)
+    .Call(c_eval_polyharmonic, normfun(x), knots, w, v, k, threads)
   }
   new_interpolant(crate(fun, normfun, knots, w, v, k, M), method = "polyharmonic", arity = M, domain = domain)
 }

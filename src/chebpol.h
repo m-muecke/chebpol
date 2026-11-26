@@ -22,9 +22,9 @@
 #endif
 
 // .Call entry points, registered in init.c
-SEXP c_eval_chebyshev(SEXP, SEXP, SEXP, SEXP);
+SEXP c_eval_chebyshev(SEXP, SEXP, SEXP);
 SEXP c_cheb_coef(SEXP, SEXP, SEXP);
-SEXP c_eval_fh(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP c_eval_fh(SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP c_fh_weights(SEXP, SEXP, SEXP);
 SEXP c_eval_multilinear(SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP c_eval_on_grid(SEXP, SEXP);
@@ -34,7 +34,7 @@ SEXP c_phi_func(SEXP, SEXP, SEXP);
 SEXP c_make_crbf(SEXP, SEXP, SEXP, SEXP);
 SEXP c_eval_crbf(SEXP, SEXP, SEXP);
 SEXP c_has_alglib(void);
-SEXP c_eval_polyharmonic(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP c_eval_polyharmonic(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP c_eval_simplexlinear(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP c_eval_oldstalker(SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP c_make_hstalker(SEXP, SEXP);

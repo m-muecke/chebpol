@@ -40,7 +40,7 @@ ipol_uniform <- function(val, dims = NULL, intervals = NULL, ...) {
   }
   fun <- function(x, threads = getOption("chebpol.threads")) {
     x <- as_points(x, arity)
-    .Call(c_eval_chebyshev, cf, map(x), threads, NULL)
+    .Call(c_eval_chebyshev, map(x), cf, threads)
   }
   domain <- stats::setNames(intervals %||% rep(list(c(-1, 1)), arity), names(intervals) %||% names(dims))
   new_interpolant(crate(fun, cf, map, arity), method = "uniform", arity = arity, domain = domain)

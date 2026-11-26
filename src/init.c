@@ -5,9 +5,9 @@
 #endif
 
 static const R_CallMethodDef CallEntries[] = {
-    {"c_eval_chebyshev", (DL_FUNC)&c_eval_chebyshev, 4},
+    {"c_eval_chebyshev", (DL_FUNC)&c_eval_chebyshev, 3},
     {"c_cheb_coef", (DL_FUNC)&c_cheb_coef, 3},
-    {"c_eval_fh", (DL_FUNC)&c_eval_fh, 6},
+    {"c_eval_fh", (DL_FUNC)&c_eval_fh, 5},
     {"c_fh_weights", (DL_FUNC)&c_fh_weights, 3},
     {"c_eval_multilinear", (DL_FUNC)&c_eval_multilinear, 5},
     {"c_eval_on_grid", (DL_FUNC)&c_eval_on_grid, 2},
@@ -17,7 +17,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"c_make_crbf", (DL_FUNC)&c_make_crbf, 4},
     {"c_eval_crbf", (DL_FUNC)&c_eval_crbf, 3},
     {"c_has_alglib", (DL_FUNC)&c_has_alglib, 0},
-    {"c_eval_polyharmonic", (DL_FUNC)&c_eval_polyharmonic, 7},
+    {"c_eval_polyharmonic", (DL_FUNC)&c_eval_polyharmonic, 6},
     {"c_eval_simplexlinear", (DL_FUNC)&c_eval_simplexlinear, 8},
     {"c_eval_oldstalker", (DL_FUNC)&c_eval_oldstalker, 5},
     {"c_make_hstalker", (DL_FUNC)&c_make_hstalker, 2},

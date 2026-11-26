@@ -24,7 +24,7 @@ ipol_fh <- function(val, grid = NULL, d = 1L, ...) {
   arity <- length(grid)
   fun <- function(x, threads = getOption("chebpol.threads")) {
     x <- as_points(x, arity)
-    .Call(c_eval_fh, x, val, grid, weights, threads, NULL)
+    .Call(c_eval_fh, x, grid, val, weights, threads)
   }
   new_interpolant(crate(fun, val, grid, weights, arity), method = "fh", arity = arity, domain = lapply(grid, range))
 }

@@ -24,7 +24,7 @@ ipol_multilinear <- function(val, grid, ..., blend = NULL) {
   ) {
     x <- as_points(x, arity)
     blend <- blend_types[[match.arg(blend)]]
-    .Call(c_eval_multilinear, grid, val, x, threads, blend)
+    .Call(c_eval_multilinear, x, grid, val, blend, threads)
   }
   fun <- crate(fun, grid, val, arity)
   new_interpolant(set_default_blend(fun, blend), method = "multilinear", arity = arity, domain = lapply(grid, range))
