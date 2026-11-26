@@ -132,7 +132,7 @@ chebeval <- function(x, coef, intervals = NULL, threads = getOption("chebpol.thr
     dim(coef) <- length(coef)
   }
   if (is.null(intervals)) {
-    return(.Call(c_eval_cheb, coef, x, threads, NULL))
+    return(.Call(c_eval_chebyshev, coef, x, threads, NULL))
   }
   if (is.numeric(intervals) && length(intervals) == 2L) {
     intervals <- list(intervals)
@@ -140,7 +140,7 @@ chebeval <- function(x, coef, intervals = NULL, threads = getOption("chebpol.thr
   assert_intervals(intervals, length(dim(coef)), what = "coef")
   ispan <- vapply(intervals, \(i) 2 / diff(i), numeric(1L))
   mid <- vapply(intervals, mean, numeric(1L))
-  .Call(c_eval_cheb, coef, (x - mid) * ispan, threads, NULL)
+  .Call(c_eval_chebyshev, coef, (x - mid) * ispan, threads, NULL)
 }
 
 ipol_chebyshev <- function(val, dims = NULL, intervals = NULL, ...) {
@@ -167,7 +167,7 @@ ipol_chebyshev <- function(val, dims = NULL, intervals = NULL, ...) {
     # it's [-1, 1] intervals, so drop transformation
     fun <- function(x, threads = getOption("chebpol.threads")) {
       x <- as_points(x, d)
-      .Call(c_eval_cheb, cf, x, threads, NULL)
+      .Call(c_eval_chebyshev, cf, x, threads, NULL)
     }
     fun <- crate(fun, cf, d)
     domain <- rep(list(c(-1, 1)), d)
@@ -179,7 +179,7 @@ ipol_chebyshev <- function(val, dims = NULL, intervals = NULL, ...) {
 
     fun <- function(x, threads = getOption("chebpol.threads")) {
       x <- as_points(x, d)
-      .Call(c_eval_cheb, cf, (x - mid) * ispan, threads, NULL)
+      .Call(c_eval_chebyshev, cf, (x - mid) * ispan, threads, NULL)
     }
     fun <- crate(fun, cf, mid, ispan, d)
     domain <- intervals
@@ -236,7 +236,7 @@ ipol_general <- function(val, grid = NULL, ...) {
   arity <- length(grid)
   fun <- function(x, threads = getOption("chebpol.threads")) {
     x <- as_points(x, arity)
-    .Call(c_eval_cheb, cf, gridmap(x), threads, NULL)
+    .Call(c_eval_chebyshev, cf, gridmap(x), threads, NULL)
   }
   new_interpolant(crate(fun, cf, gridmap, arity), method = "general", arity = arity, domain = intervals)
 }

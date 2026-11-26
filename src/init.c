@@ -5,20 +5,20 @@
 #endif
 
 static const R_CallMethodDef CallEntries[] = {
-    {"c_eval_cheb", (DL_FUNC)&c_eval_cheb, 4},
+    {"c_eval_chebyshev", (DL_FUNC)&c_eval_chebyshev, 4},
     {"c_cheb_coef", (DL_FUNC)&c_cheb_coef, 3},
-    {"c_fh", (DL_FUNC)&c_fh, 6},
+    {"c_eval_fh", (DL_FUNC)&c_eval_fh, 6},
     {"c_fh_weights", (DL_FUNC)&c_fh_weights, 3},
-    {"c_eval_mlip", (DL_FUNC)&c_eval_mlip, 5},
+    {"c_eval_multilinear", (DL_FUNC)&c_eval_multilinear, 5},
     {"c_eval_on_grid", (DL_FUNC)&c_eval_on_grid, 2},
     {"c_has_fftw", (DL_FUNC)&c_has_fftw, 0},
     {"c_sq_diffs", (DL_FUNC)&c_sq_diffs, 3},
     {"c_phi_func", (DL_FUNC)&c_phi_func, 3},
-    {"c_make_rbf", (DL_FUNC)&c_make_rbf, 4},
-    {"c_eval_rbf", (DL_FUNC)&c_eval_rbf, 3},
+    {"c_make_crbf", (DL_FUNC)&c_make_crbf, 4},
+    {"c_eval_crbf", (DL_FUNC)&c_eval_crbf, 3},
     {"c_has_alglib", (DL_FUNC)&c_has_alglib, 0},
-    {"c_eval_polyh", (DL_FUNC)&c_eval_polyh, 7},
-    {"c_eval_sl", (DL_FUNC)&c_eval_sl, 8},
+    {"c_eval_polyharmonic", (DL_FUNC)&c_eval_polyharmonic, 7},
+    {"c_eval_simplexlinear", (DL_FUNC)&c_eval_simplexlinear, 8},
     {"c_eval_oldstalker", (DL_FUNC)&c_eval_oldstalker, 5},
     {"c_make_hstalker", (DL_FUNC)&c_make_hstalker, 2},
     {"c_eval_hstalker", (DL_FUNC)&c_eval_hstalker, 4},
@@ -33,8 +33,8 @@ void attribute_visible R_init_chebpol(DllInfo *dll) {
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
   R_forceSymbols(dll, TRUE);
-  R_RegisterCCallable("chebpol", "evalcheb", (DL_FUNC)&eval_cheb);
-  R_RegisterCCallable("chebpol", "evalmlip", (DL_FUNC)&eval_mlip);
+  R_RegisterCCallable("chebpol", "evalcheb", (DL_FUNC)&eval_chebyshev);
+  R_RegisterCCallable("chebpol", "evalmlip", (DL_FUNC)&eval_multilinear);
   R_RegisterCCallable("chebpol", "evalongrid", (DL_FUNC)&eval_on_grid);
 }
 

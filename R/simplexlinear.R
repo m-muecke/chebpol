@@ -30,7 +30,7 @@ ipol_simplexlinear <- function(val, knots, ..., blend = NULL) {
       stop("`epol` must be `TRUE` or `FALSE`.")
     }
     blend <- blend_types[[match.arg(blend)]]
-    .Call(c_eval_sl, x, knots, dtri, adata, val, epol, threads, blend)
+    .Call(c_eval_simplexlinear, x, knots, dtri, adata, val, epol, threads, blend)
   }
   fun <- crate(fun, knots, dtri, adata, val, arity)
   new_interpolant(set_default_blend(fun, blend), method = "simplexlinear", arity = arity, domain = knots_domain(knots))

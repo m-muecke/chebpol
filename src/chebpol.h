@@ -22,20 +22,20 @@
 #endif
 
 // .Call entry points, registered in init.c
-SEXP c_eval_cheb(SEXP, SEXP, SEXP, SEXP);
+SEXP c_eval_chebyshev(SEXP, SEXP, SEXP, SEXP);
 SEXP c_cheb_coef(SEXP, SEXP, SEXP);
-SEXP c_fh(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP c_eval_fh(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP c_fh_weights(SEXP, SEXP, SEXP);
-SEXP c_eval_mlip(SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP c_eval_multilinear(SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP c_eval_on_grid(SEXP, SEXP);
 SEXP c_has_fftw(void);
 SEXP c_sq_diffs(SEXP, SEXP, SEXP);
 SEXP c_phi_func(SEXP, SEXP, SEXP);
-SEXP c_make_rbf(SEXP, SEXP, SEXP, SEXP);
-SEXP c_eval_rbf(SEXP, SEXP, SEXP);
+SEXP c_make_crbf(SEXP, SEXP, SEXP, SEXP);
+SEXP c_eval_crbf(SEXP, SEXP, SEXP);
 SEXP c_has_alglib(void);
-SEXP c_eval_polyh(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP c_eval_sl(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP c_eval_polyharmonic(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP c_eval_simplexlinear(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP c_eval_oldstalker(SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP c_make_hstalker(SEXP, SEXP);
 SEXP c_eval_hstalker(SEXP, SEXP, SEXP, SEXP);
@@ -45,9 +45,9 @@ SEXP c_analyze_simplex(SEXP, SEXP, SEXP);
 SEXP c_has_gsl(void);
 
 // C entry points made available to other packages in init.c
-double eval_cheb(const double *cf, const double *x, const int *dims, const int rank);
-double eval_mlip(const int rank, const double *x, const double **grid, const int *dims, const double *values,
-                 int blend);
+double eval_chebyshev(const double *cf, const double *x, const int *dims, const int rank);
+double eval_multilinear(const int rank, const double *x, const double **grid, const int *dims, const double *values,
+                        int blend);
 void eval_on_grid(void (*fun)(double *x, double *y, int valuedim, void *ud), double *arg, const double **grid,
                   const int *dims, const int rank, const int valuedim, double *result, void *userdata);
 

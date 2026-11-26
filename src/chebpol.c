@@ -180,8 +180,8 @@ SEXP c_cheb_coef(SEXP x, SEXP sdct, SEXP Sthreads) {
   return resvec;
 }
 
-static double fh(const double *fv, const double *x, const double **knots, const int *dims, const int rank,
-                 const double **weights) {
+static double eval_fh(const double *fv, const double *x, const double **knots, const int *dims, const int rank,
+                      const double **weights) {
   if (rank == 0)
     return fv[0];
   R_xlen_t siz = 1;
@@ -198,7 +198,7 @@ static double fh(const double *fv, const double *x, const double **knots, const 
   const double tol = 10.0 * DBL_EPSILON * fabs(kn[N - 1] - kn[0]);
   for (int i = 0; i < N; i++) {
     if (fabs(xx - kn[i]) <= tol)
-      return fh(&fv[i * siz], x, knots, dims, newrank, weights);
+      return eval_fh(&fv[i * siz], x, knots, dims, newrank, weights);
   }
 
   // save a recursion step
@@ -212,7 +212,7 @@ static double fh(const double *fv, const double *x, const double **knots, const 
     return num / denom;
   }
   for (int i = 0; i < N; i++) {
-    const double val = fh(&fv[i * siz], x, knots, dims, newrank, weights);
+    const double val = eval_fh(&fv[i * siz], x, knots, dims, newrank, weights);
     double pole = w[i] / (xx - kn[i]);
     num += pole * val;
     denom += pole;
@@ -220,7 +220,7 @@ static double fh(const double *fv, const double *x, const double **knots, const 
   return num / denom;
 }
 
-SEXP c_fh(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spare) {
+SEXP c_eval_fh(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spare) {
   R_xlen_t siz = 1;
   const double *val = REAL_RO(vals);
 #ifdef _OPENMP
@@ -264,7 +264,7 @@ SEXP c_fh(SEXP inx, SEXP vals, SEXP grid, SEXP Sweights, SEXP Rthreads, SEXP spa
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < numvec; i++) {
-    out[i] = fh(val, xp + i * rank, knots, dims, rank, weights);
+    out[i] = eval_fh(val, xp + i * rank, knots, dims, rank, weights);
   }
   UNPROTECT(1);
   return resvec;
@@ -321,7 +321,7 @@ SEXP c_fh_weights(SEXP Sgrid, SEXP Sd, SEXP Sthreads) {
   return ret;
 }
 
-double eval_cheb(const double *cf, const double *x, const int *dims, const int rank) {
+double eval_chebyshev(const double *cf, const double *x, const int *dims, const int rank) {
   if (rank == 0)
     return cf[0];
   // Otherwise, use the Clenshaw algorithm
@@ -344,12 +344,12 @@ double eval_cheb(const double *cf, const double *x, const int *dims, const int r
   for (int i = N - 1; i >= 0; i--) {
     bn2 = bn1;
     bn1 = bn;
-    bn = x2 * bn1 - bn2 + eval_cheb(&cf[i * siz], x, dims, newrank);
+    bn = x2 * bn1 - bn2 + eval_chebyshev(&cf[i * siz], x, dims, newrank);
   }
   return bn - x[newrank] * bn1;
 }
 
-SEXP c_eval_cheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
+SEXP c_eval_chebyshev(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
   if (XLENGTH(coef) == 0)
     Rf_error("`coef` must have at least one element.");
   R_xlen_t siz = 1;
@@ -384,14 +384,14 @@ SEXP c_eval_cheb(SEXP coef, SEXP inx, SEXP Rthreads, SEXP spare) {
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < numvec; i++) {
-    out[i] = eval_cheb(cf, xp + i * rank, dims, rank);
+    out[i] = eval_chebyshev(cf, xp + i * rank, dims, rank);
   }
   UNPROTECT(1);
   return resvec;
 }
 
-static double eval_polyh(const double *x, const double *knots, const double *weights, const double *lweights,
-                         const int rank, const int nknots, const double k) {
+static double eval_polyharmonic(const double *x, const double *knots, const double *weights, const double *lweights,
+                                const int rank, const int nknots, const double k) {
   // Find squared distance to each knot
   int ki = (int)k;
   double wsum = 0.0;
@@ -430,7 +430,7 @@ static double eval_polyh(const double *x, const double *knots, const double *wei
     wsum += lweights[i + 1] * x[i];
   return wsum;
 }
-SEXP c_eval_polyh(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, SEXP Sthreads, SEXP spare) {
+SEXP c_eval_polyharmonic(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, SEXP Sthreads, SEXP spare) {
   const double *x = REAL_RO(inx);
   const double *knots = REAL_RO(Sknots);
   const double *w = REAL_RO(weights);
@@ -461,7 +461,7 @@ SEXP c_eval_polyh(SEXP inx, SEXP Sknots, SEXP weights, SEXP lweights, SEXP Sk, S
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < numvec; i++) {
-    out[i] = eval_polyh(x + i * rank, knots, w, lw, rank, nknots, k);
+    out[i] = eval_polyharmonic(x + i * rank, knots, w, lw, rank, nknots, k);
   }
   UNPROTECT(1);
   return res;
@@ -580,8 +580,8 @@ SEXP c_eval_on_grid(SEXP fun, SEXP sgrid) {
   return resvec;
 }
 
-double eval_mlip(const int rank, const double *x, const double **grid, const int *dims, const double *values,
-                 int blend) {
+double eval_multilinear(const int rank, const double *x, const double **grid, const int *dims, const double *values,
+                        int blend) {
 
   // the blended weights of the lower and upper end of the interval in each dimension
   double wlo[rank], wup[rank];
@@ -628,7 +628,7 @@ double eval_mlip(const int rank, const double *x, const double **grid, const int
   return ipval / wsum;
 }
 
-SEXP c_eval_mlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
+SEXP c_eval_multilinear(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
   const int rank = LENGTH(sgrid);
   R_xlen_t gridsize = 1;
   int dims[rank];
@@ -665,7 +665,7 @@ SEXP c_eval_mlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
 #pragma omp parallel for num_threads(threads) schedule(static) if (numvec > 1 && threads > 1)
 #endif
   for (R_xlen_t i = 0; i < numvec; i++) {
-    out[i] = eval_mlip(rank, xp + i * rank, grid, dims, val, blend);
+    out[i] = eval_multilinear(rank, xp + i * rank, grid, dims, val, blend);
   }
   UNPROTECT(1);
   return resvec;
@@ -762,9 +762,9 @@ static double simplex_value(const double *vec, const int *tri, const double *val
   return sum / wsum;
 }
 
-static double eval_sl(const double *x, const double *knots, const int *dtri, const double *lumats, const int *ipivs,
-                      const double *bbox, bool epol, const double *val, const int dim, const int numsimplex, int nknots,
-                      blend_type blend, const simplex_grid *sg) {
+static double eval_simplexlinear(const double *x, const double *knots, const int *dtri, const double *lumats,
+                                 const int *ipivs, const double *bbox, bool epol, const double *val, const int dim,
+                                 const int numsimplex, int nknots, blend_type blend, const simplex_grid *sg) {
 
   for (int i = 0; i < dim; i++)
     if (ISNAN(x[i]))
@@ -836,7 +836,8 @@ static double eval_sl(const double *x, const double *knots, const int *dtri, con
   return NA_REAL;
 }
 
-SEXP c_eval_sl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extrapolate, SEXP Sthreads, SEXP Sblend) {
+SEXP c_eval_simplexlinear(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extrapolate, SEXP Sthreads,
+                          SEXP Sblend) {
   const int *dtri = INTEGER_RO(Sdtri);
   const int numsimplex = Rf_ncols(Sdtri);
   const double *lumats = REAL_RO(VECTOR_ELT(adata, 0));
@@ -878,8 +879,8 @@ SEXP c_eval_sl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP ext
 #pragma omp parallel for num_threads(threads) schedule(guided) if (threads > 1 && numvec > 1)
 #endif
   for (R_xlen_t i = 0; i < numvec; i++) {
-    resvec[i] =
-        eval_sl(x + i * dim, knots, dtri, lumats, pivots, bboxmat, epol, val, dim, numsimplex, nknots, blend, sg);
+    resvec[i] = eval_simplexlinear(x + i * dim, knots, dtri, lumats, pivots, bboxmat, epol, val, dim, numsimplex,
+                                   nknots, blend, sg);
   }
   UNPROTECT(1);
   return ret;
@@ -1115,7 +1116,7 @@ SEXP c_phi_func(SEXP Sx, SEXP Sk, SEXP Sthreads) {
   return res;
 }
 #ifndef HAVE_ALGLIB
-SEXP c_make_rbf(SEXP a, SEXP b, SEXP c, SEXP d) {
+SEXP c_make_crbf(SEXP a, SEXP b, SEXP c, SEXP d) {
   UNUSED(a);
   UNUSED(b);
   UNUSED(c);
@@ -1123,7 +1124,7 @@ SEXP c_make_rbf(SEXP a, SEXP b, SEXP c, SEXP d) {
   Rf_error("method = \"crbf\" is not available because chebpol has no ALGLIB support.");
   return R_NilValue;
 }
-SEXP c_eval_rbf(SEXP a, SEXP b, SEXP c) {
+SEXP c_eval_crbf(SEXP a, SEXP b, SEXP c) {
   UNUSED(a);
   UNUSED(b);
   UNUSED(c);
