@@ -38,7 +38,9 @@ static bool dct_fftw(const double *x, const int *dims, const int ndim, const R_x
       plan = fftw_plan_guru_r2r(1, &dim, 0, NULL, F, F, &kind, FFTW_ESTIMATE);
       if (plan == NULL) {
         if (tlen > 10000)
-          Rf_warning("FFTW fails on strided long (%d) vector, is it MKL?", tlen);
+          Rf_warning("FFTW can't transform a dimension of length %d, falling back to a matrix product. This happens "
+                     "with the FFTW interface of MKL.",
+                     tlen);
         return false;
       }
 #ifdef _OPENMP
@@ -80,7 +82,7 @@ static void dct_matrix(const double *x, const int *dims, const int ndim, const R
   for (int j = 0; j < ndim; j++) {
     int N = dims[j];
     if (N > 10000)
-      Rf_warning("Long vector (%d), no FFTW. This may go wrong.", N);
+      Rf_warning("A dimension of length %d needs a large matrix without FFTW, which may run out of memory.", N);
     double *jmat = NULL;
     for (int k = 0; k < j; k++) {
       if (dims[k] == N) {
@@ -154,7 +156,7 @@ SEXP c_cheb_coef(SEXP s_x, SEXP s_dct, SEXP s_threads) {
   bool dct = Rf_asLogical(s_dct);
   SEXP s_dim = Rf_getAttrib(s_x, R_DimSymbol);
   if (XLENGTH(s_x) > INT_MAX)
-    Rf_error("arrays with more than %d elements are not supported", INT_MAX);
+    Rf_error("`val` must have at most %d elements, not %lld.", INT_MAX, (long long)XLENGTH(s_x));
   // If no dim-attribute, assume one-dimensional
   const int len = (int)XLENGTH(s_x);
   int ndim = 1;
@@ -162,7 +164,7 @@ SEXP c_cheb_coef(SEXP s_x, SEXP s_dct, SEXP s_threads) {
   if (!Rf_isNull(s_dim)) {
     ndim = LENGTH(s_dim);
     if (ndim <= 0)
-      Rf_error("Rank must be positive");
+      Rf_error("`val` must have at least one dimension.");
     dims = INTEGER_RO(s_dim);
   }
   R_xlen_t siz = 1;
@@ -231,7 +233,7 @@ SEXP c_eval_fh(SEXP s_x, SEXP s_val, SEXP s_grid, SEXP s_weights, SEXP s_threads
   const int *dims = INTEGER_RO(s_dim);
   const int ndim = LENGTH(s_dim);
   if (ndim <= 0)
-    Rf_error("rank must be positive");
+    Rf_error("`val` must have at least one dimension.");
   if (Rf_isMatrix(s_x)) {
     if (ndim != Rf_nrows(s_x))
       Rf_error("`x` must have %d rows, one per dimension, not %d.", ndim, Rf_nrows(s_x));
@@ -243,16 +245,18 @@ SEXP c_eval_fh(SEXP s_x, SEXP s_val, SEXP s_grid, SEXP s_weights, SEXP s_threads
   for (int i = 0; i < ndim; i++)
     siz *= dims[i];
   if (XLENGTH(s_val) != siz)
-    Rf_error("coefficient length(%lld) does not match data length(%lld)", (long long)XLENGTH(s_val), (long long)siz);
+    Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)siz, (long long)XLENGTH(s_val));
 
   if (LENGTH(s_grid) != ndim || LENGTH(s_weights) != ndim)
-    Rf_error("There must be one value for each knot");
+    Rf_error("`grid` and the weights must have %d dimensions, one per dimension of `val`, not %d and %d.", ndim,
+             LENGTH(s_grid), LENGTH(s_weights));
   const double **knots = (const double **)R_alloc(ndim, sizeof(double *));
   const double **weights = (const double **)R_alloc(ndim, sizeof(double *));
   for (int i = 0; i < ndim; i++) {
     SEXP axis = VECTOR_ELT(s_grid, i), w = VECTOR_ELT(s_weights, i);
     if (XLENGTH(axis) != dims[i] || XLENGTH(w) != dims[i])
-      Rf_error("grid dimension %d has %lld points, values have %d", i + 1, (long long)XLENGTH(axis), dims[i]);
+      Rf_error("`grid` dimension %d and its weights must have %d points, one per value along it, not %lld and %lld.",
+               i + 1, dims[i], (long long)XLENGTH(axis), (long long)XLENGTH(w));
     knots[i] = REAL_RO(axis);
     weights[i] = REAL_RO(w);
   }
@@ -293,7 +297,7 @@ static void fh_weights(const int n, const double *grid, const int d, double *w, 
 // Compute the weights for Floater-Hormann. Formula (18) of the FH-paper
 SEXP c_fh_weights(SEXP s_grid, SEXP s_d, SEXP s_threads) {
   if (LENGTH(s_grid) != LENGTH(s_d))
-    Rf_error("Length of grid (%d) should equal length of d (%d)", LENGTH(s_grid), LENGTH(s_d));
+    Rf_error("`d` must have length %d, one per dimension of `grid`, not %d.", LENGTH(s_grid), LENGTH(s_d));
 
   const int ndim = LENGTH(s_grid);
   const double *grid[ndim];
@@ -362,7 +366,7 @@ SEXP c_eval_chebyshev(SEXP s_coef, SEXP s_x, SEXP s_threads, SEXP s_spare) {
   const int *dims = INTEGER_RO(s_dim);
   const int ndim = LENGTH(s_dim);
   if (ndim <= 0)
-    Rf_error("rank must be positive");
+    Rf_error("`coef` must have at least one dimension.");
   if (Rf_isMatrix(s_x)) {
     if (ndim != Rf_nrows(s_x))
       Rf_error("`x` must have %d rows, one per dimension, not %d.", ndim, Rf_nrows(s_x));
@@ -374,7 +378,8 @@ SEXP c_eval_chebyshev(SEXP s_coef, SEXP s_x, SEXP s_threads, SEXP s_spare) {
   for (int i = 0; i < ndim; i++)
     siz *= dims[i];
   if (XLENGTH(s_coef) != siz)
-    Rf_error("coefficient length(%lld) does not match data length(%lld)", (long long)XLENGTH(s_coef), (long long)siz);
+    Rf_error("`coef` must have %lld elements, the product of its dimensions, not %lld.", (long long)siz,
+             (long long)XLENGTH(s_coef));
 
   const double *x = REAL_RO(s_x);
   const int n_points = Rf_isMatrix(s_x) ? Rf_ncols(s_x) : 1;
@@ -446,7 +451,7 @@ SEXP c_eval_polyharmonic(SEXP s_x, SEXP s_knots, SEXP s_weights, SEXP s_lweights
     Rf_error("The linear weights must have length %d, one more than the number of dimensions, not %d.", ndim + 1,
              LENGTH(s_lweights));
   if (LENGTH(s_weights) != Rf_ncols(s_knots))
-    Rf_error("number of weights (%d) should equal number of knots (%d)", LENGTH(s_weights), Rf_ncols(s_knots));
+    Rf_error("The weights must have length %d, one per knot, not %d.", Rf_ncols(s_knots), LENGTH(s_weights));
   if (Rf_isMatrix(s_x)) {
     if (Rf_nrows(s_x) != Rf_nrows(s_knots))
       Rf_error("`x` must have %d rows, one per dimension, not %d.", Rf_nrows(s_knots), Rf_nrows(s_x));
@@ -640,7 +645,7 @@ SEXP c_eval_multilinear(SEXP s_grid, SEXP s_val, SEXP s_x, SEXP s_threads, SEXP 
   const double *grid[ndim];
   blend_type blend = BLEND_LINEAR;
   if (!Rf_isReal(s_val))
-    Rf_error("values must be numeric");
+    Rf_error("`val` must be numeric.");
   if (!Rf_isReal(s_x))
     Rf_error("`x` must be numeric.");
   if (Rf_isMatrix(s_x) && Rf_nrows(s_x) != ndim)
@@ -655,7 +660,8 @@ SEXP c_eval_multilinear(SEXP s_grid, SEXP s_val, SEXP s_x, SEXP s_threads, SEXP 
   }
 
   if (XLENGTH(s_val) != gridsize)
-    Rf_error("grid has size %lld, you supplied %lld values", (long long)gridsize, (long long)XLENGTH(s_val));
+    Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)gridsize,
+             (long long)XLENGTH(s_val));
   if (!Rf_isNull(s_blend))
     blend = (blend_type)Rf_asInteger(s_blend);
   const int n_points = Rf_isMatrix(s_x) ? Rf_ncols(s_x) : 1;

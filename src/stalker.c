@@ -661,7 +661,7 @@ SEXP c_make_stalker(SEXP s_val, SEXP s_grid) {
     Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)len, (long long)XLENGTH(s_val));
   }
   if (len > INT_MAX) {
-    Rf_error("grid size (%lld) is too large", (long long)len);
+    Rf_error("`grid` must have at most %d points, not %lld.", INT_MAX, (long long)len);
   }
   const double *val = REAL_RO(s_val);
   const double *grid[ndim];
@@ -687,7 +687,7 @@ SEXP c_make_stalker(SEXP s_val, SEXP s_grid) {
     double df = gr[1] - gr[0];
     for (int j = 2; j < dims[i]; j++)
       if (fabs(gr[j] - gr[j - 1] - df) > STALKER_EPS)
-        Rf_warning("Non-uniform grid requires linking chebpol with GSL");
+        Rf_warning("A non-uniform `grid` needs chebpol built with GSL, using degree 2 instead.");
   }
 #endif
 
@@ -715,7 +715,7 @@ SEXP c_make_hstalker(SEXP s_val, SEXP s_grid) {
     Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)len, (long long)XLENGTH(s_val));
   }
   if (len > INT_MAX) {
-    Rf_error("grid size (%lld) is too large", (long long)len);
+    Rf_error("`grid` must have at most %d points, not %lld.", INT_MAX, (long long)len);
   }
   const double *val = REAL_RO(s_val);
   const double *grid[ndim];
@@ -839,11 +839,11 @@ SEXP c_eval_oldstalker(SEXP s_x, SEXP s_stalker, SEXP s_degree, SEXP s_blend, SE
     len *= dims[r];
   }
   if (len != XLENGTH(VECTOR_ELT(s_stalker, 0))) {
-    Rf_error("number of values (%lld) does not match grid size (%lld)", (long long)XLENGTH(VECTOR_ELT(s_stalker, 0)),
-             (long long)len);
+    Rf_error("`val` must have one value per grid point (%lld), not %lld.", (long long)len,
+             (long long)XLENGTH(VECTOR_ELT(s_stalker, 0)));
   }
   if (LENGTH(s_degree) != ndim) {
-    Rf_error("degree length must match dimension (%d)", ndim);
+    Rf_error("`degree` must have length %d, one per dimension, not %d.", ndim, LENGTH(s_degree));
   }
   SEXP s_deg = PROTECT(Rf_coerceVector(s_degree, REALSXP));
   const double *degree = REAL_RO(s_deg);
