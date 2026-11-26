@@ -729,7 +729,7 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
   }
   for (int c = 0; c < ncand; c++) {
     const R_xlen_t simplex = cand != NULL ? cand[c] : c;
-    // x must be in the bounding box. Perhaps we should do binary search, or organize them hierarchically?
+    // x must be in the bounding box
     const double *box = bbox + simplex * 2 * dim;
     bool bad = false;
     for (int i = 0; i < dim; i++) {
