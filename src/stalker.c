@@ -681,14 +681,16 @@ SEXP c_make_stalker(SEXP s_val, SEXP s_grid) {
 #ifdef HAVE_GSL
   gsl_error_handler_t *gslh = gsl_set_error_handler_off();
 #else
-  // Check if grid is uniform
-  for (int i = 0; i < ndim; i++) {
+  // Check if grid is uniform, and warn once if not
+  bool uniform = true;
+  for (int i = 0; i < ndim && uniform; i++) {
     const double *gr = grid[i];
     double df = gr[1] - gr[0];
-    for (int j = 2; j < dims[i]; j++)
-      if (fabs(gr[j] - gr[j - 1] - df) > STALKER_EPS)
-        Rf_warning("A non-uniform `grid` needs chebpol built with GSL, using degree 2 instead.");
+    for (int j = 2; j < dims[i] && uniform; j++)
+      uniform = fabs(gr[j] - gr[j - 1] - df) <= STALKER_EPS;
   }
+  if (!uniform)
+    Rf_warning("A non-uniform `grid` needs chebpol built with GSL, using degree 2 instead.");
 #endif
 
   make_stalker(ndim, dims, grid, val, REAL(s_b), REAL(s_c), REAL(s_r), 0, point);
