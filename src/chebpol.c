@@ -700,6 +700,52 @@ static inline int gridcell(const double v, const double lo, const double inv, co
   return c < 0 ? 0 : (c >= m ? m - 1 : c);
 }
 
+// Whether simplex holds x. If so, vec has the barycentric coordinates of x.
+static inline bool insimplex(const double *x, const R_xlen_t simplex, const double *lumats, const int *ipivs,
+                             const double *bbox, const int dim, double *vec) {
+  // x must be in the bounding box
+  const double *box = bbox + simplex * 2 * dim;
+  for (int i = 0; i < dim; i++) {
+    if (x[i] < box[0] || x[i] > box[1])
+      return false;
+    box += 2;
+  }
+  // bounding box matches. Transform to barycentric coordinates, check that they are positive.
+  int N = dim + 1, one = 1, info;
+  memcpy(vec, x, dim * sizeof(double));
+  vec[dim] = 1.0;
+  F77_CALL(dgetrs)("N", &N, &one, lumats + simplex * N * N, &N, ipivs + simplex * N, vec, &N, &info FCONE);
+  for (int d = 0; d < N; d++)
+    if (vec[d] < -1e-10)
+      return false;
+  return true;
+}
+
+// The blended value in a simplex with vertices tri, at barycentric coordinates vec
+static inline double simplexvalue(const double *vec, const int *tri, const double *val, const int N,
+                                  const blend_type blend) {
+  if (blend == BLEND_SQUARE) {
+    // the value at the vertex with the largest barycentric coordinate
+    int largest = 0;
+    for (int d = 1; d < N; d++)
+      if (vec[d] > vec[largest])
+        largest = d;
+    return val[tri[largest] - 1];
+  }
+  double sum = 0;
+  double wsum = 0;
+  for (int d = 0; d < N; d++) {
+    // rounding can put a barycentric coordinate slightly outside [0, 1]; <= also turns -0.0 into 0
+    const double coord = vec[d] <= 0 ? 0 : (vec[d] >= 1 ? 1 : vec[d]);
+    const double w = blendfun(coord, blend);
+    if (w == 0)
+      continue;
+    wsum += w;
+    sum += w * val[tri[d] - 1];
+  }
+  return sum / wsum;
+}
+
 static double findsimplex(const double *x, const double *knots, const int *dtri, const double *lumats, const int *ipivs,
                           const double *bbox, bool epol, const double *val, const int dim, const int numsimplex,
                           int nknots, blend_type blend, const simplexgrid *sg) {
@@ -729,55 +775,8 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
   }
   for (int c = 0; c < ncand; c++) {
     const R_xlen_t simplex = cand != NULL ? cand[c] : c;
-    // x must be in the bounding box
-    const double *box = bbox + simplex * 2 * dim;
-    bool bad = false;
-    for (int i = 0; i < dim; i++) {
-      if (x[i] < box[0] || x[i] > box[1]) {
-        bad = true;
-        break;
-      }
-      box += 2;
-    }
-    if (bad)
-      continue;
-
-    // bounding box matches. Transform to barycentric coordinates, check that they are positive.
-    const double *lumat = lumats + simplex * N * N;
-    const int *ipiv = ipivs + simplex * N;
-    memcpy(vec, x, dim * sizeof(double));
-    vec[dim] = 1.0;
-    F77_CALL(dgetrs)("N", &N, &one, lumat, &N, ipiv, vec, &N, &info FCONE);
-    for (int d = 0; d < N; d++)
-      if (vec[d] < -1e-10) {
-        bad = true;
-        break;
-      }
-    if (bad)
-      continue;
-
-    // We found it
-    const int *tri = dtri + simplex * N;
-    if (blend == BLEND_SQUARE) {
-      // the value at the vertex with the largest barycentric coordinate
-      int largest = 0;
-      for (int d = 1; d < N; d++)
-        if (vec[d] > vec[largest])
-          largest = d;
-      return val[tri[largest] - 1];
-    }
-    double sum = 0;
-    double wsum = 0;
-    for (int d = 0; d < N; d++) {
-      // rounding can put a barycentric coordinate slightly outside [0, 1]; <= also turns -0.0 into 0
-      const double coord = vec[d] <= 0 ? 0 : (vec[d] >= 1 ? 1 : vec[d]);
-      const double w = blendfun(coord, blend);
-      if (w == 0)
-        continue;
-      wsum += w;
-      sum += w * val[tri[d] - 1];
-    }
-    return sum / wsum;
+    if (insimplex(x, simplex, lumats, ipivs, bbox, dim, vec))
+      return simplexvalue(vec, dtri + simplex * N, val, N, blend);
   }
 
   if (epol) {
