@@ -77,6 +77,9 @@ chebknots <- function(dims, intervals = NULL) {
 #' a <- array(rnorm(24), dim = c(2, 3, 4))
 #' chebcoef(a)
 chebcoef <- function(val, dct = FALSE) {
+  if (!is_flag(dct)) {
+    stop("`dct` must be `TRUE` or `FALSE`.")
+  }
   val <- as.array(val)
   if (is.integer(val) || is.logical(val)) {
     storage.mode(val) <- "double"

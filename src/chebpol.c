@@ -138,9 +138,7 @@ static void chebcoef(const double *x, const int *dims, const int rank, double *F
 
 SEXP R_chebcoef(SEXP x, SEXP sdct, SEXP Sthreads) {
   int threads = Rf_asInteger(Sthreads);
-  if (!Rf_isLogical(sdct) || LENGTH(sdct) != 1 || LOGICAL_RO(sdct)[0] == NA_LOGICAL)
-    Rf_error("`dct` must be `TRUE` or `FALSE`.");
-  bool dct = LOGICAL_RO(sdct)[0];
+  bool dct = Rf_asLogical(sdct);
   SEXP dim = Rf_getAttrib(x, R_DimSymbol);
   if (XLENGTH(x) > INT_MAX)
     Rf_error("arrays with more than %d elements are not supported", INT_MAX);
