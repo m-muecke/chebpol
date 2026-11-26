@@ -31,6 +31,29 @@
 #' ip(matrix(runif(12), 2), threads = 2)
 NULL
 
+# Call after any change to the formals of `fun`, `formals<-` drops the class and attributes
+new_interpolant <- function(fun, method, arity, domain = NULL) {
+  structure(
+    fun,
+    method = method,
+    arity = arity,
+    domain = as_domain(domain),
+    class = c("chebpol_interpolant", "function")
+  )
+}
+
+# The ranges of the variables as a data frame, with the columns named X1, X2, ... where no name was given
+as_domain <- function(domain) {
+  if (length(domain) == 0L) {
+    return(data.frame())
+  }
+  nms <- names(domain) %||% character(length(domain))
+  unnamed <- is.na(nms) | !nzchar(nms)
+  nms[unnamed] <- paste0("X", which(unnamed))
+  names(domain) <- nms
+  as.data.frame(domain)
+}
+
 #' @export
 print.chebpol_interpolant <- function(x, ...) {
   arity <- attr(x, "arity")
