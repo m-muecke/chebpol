@@ -66,6 +66,8 @@
 <ul><li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now reports the warning about falling back to a least squares fit for the <code><a href="../reference/ipol.html">ipol()</a></code> call. Previously it showed the source of an internal function, e.g. “In (function (val, knots, k = 2, …”.</li>
 <li>
+<code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "simplexlinear"</code> evaluate much faster with many knots, e.g. about 200 times faster with 10,000 knots in two or three dimensions. The simplex holding a point is now looked up in a grid instead of by scanning all simplices, so the time per point no longer grows with the number of knots in up to three dimensions. The gain is smaller in higher dimensions.</li>
+<li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "simplexlinear"</code> now record the range of their knots in the <code>domain</code> attribute, as polyharmonic interpolants do.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants now have class <code>chebpol_interpolant</code> and a <code>method</code> attribute. Printing one shows the method, the number of variables, the domain and the defaults of extra arguments such as <code>blend</code>, instead of the source code of the function.</li>

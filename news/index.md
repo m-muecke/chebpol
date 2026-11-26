@@ -31,6 +31,13 @@
   Previously it showed the source of an internal function, e.g. “In
   (function (val, knots, k = 2, …”.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  interpolants created with `method = "simplexlinear"` evaluate much
+  faster with many knots, e.g. about 200 times faster with 10,000 knots
+  in two or three dimensions. The simplex holding a point is now looked
+  up in a grid instead of by scanning all simplices, so the time per
+  point no longer grows with the number of knots in up to three
+  dimensions. The gain is smaller in higher dimensions.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   interpolants created with `method = "simplexlinear"` now record the
   range of their knots in the `domain` attribute, as polyharmonic
   interpolants do.

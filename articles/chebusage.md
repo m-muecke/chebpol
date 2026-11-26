@@ -385,12 +385,12 @@ Creation of the simplex linear interpolation requires calculation of the
 Delaunay triangulation of the knots. This is usually quite fast, using
 the `qhull` library (<http://www.qhull.org>) available through package
 **geometry**. Evaluation requires finding the enclosing simplex of the
-point, this is done linearly by filtering out bounding boxes which does
-not include the point, this is quite fast, and then for the remaining
-simplices, by verifying that the barycentric coordinates of the point
-are in \\\[0,1\]\\. It works reasonably fast for a few thousand knots
-and dimension below 4-5. With more knots, or higher dimensions, both
-creation and evaluation is markedly slower due to exceedingly high
+point. The simplices are indexed by a grid over the knots, so only those
+whose bounding box overlaps the grid cell of the point are examined, by
+verifying that the barycentric coordinates of the point are in
+\\\[0,1\]\\. In up to three dimensions the time per point does not grow
+with the number of knots. In higher dimensions the grid helps less, and
+both creation and evaluation are markedly slower due to exceedingly high
 numbers of simplices.
 
 The compact radial basis functions approach of ALGLIB in
@@ -450,7 +450,7 @@ system.time(sin(a))
 ```
 
     ##    user  system elapsed 
-    ##   0.009   0.000   0.009
+    ##   0.011   0.000   0.011
 
 ``` r
 
@@ -458,7 +458,7 @@ system.time(f(a, threads = 8))
 ```
 
     ##    user  system elapsed 
-    ##   0.070   0.004   0.023
+    ##   0.086   0.007   0.027
 
 ## References
 

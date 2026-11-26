@@ -416,13 +416,13 @@ methods). Evaluation is faster, of the order <span class="math inline">\(O(Kr)\)
 the Delaunay triangulation of the knots. This is usually quite fast,
 using the <code>qhull</code> library (<a href="http://www.qhull.org" class="external-link uri">http://www.qhull.org</a>) available through package
 <strong>geometry</strong>. Evaluation requires finding the enclosing
-simplex of the point, this is done linearly by filtering out bounding
-boxes which does not include the point, this is quite fast, and then for
-the remaining simplices, by verifying that the barycentric coordinates
-of the point are in <span class="math inline">\([0,1]\)</span>. It works
-reasonably fast for a few thousand knots and dimension below 4-5. With
-more knots, or higher dimensions, both creation and evaluation is
-markedly slower due to exceedingly high numbers of simplices.</p>
+simplex of the point. The simplices are indexed by a grid over the
+knots, so only those whose bounding box overlaps the grid cell of the
+point are examined, by verifying that the barycentric coordinates of the
+point are in <span class="math inline">\([0,1]\)</span>. In up to three
+dimensions the time per point does not grow with the number of knots. In
+higher dimensions the grid helps less, and both creation and evaluation
+are markedly slower due to exceedingly high numbers of simplices.</p>
 <p>The compact radial basis functions approach of ALGLIB in
 <code>method = "crbf"</code> <em>requires</em> tuning. The three
 parameters is the base radius (<code>rbase</code>), the number of layers
@@ -468,11 +468,11 @@ faster with <code>ph2(m)</code> than with
 <span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1e6</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.009   0.000   0.009</span></span></code></pre>
+<span><span class="co">##   0.011   0.000   0.011</span></span></code></pre>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu">f</span><span class="op">(</span><span class="va">a</span>, threads <span class="op">=</span> <span class="fl">8</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.070   0.004   0.023</span></span></code></pre>
+<span><span class="co">##   0.086   0.007   0.027</span></span></code></pre>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
