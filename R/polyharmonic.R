@@ -65,8 +65,8 @@ ipol_polyharmonic <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE,
   }
 
   threads <- getOption("chebpol.threads")
-  # The distance matrix is unreferenced, so c_phi_func transforms it in place
-  A <- .Call(c_phi_func, .Call(c_sq_diffs, knots, knots, threads), k, threads)
+  # The distance matrix is unreferenced, so c_rbf_kernel transforms it in place
+  A <- .Call(c_rbf_kernel, .Call(c_sq_dists, knots, knots, threads), k, threads)
   # fit the linear term in the directions the centered knots span, so that knots on a line or plane and large
   # offsets give a regular, well-conditioned system
   mu <- rowMeans(knots)

@@ -675,7 +675,7 @@ SEXP c_eval_multilinear(SEXP s_x, SEXP s_grid, SEXP s_val, SEXP s_blend, SEXP s_
   return out;
 }
 
-SEXP c_sq_diffs(SEXP s_x1, SEXP s_x2, SEXP s_threads) {
+SEXP c_sq_dists(SEXP s_x1, SEXP s_x2, SEXP s_threads) {
   // The squared distance from each column of s_x1 to each column of s_x2, with one row per column of s_x1
   const int r1 = Rf_nrows(s_x1), c1 = Rf_ncols(s_x1), r2 = Rf_nrows(s_x2), c2 = Rf_ncols(s_x2);
   const R_xlen_t N = (R_xlen_t)c1 * c2;
@@ -1062,7 +1062,7 @@ SEXP c_has_fftw(void) {
 }
 
 // inplace to save memory, do repeated multiplication instead of pow(). It's faster.
-SEXP c_phi_func(SEXP s_x, SEXP s_k, SEXP s_threads) {
+SEXP c_rbf_kernel(SEXP s_x, SEXP s_k, SEXP s_threads) {
   double k = Rf_asReal(s_k);
   double *x = REAL(s_x);
   const R_xlen_t n = XLENGTH(s_x);
