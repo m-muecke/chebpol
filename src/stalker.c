@@ -112,8 +112,7 @@ static inline double solver(double kmin, double kplus, double vmin, double vplus
       double hi = gsl_root_fsolver_x_upper(s);
       status = gsl_root_test_interval(lo, hi, 0, 1e-8);
     } while (status == GSL_CONTINUE && iter < 50);
-    // If the solver did not converge we keep the current bracket: we may be inside an
-    // OpenMP region, so we cannot signal an R error from here.
+    // If the solver did not converge we keep its current estimate.
     gsl_root_fsolver_free(s);
   }
   return r;
@@ -554,7 +553,7 @@ static double evalhyp(const double *x, const int nrank, const int *dims, const d
     }
     if (cw == 0.0)
       continue;
-    // Find a, b, c, and d for the corner. These have stride 'nrank'
+    // Find b, c, and d for the corner. These have stride 'nrank'
     const double *bb = &b[nrank * corner], *cc = &c[nrank * corner], *dd = &d[nrank * corner];
     // These are for a zero-based function, i.e. based on the corner being 0,
     // and f(0)=0
@@ -589,7 +588,7 @@ static double evalstalker(const double *x, const int nrank, const int *dims, con
   R_xlen_t stride = 1;
   for (int r = 0; r < newrank; r++)
     stride *= dims[r];
-  // Find the interval of the last coordinate, convert to zero-based
+  // Find the interval of the last coordinate
   const int imin = find_interval(gr, N, xx);
 
   // Now, find the function values on the two grid points on each side.

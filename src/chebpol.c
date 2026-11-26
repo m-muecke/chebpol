@@ -657,8 +657,7 @@ SEXP R_evalmlip(SEXP sgrid, SEXP values, SEXP x, SEXP Rthreads, SEXP Sblend) {
 }
 
 SEXP R_sqdiffs(SEXP x1, SEXP x2, SEXP Sthreads) {
-  // each column in x1 should be subtracted from each column in x2,
-  // the squared column sums should be returned.
+  // The squared distance from each column of x1 to each column of x2, with one row per column of x1
   const int r1 = Rf_nrows(x1), c1 = Rf_ncols(x1), r2 = Rf_nrows(x2), c2 = Rf_ncols(x2);
   const R_xlen_t N = (R_xlen_t)c1 * c2;
 #ifdef _OPENMP
@@ -669,17 +668,17 @@ SEXP R_sqdiffs(SEXP x1, SEXP x2, SEXP Sthreads) {
   double *np = dres;
   const double *x1v = REAL_RO(x1), *x2v = REAL_RO(x2);
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(threads) schedule(static) if (threads > 1 && c1 > 1)
+#pragma omp parallel for num_threads(threads) schedule(static) if (threads > 1 && c2 > 1)
 #endif
-  for (R_xlen_t i = 0; i < c1; i++) {
-    const double *x1p = x1v + i * r1;
-    for (R_xlen_t j = 0; j < c2; j++) {
-      const double *x2p = x2v + j * r2;
+  for (R_xlen_t j = 0; j < c2; j++) {
+    const double *x2p = x2v + j * r2;
+    for (R_xlen_t i = 0; i < c1; i++) {
+      const double *x1p = x1v + i * r1;
       double csum = 0.0;
       for (int k = 0; k < r1; k++) {
         csum += (x1p[k] - x2p[k]) * (x1p[k] - x2p[k]);
       }
-      np[j + i * c2] = csum;
+      np[i + j * c1] = csum;
     }
   }
   SEXP snewdim = PROTECT(Rf_allocVector(INTSXP, 2));
