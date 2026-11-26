@@ -47,6 +47,12 @@ test_that("simplex linear interpolation builds knots from a grid", {
   expect_equal(sl(pts), apply(pts, 2, f))
 })
 
+test_that("simplex linear interpolation accepts one-dimensional knots as a vector", {
+  skip_if_not_installed("geometry")
+  sl <- ipol(sqrt, knots = c(0, 1, 4, 9), method = "simplexlinear")
+  expect_equal(sl(c(0.5, 2.5)), c(0.5, 1.5))
+})
+
 test_that("ipol() errors without knots for simplex linear interpolation", {
   f <- function(x) exp(-sum(x^2))
   expect_snapshot(ipol(f, method = "simplexlinear"), error = TRUE)

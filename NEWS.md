@@ -47,6 +47,7 @@
 * `ipol()` with `method = "uniform"` now accepts a single interval given as a vector `c(a, b)` together with values. It already did when given a function.
 * `ipol()` with `method = "simplexlinear"` now forwards extra arguments in `...` to the function being interpolated.
 * `ipol()` with `method = "simplexlinear"` now stops with an error when the number of values differs from the number of knots. Previously the interpolant read past the end of the values and returned meaningless values or `NA`.
+* `ipol()` with `method = "simplexlinear"` now accepts one-dimensional knots given as a vector, as `method = "polyharmonic"` does. Previously it failed with "argument is of length zero".
 * `ipol()` with `method = "polyharmonic"` accepts `normalize` as a vector `c(a, b)` or a two-column matrix again. Both forms failed with "the condition has length > 1" on R >= 4.2, and the knots were never transformed, so the fit did not match the evaluation.
 * `ipol()` interpolants created with `method = "polyharmonic"` now report the range of the knots in their `domain` attribute. With normalization it was the range after scaling, `[0, 1]`.
 * `ipol()` with `method = "polyharmonic"` no longer drops extra arguments in `...` for the function being interpolated when neither `normalize` nor `nowarn` is given.

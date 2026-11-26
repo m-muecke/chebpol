@@ -2,6 +2,9 @@ slappx.real <- function(val, knots, ..., blend = NULL) {
   if (!requireNamespace("geometry", quietly = TRUE)) {
     stop("method = \"simplexlinear\" requires the geometry package.")
   }
+  if (is.null(dim(knots))) {
+    dim(knots) <- c(1L, length(knots))
+  }
   if (is.function(val)) {
     val <- apply(knots, 2L, val, ...)
   }
