@@ -237,6 +237,11 @@
   read past the end of the values and returned meaningless values or
   `NA`.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "simplexlinear"` now accepts a function that returns integer
+  or logical values, as the other methods do. Previously the interpolant
+  failed with “REAL() can only be applied to a ‘numeric’, not a
+  ‘integer’” when it was evaluated.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "simplexlinear"` now accepts one-dimensional knots given as
   a vector, as `method = "polyharmonic"` does. Previously it failed with
   “argument is of length zero”.

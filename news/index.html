@@ -149,6 +149,8 @@
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "simplexlinear"</code> now stops with an error when the number of values differs from the number of knots. Previously the interpolant read past the end of the values and returned meaningless values or <code>NA</code>.</li>
 <li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "simplexlinear"</code> now accepts a function that returns integer or logical values, as the other methods do. Previously the interpolant failed with “REAL() can only be applied to a ‘numeric’, not a ‘integer’” when it was evaluated.</li>
+<li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "simplexlinear"</code> now accepts one-dimensional knots given as a vector, as <code>method = "polyharmonic"</code> does. Previously it failed with “argument is of length zero”.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> accepts <code>normalize</code> as a vector <code>c(a, b)</code> or a two-column matrix again. Both forms failed with “the condition has length &gt; 1” on R &gt;= 4.2, and the knots were never transformed, so the fit did not match the evaluation.</li>
