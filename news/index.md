@@ -177,6 +177,15 @@
   `method = "multilinear"` and `"oldstalker"` and silently treated as
   linear blending.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  interpolants created with `method = "multilinear"` or `"oldstalker"`
+  no longer return huge or `NaN` values just outside the grid with a
+  blend other than `"linear"`, e.g. about 3.6e8 at -0.01 for
+  [`sin()`](https://rdrr.io/r/base/Trig.html) on `[0, 1]` with
+  `blend = "sigmoid"`. Outside the grid these blends now give the value
+  at the nearest edge for `"multilinear"`, and continue linearly from
+  the edge for `"oldstalker"`. Values inside the grid, and with
+  `blend = "linear"`, are unchanged.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
   interpolants created with `method = "multilinear"` now return `NA` for
   `NA` or `NaN` input. Previously the evaluation never returned.
   [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) also
