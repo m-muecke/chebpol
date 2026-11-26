@@ -87,6 +87,15 @@ test_that("ipol() errors on invalid stalker input", {
   })
 })
 
+test_that("ipol() errors when the values do not match the stalker grid", {
+  grid <- list(seq(-1, 1, length.out = 9))
+  expect_snapshot(error = TRUE, {
+    ipol(1:5, grid = grid, method = "stalker")
+    ipol(1:5, grid = grid, method = "hstalker")
+    ipol(1:5, grid = grid, method = "oldstalker")
+  })
+})
+
 test_that("ipol() errors on a stalker grid dimension with a single point", {
   grid <- list(c(0, 1, 2), 5)
   expect_snapshot(error = TRUE, {

@@ -24,6 +24,24 @@
       Error in `match.arg()`:
       ! 'arg' should be one of "cubic", "linear", "sigmoid", "parodic", "square", "mean"
 
+# ipol() errors when the values do not match the stalker grid
+
+    Code
+      ipol(1:5, grid = grid, method = "stalker")
+    Condition
+      Error in `stalkerappx()`:
+      ! `val` must have one value per grid point (9), not 5.
+    Code
+      ipol(1:5, grid = grid, method = "hstalker")
+    Condition
+      Error in `hstalkerappx()`:
+      ! `val` must have one value per grid point (9), not 5.
+    Code
+      ipol(1:5, grid = grid, method = "oldstalker")
+    Condition
+      Error in `oldstalkerappx()`:
+      ! `val` must have one value per grid point (9), not 5.
+
 # ipol() errors on a stalker grid dimension with a single point
 
     Code
