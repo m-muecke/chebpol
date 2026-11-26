@@ -193,7 +193,7 @@ chebappxf.real <- function(fun, dims, intervals = NULL, ...) {
 # order of expand.grid(grid), and each grid dimension, increasing or decreasing, is mapped onto the
 # Chebyshev knots in [-1, 1]. This may be less accurate than a Chebyshev interpolation. Without a `grid`,
 # `val` must be on a Chebyshev grid and carry its dimensions.
-chebappxg.real <- function(val, grid = NULL, mapdim = NULL) {
+chebappxg.real <- function(val, grid = NULL) {
   if (is.null(grid)) {
     return(chebappx.real(val))
   }
@@ -232,9 +232,9 @@ chebappxg.real <- function(val, grid = NULL, mapdim = NULL) {
   new_interpolant(crate(fun, cf, gridmap, arity), method = "general", arity = arity, domain = intervals)
 }
 
-chebappxgf.real <- function(fun, grid, ..., mapdim = NULL) {
+chebappxgf.real <- function(fun, grid, ...) {
   if (!is.list(grid)) {
     grid <- list(grid)
   }
-  chebappxg.real(evalongrid(fun, ..., grid = grid), grid, mapdim)
+  chebappxg.real(evalongrid(fun, ..., grid = grid), grid)
 }
