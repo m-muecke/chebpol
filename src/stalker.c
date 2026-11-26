@@ -289,10 +289,11 @@ static void makestalk(const int nrank, const int *dims, const double **grid, con
       // If non-monotonic, simulate monotonic by changing sign on vmin when computing r
       if (vplus * vmin <= 0) {
         // monotonic
-        if (fabs(vplus - vmin) <= MYEPS * kplus) {
+        // relative tests, independent of the scale of the values
+        if (vplus == 0 && vmin == 0) {
           // constant zero
           r = 2.0;
-        } else if (fabs(kmin * vplus - kplus * vmin) <= MYEPS * kplus) {
+        } else if (fabs(kmin * vplus - kplus * vmin) <= MYEPS * (fabs(kmin * vplus) + fabs(kplus * vmin))) {
           // Linear
           r = 2.0;
         } else {
