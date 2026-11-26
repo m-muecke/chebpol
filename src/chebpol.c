@@ -687,9 +687,22 @@ SEXP R_sqdiffs(SEXP x1, SEXP x2, SEXP Sthreads) {
   return res;
 }
 
+// A uniform grid over the knots. Cell i lists the simplices items[offsets[i]] .. items[offsets[i + 1] - 1]
+// whose bounding box overlaps it.
+typedef struct {
+  const double *lo, *hi, *inv;
+  int m;
+  const int *offsets, *items;
+} simplexgrid;
+
+static inline int gridcell(const double v, const double lo, const double inv, const int m) {
+  const int c = (int)((v - lo) * inv);
+  return c < 0 ? 0 : (c >= m ? m - 1 : c);
+}
+
 static double findsimplex(const double *x, const double *knots, const int *dtri, const double *lumats, const int *ipivs,
                           const double *bbox, bool epol, const double *val, const int dim, const int numsimplex,
-                          int nknots, blend_type blend) {
+                          int nknots, blend_type blend, const simplexgrid *sg) {
 
   for (int i = 0; i < dim; i++)
     if (ISNAN(x[i]))
@@ -697,7 +710,25 @@ static double findsimplex(const double *x, const double *knots, const int *dtri,
 
   double vec[dim + 1];
   int N = dim + 1, one = 1, info;
-  for (R_xlen_t simplex = 0; simplex < numsimplex; simplex++) {
+  // Only the simplices whose bounding box overlaps the grid cell of x can hold it. They are listed in
+  // increasing order, so the first hit is the same simplex a scan of all of them finds.
+  const int *cand = NULL;
+  int ncand = numsimplex;
+  if (sg != NULL) {
+    R_xlen_t cell = 0, stride = 1;
+    for (int i = 0; i < dim; i++) {
+      if (x[i] < sg->lo[i] || x[i] > sg->hi[i]) {
+        cell = -1;
+        break;
+      }
+      cell += stride * gridcell(x[i], sg->lo[i], sg->inv[i], sg->m);
+      stride *= sg->m;
+    }
+    cand = cell < 0 ? NULL : sg->items + sg->offsets[cell];
+    ncand = cell < 0 ? 0 : sg->offsets[cell + 1] - sg->offsets[cell];
+  }
+  for (int c = 0; c < ncand; c++) {
+    const R_xlen_t simplex = cand != NULL ? cand[c] : c;
     // x must be in the bounding box. Perhaps we should do binary search, or organize them hierarchically?
     const double *box = bbox + simplex * 2 * dim;
     bool bad = false;
@@ -815,13 +846,25 @@ SEXP R_evalsl(SEXP Sx, SEXP Sknots, SEXP Sdtri, SEXP adata, SEXP Sval, SEXP extr
   blend_type blend = BLEND_LINEAR;
   if (!Rf_isNull(Sblend))
     blend = (blend_type)Rf_asInteger(Sblend);
+  // interpolants saved by earlier versions have no grid and scan all simplices
+  simplexgrid grid, *sg = NULL;
+  if (LENGTH(adata) >= 7) {
+    const double *bounds = REAL_RO(VECTOR_ELT(adata, 3));
+    grid.lo = bounds;
+    grid.hi = bounds + dim;
+    grid.inv = bounds + 2 * dim;
+    grid.m = Rf_asInteger(VECTOR_ELT(adata, 4));
+    grid.offsets = INTEGER_RO(VECTOR_ELT(adata, 5));
+    grid.items = INTEGER_RO(VECTOR_ELT(adata, 6));
+    sg = &grid;
+  }
 
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(guided) if (threads > 1 && numvec > 1)
 #endif
   for (R_xlen_t i = 0; i < numvec; i++) {
     resvec[i] =
-        findsimplex(x + i * dim, knots, dtri, lumats, pivots, bboxmat, epol, val, dim, numsimplex, nknots, blend);
+        findsimplex(x + i * dim, knots, dtri, lumats, pivots, bboxmat, epol, val, dim, numsimplex, nknots, blend, sg);
   }
   UNPROTECT(1);
   return ret;
@@ -836,7 +879,7 @@ SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
   const int dim = Rf_nrows(Sknots);
   const int numsimplex = Rf_ncols(Sdtri);
   int N = dim + 1;
-  SEXP retlist = PROTECT(Rf_allocVector(VECSXP, 3));
+  SEXP retlist = PROTECT(Rf_allocVector(VECSXP, 7));
   // Allocate everything before parallel for
   SET_VECTOR_ELT(retlist, 0, Rf_allocVector(REALSXP, (R_xlen_t)numsimplex * N * N));
   SET_VECTOR_ELT(retlist, 1, Rf_allocVector(INTSXP, (R_xlen_t)numsimplex * N));
@@ -874,6 +917,97 @@ SEXP R_analyzesimplex(SEXP Sdtri, SEXP Sknots, SEXP Sthreads) {
       lumat[v * (dim + 1) + dim] = 1.0;
     }
     F77_CALL(dgetrf)(&N, &N, lumat, &N, ipiv, &info);
+  }
+
+  // Index the simplices by a uniform grid over the knots, so that evaluation need not scan all of them
+  SEXP Sbounds = Rf_allocVector(REALSXP, 3 * dim);
+  SET_VECTOR_ELT(retlist, 3, Sbounds);
+  double *lo = REAL(Sbounds), *hi = lo + dim, *inv = lo + 2 * dim;
+  for (int j = 0; j < dim; j++) {
+    lo[j] = INFINITY;
+    hi[j] = -INFINITY;
+  }
+  for (R_xlen_t s = 0; s < numsimplex; s++) {
+    const double *box = bboxmat + s * 2 * dim;
+    for (int j = 0; j < dim; j++) {
+      if (box[2 * j] < lo[j])
+        lo[j] = box[2 * j];
+      if (box[2 * j + 1] > hi[j])
+        hi[j] = box[2 * j + 1];
+    }
+  }
+  // About one cell per simplex, with fewer cells per dimension while a simplex overlaps too many of them
+  int m = numsimplex > 0 ? (int)floor(pow((double)numsimplex, 1.0 / dim)) : 1;
+  if (m < 1)
+    m = 1;
+  int *c0 = (int *)R_alloc(dim, sizeof(int)), *c1 = (int *)R_alloc(dim, sizeof(int));
+  int *cc = (int *)R_alloc(dim, sizeof(int));
+  // the lists of all cells together hold at most 16 entries per simplex
+  const R_xlen_t maxpairs = numsimplex < INT_MAX / 16 ? 16 * (R_xlen_t)numsimplex : INT_MAX;
+  R_xlen_t ncells, npairs;
+  for (;;) {
+    ncells = 1;
+    for (int j = 0; j < dim; j++) {
+      inv[j] = hi[j] > lo[j] ? m / (hi[j] - lo[j]) : 0.0;
+      ncells *= m;
+    }
+    npairs = 0;
+    for (R_xlen_t s = 0; s < numsimplex && npairs <= maxpairs; s++) {
+      const double *box = bboxmat + s * 2 * dim;
+      R_xlen_t span = 1;
+      for (int j = 0; j < dim; j++)
+        span *= gridcell(box[2 * j + 1], lo[j], inv[j], m) - gridcell(box[2 * j], lo[j], inv[j], m) + 1;
+      npairs += span;
+    }
+    if (m == 1 || npairs <= maxpairs)
+      break;
+    m /= 2;
+  }
+  SET_VECTOR_ELT(retlist, 4, Rf_ScalarInteger(m));
+  SEXP Soffsets = Rf_allocVector(INTSXP, ncells + 1);
+  SET_VECTOR_ELT(retlist, 5, Soffsets);
+  SEXP Sitems = Rf_allocVector(INTSXP, npairs);
+  SET_VECTOR_ELT(retlist, 6, Sitems);
+  int *offsets = INTEGER(Soffsets), *items = INTEGER(Sitems);
+  memset(offsets, 0, (ncells + 1) * sizeof(int));
+  // count the simplices of each cell, then fill them in increasing order
+  for (int pass = 0; pass < 2; pass++) {
+    for (R_xlen_t s = 0; s < numsimplex; s++) {
+      const double *box = bboxmat + s * 2 * dim;
+      for (int j = 0; j < dim; j++) {
+        c0[j] = gridcell(box[2 * j], lo[j], inv[j], m);
+        c1[j] = gridcell(box[2 * j + 1], lo[j], inv[j], m);
+        cc[j] = c0[j];
+      }
+      for (;;) {
+        R_xlen_t cell = 0, stride = 1;
+        for (int j = 0; j < dim; j++) {
+          cell += stride * cc[j];
+          stride *= m;
+        }
+        if (pass == 0)
+          offsets[cell + 1]++;
+        else
+          items[offsets[cell]++] = (int)s;
+        int j = 0;
+        while (j < dim && cc[j] == c1[j]) {
+          cc[j] = c0[j];
+          j++;
+        }
+        if (j == dim)
+          break;
+        cc[j]++;
+      }
+    }
+    if (pass == 0) {
+      for (R_xlen_t i = 0; i < ncells; i++)
+        offsets[i + 1] += offsets[i];
+    } else {
+      // filling advanced each offset to the start of the next cell
+      for (R_xlen_t i = ncells; i > 0; i--)
+        offsets[i] = offsets[i - 1];
+      offsets[0] = 0;
+    }
   }
 
   UNPROTECT(1);
