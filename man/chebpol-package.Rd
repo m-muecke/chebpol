@@ -24,9 +24,8 @@ one CPU if a matrix of column vectors is evaluated. Unless the option
 
 The interpolants are ordinary R-objects and can be saved with \code{save()} and loaded
 later with \code{load()} or serialized/unserialized with other tools, just like any R-object.
-However, they contain calls to functions in the package, and while the author will make efforts
-to ensure that generated interpolants are compatible with future versions of chebpol,
-no absolute guarantee can be given.
+However, they call internal functions of the package, which may change between versions, so an interpolant saved
+with one version of chebpol may not work with another. Create it again with \code{\link[=ipol]{ipol()}} after upgrading chebpol.
 }
 \section{Chebyshev}{
 

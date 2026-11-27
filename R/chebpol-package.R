@@ -17,9 +17,8 @@
 #'
 #' The interpolants are ordinary R-objects and can be saved with `save()` and loaded
 #' later with `load()` or serialized/unserialized with other tools, just like any R-object.
-#' However, they contain calls to functions in the package, and while the author will make efforts
-#' to ensure that generated interpolants are compatible with future versions of chebpol,
-#' no absolute guarantee can be given.
+#' However, they call internal functions of the package, which may change between versions, so an interpolant saved
+#' with one version of chebpol may not work with another. Create it again with [ipol()] after upgrading chebpol.
 #'
 #' @section Chebyshev:
 #' If we are free to evaluate the function to interpolate in arbitrary points, we can use
