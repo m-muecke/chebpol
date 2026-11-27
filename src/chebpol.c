@@ -777,25 +777,22 @@ static double eval_simplexlinear(const double *x, const double *knots, const int
   int N = ndim + 1, one = 1, info;
   // Only the simplices whose bounding box overlaps the grid cell of x can hold it. They are listed in
   // increasing order, so the first hit is the same simplex a scan of all of them finds.
-  const int *cand = NULL;
-  int ncand = nsimplex;
-  if (sg != NULL) {
-    R_xlen_t cell = 0, stride = 1;
-    for (int i = 0; i < ndim; i++) {
-      if (x[i] < sg->lo[i] || x[i] > sg->hi[i]) {
-        cell = -1;
-        break;
-      }
-      cell += stride * grid_cell(x[i], sg->lo[i], sg->inv[i], sg->m);
-      stride *= sg->m;
+  R_xlen_t cell = 0, stride = 1;
+  for (int i = 0; i < ndim; i++) {
+    if (x[i] < sg->lo[i] || x[i] > sg->hi[i]) {
+      cell = -1;
+      break;
     }
-    cand = cell < 0 ? NULL : sg->items + sg->offsets[cell];
-    ncand = cell < 0 ? 0 : sg->offsets[cell + 1] - sg->offsets[cell];
+    cell += stride * grid_cell(x[i], sg->lo[i], sg->inv[i], sg->m);
+    stride *= sg->m;
   }
-  for (int c = 0; c < ncand; c++) {
-    const R_xlen_t simplex = cand != NULL ? cand[c] : c;
-    if (in_simplex(x, simplex, lumats, pivots, bbox, ndim, vec))
-      return simplex_value(vec, dtri + simplex * N, val, N, blend);
+  if (cell >= 0) {
+    const int *cand = sg->items + sg->offsets[cell];
+    const int ncand = sg->offsets[cell + 1] - sg->offsets[cell];
+    for (int c = 0; c < ncand; c++) {
+      if (in_simplex(x, cand[c], lumats, pivots, bbox, ndim, vec))
+        return simplex_value(vec, dtri + (R_xlen_t)cand[c] * N, val, N, blend);
+    }
   }
 
   if (epol) {
@@ -865,25 +862,22 @@ SEXP c_eval_simplexlinear(SEXP s_x, SEXP s_knots, SEXP s_dtri, SEXP s_simplices,
   blend_type blend = BLEND_LINEAR;
   if (!Rf_isNull(s_blend))
     blend = (blend_type)Rf_asInteger(s_blend);
-  // interpolants saved by earlier versions have no grid and scan all simplices
-  simplex_grid grid, *sg = NULL;
-  if (LENGTH(s_simplices) >= 7) {
-    const double *bounds = REAL_RO(VECTOR_ELT(s_simplices, 3));
-    grid.lo = bounds;
-    grid.hi = bounds + ndim;
-    grid.inv = bounds + 2 * ndim;
-    grid.m = Rf_asInteger(VECTOR_ELT(s_simplices, 4));
-    grid.offsets = INTEGER_RO(VECTOR_ELT(s_simplices, 5));
-    grid.items = INTEGER_RO(VECTOR_ELT(s_simplices, 6));
-    sg = &grid;
-  }
+  const double *bounds = REAL_RO(VECTOR_ELT(s_simplices, 3));
+  const simplex_grid grid = {
+      .lo = bounds,
+      .hi = bounds + ndim,
+      .inv = bounds + 2 * ndim,
+      .m = Rf_asInteger(VECTOR_ELT(s_simplices, 4)),
+      .offsets = INTEGER_RO(VECTOR_ELT(s_simplices, 5)),
+      .items = INTEGER_RO(VECTOR_ELT(s_simplices, 6)),
+  };
 
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads) schedule(guided) if (threads > 1 && npoints > 1)
 #endif
   for (R_xlen_t i = 0; i < npoints; i++) {
     p_out[i] = eval_simplexlinear(x + i * ndim, knots, dtri, lumats, pivots, bboxmat, epol, val, ndim, nsimplex, nknots,
-                                  blend, sg);
+                                  blend, &grid);
   }
   UNPROTECT(1);
   return out;
