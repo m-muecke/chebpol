@@ -297,46 +297,6 @@ simplex)](chebusage_files/figure-html/volcano-4.png)
 Figure 1: Volcanoes (top left: low resolution, top right: polyharmonic,
 bottom left: Floater-Hormann, bottom right: simplex)
 
-## Radial basis functions with compact support (ALGLIB)
-
-The ALGLIB library (<https://www.alglib.net/interpolation/fastrbf.php>)
-contains an implementation of compact support radial basis function
-interpolation on scattered data. It is available with
-`ipol(..., method = "crbf")` if ALGLIB was available at build time.
-
-By default, this is not true for Windows. However if ALGLIB is
-available, **chebpol** can be built with it from source by editing the
-file `src/Makevars.win`. The library must be put into the make variable
-`PKG_LIBS` as something like `-LC:/somewhere/libs -lalglib`, and the
-compiler must be told where to find ALGLIB’s include file by inserting
-something like `-IC:/somewhere/include -DHAVE_ALGLIB` in the
-`PKG_CPPFLAGS`.
-
-On linux and other unix-variants, ALGLIB should be put into the
-`pkg-config` database so that the command `pkg-config --libs alglib`
-reports the link and compiler flags. This amounts to creating a file
-`alglib.pc` in the search path of `pkg-config` with the necessary
-content (`Libs:` and `Cflags:`) The author has put ALGLIB in
-`/usr/local`, and `alglib.pc` contains:
-
-    prefix=/usr/local
-    exec_prefix=${prefix}
-    libdir=${prefix}/lib
-    includedir=${prefix}/include/alglib
-
-    Name: ALGLIB
-    Description: Various numerical mathematics
-    Version: 3.14.0
-    Libs: -L${libdir} -lalglib
-    Cflags: -I${includedir}
-
-When this works, **chebpol** will be built with ALGLIB when you do an
-`install.packages("chebpol")`.
-
-As of version 2.1, ALGLIB support has been removed from **chebpol**
-because CRAN does not support OpenMP in both C and C++, and alglib
-requires C++.
-
 ## Speed considerations
 
 There are two parts to interpolation. Creating the interpolant, and
@@ -393,19 +353,6 @@ with the number of knots. In higher dimensions the grid helps less, and
 both creation and evaluation are markedly slower due to exceedingly high
 numbers of simplices.
 
-The compact radial basis functions approach of ALGLIB in
-`method = "crbf"` *requires* tuning. The three parameters is the base
-radius (`rbase`), the number of layers (`layers`), and a smoothing
-parameter (`lambda`). The ALGLIB docs says that the base radius should
-be larger than the typical Euclidean distance between the knots. Each
-layer halves the radius, and the final radius should be smaller than the
-minimal distance, to capture the most rapid changes. The smoothing
-parameter \\\lambda\\ defaults to \\0\\, but typical values can be
-around \\10^{-6}\\ or \\10^{-5}\\. The default in `ipol` is \\(2, 5,
-0)\\, but this may be a very bad choice for your data. A commercial
-variant of ALGLIB is available, with parallelization and
-instruction-level optimizations, the author has not tried it.
-
 To alleviate speed problems, parts of **chebpol** has been parallelized
 with OpenMP. The number of threads is taken from
 `getOption("chebpol.threads")` which is initialized from the environment
@@ -450,7 +397,7 @@ system.time(sin(a))
 ```
 
     ##    user  system elapsed 
-    ##   0.008   0.000   0.008
+    ##   0.010   0.001   0.011
 
 ``` r
 
@@ -458,7 +405,7 @@ system.time(f(a, threads = 8))
 ```
 
     ##    user  system elapsed 
-    ##   0.074   0.004   0.023
+    ##   0.069   0.000   0.019
 
 ## References
 

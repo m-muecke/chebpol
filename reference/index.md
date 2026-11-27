@@ -25,7 +25,6 @@
   [`chebpol-package`](https://m-muecke.github.io/chebpol/reference/chebpol-package.md)
   : Methods for creating multivariate interpolations on hypercubes
 - [`has_fftw()`](https://m-muecke.github.io/chebpol/reference/has_fftw.md)
-  [`has_alglib()`](https://m-muecke.github.io/chebpol/reference/has_fftw.md)
   [`has_gsl()`](https://m-muecke.github.io/chebpol/reference/has_fftw.md)
   : Check which optional libraries chebpol was built with
 

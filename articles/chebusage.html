@@ -333,45 +333,6 @@ bottom left: Floater-Hormann, bottom right: simplex)
 </div>
 </div>
 <div class="section level2">
-<h2 id="radial-basis-functions-with-compact-support-alglib">Radial basis functions with compact support (ALGLIB)<a class="anchor" aria-label="anchor" href="#radial-basis-functions-with-compact-support-alglib"></a>
-</h2>
-<p>The ALGLIB library (<a href="https://www.alglib.net/interpolation/fastrbf.php" class="external-link uri">https://www.alglib.net/interpolation/fastrbf.php</a>)
-contains an implementation of compact support radial basis function
-interpolation on scattered data. It is available with
-<code>ipol(..., method = "crbf")</code> if ALGLIB was available at build
-time.</p>
-<p>By default, this is not true for Windows. However if ALGLIB is
-available, <strong>chebpol</strong> can be built with it from source by
-editing the file <code>src/Makevars.win</code>. The library must be put
-into the make variable <code>PKG_LIBS</code> as something like
-<code>-LC:/somewhere/libs -lalglib</code>, and the compiler must be told
-where to find ALGLIB’s include file by inserting something like
-<code>-IC:/somewhere/include -DHAVE_ALGLIB</code> in the
-<code>PKG_CPPFLAGS</code>.</p>
-<p>On linux and other unix-variants, ALGLIB should be put into the
-<code>pkg-config</code> database so that the command
-<code>pkg-config --libs alglib</code> reports the link and compiler
-flags. This amounts to creating a file <code>alglib.pc</code> in the
-search path of <code>pkg-config</code> with the necessary content
-(<code>Libs:</code> and <code>Cflags:</code>) The author has put ALGLIB
-in <code>/usr/local</code>, and <code>alglib.pc</code> contains:</p>
-<pre><code>prefix=/usr/local
-exec_prefix=${prefix}
-libdir=${prefix}/lib
-includedir=${prefix}/include/alglib
-
-Name: ALGLIB
-Description: Various numerical mathematics
-Version: 3.14.0
-Libs: -L${libdir} -lalglib
-Cflags: -I${includedir}</code></pre>
-<p>When this works, <strong>chebpol</strong> will be built with ALGLIB
-when you do an <code>install.packages("chebpol")</code>.</p>
-<p>As of version 2.1, ALGLIB support has been removed from
-<strong>chebpol</strong> because CRAN does not support OpenMP in both C
-and C++, and alglib requires C++.</p>
-</div>
-<div class="section level2">
 <h2 id="speed-considerations">Speed considerations<a class="anchor" aria-label="anchor" href="#speed-considerations"></a>
 </h2>
 <p>There are two parts to interpolation. Creating the interpolant, and
@@ -423,19 +384,6 @@ point are in <span class="math inline">\([0,1]\)</span>. In up to three
 dimensions the time per point does not grow with the number of knots. In
 higher dimensions the grid helps less, and both creation and evaluation
 are markedly slower due to exceedingly high numbers of simplices.</p>
-<p>The compact radial basis functions approach of ALGLIB in
-<code>method = "crbf"</code> <em>requires</em> tuning. The three
-parameters is the base radius (<code>rbase</code>), the number of layers
-(<code>layers</code>), and a smoothing parameter (<code>lambda</code>).
-The ALGLIB docs says that the base radius should be larger than the
-typical Euclidean distance between the knots. Each layer halves the
-radius, and the final radius should be smaller than the minimal
-distance, to capture the most rapid changes. The smoothing parameter
-<span class="math inline">\(\lambda\)</span> defaults to <span class="math inline">\(0\)</span>, but typical values can be around <span class="math inline">\(10^{-6}\)</span> or <span class="math inline">\(10^{-5}\)</span>. The default in <code>ipol</code>
-is <span class="math inline">\((2, 5, 0)\)</span>, but this may be a
-very bad choice for your data. A commercial variant of ALGLIB is
-available, with parallelization and instruction-level optimizations, the
-author has not tried it.</p>
 <p>To alleviate speed problems, parts of <strong>chebpol</strong> has
 been parallelized with OpenMP. The number of threads is taken from
 <code>getOption("chebpol.threads")</code> which is initialized from the
@@ -447,13 +395,13 @@ parallel.</p>
 <p>Evaluation of the interpolants are parallelized if one evaluates more
 than one point. I.e. the interpolants can take a matrix of column
 vectors, and may calculate values in parallel:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="fl">6</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            [,1]        [,2]       [,3]       [,4]       [,5]      [,6]</span></span>
 <span><span class="co">## [1,] -0.9711147  0.04088274 -0.2114722 -0.3162226 -0.1854045 0.1936394</span></span>
 <span><span class="co">## [2,] -0.1570820 -0.52174500 -0.9379660 -0.1015732  0.6033676 0.6767862</span></span></code></pre>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">ph2</span><span class="op">(</span><span class="va">m</span>, threads <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.9369171 0.9713621 0.9770991 0.9693429 0.9133033 0.9146778</span></span></code></pre>
 <p>This means that even if one has a function available in R, it might
@@ -463,16 +411,16 @@ matrix interface if more than one point is to be evaluated (such as in
 the vector interface of package <strong>cubature</strong>), it is a lot
 faster with <code>ph2(m)</code> than with
 <code>apply(m, 2, ph2)</code>.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ipol.html">ipol</a></span><span class="op">(</span><span class="va">sin</span>, grid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="va">pi</span>, <span class="va">pi</span>, length.out <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"hstalker"</span><span class="op">)</span></span>
 <span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1e6</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.008   0.000   0.008</span></span></code></pre>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<span><span class="co">##   0.010   0.001   0.011</span></span></code></pre>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu">f</span><span class="op">(</span><span class="va">a</span>, threads <span class="op">=</span> <span class="fl">8</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.074   0.004   0.023</span></span></code></pre>
+<span><span class="co">##   0.069   0.000   0.019</span></span></code></pre>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

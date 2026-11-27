@@ -34,17 +34,17 @@
   interpolants created with `method = "simplexlinear"` now use
   `blend = "linear"` by default instead of `"cubic"`, so they
   interpolate linearly in each simplex, as documented.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) no
+  longer has `method = "crbf"`. It needed ALGLIB, which chebpol has not
+  supported since version 2.1, so it always stopped with an error.
 
 ### Lifecycle changes
 
 - [`havefftw()`](https://m-muecke.github.io/chebpol/reference/chebpol-deprecated.md)
-  and
+  is deprecated in favor of
+  [`has_fftw()`](https://m-muecke.github.io/chebpol/reference/has_fftw.md).
   [`havealglib()`](https://m-muecke.github.io/chebpol/reference/chebpol-deprecated.md)
-  are deprecated in favor of
-  [`has_fftw()`](https://m-muecke.github.io/chebpol/reference/has_fftw.md)
-  and
-  [`has_alglib()`](https://m-muecke.github.io/chebpol/reference/has_fftw.md).
-  The new
+  is deprecated and always returns `FALSE`. The new
   [`has_gsl()`](https://m-muecke.github.io/chebpol/reference/has_fftw.md)
   reports whether chebpol was built with GSL, which the stalker methods
   need to solve for the degree on a non-uniform grid.

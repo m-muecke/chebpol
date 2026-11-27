@@ -65,11 +65,13 @@
 <li>geometry is now a suggested package instead of a required one, so installing chebpol no longer pulls in geometry and its dependencies. <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "simplexlinear"</code> needs it to build the triangulation and stops with an error when it is missing. Saved simplex linear interpolants can be evaluated without it.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "simplexlinear"</code> now use <code>blend = "linear"</code> by default instead of <code>"cubic"</code>, so they interpolate linearly in each simplex, as documented.</li>
+<li>
+<code><a href="../reference/ipol.html">ipol()</a></code> no longer has <code>method = "crbf"</code>. It needed ALGLIB, which chebpol has not supported since version 2.1, so it always stopped with an error.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="lifecycle-changes-development-version">Lifecycle changes<a class="anchor" aria-label="anchor" href="#lifecycle-changes-development-version"></a></h3>
 <ul><li>
-<code><a href="../reference/chebpol-deprecated.html">havefftw()</a></code> and <code><a href="../reference/chebpol-deprecated.html">havealglib()</a></code> are deprecated in favor of <code><a href="../reference/has_fftw.html">has_fftw()</a></code> and <code><a href="../reference/has_fftw.html">has_alglib()</a></code>. The new <code><a href="../reference/has_fftw.html">has_gsl()</a></code> reports whether chebpol was built with GSL, which the stalker methods need to solve for the degree on a non-uniform grid.</li>
+<code><a href="../reference/chebpol-deprecated.html">havefftw()</a></code> is deprecated in favor of <code><a href="../reference/has_fftw.html">has_fftw()</a></code>. <code><a href="../reference/chebpol-deprecated.html">havealglib()</a></code> is deprecated and always returns <code>FALSE</code>. The new <code><a href="../reference/has_fftw.html">has_gsl()</a></code> reports whether chebpol was built with GSL, which the stalker methods need to solve for the degree on a non-uniform grid.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-development-version">Minor improvements<a class="anchor" aria-label="anchor" href="#minor-improvements-development-version"></a></h3>
