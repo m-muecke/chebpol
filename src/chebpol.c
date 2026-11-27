@@ -1,5 +1,4 @@
 #include "chebpol.h"
-#define UNUSED(x) (void)(x)
 #ifdef HAVE_FFTW
 #include <fftw3.h>
 #endif
@@ -1112,22 +1111,3 @@ SEXP c_rbf_kernel(SEXP s_x, SEXP s_k, SEXP s_threads) {
     UNPROTECT(1);
   return out;
 }
-#ifndef HAVE_ALGLIB
-SEXP c_make_crbf(SEXP s_data, SEXP s_layers, SEXP s_rbase, SEXP s_lambda) {
-  UNUSED(s_data);
-  UNUSED(s_layers);
-  UNUSED(s_rbase);
-  UNUSED(s_lambda);
-  Rf_error("method = \"crbf\" is not available because chebpol has no ALGLIB support.");
-  return R_NilValue;
-}
-SEXP c_eval_crbf(SEXP s_x, SEXP s_model, SEXP s_threads) {
-  UNUSED(s_x);
-  UNUSED(s_model);
-  UNUSED(s_threads);
-  Rf_error("method = \"crbf\" is not available because chebpol has no ALGLIB support.");
-  return R_NilValue;
-}
-SEXP c_has_alglib(void) { return Rf_ScalarLogical(FALSE); }
-
-#endif

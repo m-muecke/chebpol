@@ -2,13 +2,10 @@
 % Please edit documentation in R/libraries.R
 \name{has_fftw}
 \alias{has_fftw}
-\alias{has_alglib}
 \alias{has_gsl}
 \title{Check which optional libraries chebpol was built with}
 \usage{
 has_fftw()
-
-has_alglib()
 
 has_gsl()
 }
@@ -16,15 +13,13 @@ has_gsl()
 \code{TRUE} if chebpol was built with the library, otherwise \code{FALSE}.
 }
 \description{
-chebpol can be compiled with or without three optional C libraries, each of which enables part of the package:
+chebpol can be compiled with or without two optional C libraries, each of which enables part of the package:
 }
 \details{
 \itemize{
 \item FFTW computes Chebyshev coefficients with a fast DCT. Without it, \code{chebcoef()} and \code{ipol()} with
 \code{method = "chebyshev"} use a matrix product, which is not feasible for high-degree polynomials: a 100x100x100
 approximation is possible, but not a one-dimensional 1000000.
-\item ALGLIB provides compact support radial basis function interpolation of scattered data, \code{ipol()} with
-\code{method = "crbf"}.
 \item GSL solves for the degree of the stalker splines on a non-uniform grid. Without it, \code{ipol()} with
 \code{method = "stalker"} uses degree 2 there and warns, and \code{method = "oldstalker"} with \code{k = NA} stops with an error.
 }
@@ -35,6 +30,5 @@ before installing, or pass \code{--disable-fftw} or \code{--disable-gsl} in \cod
 }
 \examples{
 has_fftw()
-has_alglib()
 has_gsl()
 }

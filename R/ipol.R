@@ -45,12 +45,6 @@
 #' If knots are required, but the `grid` argument is given, knots are constructed as
 #' `t(expand.grid(grid))`.
 #'
-#' The `"crbf"` is the multilayer compact radial basis function
-#' interpolation in ALGLIB (<https://www.alglib.net/interpolation/fastrbf.php>).
-#' It is only available if ALGLIB was available at
-#' compile time. It takes the extra arguments `"rbase"`, `"layers"`, and
-#' `"lambda"`. These are discussed in the ALGLIB documentation.
-#'
 #' There are also some usage examples and more in `vignette("chebpol")` and `vignette("chebusage")`.
 #'
 #' @param val array or function. Function values on a grid, or the function
@@ -100,10 +94,6 @@
 #' ch2 <- ipol(f, dims = c(10, 10, 10), intervals = list(0:1, 0:1, 0:1), method = "chebyshev")
 #' knots <- matrix(runif(3 * 1000), 3)
 #' ph2 <- ipol(f, knots = knots, k = 2, method = "polyharmonic")
-#' # my alglib is a bit slow, so stick to 100 knots
-#' if (has_alglib()) {
-#'   crb <- ipol(f, knots = knots[, 1:100], method = "crbf", rbase = 2, layers = 5, lambda = 0)
-#' }
 #' # make 7 points in R3 to test them on
 #' m <- matrix(runif(3 * 7), 3)
 #' rbind(
@@ -112,8 +102,7 @@
 #'   fh = fh2(m),
 #'   cheb = ch2(m),
 #'   poly = ph2(m),
-#'   hst = hst(m),
-#'   crbf = if (has_alglib()) crb(m) else NULL
+#'   hst = hst(m)
 #' )
 #' @examplesIf requireNamespace("geometry", quietly = TRUE)
 #' # simplex linear interpolation needs the geometry package
@@ -136,7 +125,6 @@ ipol <- function(
     "simplexlinear",
     "hstalker",
     "stalker",
-    "crbf",
     "oldstalker"
   ),
   ...
@@ -242,21 +230,6 @@ ipol <- function(
     stalker = {
       assert_grid(grid, "stalker", min_points = 2L)
       ipol_stalker(val, grid, ...)
-    },
-    crbf = {
-      if (is.null(knots)) {
-        stop("`knots` must be given for method = \"crbf\".")
-      }
-      if (length(args) == 0L) {
-        # old interface
-        k <- k %||% c(2, 5, 0)
-        return(ipol_crbf(val, knots, k[1L], k[2L], k[3L]))
-      }
-      rbase <- args[["rbase"]] %||% 2
-      layers <- args[["layers"]] %||% 5L
-      lambda <- args[["lambda"]] %||% 0
-      rest <- args[!names(args) %in% c("rbase", "layers", "lambda")]
-      do.call(ipol_crbf, c(list(val, knots, rbase, layers, lambda), rest))
     }
   )
 }

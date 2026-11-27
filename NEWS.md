@@ -9,10 +9,11 @@
 * The C routines `evalcheb`, `evalmlip` and `evalongrid`, registered for other packages to call through `R_GetCCallable()`, have been removed. They were undocumented, had no header file, and no known package used them.
 * geometry is now a suggested package instead of a required one, so installing chebpol no longer pulls in geometry and its dependencies. `ipol()` with `method = "simplexlinear"` needs it to build the triangulation and stops with an error when it is missing. Saved simplex linear interpolants can be evaluated without it.
 * `ipol()` interpolants created with `method = "simplexlinear"` now use `blend = "linear"` by default instead of `"cubic"`, so they interpolate linearly in each simplex, as documented.
+* `ipol()` no longer has `method = "crbf"`. It needed ALGLIB, which chebpol has not supported since version 2.1, so it always stopped with an error.
 
 ## Lifecycle changes
 
-* `havefftw()` and `havealglib()` are deprecated in favor of `has_fftw()` and `has_alglib()`. The new `has_gsl()` reports whether chebpol was built with GSL, which the stalker methods need to solve for the degree on a non-uniform grid.
+* `havefftw()` is deprecated in favor of `has_fftw()`. `havealglib()` is deprecated and always returns `FALSE`. The new `has_gsl()` reports whether chebpol was built with GSL, which the stalker methods need to solve for the degree on a non-uniform grid.
 
 ## Minor improvements
 

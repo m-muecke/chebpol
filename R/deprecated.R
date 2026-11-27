@@ -4,7 +4,7 @@
 #' These functions are deprecated:
 #'
 #' * `havefftw()` is replaced by [has_fftw()].
-#' * `havealglib()` is replaced by [has_alglib()].
+#' * `havealglib()` always returns `FALSE`, since chebpol no longer supports ALGLIB.
 #'
 #' @keywords internal
 #' @name chebpol-deprecated
@@ -20,6 +20,6 @@ havefftw <- function() {
 #' @rdname chebpol-deprecated
 #' @export
 havealglib <- function() {
-  .Deprecated("has_alglib", package = "chebpol")
-  has_alglib()
+  .Deprecated(msg = "'havealglib' is deprecated. chebpol no longer supports ALGLIB.")
+  FALSE
 }

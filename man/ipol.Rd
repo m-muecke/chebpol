@@ -12,7 +12,7 @@ ipol(
   knots = NULL,
   k = NULL,
   method = c("chebyshev", "multilinear", "fh", "uniform", "general", "polyharmonic",
-    "simplexlinear", "hstalker", "stalker", "crbf", "oldstalker"),
+    "simplexlinear", "hstalker", "stalker", "oldstalker"),
   ...
 )
 }
@@ -95,12 +95,6 @@ by weighting the vertex values with the barycentric coordinates.
 If knots are required, but the \code{grid} argument is given, knots are constructed as
 \code{t(expand.grid(grid))}.
 
-The \code{"crbf"} is the multilayer compact radial basis function
-interpolation in ALGLIB (\url{https://www.alglib.net/interpolation/fastrbf.php}).
-It is only available if ALGLIB was available at
-compile time. It takes the extra arguments \code{"rbase"}, \code{"layers"}, and
-\code{"lambda"}. These are discussed in the ALGLIB documentation.
-
 There are also some usage examples and more in \code{vignette("chebpol")} and \code{vignette("chebusage")}.
 }
 \examples{
@@ -128,10 +122,6 @@ hst <- ipol(f, grid = grid, method = "hstalker")
 ch2 <- ipol(f, dims = c(10, 10, 10), intervals = list(0:1, 0:1, 0:1), method = "chebyshev")
 knots <- matrix(runif(3 * 1000), 3)
 ph2 <- ipol(f, knots = knots, k = 2, method = "polyharmonic")
-# my alglib is a bit slow, so stick to 100 knots
-if (has_alglib()) {
-  crb <- ipol(f, knots = knots[, 1:100], method = "crbf", rbase = 2, layers = 5, lambda = 0)
-}
 # make 7 points in R3 to test them on
 m <- matrix(runif(3 * 7), 3)
 rbind(
@@ -140,8 +130,7 @@ rbind(
   fh = fh2(m),
   cheb = ch2(m),
   poly = ph2(m),
-  hst = hst(m),
-  crbf = if (has_alglib()) crb(m) else NULL
+  hst = hst(m)
 )
 \dontshow{if (requireNamespace("geometry", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 # simplex linear interpolation needs the geometry package

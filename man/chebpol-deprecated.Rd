@@ -14,7 +14,7 @@ havealglib()
 These functions are deprecated:
 \itemize{
 \item \code{havefftw()} is replaced by \code{\link[=has_fftw]{has_fftw()}}.
-\item \code{havealglib()} is replaced by \code{\link[=has_alglib]{has_alglib()}}.
+\item \code{havealglib()} always returns \code{FALSE}, since chebpol no longer supports ALGLIB.
 }
 }
 \keyword{internal}

@@ -5,9 +5,9 @@ test_that("havefftw() and havealglib() are deprecated", {
   })
 })
 
-test_that("havefftw() and havealglib() return what has_fftw() and has_alglib() do", {
+test_that("havefftw() returns what has_fftw() does and havealglib() returns FALSE", {
   suppressWarnings({
     expect_identical(havefftw(), has_fftw())
-    expect_identical(havealglib(), has_alglib())
+    expect_identical(havealglib(), FALSE)
   })
 })

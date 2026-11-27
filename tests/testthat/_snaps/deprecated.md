@@ -11,7 +11,5 @@
       . <- havealglib()
     Condition
       Warning in `havealglib()`:
-      'havealglib' is deprecated.
-      Use 'has_alglib' instead.
-      See help("Deprecated") and help("chebpol-deprecated").
+      'havealglib' is deprecated. chebpol no longer supports ALGLIB.
 
