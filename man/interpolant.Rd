@@ -13,9 +13,10 @@ be evaluated in parallel.}
 
 \item{...}{Other parameters. Currently used for simplex linear interpolants with the logical argument
 \code{epol} which makes the interpolant extrapolate to points outside the domain.
-The stalker spline has the argument \code{blend = c("linear", "cubic", "sigmoid")} where a
-blending function can be chosen as described in a vignette. The \code{"multilinear"} and \code{"simplexlinear"} interpolants
-also have such a blending function, which is \code{"linear"} by default.}
+The \code{"stalker"}, \code{"hstalker"}, \code{"oldstalker"}, \code{"multilinear"} and \code{"simplexlinear"} interpolants have the argument
+\code{blend}, one of \code{"linear"}, \code{"cubic"}, \code{"sigmoid"}, \code{"parodic"} and \code{"square"}, which chooses the blending function
+described in \code{vignette("stalker", package = "chebpol")}. \code{"stalker"}, \code{"hstalker"} and \code{"simplexlinear"} also take
+\code{"mean"}. The default is \code{"cubic"} for \code{"stalker"} and \code{"hstalker"}, and \code{"linear"} for the others.}
 }
 \value{
 A numeric. If more than one point was evaluated, a vector.
