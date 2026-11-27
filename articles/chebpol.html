@@ -387,7 +387,7 @@ Delaunay triangulation looks like.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>true <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">test</span>, <span class="fl">2</span>, <span class="va">f</span><span class="op">)</span>, sl <span class="op">=</span> <span class="fu">g</span><span class="op">(</span><span class="va">test</span>, epol <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##           [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]</span></span>
 <span><span class="co">## true 0.8573409 0.9569339 0.7836407 0.9354700 0.6468739 0.8716940 0.5273634</span></span>
-<span><span class="co">## sl   0.8394309 0.9476747 0.7543278 0.9308245 0.6273019 0.8610124 0.4966036</span></span></code></pre>
+<span><span class="co">## sl   0.8482392 0.9502945 0.7746896 0.9315686 0.6292800 0.8657017 0.5065331</span></span></code></pre>
 <p>The main shortcoming of this method is visible in the Delaunay
 triangulation. Some of the triangles near the borders are very stretched
 out. This can happen even if we have a large number of knots. This is

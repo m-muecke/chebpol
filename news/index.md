@@ -25,6 +25,10 @@
   `method = "simplexlinear"` needs it to build the triangulation and
   stops with an error when it is missing. Saved simplex linear
   interpolants can be evaluated without it.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  interpolants created with `method = "simplexlinear"` now use
+  `blend = "linear"` by default instead of `"cubic"`, so they
+  interpolate linearly in each simplex, as documented.
 
 ### Lifecycle changes
 
@@ -137,6 +141,16 @@
   ‘integer’, not a ‘NULL’”.
 - [`chebeval()`](https://m-muecke.github.io/chebpol/reference/chebeval.md)
   now errors when `coef` is empty. Previously it could crash R.
+- [`chebknots()`](https://m-muecke.github.io/chebpol/reference/chebknots.md),
+  [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
+  and [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  with `method = "chebyshev"` now stop with an error when `dims` is not
+  whole numbers, or when `intervals` is not a list with one
+  `c(lower, upper)` pair per dimension. Previously `dims = 2.5` gave two
+  knots that are not Chebyshev knots, so
+  [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  silently returned a wrong interpolant, and a list of `intervals` of
+  the wrong length was silently recycled or gave an unrelated error.
 - Loading chebpol no longer overwrites the `chebpol.threads` option when
   it is already set, for example in `.Rprofile`. The `CHEBPOL_THREADS`
   environment variable is only used when the option is unset.
@@ -177,8 +191,9 @@
   and `domain` attributes. Previously setting the default blend dropped
   them.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) now
-  stops with an error when `grid` contains missing values. Previously
-  these failed with “missing value where TRUE/FALSE needed”.
+  stops with an error when `grid` contains missing values or values that
+  are not numbers, such as strings. Previously these failed with
+  “missing value where TRUE/FALSE needed”.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "chebyshev"` or `"uniform"` now stops with an error when the
   function does not return a single number. Previously a function
@@ -329,6 +344,14 @@
   Previously small differences between neighboring values were treated
   as constant or linear, so interpolating small values, e.g. `1e-6 * f`,
   gave a different curve than interpolating `f` and scaling the result.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
+  `method = "stalker"` on a uniform grid now gives the same spline
+  whether or not chebpol was built with GSL. Previously a build without
+  GSL used degree 2 next to every local extremum, where a build with GSL
+  lowers the degree to limit the overshoot. The warning that a
+  non-uniform grid needs GSL no longer depends on the scale of the grid
+  either: a non-uniform grid spaced less than about 1e-5 apart gave no
+  warning, and a uniform grid with coordinates around 1e12 warned.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "oldstalker"` and `k = NA` no longer depends on the scale of
   the grid. Previously a non-uniform grid spaced less than about 1e-8

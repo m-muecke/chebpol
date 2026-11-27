@@ -333,7 +333,7 @@ rbind(true = apply(test, 2, f), sl = g(test, epol = TRUE))
 
     ##           [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]
     ## true 0.8573409 0.9569339 0.7836407 0.9354700 0.6468739 0.8716940 0.5273634
-    ## sl   0.8394309 0.9476747 0.7543278 0.9308245 0.6273019 0.8610124 0.4966036
+    ## sl   0.8482392 0.9502945 0.7746896 0.9315686 0.6292800 0.8657017 0.5065331
 
 The main shortcoming of this method is visible in the Delaunay
 triangulation. Some of the triangles near the borders are very stretched

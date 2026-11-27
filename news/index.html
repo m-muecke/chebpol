@@ -61,6 +61,8 @@
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants no longer have a <code>chebpol.version</code> attribute. Nothing in chebpol used it, and looking up the version took most of the time needed to create a small interpolant, which is now about four times faster.</li>
 <li>The C routines <code>evalcheb</code>, <code>evalmlip</code> and <code>evalongrid</code>, registered for other packages to call through <code>R_GetCCallable()</code>, have been removed. They were undocumented, had no header file, and no known package used them.</li>
 <li>geometry is now a suggested package instead of a required one, so installing chebpol no longer pulls in geometry and its dependencies. <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "simplexlinear"</code> needs it to build the triangulation and stops with an error when it is missing. Saved simplex linear interpolants can be evaluated without it.</li>
+<li>
+<code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "simplexlinear"</code> now use <code>blend = "linear"</code> by default instead of <code>"cubic"</code>, so they interpolate linearly in each simplex, as documented.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="lifecycle-changes-development-version">Lifecycle changes<a class="anchor" aria-label="anchor" href="#lifecycle-changes-development-version"></a></h3>
@@ -105,6 +107,8 @@
 <code><a href="../reference/chebeval.html">chebeval()</a></code> now treats coefficients without a <code>dim</code> attribute, such as <code>c(1, 0.5, 0.25)</code> or <code>as.numeric(chebcoef(val))</code>, as one-dimensional. Previously it failed with “INTEGER() can only be applied to a ‘integer’, not a ‘NULL’”.</li>
 <li>
 <code><a href="../reference/chebeval.html">chebeval()</a></code> now errors when <code>coef</code> is empty. Previously it could crash R.</li>
+<li>
+<code><a href="../reference/chebknots.html">chebknots()</a></code>, <code><a href="../reference/evalongrid.html">evalongrid()</a></code> and <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "chebyshev"</code> now stop with an error when <code>dims</code> is not whole numbers, or when <code>intervals</code> is not a list with one <code>c(lower, upper)</code> pair per dimension. Previously <code>dims = 2.5</code> gave two knots that are not Chebyshev knots, so <code><a href="../reference/ipol.html">ipol()</a></code> silently returned a wrong interpolant, and a list of <code>intervals</code> of the wrong length was silently recycled or gave an unrelated error.</li>
 <li>Loading chebpol no longer overwrites the <code>chebpol.threads</code> option when it is already set, for example in <code>.Rprofile</code>. The <code>CHEBPOL_THREADS</code> environment variable is only used when the option is unset.</li>
 <li>
 <code><a href="../reference/evalongrid.html">evalongrid()</a></code> and <code><a href="../reference/ipol.html">ipol()</a></code> no longer overwrite an argument vector that the function has kept. Previously one vector was reused for every grid point, so a function that kept its argument, for example to record the points it was called with, saw every copy change to the last grid point.</li>
@@ -121,7 +125,7 @@
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with an explicit <code>blend</code> now keep their <code>arity</code> and <code>domain</code> attributes. Previously setting the default blend dropped them.</li>
 <li>
-<code><a href="../reference/ipol.html">ipol()</a></code> now stops with an error when <code>grid</code> contains missing values. Previously these failed with “missing value where TRUE/FALSE needed”.</li>
+<code><a href="../reference/ipol.html">ipol()</a></code> now stops with an error when <code>grid</code> contains missing values or values that are not numbers, such as strings. Previously these failed with “missing value where TRUE/FALSE needed”.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "chebyshev"</code> or <code>"uniform"</code> now stops with an error when the function does not return a single number. Previously a function returning a vector gave an interpolant with one variable too many, treating the position in the returned vector as an extra dimension.</li>
 <li>
@@ -186,6 +190,8 @@
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "hstalker"</code> no longer depends on the scale of the values or of the grid. Previously small differences between neighboring values were treated as constant or linear, and could produce a narrow spike between grid points.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "stalker"</code> no longer depends on the scale of the values. Previously small differences between neighboring values were treated as constant or linear, so interpolating small values, e.g. <code>1e-6 * f</code>, gave a different curve than interpolating <code>f</code> and scaling the result.</li>
+<li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "stalker"</code> on a uniform grid now gives the same spline whether or not chebpol was built with GSL. Previously a build without GSL used degree 2 next to every local extremum, where a build with GSL lowers the degree to limit the overshoot. The warning that a non-uniform grid needs GSL no longer depends on the scale of the grid either: a non-uniform grid spaced less than about 1e-5 apart gave no warning, and a uniform grid with coordinates around 1e12 warned.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "oldstalker"</code> and <code>k = NA</code> no longer depends on the scale of the grid. Previously a non-uniform grid spaced less than about 1e-8 apart was treated as uniform, and the interpolant could overshoot the data by orders of magnitude.</li>
 <li>

@@ -24,8 +24,9 @@ some reasonable values.
   the logical argument `epol` which makes the interpolant extrapolate to
   points outside the domain. The stalker spline has the argument
   `blend = c("linear", "cubic", "sigmoid")` where a blending function
-  can be chosen as described in a vignette. The `"multilinear"`
-  interpolant also has such a blending function.
+  can be chosen as described in a vignette. The `"multilinear"` and
+  `"simplexlinear"` interpolants also have such a blending function,
+  which is `"linear"` by default.
 
 ## Value
 
