@@ -46,6 +46,9 @@
 
 ### Minor improvements
 
+- chebpol can be built without FFTW or GSL by setting the environment
+  variable `CHEBPOL_DISABLE_FFTW` or `CHEBPOL_DISABLE_GSL` before
+  installing, as an alternative to `--configure-args`.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "polyharmonic"` now reports the warning about falling back
   to a least squares fit for the

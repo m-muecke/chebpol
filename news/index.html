@@ -71,7 +71,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-development-version">Minor improvements<a class="anchor" aria-label="anchor" href="#minor-improvements-development-version"></a></h3>
-<ul><li>
+<ul><li>chebpol can be built without FFTW or GSL by setting the environment variable <code>CHEBPOL_DISABLE_FFTW</code> or <code>CHEBPOL_DISABLE_GSL</code> before installing, as an alternative to <code>--configure-args</code>.</li>
+<li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now reports the warning about falling back to a least squares fit for the <code><a href="../reference/ipol.html">ipol()</a></code> call. Previously it showed the source of an internal function, e.g. “In (function (val, knots, k = 2, …”.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "multilinear"</code>, <code>"stalker"</code> or <code>"hstalker"</code> evaluate faster in several dimensions with a blend other than <code>"linear"</code>, e.g. about four times faster for <code>"multilinear"</code> and twice as fast for the stalker methods with <code>blend = "sigmoid"</code> in five dimensions. The blending weights are now computed once per dimension instead of once per corner of the grid cell.</li>

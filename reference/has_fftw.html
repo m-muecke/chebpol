@@ -78,7 +78,10 @@ approximation is possible, but not a one-dimensional 1000000.</p></li>
 <code>method = "crbf"</code>.</p></li>
 <li><p>GSL solves for the degree of the stalker splines on a non-uniform grid. Without it, <code><a href="ipol.html">ipol()</a></code> with
 <code>method = "stalker"</code> uses degree 2 there and warns, and <code>method = "oldstalker"</code> with <code>k = NA</code> stops with an error.</p></li>
-</ul></div>
+</ul><p>When chebpol is installed from source on Linux or macOS, FFTW and GSL are used if pkg-config finds them. To build
+without one, set the environment variable <code>CHEBPOL_DISABLE_FFTW</code> or <code>CHEBPOL_DISABLE_GSL</code> to a non-empty value
+before installing, or pass <code>--disable-fftw</code> or <code>--disable-gsl</code> in <code>configure.args</code>.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

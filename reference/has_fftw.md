@@ -37,6 +37,12 @@ has_gsl()
   `method = "stalker"` uses degree 2 there and warns, and
   `method = "oldstalker"` with `k = NA` stops with an error.
 
+When chebpol is installed from source on Linux or macOS, FFTW and GSL
+are used if pkg-config finds them. To build without one, set the
+environment variable `CHEBPOL_DISABLE_FFTW` or `CHEBPOL_DISABLE_GSL` to
+a non-empty value before installing, or pass `--disable-fftw` or
+`--disable-gsl` in `configure.args`.
+
 ## Examples
 
 ``` r
