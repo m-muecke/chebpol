@@ -23,10 +23,12 @@ variable `CHEBPOL_THREADS` upon loading of the package. It defaults to
 The interpolants are ordinary R-objects and can be saved with
 [`save()`](https://rdrr.io/r/base/save.html) and loaded later with
 [`load()`](https://rdrr.io/r/base/load.html) or serialized/unserialized
-with other tools, just like any R-object. However, they contain calls to
-functions in the package, and while the author will make efforts to
-ensure that generated interpolants are compatible with future versions
-of chebpol, no absolute guarantee can be given.
+with other tools, just like any R-object. However, they call internal
+functions of the package, which may change between versions, so an
+interpolant saved with one version of chebpol may not work with another.
+Create it again with
+[`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) after
+upgrading chebpol.
 
 ## Chebyshev
 

@@ -15,6 +15,11 @@
   chebpol used it, and looking up the version took most of the time
   needed to create a small interpolant, which is now about four times
   faster.
+- [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
+  interpolants saved with an earlier version of chebpol can no longer be
+  evaluated, because the internal functions they call have been renamed.
+  Create them again with
+  [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md).
 - The C routines `evalcheb`, `evalmlip` and `evalongrid`, registered for
   other packages to call through `R_GetCCallable()`, have been removed.
   They were undocumented, had no header file, and no known package used
