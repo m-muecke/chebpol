@@ -155,7 +155,6 @@ test_that("the hyperbolic stalker does not depend on the scale of the values or 
 test_that("the stalker spline does not depend on the scale of the values or the grid", {
   f <- function(x) exp(2 * x) * sin(5 * x)
   x <- seq(0, 1, length.out = 101)
-  # a non-uniform grid warns without GSL
   grids <- c(list(seq(0, 1, length.out = 6)), if (has_gsl()) list(c(0, 0.1, 0.35, 0.5, 0.8, 1)))
   for (grid in grids) {
     expected <- ipol(f, grid = list(grid), method = "stalker")(x)
