@@ -191,9 +191,10 @@
   and `domain` attributes. Previously setting the default blend dropped
   them.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) now
-  stops with an error when `grid` contains missing values or values that
-  are not numbers, such as strings. Previously these failed with
-  “missing value where TRUE/FALSE needed”.
+  stops with an error when `grid` contains missing or infinite values,
+  or values that are not numbers, such as strings. Previously these
+  failed with “missing value where TRUE/FALSE needed” or gave an
+  interpolant that returned `NaN`.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "chebyshev"` or `"uniform"` now stops with an error when the
   function does not return a single number. Previously a function
@@ -232,8 +233,9 @@
   `NA` or `NaN` input now gives `NA` for every blend.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "fh"` now stops with an error when the degree `k` is
-  negative or not smaller than the number of grid points in a dimension.
-  Before, the interpolant returned `NaN` between the grid points.
+  negative, not a whole number or not smaller than the number of grid
+  points in a dimension. Before, the interpolant returned `NaN` between
+  the grid points, and `k = 1.5` was silently used as 1.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "fh"` now stops with an error when `k` has neither length 1
   nor one value per grid dimension. Previously a shorter `k` was
@@ -313,10 +315,10 @@
   Previously it failed with “invalid ‘nrow’ value”.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "polyharmonic"` now stops with an error when `k` is zero,
-  missing or not a single number. Previously `k = 0` silently fitted a
-  spline with a logarithmic kernel that could be far off between the
-  knots, and the other cases failed with “missing value where TRUE/FALSE
-  needed” or “the condition has length \> 1”.
+  missing, infinite or not a single number. Previously `k = 0` silently
+  fitted a spline with a logarithmic kernel that could be far off
+  between the knots, and the other cases failed with “missing value
+  where TRUE/FALSE needed” or “the condition has length \> 1”.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md) with
   `method = "polyharmonic"` now stops with an error when `nowarn` is not
   `TRUE` or `FALSE`. Previously `nowarn = NA` failed with “missing value

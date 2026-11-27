@@ -125,7 +125,7 @@
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with an explicit <code>blend</code> now keep their <code>arity</code> and <code>domain</code> attributes. Previously setting the default blend dropped them.</li>
 <li>
-<code><a href="../reference/ipol.html">ipol()</a></code> now stops with an error when <code>grid</code> contains missing values or values that are not numbers, such as strings. Previously these failed with “missing value where TRUE/FALSE needed”.</li>
+<code><a href="../reference/ipol.html">ipol()</a></code> now stops with an error when <code>grid</code> contains missing or infinite values, or values that are not numbers, such as strings. Previously these failed with “missing value where TRUE/FALSE needed” or gave an interpolant that returned <code>NaN</code>.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "chebyshev"</code> or <code>"uniform"</code> now stops with an error when the function does not return a single number. Previously a function returning a vector gave an interpolant with one variable too many, treating the position in the returned vector as an extra dimension.</li>
 <li>
@@ -139,7 +139,7 @@
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> interpolants created with <code>method = "simplexlinear"</code> no longer return <code>NaN</code> with <code>blend = "square"</code> or <code>blend = "sigmoid"</code>. Square blending now uses the value at the vertex with the largest barycentric coordinate, and coordinates are clamped to <code>[0, 1]</code> before blending. <code>NA</code> or <code>NaN</code> input now gives <code>NA</code> for every blend.</li>
 <li>
-<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "fh"</code> now stops with an error when the degree <code>k</code> is negative or not smaller than the number of grid points in a dimension. Before, the interpolant returned <code>NaN</code> between the grid points.</li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "fh"</code> now stops with an error when the degree <code>k</code> is negative, not a whole number or not smaller than the number of grid points in a dimension. Before, the interpolant returned <code>NaN</code> between the grid points, and <code>k = 1.5</code> was silently used as 1.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "fh"</code> now stops with an error when <code>k</code> has neither length 1 nor one value per grid dimension. Previously a shorter <code>k</code> was silently repeated, or failed with “Length of grid (3) should equal length of d (2)”.</li>
 <li>
@@ -177,7 +177,7 @@
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now fits a spline with a single knot. Previously it failed with “invalid ‘nrow’ value”.</li>
 <li>
-<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now stops with an error when <code>k</code> is zero, missing or not a single number. Previously <code>k = 0</code> silently fitted a spline with a logarithmic kernel that could be far off between the knots, and the other cases failed with “missing value where TRUE/FALSE needed” or “the condition has length &gt; 1”.</li>
+<code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now stops with an error when <code>k</code> is zero, missing, infinite or not a single number. Previously <code>k = 0</code> silently fitted a spline with a logarithmic kernel that could be far off between the knots, and the other cases failed with “missing value where TRUE/FALSE needed” or “the condition has length &gt; 1”.</li>
 <li>
 <code><a href="../reference/ipol.html">ipol()</a></code> with <code>method = "polyharmonic"</code> now stops with an error when <code>nowarn</code> is not <code>TRUE</code> or <code>FALSE</code>. Previously <code>nowarn = NA</code> failed with “missing value where TRUE/FALSE needed”, and only when the fit fell back to least squares.</li>
 <li>
