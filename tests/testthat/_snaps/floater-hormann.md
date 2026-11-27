@@ -4,17 +4,22 @@
       ipol(f, grid = grid, method = "fh", k = -1)
     Condition
       Error in `ipol()`:
-      ! `k` must be between 0 and one less than the number of grid points in each dimension.
+      ! `k` must be whole numbers between 0 and one less than the number of grid points in each dimension.
     Code
       ipol(f, grid = grid, method = "fh", k = 4)
     Condition
       Error in `ipol()`:
-      ! `k` must be between 0 and one less than the number of grid points in each dimension.
+      ! `k` must be whole numbers between 0 and one less than the number of grid points in each dimension.
     Code
       ipol(f, grid = grid, method = "fh", k = c(6, 3))
     Condition
       Error in `ipol()`:
-      ! `k` must be between 0 and one less than the number of grid points in each dimension.
+      ! `k` must be whole numbers between 0 and one less than the number of grid points in each dimension.
+    Code
+      ipol(f, grid = grid, method = "fh", k = 1.5)
+    Condition
+      Error in `ipol()`:
+      ! `k` must be whole numbers between 0 and one less than the number of grid points in each dimension.
 
 # ipol() errors when the Floater-Hormann degree does not match the grid dimensions
 

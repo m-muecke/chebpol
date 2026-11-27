@@ -1,3 +1,7 @@
+`%||%` <- function(lhs, rhs) {
+  if (is.null(lhs)) rhs else lhs # nolint
+}
+
 crate <- function(.fn, ..., .parent = topenv(parent.frame())) {
   nn <- vapply(as.list(substitute(list(...)))[-1L], as.character, character(1L))
   environment(.fn) <- list2env(stats::setNames(list(...), nn), parent = .parent)
@@ -41,44 +45,10 @@ as_points <- function(x, n_dim, call = sys.call(sys.parent())) {
   x
 }
 
-assert_intervals <- function(intervals, n_dim, what = "val", call = sys.call(sys.parent())) {
-  if (!is.list(intervals) || length(intervals) != n_dim || any(lengths(intervals) != 2L)) {
-    msg <- sprintf("`intervals` must be a list of %d `c(lower, upper)` pairs, one per dimension of `%s`.", n_dim, what)
-    stop(errorCondition(msg, call = call))
-  }
-}
-
-assert_grid <- function(grid, method, min_points = 1L, call = sys.call(sys.parent())) {
-  if (is.null(grid)) {
-    msg <- sprintf("`grid` must be given for method = \"%s\".", method)
-    stop(errorCondition(msg, call = call))
-  }
-  if (any(lengths(grid) < min_points)) {
-    msg <- sprintf(
-      "Each `grid` dimension must have at least %s points for method = \"%s\".",
-      c("one", "two")[min_points],
-      method
-    )
-    stop(errorCondition(msg, call = call))
-  }
-  unsorted <- vapply(grid, \(g) is.unsorted(g, strictly = TRUE) && is.unsorted(-g, strictly = TRUE), logical(1L))
-  if (any(unsorted)) {
-    stop(errorCondition("Each `grid` dimension must be strictly increasing or strictly decreasing.", call = call))
-  }
-}
-
-is_flag <- function(x) {
-  is.logical(x) && length(x) == 1L && !is.na(x)
-}
-
 grid_knots <- function(grid) {
   knots <- t(expand.grid(lapply(grid, as.numeric)))
   rownames(knots) <- names(grid)
   knots
-}
-
-`%||%` <- function(lhs, rhs) {
-  if (is.null(lhs)) rhs else lhs # nolint
 }
 
 blend_types <- c(linear = 0L, sigmoid = 1L, parodic = 2L, cubic = 3L, square = 4L, mean = 5L)

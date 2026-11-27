@@ -6,6 +6,11 @@
       Error in `chebknots()`:
       ! `dims` must be non-negative whole numbers.
     Code
+      chebknots(Inf)
+    Condition
+      Error in `chebknots()`:
+      ! `dims` must be non-negative whole numbers.
+    Code
       chebknots(c(2, 2), list(c(0, 1)))
     Condition
       Error in `chebknots()`:

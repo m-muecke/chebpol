@@ -80,6 +80,7 @@ test_that("ipol() errors on an invalid polyharmonic k", {
   expect_snapshot(error = TRUE, {
     ipol(f, knots = knots, k = 0, method = "polyharmonic")
     ipol(f, knots = knots, k = NA, method = "polyharmonic")
+    ipol(f, knots = knots, k = -Inf, method = "polyharmonic")
     ipol(f, knots = knots, k = c(2, 3), method = "polyharmonic")
     ipol(f, knots = knots, k = 2.5, method = "polyharmonic")
   })

@@ -8,6 +8,7 @@ test_that("chebknots() returns Chebyshev knots", {
 test_that("chebknots() errors on malformed dims and intervals", {
   expect_snapshot(error = TRUE, {
     chebknots(2.5)
+    chebknots(Inf)
     chebknots(c(2, 2), list(c(0, 1)))
     chebknots(2, list(c(0, 1), c(5, 6)))
     chebknots(3, c(0, 1, 2))

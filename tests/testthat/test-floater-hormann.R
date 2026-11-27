@@ -60,6 +60,7 @@ test_that("ipol() rejects a Floater-Hormann degree outside the valid range", {
     ipol(f, grid = grid, method = "fh", k = -1)
     ipol(f, grid = grid, method = "fh", k = 4)
     ipol(f, grid = grid, method = "fh", k = c(6, 3))
+    ipol(f, grid = grid, method = "fh", k = 1.5)
   })
 })
 

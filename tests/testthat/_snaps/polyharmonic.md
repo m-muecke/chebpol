@@ -32,6 +32,11 @@
       Error:
       ! `k` must be a positive whole number or a negative number.
     Code
+      ipol(f, knots = knots, k = -Inf, method = "polyharmonic")
+    Condition
+      Error:
+      ! `k` must be a positive whole number or a negative number.
+    Code
       ipol(f, knots = knots, k = c(2, 3), method = "polyharmonic")
     Condition
       Error:

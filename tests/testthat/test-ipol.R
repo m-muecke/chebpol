@@ -91,11 +91,12 @@ test_that("ipol() errors on a grid without dimensions", {
   })
 })
 
-test_that("ipol() errors on a grid with missing values", {
+test_that("ipol() errors on a grid with missing or infinite values", {
   expect_snapshot(error = TRUE, {
     ipol(1:3, grid = c(0, NA, 1), method = "multilinear")
     ipol(sum, grid = list(0:2, c(0, NaN, 1)), method = "fh")
     ipol(1:2, grid = c("a", "b"), method = "fh")
+    ipol(1:3, grid = c(0, 1, Inf), method = "multilinear")
   })
 })
 

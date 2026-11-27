@@ -162,8 +162,8 @@ ipol <- function(
   if (!is.null(grid)) {
     grid <- lapply(grid, as.numeric)
   }
-  if (anyNA(grid, recursive = TRUE)) {
-    stop("`grid` must not contain missing values.")
+  if (!all(is.finite(unlist(grid, use.names = FALSE)))) {
+    stop("`grid` must not contain missing or infinite values.")
   }
   switch(
     method,
@@ -194,8 +194,8 @@ ipol <- function(
         stop(sprintf("`k` must have length 1 or %d, not %d.", length(grid), length(k)))
       }
       k <- rep_len(k, length(grid))
-      if (anyNA(k) || any(k < 0 | k > lengths(grid) - 1L)) {
-        stop("`k` must be between 0 and one less than the number of grid points in each dimension.")
+      if (!is_whole(k) || any(k > lengths(grid) - 1L)) {
+        stop("`k` must be whole numbers between 0 and one less than the number of grid points in each dimension.")
       }
       ipol_fh(val, grid, degree = k, ...)
     },

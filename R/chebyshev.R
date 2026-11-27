@@ -34,7 +34,7 @@ chebyshev_knots_1d <- function(n, interval = NULL) {
 #' # Multivariate grid
 #' head(expand.grid(chebknots(c(x = 3, y = 4, z = 5), list(c(1, 3), c(4, 6), c(800, 900)))))
 chebknots <- function(dims, intervals = NULL) {
-  if (!is.numeric(dims) || anyNA(dims) || any(dims < 0 | dims != trunc(dims))) {
+  if (!is_whole(dims)) {
     stop("`dims` must be non-negative whole numbers.")
   }
   if (is.null(intervals)) {
