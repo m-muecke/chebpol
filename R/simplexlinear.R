@@ -23,7 +23,7 @@ ipol_simplexlinear <- function(val, knots, ..., blend = NULL) {
     x,
     threads = getOption("chebpol.threads"),
     epol = FALSE,
-    blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
+    blend = c("linear", "cubic", "sigmoid", "parodic", "square", "mean")
   ) {
     x <- as_points(x, n_dim)
     if (!is_flag(epol)) {

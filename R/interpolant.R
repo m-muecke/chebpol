@@ -18,8 +18,8 @@
 #' @param ... Other parameters. Currently used for simplex linear interpolants with the logical argument
 #' `epol` which makes the interpolant extrapolate to points outside the domain.
 #' The stalker spline has the argument `blend = c("linear", "cubic", "sigmoid")` where a
-#' blending function can be chosen as described in a vignette. The `"multilinear"` interpolant also
-#' has such a blending function.
+#' blending function can be chosen as described in a vignette. The `"multilinear"` and `"simplexlinear"` interpolants
+#' also have such a blending function, which is `"linear"` by default.
 #' @return A numeric. If more than one point was evaluated, a vector.
 #' @examples
 #' grid <- list(x = seq(0, 1, length.out = 10), y = seq(0, 1, length.out = 10))

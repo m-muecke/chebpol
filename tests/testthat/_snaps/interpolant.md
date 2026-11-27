@@ -25,5 +25,5 @@
     Output
       <chebpol_interpolant> simplexlinear, 2 variables
       Domain: [0, 2] x [0, 1]
-      Defaults: epol = FALSE, blend = "cubic"
+      Defaults: epol = FALSE, blend = "linear"
 

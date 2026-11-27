@@ -7,14 +7,14 @@ test_that("simplex linear interpolation reproduces values at the knots", {
   expect_equal(sl(knots), apply(knots, 2, f))
 })
 
-test_that("simplex linear interpolation is exact for a linear function with linear blending", {
+test_that("simplex linear interpolation is exact for a linear function", {
   skip_if_not_installed("geometry")
   withr::local_seed(42)
   f <- function(x) 1 + 2 * x[1] - 3 * x[2]
   knots <- cbind(matrix(runif(200, -1, 1), 2), c(-1, -1), c(-1, 1), c(1, -1), c(1, 1))
   sl <- ipol(f, knots = knots, method = "simplexlinear")
   s <- matrix(runif(100, -0.9, 0.9), 2)
-  expect_equal(sl(s, blend = "linear"), apply(s, 2, f))
+  expect_equal(sl(s), apply(s, 2, f))
 })
 
 test_that("simplex linear interpolation approximates a smooth function", {
