@@ -5,12 +5,15 @@
 #
 # Skip a library with
 #   R CMD INSTALL --configure-args='--disable-fftw --disable-gsl'
-# or set its flags by hand with
+# or by setting CHEBPOL_DISABLE_FFTW or CHEBPOL_DISABLE_GSL to a non-empty
+# value in the environment. Set a library's flags by hand with
 #   R CMD INSTALL --configure-vars='FFTW_CFLAGS=... FFTW_LIBS=...'
 # (likewise GSL_CFLAGS and GSL_LIBS).
 
 use_fftw=yes
 use_gsl=yes
+[ -n "${CHEBPOL_DISABLE_FFTW-}" ] && use_fftw=no
+[ -n "${CHEBPOL_DISABLE_GSL-}" ] && use_gsl=no
 for arg in "$@"; do
   case "$arg" in
     --disable-fftw) use_fftw=no ;;

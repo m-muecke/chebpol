@@ -28,6 +28,10 @@ approximation is possible, but not a one-dimensional 1000000.
 \item GSL solves for the degree of the stalker splines on a non-uniform grid. Without it, \code{ipol()} with
 \code{method = "stalker"} uses degree 2 there and warns, and \code{method = "oldstalker"} with \code{k = NA} stops with an error.
 }
+
+When chebpol is installed from source on Linux or macOS, FFTW and GSL are used if pkg-config finds them. To build
+without one, set the environment variable \code{CHEBPOL_DISABLE_FFTW} or \code{CHEBPOL_DISABLE_GSL} to a non-empty value
+before installing, or pass \code{--disable-fftw} or \code{--disable-gsl} in \code{configure.args}.
 }
 \examples{
 has_fftw()
