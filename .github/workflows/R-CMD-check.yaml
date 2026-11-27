@@ -14,7 +14,7 @@ jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
 
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }}${{ matrix.config.label && format(', {0}', matrix.config.label) || '' }})
 
     strategy:
       fail-fast: false
@@ -23,12 +23,18 @@ jobs:
           - { os: macos-latest, r: "release" }
           - { os: windows-latest, r: "release" }
           - { os: ubuntu-latest, r: "devel", http-user-agent: "release" }
-          - { os: ubuntu-latest, r: "release" }
+          - { os: ubuntu-latest, r: "release", label: "4 threads", threads: 4 }
+          - os: ubuntu-latest
+            r: "release"
+            label: "no FFTW or GSL"
+            check-args: >-
+              c("--no-manual", "--as-cran", "--install-args=--configure-args='--disable-fftw --disable-gsl'")
           - { os: ubuntu-latest, r: "oldrel-1" }
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      CHEBPOL_THREADS: ${{ matrix.config.threads || 1 }}
 
     steps:
       - uses: actions/checkout@v7
@@ -42,7 +48,7 @@ jobs:
           use-public-rspm: true
 
       - name: Install FFTW and GSL (Linux)
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && !matrix.config.check-args
         run: |
           sudo apt-get update
           sudo apt-get install -y libfftw3-dev libgsl-dev
@@ -61,4 +67,5 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
+          args: "${{ matrix.config.check-args || 'c(\"--no-manual\", \"--as-cran\")' }}"
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
