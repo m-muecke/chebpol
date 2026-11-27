@@ -214,7 +214,7 @@ ipol_general <- function(val, grid = NULL, ...) {
   # create monotone splines with splinefun, method hyman, which gives NA for a single grid point. That point maps
   # onto the single Chebyshev knot, 0.
   gridmaps <- Map(
-    \(g, knots) if (length(g) == 1L) \(x) 0 * x else stats::splinefun(g, knots, method = "hyman"),
+    \(g, knots) if (length(g) == 1L) crate(\(x) 0 * x) else stats::splinefun(g, knots, method = "hyman"),
     grid,
     chebknots(dim(val))
   )

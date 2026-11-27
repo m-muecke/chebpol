@@ -65,6 +65,7 @@ test_that("an interpolant does not keep the extra arguments of the function", {
     ipol(f, dims = c(5, 4), method = "chebyshev", data = data),
     ipol(f, dims = c(5, 4), method = "uniform", data = data),
     ipol(f, grid = grid, method = "general", data = data),
+    ipol(f, grid = list(c(0, 1, 2), 5), method = "general", data = data),
     ipol(f, grid = grid, method = "fh", data = data),
     ipol(f, grid = grid, method = "multilinear", data = data),
     ipol(f, grid = grid, method = "stalker", data = data),
