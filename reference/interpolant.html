@@ -77,9 +77,10 @@ be evaluated in parallel.</p></dd>
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Other parameters. Currently used for simplex linear interpolants with the logical argument
 <code>epol</code> which makes the interpolant extrapolate to points outside the domain.
-The stalker spline has the argument <code>blend = c("linear", "cubic", "sigmoid")</code> where a
-blending function can be chosen as described in a vignette. The <code>"multilinear"</code> and <code>"simplexlinear"</code> interpolants
-also have such a blending function, which is <code>"linear"</code> by default.</p></dd>
+The <code>"stalker"</code>, <code>"hstalker"</code>, <code>"oldstalker"</code>, <code>"multilinear"</code> and <code>"simplexlinear"</code> interpolants have the argument
+<code>blend</code>, one of <code>"linear"</code>, <code>"cubic"</code>, <code>"sigmoid"</code>, <code>"parodic"</code> and <code>"square"</code>, which chooses the blending function
+described in <code><a href="../articles/stalker.html">vignette("stalker", package = "chebpol")</a></code>. <code>"stalker"</code>, <code>"hstalker"</code> and <code>"simplexlinear"</code> also take
+<code>"mean"</code>. The default is <code>"cubic"</code> for <code>"stalker"</code> and <code>"hstalker"</code>, and <code>"linear"</code> for the others.</p></dd>
 
 </dl></div>
     <div class="section level2">

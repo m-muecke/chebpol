@@ -22,11 +22,15 @@ some reasonable values.
 
   Other parameters. Currently used for simplex linear interpolants with
   the logical argument `epol` which makes the interpolant extrapolate to
-  points outside the domain. The stalker spline has the argument
-  `blend = c("linear", "cubic", "sigmoid")` where a blending function
-  can be chosen as described in a vignette. The `"multilinear"` and
-  `"simplexlinear"` interpolants also have such a blending function,
-  which is `"linear"` by default.
+  points outside the domain. The `"stalker"`, `"hstalker"`,
+  `"oldstalker"`, `"multilinear"` and `"simplexlinear"` interpolants
+  have the argument `blend`, one of `"linear"`, `"cubic"`, `"sigmoid"`,
+  `"parodic"` and `"square"`, which chooses the blending function
+  described in
+  [`vignette("stalker", package = "chebpol")`](https://m-muecke.github.io/chebpol/articles/stalker.md).
+  `"stalker"`, `"hstalker"` and `"simplexlinear"` also take `"mean"`.
+  The default is `"cubic"` for `"stalker"` and `"hstalker"`, and
+  `"linear"` for the others.
 
 ## Value
 
