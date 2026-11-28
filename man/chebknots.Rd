@@ -33,3 +33,10 @@ chebknots(c(x = 3, y = 4, z = 3))
 # Multivariate grid
 head(expand.grid(chebknots(c(x = 3, y = 4, z = 5), list(c(1, 3), c(4, 6), c(800, 900)))))
 }
+\seealso{
+Other Chebyshev tools:
+\code{\link[=chebcoef]{chebcoef()}},
+\code{\link[=chebeval]{chebeval()}},
+\code{\link[=evalongrid]{evalongrid()}}
+}
+\concept{Chebyshev tools}

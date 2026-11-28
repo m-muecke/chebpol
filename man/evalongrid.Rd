@@ -73,3 +73,10 @@ evalongridV(g, grid = grid, threads = 2)
 f <- function(x) c(prod(x), sum(x^2))
 evalongrid(f, grid = grid)
 }
+\seealso{
+Other Chebyshev tools:
+\code{\link[=chebcoef]{chebcoef()}},
+\code{\link[=chebeval]{chebeval()}},
+\code{\link[=chebknots]{chebknots()}}
+}
+\concept{Chebyshev tools}

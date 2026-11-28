@@ -44,3 +44,10 @@ lines(s, tch(s), col = "blue")
 lines(s, f(s))
 lines(s, ch2(s), col = "green")
 }
+\seealso{
+Other Chebyshev tools:
+\code{\link[=chebcoef]{chebcoef()}},
+\code{\link[=chebknots]{chebknots()}},
+\code{\link[=evalongrid]{evalongrid()}}
+}
+\concept{Chebyshev tools}

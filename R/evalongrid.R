@@ -36,6 +36,7 @@
 #' @return An array with the value of `fun` on each grid point. The `dim` attribute has been
 #'   appropriately set for the grid. If `fun` returns a vector, this will be the first dimension of
 #'   the returned array.
+#' @family Chebyshev tools
 #' @export
 #' @examples
 #' f <- function(x) {

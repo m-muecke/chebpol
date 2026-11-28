@@ -34,4 +34,10 @@ chebcoef(a)
 }
 \seealso{
 \code{\link[=has_fftw]{has_fftw()}}
+
+Other Chebyshev tools:
+\code{\link[=chebeval]{chebeval()}},
+\code{\link[=chebknots]{chebknots()}},
+\code{\link[=evalongrid]{evalongrid()}}
 }
+\concept{Chebyshev tools}

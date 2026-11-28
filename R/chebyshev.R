@@ -21,6 +21,7 @@ chebyshev_knots_1d <- function(n, interval = NULL) {
 #'   Chebyshev polynomial of degree `n - 1`.
 #' @param intervals A list of vectors of length 2. The lower and upper bounds of the hypercube.
 #' @return An array of dimension `dims`. The Chebyshev grid points.
+#' @family Chebyshev tools
 #' @export
 #' @examples
 #' # Standard knots for degree 3
@@ -62,6 +63,7 @@ chebknots <- function(dims, intervals = NULL) {
 #'   is merely provided as a convenience for those who might need it.
 #' @return An array of Chebyshev coefficients for an interpolating Chebyshev polynomial.
 #' @seealso [has_fftw()]
+#' @family Chebyshev tools
 #' @export
 #' @examples
 #' # Coefficients for a 2x3x4 grid
@@ -89,6 +91,7 @@ chebcoef <- function(val, dct = FALSE) {
 #' @param threads An integer. In case `x` is a matrix of column vectors, use this number of threads
 #'   in parallel to evaluate.
 #' @return A numeric. The interpolated value.
+#' @family Chebyshev tools
 #' @export
 #' @examples
 #' # make a function which is known to be unsuitable for Chebyshev approximation
