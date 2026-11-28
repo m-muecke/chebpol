@@ -9,15 +9,13 @@ chebeval(x, coef, intervals = NULL, threads = getOption("chebpol.threads"))
 \arguments{
 \item{x}{The point to evaluate.}
 
-\item{coef}{The Chebyshev coefficients. Typically from a call to
-\code{\link[=chebcoef]{chebcoef()}}, possibly modified. A vector without a \code{dim} attribute is
-treated as one-dimensional.}
+\item{coef}{The Chebyshev coefficients. Typically from a call to \code{\link[=chebcoef]{chebcoef()}}, possibly modified.
+A vector without a \code{dim} attribute is treated as one-dimensional.}
 
-\item{intervals}{A list of minimum and maximum values. One for each
-dimension of the hypercube.}
+\item{intervals}{A list of minimum and maximum values. One for each dimension of the hypercube.}
 
-\item{threads}{An integer. In case \code{x} is a matrix of column vectors,
-use this number of threads in parallel to evaluate.}
+\item{threads}{An integer. In case \code{x} is a matrix of column vectors, use this number of threads
+in parallel to evaluate.}
 }
 \value{
 A numeric. The interpolated value.

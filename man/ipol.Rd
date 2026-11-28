@@ -17,18 +17,18 @@ ipol(
 )
 }
 \arguments{
-\item{val}{array or function. Function values on a grid, or the function
-itself. If it is the values, the \code{"dim"}-attribute must be
-appropriately set. If it is a function, it will be evaluated in the grid points.}
+\item{val}{array or function. Function values on a grid, or the function itself. If it is the
+values, the \code{"dim"}-attribute must be appropriately set. If it is a function, it will be
+evaluated in the grid points.}
 
-\item{dims}{integer vector. The number of grid points in each dimension. Not
-needed if \code{val} is an array or \code{grid} is used.}
+\item{dims}{integer vector. The number of grid points in each dimension. Not needed if \code{val} is
+an array or \code{grid} is used.}
 
-\item{intervals}{list of length 2 numeric vectors. The lower and upper bound
-in each dimension. Not used if \code{grid} is specified.}
+\item{intervals}{list of length 2 numeric vectors. The lower and upper bound in each dimension.
+Not used if \code{grid} is specified.}
 
-\item{grid}{list. Each element is a vector of ordered grid-points for a
-dimension. These need not be Chebyshev-knots, nor evenly spaced.}
+\item{grid}{list. Each element is a vector of ordered grid-points for a dimension. These need not
+be Chebyshev-knots, nor evenly spaced.}
 
 \item{knots}{matrix. Each column is a point in an M-dimensional space.}
 
@@ -36,61 +36,51 @@ dimension. These need not be Chebyshev-knots, nor evenly spaced.}
 
 \item{method}{character. The interpolation method to use.}
 
-\item{...}{Further arguments to the function, if \code{is.function(val)}. And some
-extra arguments for interpolant creation described in section Details.}
+\item{...}{Further arguments to the function, if \code{is.function(val)}. And some extra arguments for
+interpolant creation described in section Details.}
 }
 \value{
-A \verb{function(x, threads = getOption("chebpol.threads"))} defined on a hypercube, an \link{interpolant}
-for the given function. The argument \code{x} can be a matrix of column
-vectors which are evaluated in parallel in a number of threads. The
-function yields values for arguments outside the hypercube as well, though
-it will typically be a poor approximation. \code{threads} is an integer
-specifying the number of parallel threads which should be used when
-evaluating a matrix of column vectors.
+A \verb{function(x, threads = getOption("chebpol.threads"))} defined on a hypercube, an
+\link{interpolant} for the given function. The argument \code{x} can be a matrix of column vectors which
+are evaluated in parallel in a number of threads. The function yields values for arguments
+outside the hypercube as well, though it will typically be a poor approximation. \code{threads} is an
+integer specifying the number of parallel threads which should be used when evaluating a matrix
+of column vectors.
 }
 \description{
-Create an interpolating function from given values. Several interpolation methods are
-supported.
+Create an interpolating function from given values. Several interpolation methods are supported.
 }
 \details{
-\code{ipol()} is a wrapper around various interpolation methods in package chebpol.
-Which arguments to specify depends on the method. The interpolation methods are described
-in \code{vignette("chebpol", package = "chebpol")}.
+\code{ipol()} is a wrapper around various interpolation methods in package chebpol. Which arguments to
+specify depends on the method. The interpolation methods are described in \code{vignette("chebpol", package = "chebpol")}.
 
-The method \code{"chebyshev"} needs only the number of Chebyshev knots in
-each dimension. This is either the \code{"dim"} attribute of the array
-\code{val}, or the \code{dims} argument if \code{val} is a function. Also
-the intervals can be specified if different from \verb{[-1, 1]}.
+The method \code{"chebyshev"} needs only the number of Chebyshev knots in each dimension. This is
+either the \code{"dim"} attribute of the array \code{val}, or the \code{dims} argument if \code{val} is a function.
+Also the intervals can be specified if different from \verb{[-1, 1]}.
 
-The method \code{"uniform"} is similar to the \code{"chebyshev"}, but
-uniformly spaced knots are created. The argument
-\code{intervals} generally goes with \code{dims} when other than
-standard intervals \verb{[-1, 1]} are used.
+The method \code{"uniform"} is similar to the \code{"chebyshev"}, but uniformly spaced knots are created.
+The argument \code{intervals} generally goes with \code{dims} when other than standard intervals \verb{[-1, 1]}
+are used.
 
-The methods \code{"multilinear"}, \code{"fh"} (Floater-Hormann), \code{"stalker"},
-\code{"hstalker"}, and
-\code{"general"} need the argument \code{grid}. These are the methods
-which can use arbitrary Cartesian grids.
-The stalker spline
-is described in \code{vignette("stalker", package = "chebpol")}. The Floater-Hormann
-method (\code{"fh"}) also needs the \code{k} argument, the degree of the blending
-polynomials. It defaults to 4. It must be between 0 and one less than the number of grid points in
-each dimension. Give either one value for all dimensions or one value per dimension.
+The methods \code{"multilinear"}, \code{"fh"} (Floater-Hormann), \code{"stalker"}, \code{"hstalker"}, and \code{"general"}
+need the argument \code{grid}. These are the methods which can use arbitrary Cartesian grids. The
+stalker spline is described in \code{vignette("stalker", package = "chebpol")}. The Floater-Hormann
+method (\code{"fh"}) also needs the \code{k} argument, the degree of the blending polynomials. It defaults
+to 4. It must be between 0 and one less than the number of grid points in each dimension. Give
+either one value for all dimensions or one value per dimension.
 
-The method \code{"polyharmonic"} needs the arguments \code{knots} and
-\code{k}. In addition it can take the logical argument \code{normalize}
-for normalizing the knots to the unit hypercube. The default is \code{NA}, which
-uses normalization if any of the knots are outside the unit hypercube. \code{normalize} can also
-be a vector \code{c(a, b)}, or a matrix with columns \code{a} and \code{b} and one row per dimension, in which
-case each coordinate is transformed as \code{a * (x - b)}. Also, a logical
-\code{nowarn} is accepted. It is used to suppress a warning in case the system can't
-be solved exactly and a least squares fallback method is used.
-Fitting solves a dense linear system with one row and column per knot, so it
-becomes slow beyond a few thousand knots.
+The method \code{"polyharmonic"} needs the arguments \code{knots} and \code{k}. In addition it can take the
+logical argument \code{normalize} for normalizing the knots to the unit hypercube. The default is
+\code{NA}, which uses normalization if any of the knots are outside the unit hypercube. \code{normalize}
+can also be a vector \code{c(a, b)}, or a matrix with columns \code{a} and \code{b} and one row per dimension,
+in which case each coordinate is transformed as \code{a * (x - b)}. Also, a logical \code{nowarn} is
+accepted. It is used to suppress a warning in case the system can't be solved exactly and a least
+squares fallback method is used. Fitting solves a dense linear system with one row and column per
+knot, so it becomes slow beyond a few thousand knots.
 
-The method \code{"simplexlinear"} needs the argument \code{knots}. It creates a
-Delaunay triangulation from the knots, and does linear interpolation in each simplex
-by weighting the vertex values with the barycentric coordinates.
+The method \code{"simplexlinear"} needs the argument \code{knots}. It creates a Delaunay triangulation from
+the knots, and does linear interpolation in each simplex by weighting the vertex values with the
+barycentric coordinates.
 
 If knots are required, but the \code{grid} argument is given, knots are constructed as
 \code{t(expand.grid(grid))}.

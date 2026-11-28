@@ -1,26 +1,27 @@
 #' Evaluate an interpolant in a point
 #'
-#' An interpolant is a function returned by [ipol()] which has prespecified values in some
-#' points, and which fills in between with some reasonable values.
+#' An interpolant is a function returned by [ipol()] which has prespecified values in some points,
+#' and which fills in between with some reasonable values.
 #'
-#' Interpolants have class `chebpol_interpolant` and the attributes `method`, the interpolation method, `arity`,
-#' the number of variables, and `domain`, a data frame with one row per variable and the columns `variable`, `lower`
-#' and `upper`. The variables take their names from `grid`, `dims`, `intervals` or the row names of `knots`, and are
-#' named `X1`, `X2`, ... otherwise. Printing an interpolant shows these together with the defaults of its extra
-#' arguments, such as `blend`.
+#' Interpolants have class `chebpol_interpolant` and the attributes `method`, the interpolation
+#' method, `arity`, the number of variables, and `domain`, a data frame with one row per variable
+#' and the columns `variable`, `lower` and `upper`. The variables take their names from `grid`,
+#' `dims`, `intervals` or the row names of `knots`, and are named `X1`, `X2`, ... otherwise.
+#' Printing an interpolant shows these together with the defaults of its extra arguments, such as
+#' `blend`.
 #'
 #' @name interpolant
-#' @param x The argument of the function. A function of more than one variable takes a
-#' vector. `x` can also be a matrix of column vectors.
-#' @param threads The number of threads to use for evaluation. All interpolants created by
-#' chebpol are parallelized. If given a matrix argument `x`, the vectors can
-#' be evaluated in parallel.
-#' @param ... Other parameters. Currently used for simplex linear interpolants with the logical argument
-#' `epol` which makes the interpolant extrapolate to points outside the domain.
-#' The `"stalker"`, `"hstalker"`, `"oldstalker"`, `"multilinear"` and `"simplexlinear"` interpolants have the argument
-#' `blend`, one of `"linear"`, `"cubic"`, `"sigmoid"`, `"parodic"` and `"square"`, which chooses the blending function
-#' described in `vignette("stalker", package = "chebpol")`. `"stalker"`, `"hstalker"` and `"simplexlinear"` also take
-#' `"mean"`. The default is `"cubic"` for `"stalker"` and `"hstalker"`, and `"linear"` for the others.
+#' @param x The argument of the function. A function of more than one variable takes a vector. `x`
+#' can also be a matrix of column vectors.
+#' @param threads The number of threads to use for evaluation. All interpolants created by chebpol
+#' are parallelized. If given a matrix argument `x`, the vectors can be evaluated in parallel.
+#' @param ... Other parameters. Currently used for simplex linear interpolants with the logical
+#' argument `epol` which makes the interpolant extrapolate to points outside the domain. The
+#' `"stalker"`, `"hstalker"`, `"oldstalker"`, `"multilinear"` and `"simplexlinear"` interpolants
+#' have the argument `blend`, one of `"linear"`, `"cubic"`, `"sigmoid"`, `"parodic"` and `"square"`,
+#' which chooses the blending function described in `vignette("stalker", package = "chebpol")`.
+#' `"stalker"`, `"hstalker"` and `"simplexlinear"` also take `"mean"`. The default is `"cubic"` for
+#' `"stalker"` and `"hstalker"`, and `"linear"` for the others.
 #' @return A numeric. If more than one point was evaluated, a vector.
 #' @examples
 #' grid <- list(x = seq(0, 1, length.out = 10), y = seq(0, 1, length.out = 10))

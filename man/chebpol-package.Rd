@@ -6,32 +6,29 @@
 \alias{chebpol-package}
 \title{Methods for creating multivariate interpolations on hypercubes}
 \description{
-The package contains methods for creating multivariate/multidimensional
-interpolations for real-valued functions on hypercubes. The
-methods include classical Chebyshev interpolation, multilinear
-and Floater-Hormann for arbitrary Cartesian product grids, and simplex linear
-and polyharmonic spline for scattered multi dimensional data.
+The package contains methods for creating multivariate/multidimensional interpolations for
+real-valued functions on hypercubes. The methods include classical Chebyshev interpolation,
+multilinear and Floater-Hormann for arbitrary Cartesian product grids, and simplex linear and
+polyharmonic spline for scattered multi dimensional data.
 }
 \details{
-The primary method of the package is \code{\link[=ipol]{ipol()}} which
-dispatches to some other method. All the generated
-\link{interpolant}s accept as an argument a matrix of column
-vectors. The generated functions also accept an argument
-\code{threads = getOption("chebpol.threads")} to utilize more than
-one CPU if a matrix of column vectors is evaluated. Unless the option
-\code{chebpol.threads} is already set, it is initialized from the environment variable
-\code{CHEBPOL_THREADS} upon loading of the package. It defaults to \code{1}.
+The primary method of the package is \code{\link[=ipol]{ipol()}} which dispatches to some other method. All the
+generated \link{interpolant}s accept as an argument a matrix of column vectors. The generated
+functions also accept an argument \code{threads = getOption("chebpol.threads")} to utilize more than
+one CPU if a matrix of column vectors is evaluated. Unless the option \code{chebpol.threads} is
+already set, it is initialized from the environment variable \code{CHEBPOL_THREADS} upon loading of
+the package. It defaults to \code{1}.
 
-The interpolants are ordinary R-objects and can be saved with \code{save()} and loaded
-later with \code{load()} or serialized/unserialized with other tools, just like any R-object.
-However, they call internal functions of the package, which may change between versions, so an interpolant saved
-with one version of chebpol may not work with another. Create it again with \code{\link[=ipol]{ipol()}} after upgrading chebpol.
+The interpolants are ordinary R-objects and can be saved with \code{save()} and loaded later with
+\code{load()} or serialized/unserialized with other tools, just like any R-object. However, they call
+internal functions of the package, which may change between versions, so an interpolant saved
+with one version of chebpol may not work with another. Create it again with \code{\link[=ipol]{ipol()}} after
+upgrading chebpol.
 }
 \section{Chebyshev}{
 
-If we are free to evaluate the function to interpolate in arbitrary points, we can use
-a Chebyshev interpolation. The classical one is available with
-\code{ipol(..., method = "chebyshev")}.
+If we are free to evaluate the function to interpolate in arbitrary points, we can use a
+Chebyshev interpolation. The classical one is available with \code{ipol(..., method = "chebyshev")}.
 }
 
 \section{Uniform grids}{
@@ -43,29 +40,27 @@ There is a transformed Chebyshev variant \code{ipol(..., method = "uniform")}.
 
 \section{Arbitrary grids}{
 
-For grids which are not uniform, but still Cartesian products of one-dimensional grids,
-there is the Floater-Hormann interpolation \code{ipol(..., method = "fh")}, and a transformed
-Chebyshev variant \code{ipol(..., method = "general")}, as well as a multilinear
-\code{ipol(..., method = "multilinear")}. These methods work on uniform grids as well.
-There is also a \code{method = "stalker"} which is a shape preserving spline, and a variant
-\code{method = "hstalker"}. Both are described in a vignette. These splines in one dimension
-attempt to honour monotonicity and local extrema, in particular the \code{"hstalker"} is
-positivity-preserving in the sense that it will preserve maxima and minima.
+For grids which are not uniform, but still Cartesian products of one-dimensional grids, there is
+the Floater-Hormann interpolation \code{ipol(..., method = "fh")}, and a transformed Chebyshev variant
+\code{ipol(..., method = "general")}, as well as a multilinear \code{ipol(..., method = "multilinear")}.
+These methods work on uniform grids as well. There is also a \code{method = "stalker"} which is a
+shape preserving spline, and a variant \code{method = "hstalker"}. Both are described in a vignette.
+These splines in one dimension attempt to honour monotonicity and local extrema, in particular
+the \code{"hstalker"} is positivity-preserving in the sense that it will preserve maxima and minima.
 }
 
 \section{Scattered data}{
 
-For scattered data, not necessarily organised as a Cartesian product grid, there is
-a simplex linear interpolation available with \code{ipol(..., method = "simplexlinear")},
-and a polyharmonic spline with \code{ipol(..., method = "polyharmonic")}.
+For scattered data, not necessarily organised as a Cartesian product grid, there is a simplex
+linear interpolation available with \code{ipol(..., method = "simplexlinear")}, and a polyharmonic
+spline with \code{ipol(..., method = "polyharmonic")}.
 }
 
 \section{Support functions}{
 
-There are also functions for producing Chebyshev grids
-(\code{\link[=chebknots]{chebknots()}}) as well as a function for evaluating a
-function on a grid (\code{\link[=evalongrid]{evalongrid()}}), and a function for finding
-the Chebyshev coefficients (\code{\link[=chebcoef]{chebcoef()}}).
+There are also functions for producing Chebyshev grids (\code{\link[=chebknots]{chebknots()}}) as well as a function for
+evaluating a function on a grid (\code{\link[=evalongrid]{evalongrid()}}), and a function for finding the Chebyshev
+coefficients (\code{\link[=chebcoef]{chebcoef()}}).
 }
 
 \examples{
@@ -73,8 +68,7 @@ the Chebyshev coefficients (\code{\link[=chebcoef]{chebcoef()}}).
 dims <- c(x = 50, y = 50, z = 50)
 f <- function(x) sqrt(1 + x[1]) * exp(x[2]) * sin(5 * x[3])^2
 value <- evalongrid(f, dims)
-# fit a Chebyshev approximation to it. Note that the value-array contains the
-# grid-structure.
+# fit a Chebyshev approximation to it. Note that the value-array contains the grid-structure.
 ch <- ipol(value, method = "chebyshev")
 # To see the grid, use the chebknots function and expand.grid. Compare the
 # values with the approximation in the first few grid points.

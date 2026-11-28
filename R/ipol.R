@@ -1,73 +1,64 @@
 #' Create an interpolating function
 #'
-#' Create an interpolating function from given values. Several interpolation methods are
-#' supported.
+#' Create an interpolating function from given values. Several interpolation methods are supported.
 #'
-#' `ipol()` is a wrapper around various interpolation methods in package chebpol.
-#' Which arguments to specify depends on the method. The interpolation methods are described
-#' in `vignette("chebpol", package = "chebpol")`.
+#' `ipol()` is a wrapper around various interpolation methods in package chebpol. Which arguments to
+#' specify depends on the method. The interpolation methods are described in `vignette("chebpol",
+#' package = "chebpol")`.
 #'
-#' The method `"chebyshev"` needs only the number of Chebyshev knots in
-#' each dimension. This is either the `"dim"` attribute of the array
-#' `val`, or the `dims` argument if `val` is a function. Also
-#' the intervals can be specified if different from `[-1, 1]`.
+#' The method `"chebyshev"` needs only the number of Chebyshev knots in each dimension. This is
+#' either the `"dim"` attribute of the array `val`, or the `dims` argument if `val` is a function.
+#' Also the intervals can be specified if different from `[-1, 1]`.
 #'
-#' The method `"uniform"` is similar to the `"chebyshev"`, but
-#' uniformly spaced knots are created. The argument
-#' `intervals` generally goes with `dims` when other than
-#' standard intervals `[-1, 1]` are used.
+#' The method `"uniform"` is similar to the `"chebyshev"`, but uniformly spaced knots are created.
+#' The argument `intervals` generally goes with `dims` when other than standard intervals `[-1, 1]`
+#' are used.
 #'
-#' The methods `"multilinear"`, `"fh"` (Floater-Hormann), `"stalker"`,
-#' `"hstalker"`, and
-#' `"general"` need the argument `grid`. These are the methods
-#' which can use arbitrary Cartesian grids.
-#' The stalker spline
-#' is described in `vignette("stalker", package = "chebpol")`. The Floater-Hormann
-#' method (`"fh"`) also needs the `k` argument, the degree of the blending
-#' polynomials. It defaults to 4. It must be between 0 and one less than the number of grid points in
-#' each dimension. Give either one value for all dimensions or one value per dimension.
+#' The methods `"multilinear"`, `"fh"` (Floater-Hormann), `"stalker"`, `"hstalker"`, and `"general"`
+#' need the argument `grid`. These are the methods which can use arbitrary Cartesian grids. The
+#' stalker spline is described in `vignette("stalker", package = "chebpol")`. The Floater-Hormann
+#' method (`"fh"`) also needs the `k` argument, the degree of the blending polynomials. It defaults
+#' to 4. It must be between 0 and one less than the number of grid points in each dimension. Give
+#' either one value for all dimensions or one value per dimension.
 #'
-#' The method `"polyharmonic"` needs the arguments `knots` and
-#' `k`. In addition it can take the logical argument `normalize`
-#' for normalizing the knots to the unit hypercube. The default is `NA`, which
-#' uses normalization if any of the knots are outside the unit hypercube. `normalize` can also
-#' be a vector `c(a, b)`, or a matrix with columns `a` and `b` and one row per dimension, in which
-#' case each coordinate is transformed as `a * (x - b)`. Also, a logical
-#' `nowarn` is accepted. It is used to suppress a warning in case the system can't
-#' be solved exactly and a least squares fallback method is used.
-#' Fitting solves a dense linear system with one row and column per knot, so it
-#' becomes slow beyond a few thousand knots.
+#' The method `"polyharmonic"` needs the arguments `knots` and `k`. In addition it can take the
+#' logical argument `normalize` for normalizing the knots to the unit hypercube. The default is
+#' `NA`, which uses normalization if any of the knots are outside the unit hypercube. `normalize`
+#' can also be a vector `c(a, b)`, or a matrix with columns `a` and `b` and one row per dimension,
+#' in which case each coordinate is transformed as `a * (x - b)`. Also, a logical `nowarn` is
+#' accepted. It is used to suppress a warning in case the system can't be solved exactly and a least
+#' squares fallback method is used. Fitting solves a dense linear system with one row and column per
+#' knot, so it becomes slow beyond a few thousand knots.
 #'
-#' The method `"simplexlinear"` needs the argument `knots`. It creates a
-#' Delaunay triangulation from the knots, and does linear interpolation in each simplex
-#' by weighting the vertex values with the barycentric coordinates.
+#' The method `"simplexlinear"` needs the argument `knots`. It creates a Delaunay triangulation from
+#' the knots, and does linear interpolation in each simplex by weighting the vertex values with the
+#' barycentric coordinates.
 #'
 #' If knots are required, but the `grid` argument is given, knots are constructed as
 #' `t(expand.grid(grid))`.
 #'
 #' There are also some usage examples and more in `vignette("chebpol")` and `vignette("chebusage")`.
 #'
-#' @param val array or function. Function values on a grid, or the function
-#' itself. If it is the values, the `"dim"`-attribute must be
-#' appropriately set. If it is a function, it will be evaluated in the grid points.
-#' @param dims integer vector. The number of grid points in each dimension. Not
-#' needed if `val` is an array or `grid` is used.
-#' @param intervals list of length 2 numeric vectors. The lower and upper bound
-#' in each dimension. Not used if `grid` is specified.
-#' @param grid list. Each element is a vector of ordered grid-points for a
-#' dimension. These need not be Chebyshev-knots, nor evenly spaced.
+#' @param val array or function. Function values on a grid, or the function itself. If it is the
+#' values, the `"dim"`-attribute must be appropriately set. If it is a function, it will be
+#' evaluated in the grid points.
+#' @param dims integer vector. The number of grid points in each dimension. Not needed if `val` is
+#' an array or `grid` is used.
+#' @param intervals list of length 2 numeric vectors. The lower and upper bound in each dimension.
+#' Not used if `grid` is specified.
+#' @param grid list. Each element is a vector of ordered grid-points for a dimension. These need not
+#' be Chebyshev-knots, nor evenly spaced.
 #' @param knots matrix. Each column is a point in an M-dimensional space.
 #' @param k numeric. Additional value, used with some methods.
 #' @param method character. The interpolation method to use.
-#' @param ... Further arguments to the function, if `is.function(val)`. And some
-#' extra arguments for interpolant creation described in section Details.
-#' @return A `function(x, threads = getOption("chebpol.threads"))` defined on a hypercube, an [interpolant]
-#' for the given function. The argument `x` can be a matrix of column
-#' vectors which are evaluated in parallel in a number of threads. The
-#' function yields values for arguments outside the hypercube as well, though
-#' it will typically be a poor approximation. `threads` is an integer
-#' specifying the number of parallel threads which should be used when
-#' evaluating a matrix of column vectors.
+#' @param ... Further arguments to the function, if `is.function(val)`. And some extra arguments for
+#' interpolant creation described in section Details.
+#' @return A `function(x, threads = getOption("chebpol.threads"))` defined on a hypercube, an
+#' [interpolant] for the given function. The argument `x` can be a matrix of column vectors which
+#' are evaluated in parallel in a number of threads. The function yields values for arguments
+#' outside the hypercube as well, though it will typically be a poor approximation. `threads` is an
+#' integer specifying the number of parallel threads which should be used when evaluating a matrix
+#' of column vectors.
 #' @export
 #' @examples
 #' # evenly spaced grid-points

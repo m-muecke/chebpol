@@ -13,15 +13,13 @@ chebyshev_knots_1d <- function(n, interval = NULL) {
 #'
 #' Create a Chebyshev grid on a hypercube.
 #'
-#' If `intervals` is not provided, it is assumed that the domain of the
-#' function in each dimension is `[-1, 1]`. Thus, standard Chebyshev knots are
-#' produced. If `dims` is of length 1, `intervals` may be a vector
-#' of length 2 rather than a list with a vector of length 2.
+#' If `intervals` is not provided, it is assumed that the domain of the function in each dimension
+#' is `[-1, 1]`. Thus, standard Chebyshev knots are produced. If `dims` is of length 1, `intervals`
+#' may be a vector of length 2 rather than a list with a vector of length 2.
 #'
-#' @param dims The number of grid-points in each dimension. For
-#' Chebyshev-polynomial of degree `dims-1`.
-#' @param intervals A list of vectors of length 2. The lower and upper bounds
-#' of the hypercube.
+#' @param dims The number of grid-points in each dimension. For Chebyshev-polynomial of degree
+#' `dims-1`.
+#' @param intervals A list of vectors of length 2. The lower and upper bounds of the hypercube.
 #' @return An array of dimension `dims`. The Chebyshev grid-points.
 #' @export
 #' @examples
@@ -49,23 +47,20 @@ chebknots <- function(dims, intervals = NULL) {
 
 #' Compute Chebyshev-coefficients given values on a Chebyshev grid
 #'
-#' Compute the multivariate Chebyshev-coefficients, given values on a Chebyshev
-#' grid.
+#' Compute the multivariate Chebyshev-coefficients, given values on a Chebyshev grid.
 #'
-#' If `val` has no `dim`-attribute, it is assumed to be
-#' one-dimensional with length `length(val)`.
+#' If `val` has no `dim`-attribute, it is assumed to be one-dimensional with length `length(val)`.
 #'
-#' If chebpol was compiled without FFTW, running
-#' `chebcoef()` on large grids may be slow and memory-demanding.
+#' If chebpol was compiled without FFTW, running `chebcoef()` on large grids may be slow and
+#' memory-demanding.
 #'
-#' @param val An `array` of function values on a Chebyshev grid. The
-#' `dim`-attribute must be appropriately set. If not set, it is assumed
+#' @param val An `array` of function values on a Chebyshev grid. The `dim`-attribute must be
+#' appropriately set. If not set, it is assumed
 #' to be one-dimensional.
-#' @param dct Logical. Since the Chebyshev coefficients are closely related to
-#' the DCT-II transform of `val`, the non-normalized real-even DCT-II
-#' coefficients may be retrieved instead. I.e. those from `FFTW_REDFT10` in each
-#' dimension. This is not used anywhere in the package, it is merely provided
-#' as a convenience for those who might need it.
+#' @param dct Logical. Since the Chebyshev coefficients are closely related to the DCT-II transform
+#' of `val`, the non-normalized real-even DCT-II coefficients may be retrieved instead. I.e. those
+#' from `FFTW_REDFT10` in each dimension. This is not used anywhere in the package, it is merely
+#' provided as a convenience for those who might need it.
 #' @return An array of Chebyshev-coefficients for an interpolating
 #' Chebyshev-polynomial.
 #' @seealso [has_fftw()]
@@ -90,13 +85,11 @@ chebcoef <- function(val, dct = FALSE) {
 #' Given Chebyshev coefficients, evaluate the interpolation in a point.
 #'
 #' @param x The point to evaluate.
-#' @param coef The Chebyshev coefficients. Typically from a call to
-#' [chebcoef()], possibly modified. A vector without a `dim` attribute is
-#' treated as one-dimensional.
-#' @param intervals A list of minimum and maximum values. One for each
-#' dimension of the hypercube.
-#' @param threads An integer. In case `x` is a matrix of column vectors,
-#' use this number of threads in parallel to evaluate.
+#' @param coef The Chebyshev coefficients. Typically from a call to [chebcoef()], possibly modified.
+#' A vector without a `dim` attribute is treated as one-dimensional.
+#' @param intervals A list of minimum and maximum values. One for each dimension of the hypercube.
+#' @param threads An integer. In case `x` is a matrix of column vectors, use this number of threads
+#' in parallel to evaluate.
 #' @return A numeric. The interpolated value.
 #' @export
 #' @examples
@@ -185,10 +178,10 @@ ipol_chebyshev <- function(val, dims = NULL, intervals = NULL, ...) {
   new_interpolant(fun, method = "chebyshev", arity = n_dim, domain = stats::setNames(domain, nms))
 }
 
-# Interpolate on a Cartesian grid that is not a Chebyshev grid. `val` holds the function values in the
-# order of expand.grid(grid), and each grid dimension, increasing or decreasing, is mapped onto the
-# Chebyshev knots in [-1, 1]. This may be less accurate than a Chebyshev interpolation. Without a `grid`,
-# `val` must be on a Chebyshev grid and carry its dimensions.
+# Interpolate on a Cartesian grid that is not a Chebyshev grid. `val` holds the function values in
+# the order of expand.grid(grid), and each grid dimension, increasing or decreasing, is mapped onto
+# the Chebyshev knots in [-1, 1]. This may be less accurate than a Chebyshev interpolation. Without
+# a `grid`, `val` must be on a Chebyshev grid and carry its dimensions.
 ipol_general <- function(val, grid = NULL, ...) {
   if (is.null(grid)) {
     return(ipol_chebyshev(val))
@@ -211,8 +204,8 @@ ipol_general <- function(val, grid = NULL, ...) {
   dim(val) <- lengths(grid)
 
   intervals <- lapply(grid, range)
-  # create monotone splines with splinefun, method hyman, which gives NA for a single grid point. That point maps
-  # onto the single Chebyshev knot, 0.
+  # create monotone splines with splinefun, method hyman, which gives NA for a single grid point.
+  # That point maps onto the single Chebyshev knot, 0.
   gridmaps <- Map(
     \(g, knots) if (length(g) == 1L) crate(\(x) 0 * x) else stats::splinefun(g, knots, method = "hyman"),
     grid,

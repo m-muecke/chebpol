@@ -4,33 +4,34 @@
 \alias{interpolant}
 \title{Evaluate an interpolant in a point}
 \arguments{
-\item{x}{The argument of the function. A function of more than one variable takes a
-vector. \code{x} can also be a matrix of column vectors.}
+\item{x}{The argument of the function. A function of more than one variable takes a vector. \code{x}
+can also be a matrix of column vectors.}
 
-\item{threads}{The number of threads to use for evaluation. All interpolants created by
-chebpol are parallelized. If given a matrix argument \code{x}, the vectors can
-be evaluated in parallel.}
+\item{threads}{The number of threads to use for evaluation. All interpolants created by chebpol
+are parallelized. If given a matrix argument \code{x}, the vectors can be evaluated in parallel.}
 
-\item{...}{Other parameters. Currently used for simplex linear interpolants with the logical argument
-\code{epol} which makes the interpolant extrapolate to points outside the domain.
-The \code{"stalker"}, \code{"hstalker"}, \code{"oldstalker"}, \code{"multilinear"} and \code{"simplexlinear"} interpolants have the argument
-\code{blend}, one of \code{"linear"}, \code{"cubic"}, \code{"sigmoid"}, \code{"parodic"} and \code{"square"}, which chooses the blending function
-described in \code{vignette("stalker", package = "chebpol")}. \code{"stalker"}, \code{"hstalker"} and \code{"simplexlinear"} also take
-\code{"mean"}. The default is \code{"cubic"} for \code{"stalker"} and \code{"hstalker"}, and \code{"linear"} for the others.}
+\item{...}{Other parameters. Currently used for simplex linear interpolants with the logical
+argument \code{epol} which makes the interpolant extrapolate to points outside the domain. The
+\code{"stalker"}, \code{"hstalker"}, \code{"oldstalker"}, \code{"multilinear"} and \code{"simplexlinear"} interpolants
+have the argument \code{blend}, one of \code{"linear"}, \code{"cubic"}, \code{"sigmoid"}, \code{"parodic"} and \code{"square"},
+which chooses the blending function described in \code{vignette("stalker", package = "chebpol")}.
+\code{"stalker"}, \code{"hstalker"} and \code{"simplexlinear"} also take \code{"mean"}. The default is \code{"cubic"} for
+\code{"stalker"} and \code{"hstalker"}, and \code{"linear"} for the others.}
 }
 \value{
 A numeric. If more than one point was evaluated, a vector.
 }
 \description{
-An interpolant is a function returned by \code{\link[=ipol]{ipol()}} which has prespecified values in some
-points, and which fills in between with some reasonable values.
+An interpolant is a function returned by \code{\link[=ipol]{ipol()}} which has prespecified values in some points,
+and which fills in between with some reasonable values.
 }
 \details{
-Interpolants have class \code{chebpol_interpolant} and the attributes \code{method}, the interpolation method, \code{arity},
-the number of variables, and \code{domain}, a data frame with one row per variable and the columns \code{variable}, \code{lower}
-and \code{upper}. The variables take their names from \code{grid}, \code{dims}, \code{intervals} or the row names of \code{knots}, and are
-named \code{X1}, \code{X2}, ... otherwise. Printing an interpolant shows these together with the defaults of its extra
-arguments, such as \code{blend}.
+Interpolants have class \code{chebpol_interpolant} and the attributes \code{method}, the interpolation
+method, \code{arity}, the number of variables, and \code{domain}, a data frame with one row per variable
+and the columns \code{variable}, \code{lower} and \code{upper}. The variables take their names from \code{grid},
+\code{dims}, \code{intervals} or the row names of \code{knots}, and are named \code{X1}, \code{X2}, ... otherwise.
+Printing an interpolant shows these together with the defaults of its extra arguments, such as
+\code{blend}.
 }
 \examples{
 grid <- list(x = seq(0, 1, length.out = 10), y = seq(0, 1, length.out = 10))

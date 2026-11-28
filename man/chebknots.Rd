@@ -7,11 +7,10 @@
 chebknots(dims, intervals = NULL)
 }
 \arguments{
-\item{dims}{The number of grid-points in each dimension. For
-Chebyshev-polynomial of degree \code{dims-1}.}
+\item{dims}{The number of grid-points in each dimension. For Chebyshev-polynomial of degree
+\code{dims-1}.}
 
-\item{intervals}{A list of vectors of length 2. The lower and upper bounds
-of the hypercube.}
+\item{intervals}{A list of vectors of length 2. The lower and upper bounds of the hypercube.}
 }
 \value{
 An array of dimension \code{dims}. The Chebyshev grid-points.
@@ -20,10 +19,9 @@ An array of dimension \code{dims}. The Chebyshev grid-points.
 Create a Chebyshev grid on a hypercube.
 }
 \details{
-If \code{intervals} is not provided, it is assumed that the domain of the
-function in each dimension is \verb{[-1, 1]}. Thus, standard Chebyshev knots are
-produced. If \code{dims} is of length 1, \code{intervals} may be a vector
-of length 2 rather than a list with a vector of length 2.
+If \code{intervals} is not provided, it is assumed that the domain of the function in each dimension
+is \verb{[-1, 1]}. Thus, standard Chebyshev knots are produced. If \code{dims} is of length 1, \code{intervals}
+may be a vector of length 2 rather than a list with a vector of length 2.
 }
 \examples{
 # Standard knots for degree 3

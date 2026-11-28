@@ -2,44 +2,40 @@
 #'
 #' Evaluate a function on a Chebyshev grid, or on a user-specified grid.
 #'
-#' The function `fun` should be a `function(x, ...)`, where
-#' `length(x)` equals `length(dims)` (or `length(grid)`).
+#' The function `fun` should be a `function(x, ...)`, where `length(x)` equals `length(dims)` (or
+#' `length(grid)`).
 #'
-#' If `grid` is provided, `fun` is evaluated on each point in the
-#' Cartesian product of the vectors in `grid`.
+#' If `grid` is provided, `fun` is evaluated on each point in the Cartesian product of the vectors
+#' in `grid`.
 #'
-#' If `intervals` is not provided, it is assumed that the domain of the
-#' function is the hypercube `[-1, 1] x [-1, 1] x ... x [-1, 1]`. Thus, the
-#' function is evaluated on a standard Chebyshev grid.
+#' If `intervals` is not provided, it is assumed that the domain of the function is the hypercube
+#' `[-1, 1] x [-1, 1] x ... x [-1, 1]`. Thus, the function is evaluated on a standard Chebyshev
+#' grid.
 #'
-#' If `intervals` is provided, it should be a `list` with elements of
-#' length 2, providing minimum and maximum for each dimension.
+#' If `intervals` is provided, it should be a `list` with elements of length 2, providing minimum
+#' and maximum for each dimension.
 #'
-#' The grid itself may be produced by
-#' `expand.grid(chebknots(dims, intervals))`, or
+#' The grid itself may be produced by `expand.grid(chebknots(dims, intervals))`, or
 #' `expand.grid(grid)`.
 #'
-#' This function does the same as `apply(expand.grid(grid), 1, fun)`, but
-#' it's faster and more memory-efficient for large grids because it does not
-#' actually expand the grid.
+#' This function does the same as `apply(expand.grid(grid), 1, fun)`, but it's faster and more
+#' memory-efficient for large grids because it does not actually expand the grid.
 #'
-#' The function `evalongridV()` is for vectorized functions, i.e. those that
-#' can take a matrix of column vectors as argument. It's equivalent to
-#' `fun(t(expand.grid(grid)))`.
+#' The function `evalongridV()` is for vectorized functions, i.e. those that can take a matrix of
+#' column vectors as argument. It's equivalent to `fun(t(expand.grid(grid)))`.
 #'
-#' @param fun Multivariate real-valued function to be evaluated. Must be
-#' defined on the hypercube described by `intervals`.
-#' @param dims A vector of integers. The number of grid-points in each
-#' dimension.
-#' @param intervals A list. Each entry is a vector of length 2 with the lower
-#' and upper end of the interval in each dimension.
+#' @param fun Multivariate real-valued function to be evaluated. Must be defined on the hypercube
+#' described by `intervals`.
+#' @param dims A vector of integers. The number of grid-points in each dimension.
+#' @param intervals A list. Each entry is a vector of length 2 with the lower and upper end of the
+#' interval in each dimension.
 #' @param ... Further arguments to `fun`.
-#' @param grid Rather than specifying `dims` and `intervals` to get a Chebyshev
-#' grid, you may specify your own `grid` as a list of vectors whose
-#' Cartesian product will be the grid, as in `expand.grid(grid)`.
-#' @return An array with the value of `fun` on each grid point. The
-#' `dim` attribute has been appropriately set for the grid. If `fun`
-#' returns a vector, this will be the first dimension of the returned array.
+#' @param grid Rather than specifying `dims` and `intervals` to get a Chebyshev grid, you may
+#' specify your own `grid` as a list of vectors whose Cartesian product will be the grid, as in
+#' `expand.grid(grid)`.
+#' @return An array with the value of `fun` on each grid point. The `dim` attribute has been
+#' appropriately set for the grid. If `fun` returns a vector, this will be the first dimension of
+#' the returned array.
 #' @export
 #' @examples
 #' f <- function(x) {
