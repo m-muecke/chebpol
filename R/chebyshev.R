@@ -17,8 +17,8 @@ chebyshev_knots_1d <- function(n, interval = NULL) {
 #' is `[-1, 1]`. Thus, standard Chebyshev knots are produced. If `dims` is of length 1, `intervals`
 #' may be a vector of length 2 rather than a list with a vector of length 2.
 #'
-#' @param dims The number of grid points in each dimension. For Chebyshev polynomial of degree
-#'   `dims-1`.
+#' @param dims The number of grid points in each dimension. A dimension with `n` points gives a
+#'   Chebyshev polynomial of degree `n - 1`.
 #' @param intervals A list of vectors of length 2. The lower and upper bounds of the hypercube.
 #' @return An array of dimension `dims`. The Chebyshev grid points.
 #' @export

@@ -7,8 +7,8 @@
 chebknots(dims, intervals = NULL)
 }
 \arguments{
-\item{dims}{The number of grid points in each dimension. For Chebyshev polynomial of degree
-\code{dims-1}.}
+\item{dims}{The number of grid points in each dimension. A dimension with \code{n} points gives a
+Chebyshev polynomial of degree \code{n - 1}.}
 
 \item{intervals}{A list of vectors of length 2. The lower and upper bounds of the hypercube.}
 }
