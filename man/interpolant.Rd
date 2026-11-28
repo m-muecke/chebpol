@@ -27,10 +27,10 @@ points, and which fills in between with some reasonable values.
 }
 \details{
 Interpolants have class \code{chebpol_interpolant} and the attributes \code{method}, the interpolation method, \code{arity},
-the number of variables, and \code{domain}, a data frame with the lower and upper bound of each variable. The columns
-of \code{domain} take their names from \code{grid}, \code{dims}, \code{intervals} or the row names of \code{knots}, and are named \code{X1},
-\code{X2}, ... otherwise. Printing an interpolant shows these together with the defaults of its extra arguments, such
-as \code{blend}.
+the number of variables, and \code{domain}, a data frame with one column per variable and the rows \code{lower} and \code{upper}.
+The columns of \code{domain} take their names from \code{grid}, \code{dims}, \code{intervals} or the row names of \code{knots}, and are
+named \code{X1}, \code{X2}, ... otherwise. Printing an interpolant shows these together with the defaults of its extra
+arguments, such as \code{blend}.
 }
 \examples{
 grid <- list(x = seq(0, 1, length.out = 10), y = seq(0, 1, length.out = 10))

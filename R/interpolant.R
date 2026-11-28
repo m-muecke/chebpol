@@ -4,10 +4,10 @@
 #' points, and which fills in between with some reasonable values.
 #'
 #' Interpolants have class `chebpol_interpolant` and the attributes `method`, the interpolation method, `arity`,
-#' the number of variables, and `domain`, a data frame with the lower and upper bound of each variable. The columns
-#' of `domain` take their names from `grid`, `dims`, `intervals` or the row names of `knots`, and are named `X1`,
-#' `X2`, ... otherwise. Printing an interpolant shows these together with the defaults of its extra arguments, such
-#' as `blend`.
+#' the number of variables, and `domain`, a data frame with one column per variable and the rows `lower` and `upper`.
+#' The columns of `domain` take their names from `grid`, `dims`, `intervals` or the row names of `knots`, and are
+#' named `X1`, `X2`, ... otherwise. Printing an interpolant shows these together with the defaults of its extra
+#' arguments, such as `blend`.
 #'
 #' @name interpolant
 #' @param x The argument of the function. A function of more than one variable takes a
@@ -32,7 +32,7 @@
 #' ip(matrix(runif(12), 2), threads = 2)
 NULL
 
-new_interpolant <- function(fun, method, arity, domain = NULL) {
+new_interpolant <- function(fun, method, arity, domain) {
   structure(
     fun,
     method = method,
@@ -44,25 +44,19 @@ new_interpolant <- function(fun, method, arity, domain = NULL) {
 
 # The ranges of the variables as a data frame, with the columns named X1, X2, ... where no name was given
 as_domain <- function(domain) {
-  if (length(domain) == 0L) {
-    return(data.frame())
-  }
   nms <- names(domain) %||% character(length(domain))
   unnamed <- is.na(nms) | !nzchar(nms)
   nms[unnamed] <- paste0("X", which(unnamed))
   names(domain) <- nms
-  as.data.frame(domain)
+  as.data.frame(lapply(domain, range), row.names = c("lower", "upper"), check.names = FALSE)
 }
 
 #' @export
 print.chebpol_interpolant <- function(x, ...) {
   arity <- attr(x, "arity")
   cat(sprintf("<chebpol_interpolant> %s, %d variable%s\n", attr(x, "method"), arity, if (arity == 1L) "" else "s"))
-  domain <- attr(x, "domain")
-  if (length(domain) > 0L) {
-    bounds <- vapply(domain, \(r) sprintf("[%s, %s]", format(r[[1L]]), format(r[[2L]])), character(1L))
-    cat("Domain: ", paste(bounds, collapse = " x "), "\n", sep = "")
-  }
+  bounds <- vapply(attr(x, "domain"), \(r) sprintf("[%s, %s]", format(r[[1L]]), format(r[[2L]])), character(1L))
+  cat("Domain: ", paste(bounds, collapse = " x "), "\n", sep = "")
   defaults <- formals(x)
   defaults <- defaults[setdiff(names(defaults), c("x", "threads"))]
   if (length(defaults) > 0L) {

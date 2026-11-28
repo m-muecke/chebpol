@@ -29,7 +29,7 @@
 ## Bug fixes
 
 * `ipol()` interpolants no longer keep the extra arguments passed to the interpolated function, nor intermediate results such as the function values next to the Chebyshev coefficients. Previously an interpolant built with a large extra argument, e.g. `ipol(f, grid = grid, method = "fh", data = big)`, kept `big` in memory and in saved files.
-* `ipol()` interpolants now name the columns of their `domain` attribute after the variables, taken from `grid`, `dims`, `intervals` or the row names of `knots`, and `X1`, `X2`, ... otherwise. Previously unnamed variables got names made from their bounds, such as `c.0..1.`, and names given in `dims` were dropped.
+* `ipol()` interpolants now name the columns of their `domain` attribute after the variables, taken from `grid`, `dims`, `intervals` or the row names of `knots`, and `X1`, `X2`, ... otherwise. Previously unnamed variables got names made from their bounds, such as `c.0..1.`, and names given in `dims` were dropped. The rows are named `lower` and `upper`.
 * chebpol compiles again with current versions of R. FFTW is now found when it is installed outside the default include path.
 * Error messages are now consistent across interpolation methods and report the value that was given, e.g. "`x` must have 2 rows, not 3." instead of four differently worded messages for the same mistake.
 * Integer input is now accepted everywhere a number is expected: the points passed to an interpolant, the values, grids and knots passed to `ipol()`, the grid in `evalongrid()`, and the arguments of `chebcoef()` and `chebeval()`. Previously most of these failed with "REAL() can only be applied to a 'numeric'".
