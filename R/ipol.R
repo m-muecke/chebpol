@@ -3,8 +3,7 @@
 #' Create an interpolating function from given values. Several interpolation methods are supported.
 #'
 #' `ipol()` is a wrapper around various interpolation methods in package chebpol. Which arguments to
-#' specify depends on the method. The interpolation methods are described in `vignette("chebpol",
-#' package = "chebpol")`.
+#' specify depends on the method. The interpolation methods are described in `vignette("chebpol")`.
 #'
 #' The method `"chebyshev"` needs only the number of Chebyshev knots in each dimension. This is
 #' either the `"dim"` attribute of the array `val`, or the `dims` argument if `val` is a function.
@@ -16,10 +15,10 @@
 #'
 #' The methods `"multilinear"`, `"fh"` (Floater-Hormann), `"stalker"`, `"hstalker"`, and `"general"`
 #' need the argument `grid`. These are the methods which can use arbitrary Cartesian grids. The
-#' stalker spline is described in `vignette("stalker", package = "chebpol")`. The Floater-Hormann
-#' method (`"fh"`) also needs the `k` argument, the degree of the blending polynomials. It defaults
-#' to 4. It must be between 0 and one less than the number of grid points in each dimension. Give
-#' either one value for all dimensions or one value per dimension.
+#' stalker spline is described in `vignette("stalker")`. The Floater-Hormann method (`"fh"`) also
+#' needs the `k` argument, the degree of the blending polynomials. It defaults to 4. It must be
+#' between 0 and one less than the number of grid points in each dimension. Give either one value
+#' for all dimensions or one value per dimension.
 #'
 #' The method `"polyharmonic"` needs the arguments `knots` and `k`. In addition it can take the
 #' logical argument `normalize` for normalizing the knots to the unit hypercube. The default is

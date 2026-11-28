@@ -52,7 +52,7 @@ Create an interpolating function from given values. Several interpolation method
 }
 \details{
 \code{ipol()} is a wrapper around various interpolation methods in package chebpol. Which arguments to
-specify depends on the method. The interpolation methods are described in \code{vignette("chebpol", package = "chebpol")}.
+specify depends on the method. The interpolation methods are described in \code{vignette("chebpol")}.
 
 The method \code{"chebyshev"} needs only the number of Chebyshev knots in each dimension. This is
 either the \code{"dim"} attribute of the array \code{val}, or the \code{dims} argument if \code{val} is a function.
@@ -64,10 +64,10 @@ are used.
 
 The methods \code{"multilinear"}, \code{"fh"} (Floater-Hormann), \code{"stalker"}, \code{"hstalker"}, and \code{"general"}
 need the argument \code{grid}. These are the methods which can use arbitrary Cartesian grids. The
-stalker spline is described in \code{vignette("stalker", package = "chebpol")}. The Floater-Hormann
-method (\code{"fh"}) also needs the \code{k} argument, the degree of the blending polynomials. It defaults
-to 4. It must be between 0 and one less than the number of grid points in each dimension. Give
-either one value for all dimensions or one value per dimension.
+stalker spline is described in \code{vignette("stalker")}. The Floater-Hormann method (\code{"fh"}) also
+needs the \code{k} argument, the degree of the blending polynomials. It defaults to 4. It must be
+between 0 and one less than the number of grid points in each dimension. Give either one value
+for all dimensions or one value per dimension.
 
 The method \code{"polyharmonic"} needs the arguments \code{knots} and \code{k}. In addition it can take the
 logical argument \code{normalize} for normalizing the knots to the unit hypercube. The default is
