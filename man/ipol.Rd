@@ -106,7 +106,7 @@ fh1 <- ipol(exp, grid = list(s), method = "fh")
 ml1(su) - exp(su)
 fh1(su) - exp(su)
 
-# multi dimensional approximation
+# multidimensional approximation
 f <- function(x) 10 / (1 + 25 * mean(x^2))
 # a 3-dimensional 10x10x10 grid, first and third coordinate are non-uniform
 grid <- list(s, su, sort(1 - s))

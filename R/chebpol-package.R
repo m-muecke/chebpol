@@ -3,7 +3,7 @@
 #' The package contains methods for creating multivariate/multidimensional interpolations for
 #' real-valued functions on hypercubes. The methods include classical Chebyshev interpolation,
 #' multilinear and Floater-Hormann for arbitrary Cartesian product grids, and simplex linear and
-#' polyharmonic spline for scattered multi dimensional data.
+#' polyharmonic spline for scattered multidimensional data.
 #'
 #' The primary method of the package is [ipol()] which dispatches to some other method. All the
 #' generated [interpolant]s accept as an argument a matrix of column vectors. The generated
