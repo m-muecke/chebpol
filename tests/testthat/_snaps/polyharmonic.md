@@ -3,12 +3,12 @@
     Code
       ipol(f, knots = knots, method = "polyharmonic", normalize = c(1, 2, 3))
     Condition
-      Error:
+      Error in `ipol_polyharmonic()`:
       ! `normalize` must be a logical, a vector `c(a, b)`, or a two-column matrix.
     Code
       ipol(f, knots = knots, method = "polyharmonic", normalize = matrix(1, 3L, 2L))
     Condition
-      Error:
+      Error in `ipol_polyharmonic()`:
       ! The number of rows of `normalize` (3) must divide the number of dimensions (2).
 
 # ipol() errors when nowarn is not TRUE or FALSE
@@ -16,7 +16,7 @@
     Code
       ipol(sum, knots = knots, method = "polyharmonic", nowarn = NA)
     Condition
-      Error:
+      Error in `ipol_polyharmonic()`:
       ! `nowarn` must be `TRUE` or `FALSE`.
 
 # ipol() errors on an invalid polyharmonic k
@@ -24,27 +24,27 @@
     Code
       ipol(f, knots = knots, k = 0, method = "polyharmonic")
     Condition
-      Error:
+      Error in `ipol_polyharmonic()`:
       ! `k` must be a positive whole number or a negative number.
     Code
       ipol(f, knots = knots, k = NA, method = "polyharmonic")
     Condition
-      Error:
+      Error in `ipol_polyharmonic()`:
       ! `k` must be a positive whole number or a negative number.
     Code
       ipol(f, knots = knots, k = -Inf, method = "polyharmonic")
     Condition
-      Error:
+      Error in `ipol_polyharmonic()`:
       ! `k` must be a positive whole number or a negative number.
     Code
       ipol(f, knots = knots, k = c(2, 3), method = "polyharmonic")
     Condition
-      Error:
+      Error in `ipol_polyharmonic()`:
       ! `k` must be a positive whole number or a negative number.
     Code
       ipol(f, knots = knots, k = 2.5, method = "polyharmonic")
     Condition
-      Error:
+      Error in `ipol_polyharmonic()`:
       ! A positive `k` must be a whole number, not 2.5.
 
 # ipol() errors when values and knots differ in number
@@ -52,7 +52,7 @@
     Code
       ipol(1:3, knots = knots, method = "polyharmonic")
     Condition
-      Error:
+      Error in `ipol_polyharmonic()`:
       ! `val` must have one value per knot (10), not 3.
 
 # polyharmonic interpolation warns for the ipol() call when it falls back to least squares

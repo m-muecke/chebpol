@@ -130,7 +130,6 @@ ipol <- function(
   ...
 ) {
   method <- match.arg(method)
-  args <- list(...)
   if (!is.function(val) && !is.numeric(val) && !is.logical(val)) {
     stop(sprintf("`val` must be numeric values or a function, not a %s.", class(val)[1L]))
   }
@@ -210,13 +209,7 @@ ipol <- function(
       }
       knots <- knots %||% grid_knots(grid)
       k <- k %||% 3
-      # Now, ... may contain normalize and nowarn in addition to
-      # arguments to val if it is a function
-      # peel off normalize and nowarn
-      normalize <- args[["normalize"]] %||% NA
-      nowarn <- args[["nowarn"]] %||% FALSE
-      rest <- args[!names(args) %in% c("normalize", "nowarn")]
-      do.call(ipol_polyharmonic, c(list(val, knots, k, normalize, nowarn), rest))
+      ipol_polyharmonic(val, knots, k = k, ...)
     },
     oldstalker = {
       assert_grid(grid, "oldstalker", min_points = 2L)
