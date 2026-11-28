@@ -20,17 +20,25 @@ some reasonable values.
 
 - ...:
 
-  Other parameters. Currently used for simplex linear interpolants with
-  the logical argument `epol` which makes the interpolant extrapolate to
-  points outside the domain. The `"stalker"`, `"hstalker"`,
-  `"oldstalker"`, `"multilinear"` and `"simplexlinear"` interpolants
-  have the argument `blend`, one of `"linear"`, `"cubic"`, `"sigmoid"`,
-  `"parodic"` and `"square"`, which chooses the blending function
-  described in
-  [`vignette("stalker")`](https://m-muecke.github.io/chebpol/articles/stalker.md).
-  `"stalker"`, `"hstalker"` and `"simplexlinear"` also take `"mean"`.
-  The default is `"cubic"` for `"stalker"` and `"hstalker"`, and
-  `"linear"` for the others.
+  Extra arguments, which only some methods take:
+
+  - `blend`: for `"stalker"`, `"hstalker"`, `"oldstalker"`,
+    `"multilinear"` and `"simplexlinear"`. The blending function
+    described in
+    [`vignette("stalker")`](https://m-muecke.github.io/chebpol/articles/stalker.md),
+    one of `"linear"`, `"cubic"`, `"sigmoid"`, `"parodic"` and
+    `"square"`. `"stalker"`, `"hstalker"` and `"simplexlinear"` also
+    take `"mean"`. Defaults to the `blend` given to
+    [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md),
+    otherwise `"cubic"` for `"stalker"` and `"hstalker"`, and `"linear"`
+    for the others.
+
+  - `epol`: for `"simplexlinear"`. If `TRUE`, the interpolant
+    extrapolates to points outside the domain. Defaults to `FALSE`.
+
+  - `degree`: for `"oldstalker"`. The degree of the spline, overriding
+    the `k` given to
+    [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md).
 
 ## Value
 

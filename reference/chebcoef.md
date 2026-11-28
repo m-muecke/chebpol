@@ -42,6 +42,11 @@ grids may be slow and memory-demanding.
 
 [`has_fftw()`](https://m-muecke.github.io/chebpol/reference/has_fftw.md)
 
+Other Chebyshev tools:
+[`chebeval()`](https://m-muecke.github.io/chebpol/reference/chebeval.md),
+[`chebknots()`](https://m-muecke.github.io/chebpol/reference/chebknots.md),
+[`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
+
 ## Examples
 
 ``` r

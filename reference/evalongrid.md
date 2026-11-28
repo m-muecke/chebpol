@@ -68,6 +68,13 @@ The function `evalongridV()` is for vectorized functions, i.e. those
 that can take a matrix of column vectors as argument. It's equivalent to
 `fun(t(expand.grid(grid)))`.
 
+## See also
+
+Other Chebyshev tools:
+[`chebcoef()`](https://m-muecke.github.io/chebpol/reference/chebcoef.md),
+[`chebeval()`](https://m-muecke.github.io/chebpol/reference/chebeval.md),
+[`chebknots()`](https://m-muecke.github.io/chebpol/reference/chebknots.md)
+
 ## Examples
 
 ``` r

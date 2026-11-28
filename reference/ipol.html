@@ -104,7 +104,9 @@ not be Chebyshev knots, nor evenly spaced.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
-<dd><p>A string. The interpolation method to use.</p></dd>
+<dd><p>A string. The interpolation method to use, one of <code>"chebyshev"</code> (the default),
+<code>"multilinear"</code>, <code>"fh"</code>, <code>"uniform"</code>, <code>"general"</code>, <code>"polyharmonic"</code>, <code>"simplexlinear"</code>,
+<code>"hstalker"</code>, <code>"stalker"</code> and <code>"oldstalker"</code>. See Details for the arguments each one needs.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -114,12 +116,9 @@ interpolant creation described in section Details.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A <code>function(x, threads = getOption("chebpol.threads"))</code> defined on a hypercube, an
-<a href="interpolant.html">interpolant</a> for the given function. The argument <code>x</code> can be a matrix of column vectors which
-are evaluated in parallel in a number of threads. The function yields values for arguments
-outside the hypercube as well, though it will typically be a poor approximation. <code>threads</code> is
-an integer specifying the number of parallel threads which should be used when evaluating a
-matrix of column vectors.</p>
+    <p>An <a href="interpolant.html">interpolant</a>, a function of <code>x</code> and <code>threads</code>. Outside the domain it still returns
+values, though typically poor approximations, except for <code>"simplexlinear"</code>, which returns <code>NA</code>
+there unless evaluated with <code>epol = TRUE</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -131,12 +130,15 @@ Also the intervals can be specified if different from <code>[-1, 1]</code>.</p>
 <p>The method <code>"uniform"</code> is similar to the <code>"chebyshev"</code>, but uniformly spaced knots are created.
 The argument <code>intervals</code> generally goes with <code>dims</code> when other than standard intervals <code>[-1, 1]</code>
 are used.</p>
-<p>The methods <code>"multilinear"</code>, <code>"fh"</code> (Floater-Hormann), <code>"stalker"</code>, <code>"hstalker"</code>, and <code>"general"</code>
-need the argument <code>grid</code>. These are the methods which can use arbitrary Cartesian grids. The
-stalker spline is described in <code><a href="../articles/stalker.html">vignette("stalker")</a></code>. The Floater-Hormann method (<code>"fh"</code>) also
-needs the <code>k</code> argument, the degree of the blending polynomials. It defaults to 4. It must be
-between 0 and one less than the number of grid points in each dimension. Give either one value
-for all dimensions or one value per dimension.</p>
+<p>The methods <code>"multilinear"</code>, <code>"fh"</code> (Floater-Hormann), <code>"stalker"</code>, <code>"hstalker"</code>, <code>"oldstalker"</code>,
+and <code>"general"</code> need the argument <code>grid</code>. These are the methods which can use arbitrary Cartesian
+grids. The stalker spline is described in <code><a href="../articles/stalker.html">vignette("stalker")</a></code>. The Floater-Hormann method
+(<code>"fh"</code>) also needs the <code>k</code> argument, the degree of the blending polynomials. It defaults to 4.
+It must be between 0 and one less than the number of grid points in each dimension. Give either
+one value for all dimensions or one value per dimension.</p>
+<p>The method <code>"oldstalker"</code> is an older implementation of the stalker spline with a fixed degree.
+The degree is given by <code>k</code>, which defaults to 2, either one value for all dimensions or one value
+per dimension. With <code>k = NA</code> the degree is chosen from the data, as with <code>"stalker"</code>.</p>
 <p>The method <code>"polyharmonic"</code> needs the arguments <code>knots</code> and <code>k</code>. In addition it can take the
 logical argument <code>normalize</code> for normalizing the knots to the unit hypercube. The default is
 <code>NA</code>, which uses normalization if any of the knots are outside the unit hypercube. <code>normalize</code>
@@ -171,7 +173,7 @@ barycentric coordinates.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.000000e+00  1.442078e-09 -2.352982e-08  7.217898e-08  1.287035e-07</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [6] -7.880319e-07 -8.460980e-07  3.720989e-06  1.076317e-05  0.000000e+00</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># multi dimensional approximation</span></span></span>
+<span class="r-in"><span><span class="co"># multidimensional approximation</span></span></span>
 <span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fl">10</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fl">25</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># a 3-dimensional 10x10x10 grid, first and third coordinate are non-uniform</span></span></span>
 <span class="r-in"><span><span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">s</span>, <span class="va">su</span>, <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">s</span><span class="op">)</span><span class="op">)</span></span></span>

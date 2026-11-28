@@ -12,8 +12,8 @@ chebknots(dims, intervals = NULL)
 
 - dims:
 
-  The number of grid points in each dimension. For Chebyshev polynomial
-  of degree `dims-1`.
+  The number of grid points in each dimension. A dimension with `n`
+  points gives a Chebyshev polynomial of degree `n - 1`.
 
 - intervals:
 
@@ -30,6 +30,13 @@ If `intervals` is not provided, it is assumed that the domain of the
 function in each dimension is `[-1, 1]`. Thus, standard Chebyshev knots
 are produced. If `dims` is of length 1, `intervals` may be a vector of
 length 2 rather than a list with a vector of length 2.
+
+## See also
+
+Other Chebyshev tools:
+[`chebcoef()`](https://m-muecke.github.io/chebpol/reference/chebcoef.md),
+[`chebeval()`](https://m-muecke.github.io/chebpol/reference/chebeval.md),
+[`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
 
 ## Examples
 

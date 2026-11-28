@@ -35,6 +35,13 @@ chebeval(x, coef, intervals = NULL, threads = getOption("chebpol.threads"))
 
 A numeric. The interpolated value.
 
+## See also
+
+Other Chebyshev tools:
+[`chebcoef()`](https://m-muecke.github.io/chebpol/reference/chebcoef.md),
+[`chebknots()`](https://m-muecke.github.io/chebpol/reference/chebknots.md),
+[`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)
+
 ## Examples
 
 ``` r

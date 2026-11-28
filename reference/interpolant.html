@@ -74,13 +74,15 @@ are parallelized. If given a matrix argument <code>x</code>, the vectors can be 
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Other parameters. Currently used for simplex linear interpolants with the logical
-argument <code>epol</code> which makes the interpolant extrapolate to points outside the domain. The
-<code>"stalker"</code>, <code>"hstalker"</code>, <code>"oldstalker"</code>, <code>"multilinear"</code> and <code>"simplexlinear"</code> interpolants
-have the argument <code>blend</code>, one of <code>"linear"</code>, <code>"cubic"</code>, <code>"sigmoid"</code>, <code>"parodic"</code> and
-<code>"square"</code>, which chooses the blending function described in <code><a href="../articles/stalker.html">vignette("stalker")</a></code>.
-<code>"stalker"</code>, <code>"hstalker"</code> and <code>"simplexlinear"</code> also take <code>"mean"</code>. The default is <code>"cubic"</code>
-for <code>"stalker"</code> and <code>"hstalker"</code>, and <code>"linear"</code> for the others.</p></dd>
+<dd><p>Extra arguments, which only some methods take:</p><ul><li><p><code>blend</code>: for <code>"stalker"</code>, <code>"hstalker"</code>, <code>"oldstalker"</code>, <code>"multilinear"</code> and
+<code>"simplexlinear"</code>. The blending function described in <code><a href="../articles/stalker.html">vignette("stalker")</a></code>, one of
+<code>"linear"</code>, <code>"cubic"</code>, <code>"sigmoid"</code>, <code>"parodic"</code> and <code>"square"</code>. <code>"stalker"</code>, <code>"hstalker"</code> and
+<code>"simplexlinear"</code> also take <code>"mean"</code>. Defaults to the <code>blend</code> given to <code><a href="ipol.html">ipol()</a></code>, otherwise
+<code>"cubic"</code> for <code>"stalker"</code> and <code>"hstalker"</code>, and <code>"linear"</code> for the others.</p></li>
+<li><p><code>epol</code>: for <code>"simplexlinear"</code>. If <code>TRUE</code>, the interpolant extrapolates to points outside the
+domain. Defaults to <code>FALSE</code>.</p></li>
+<li><p><code>degree</code>: for <code>"oldstalker"</code>. The degree of the spline, overriding the <code>k</code> given to <code><a href="ipol.html">ipol()</a></code>.</p></li>
+</ul></dd>
 
 </dl></div>
     <div class="section level2">

@@ -308,7 +308,7 @@ Cartesian grids, the number of knots is \\n^r\\.
 Traditionally, Chebyshev interpolation has been favoured for two
 reasons. The Chebyshev interpolation is the right way to do polynomial
 interpolation, due to certain analytical facts. The Chebyshev
-coefficients can also be calculated by a (possibly multi dimensional)
+coefficients can also be calculated by a (possibly multidimensional)
 Fast Fourier Transform (FFT). This is much faster than solving a large
 linear system which is the pedestrian approach for finding polynomial
 interpolants. **chebpol** uses the FFT from the software package FFTW,
@@ -397,7 +397,7 @@ system.time(sin(a))
 ```
 
     ##    user  system elapsed 
-    ##   0.008   0.004   0.012
+    ##   0.006   0.003   0.009
 
 ``` r
 
@@ -405,7 +405,7 @@ system.time(f(a, threads = 8))
 ```
 
     ##    user  system elapsed 
-    ##   0.074   0.001   0.022
+    ##   0.077   0.000   0.023
 
 ## References
 

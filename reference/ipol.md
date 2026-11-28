@@ -53,7 +53,10 @@ ipol(
 
 - method:
 
-  A string. The interpolation method to use.
+  A string. The interpolation method to use, one of `"chebyshev"` (the
+  default), `"multilinear"`, `"fh"`, `"uniform"`, `"general"`,
+  `"polyharmonic"`, `"simplexlinear"`, `"hstalker"`, `"stalker"` and
+  `"oldstalker"`. See Details for the arguments each one needs.
 
 - ...:
 
@@ -62,15 +65,12 @@ ipol(
 
 ## Value
 
-A `function(x, threads = getOption("chebpol.threads"))` defined on a
-hypercube, an
-[interpolant](https://m-muecke.github.io/chebpol/reference/interpolant.md)
-for the given function. The argument `x` can be a matrix of column
-vectors which are evaluated in parallel in a number of threads. The
-function yields values for arguments outside the hypercube as well,
-though it will typically be a poor approximation. `threads` is an
-integer specifying the number of parallel threads which should be used
-when evaluating a matrix of column vectors.
+An
+[interpolant](https://m-muecke.github.io/chebpol/reference/interpolant.md),
+a function of `x` and `threads`. Outside the domain it still returns
+values, though typically poor approximations, except for
+`"simplexlinear"`, which returns `NA` there unless evaluated with
+`epol = TRUE`.
 
 ## Details
 
@@ -89,14 +89,19 @@ spaced knots are created. The argument `intervals` generally goes with
 `dims` when other than standard intervals `[-1, 1]` are used.
 
 The methods `"multilinear"`, `"fh"` (Floater-Hormann), `"stalker"`,
-`"hstalker"`, and `"general"` need the argument `grid`. These are the
-methods which can use arbitrary Cartesian grids. The stalker spline is
-described in
+`"hstalker"`, `"oldstalker"`, and `"general"` need the argument `grid`.
+These are the methods which can use arbitrary Cartesian grids. The
+stalker spline is described in
 [`vignette("stalker")`](https://m-muecke.github.io/chebpol/articles/stalker.md).
 The Floater-Hormann method (`"fh"`) also needs the `k` argument, the
 degree of the blending polynomials. It defaults to 4. It must be between
 0 and one less than the number of grid points in each dimension. Give
 either one value for all dimensions or one value per dimension.
+
+The method `"oldstalker"` is an older implementation of the stalker
+spline with a fixed degree. The degree is given by `k`, which defaults
+to 2, either one value for all dimensions or one value per dimension.
+With `k = NA` the degree is chosen from the data, as with `"stalker"`.
 
 The method `"polyharmonic"` needs the arguments `knots` and `k`. In
 addition it can take the logical argument `normalize` for normalizing
@@ -142,7 +147,7 @@ fh1(su) - exp(su)
 #>  [1]  0.000000e+00  1.442078e-09 -2.352982e-08  7.217898e-08  1.287035e-07
 #>  [6] -7.880319e-07 -8.460980e-07  3.720989e-06  1.076317e-05  0.000000e+00
 
-# multi dimensional approximation
+# multidimensional approximation
 f <- function(x) 10 / (1 + 25 * mean(x^2))
 # a 3-dimensional 10x10x10 grid, first and third coordinate are non-uniform
 grid <- list(s, su, sort(1 - s))
