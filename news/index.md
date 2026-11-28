@@ -107,7 +107,7 @@
   the variables, taken from `grid`, `dims`, `intervals` or the row names
   of `knots`, and `X1`, `X2`, … otherwise. Previously unnamed variables
   got names made from their bounds, such as `c.0..1.`, and names given
-  in `dims` were dropped.
+  in `dims` were dropped. The rows are named `lower` and `upper`.
 - chebpol compiles again with current versions of R. FFTW is now found
   when it is installed outside the default include path.
 - Error messages are now consistent across interpolation methods and
