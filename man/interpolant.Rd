@@ -28,8 +28,8 @@ and which fills in between with some reasonable values.
 \details{
 Interpolants have class \code{chebpol_interpolant} and the attributes \code{method}, the interpolation
 method, \code{arity}, the number of variables, and \code{domain}, a data frame with one row per variable
-and the columns \code{variable}, \code{lower} and \code{upper}. The variables take their names from \code{grid},
-\code{dims}, \code{intervals} or the row names of \code{knots}, and are named \code{X1}, \code{X2}, ... otherwise.
+and the columns \code{name}, \code{lower} and \code{upper}. The variables take their names from \code{grid}, \code{dims},
+\code{intervals} or the row names of \code{knots}, and are named \code{X1}, \code{X2}, ... otherwise.
 Printing an interpolant shows these together with the defaults of its extra arguments, such as
 \code{blend}.
 }

@@ -5,8 +5,8 @@
 #'
 #' Interpolants have class `chebpol_interpolant` and the attributes `method`, the interpolation
 #' method, `arity`, the number of variables, and `domain`, a data frame with one row per variable
-#' and the columns `variable`, `lower` and `upper`. The variables take their names from `grid`,
-#' `dims`, `intervals` or the row names of `knots`, and are named `X1`, `X2`, ... otherwise.
+#' and the columns `name`, `lower` and `upper`. The variables take their names from `grid`, `dims`,
+#' `intervals` or the row names of `knots`, and are named `X1`, `X2`, ... otherwise.
 #' Printing an interpolant shows these together with the defaults of its extra arguments, such as
 #' `blend`.
 #'
@@ -45,11 +45,11 @@ new_interpolant <- function(fun, method, arity, domain) {
 
 # One row per variable, named X1, X2, ... where no name was given
 as_domain <- function(domain) {
-  variable <- names(domain) %||% character(length(domain))
-  unnamed <- is.na(variable) | !nzchar(variable)
-  variable[unnamed] <- paste0("X", which(unnamed))
+  nms <- names(domain) %||% character(length(domain))
+  unnamed <- is.na(nms) | !nzchar(nms)
+  nms[unnamed] <- paste0("X", which(unnamed))
   data.frame(
-    variable = variable,
+    name = nms,
     lower = vapply(domain, min, numeric(1L), USE.NAMES = FALSE),
     upper = vapply(domain, max, numeric(1L), USE.NAMES = FALSE)
   )
