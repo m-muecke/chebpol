@@ -42,12 +42,9 @@ not be Chebyshev knots, nor evenly spaced.}
 interpolant creation described in section Details.}
 }
 \value{
-A \verb{function(x, threads = getOption("chebpol.threads"))} defined on a hypercube, an
-\link{interpolant} for the given function. The argument \code{x} can be a matrix of column vectors which
-are evaluated in parallel in a number of threads. The function yields values for arguments
-outside the hypercube as well, though it will typically be a poor approximation. \code{threads} is
-an integer specifying the number of parallel threads which should be used when evaluating a
-matrix of column vectors.
+An \link{interpolant}, a function of \code{x} and \code{threads}. Outside the domain it still returns
+values, though typically poor approximations, except for \code{"simplexlinear"}, which returns \code{NA}
+there unless evaluated with \code{epol = TRUE}.
 }
 \description{
 Create an interpolating function from given values. Several interpolation methods are supported.

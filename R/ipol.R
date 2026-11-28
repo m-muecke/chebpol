@@ -58,12 +58,9 @@
 #'   `"hstalker"`, `"stalker"` and `"oldstalker"`. See Details for the arguments each one needs.
 #' @param ... Further arguments to the function, if `is.function(val)`. And some extra arguments for
 #'   interpolant creation described in section Details.
-#' @return A `function(x, threads = getOption("chebpol.threads"))` defined on a hypercube, an
-#'   [interpolant] for the given function. The argument `x` can be a matrix of column vectors which
-#'   are evaluated in parallel in a number of threads. The function yields values for arguments
-#'   outside the hypercube as well, though it will typically be a poor approximation. `threads` is
-#'   an integer specifying the number of parallel threads which should be used when evaluating a
-#'   matrix of column vectors.
+#' @return An [interpolant], a function of `x` and `threads`. Outside the domain it still returns
+#'   values, though typically poor approximations, except for `"simplexlinear"`, which returns `NA`
+#'   there unless evaluated with `epol = TRUE`.
 #' @export
 #' @examples
 #' # evenly spaced grid points
