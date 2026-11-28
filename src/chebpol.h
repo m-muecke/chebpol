@@ -14,7 +14,6 @@
 #include <R_ext/Rdynload.h>
 #include <R_ext/BLAS.h>
 #include <R_ext/Lapack.h>
-#include <R_ext/Applic.h>
 #include <R_ext/Visibility.h>
 
 #ifndef FCONE
