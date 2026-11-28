@@ -39,18 +39,18 @@
 #'
 #' There are also some usage examples and more in `vignette("chebpol")` and `vignette("chebusage")`.
 #'
-#' @param val array or function. Function values on a grid, or the function itself. If it is the
-#'   values, the `"dim"`-attribute must be appropriately set. If it is a function, it will be
+#' @param val An array or a function. Function values on a grid, or the function itself. If it is
+#'   the values, the `"dim"`-attribute must be appropriately set. If it is a function, it will be
 #'   evaluated in the grid points.
-#' @param dims integer vector. The number of grid points in each dimension. Not needed if `val` is
-#'   an array or `grid` is used.
-#' @param intervals list of length 2 numeric vectors. The lower and upper bound in each dimension.
-#'   Not used if `grid` is specified.
-#' @param grid list. Each element is a vector of ordered grid-points for a dimension. These need not
-#'   be Chebyshev-knots, nor evenly spaced.
-#' @param knots matrix. Each column is a point in an M-dimensional space.
-#' @param k numeric. Additional value, used with some methods.
-#' @param method character. The interpolation method to use.
+#' @param dims An integer vector. The number of grid points in each dimension. Not needed if `val`
+#'   is an array or `grid` is used.
+#' @param intervals A list of numeric vectors of length 2. The lower and upper bound in each
+#'   dimension. Not used if `grid` is specified.
+#' @param grid A list. Each element is a vector of ordered grid-points for a dimension. These need
+#'   not be Chebyshev-knots, nor evenly spaced.
+#' @param knots A matrix. Each column is a point in an M-dimensional space.
+#' @param k A numeric vector. Additional value, used with some methods.
+#' @param method A string. The interpolation method to use.
 #' @param ... Further arguments to the function, if `is.function(val)`. And some extra arguments for
 #'   interpolant creation described in section Details.
 #' @return A `function(x, threads = getOption("chebpol.threads"))` defined on a hypercube, an

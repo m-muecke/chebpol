@@ -24,7 +24,7 @@
 #' The function `evalongridV()` is for vectorized functions, i.e. those that can take a matrix of
 #' column vectors as argument. It's equivalent to `fun(t(expand.grid(grid)))`.
 #'
-#' @param fun Multivariate real-valued function to be evaluated. Must be defined on the hypercube
+#' @param fun A multivariate real-valued function to be evaluated. Must be defined on the hypercube
 #'   described by `intervals`.
 #' @param dims A vector of integers. The number of grid-points in each dimension.
 #' @param intervals A list. Each entry is a vector of length 2 with the lower and upper end of the

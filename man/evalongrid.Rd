@@ -10,7 +10,7 @@ evalongrid(fun, dims, intervals = NULL, ..., grid = NULL)
 evalongridV(fun, dims, intervals = NULL, ..., grid = NULL)
 }
 \arguments{
-\item{fun}{Multivariate real-valued function to be evaluated. Must be defined on the hypercube
+\item{fun}{A multivariate real-valued function to be evaluated. Must be defined on the hypercube
 described by \code{intervals}.}
 
 \item{dims}{A vector of integers. The number of grid-points in each dimension.}

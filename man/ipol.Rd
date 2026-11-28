@@ -17,24 +17,24 @@ ipol(
 )
 }
 \arguments{
-\item{val}{array or function. Function values on a grid, or the function itself. If it is the
-values, the \code{"dim"}-attribute must be appropriately set. If it is a function, it will be
+\item{val}{An array or a function. Function values on a grid, or the function itself. If it is
+the values, the \code{"dim"}-attribute must be appropriately set. If it is a function, it will be
 evaluated in the grid points.}
 
-\item{dims}{integer vector. The number of grid points in each dimension. Not needed if \code{val} is
-an array or \code{grid} is used.}
+\item{dims}{An integer vector. The number of grid points in each dimension. Not needed if \code{val}
+is an array or \code{grid} is used.}
 
-\item{intervals}{list of length 2 numeric vectors. The lower and upper bound in each dimension.
-Not used if \code{grid} is specified.}
+\item{intervals}{A list of numeric vectors of length 2. The lower and upper bound in each
+dimension. Not used if \code{grid} is specified.}
 
-\item{grid}{list. Each element is a vector of ordered grid-points for a dimension. These need not
-be Chebyshev-knots, nor evenly spaced.}
+\item{grid}{A list. Each element is a vector of ordered grid-points for a dimension. These need
+not be Chebyshev-knots, nor evenly spaced.}
 
-\item{knots}{matrix. Each column is a point in an M-dimensional space.}
+\item{knots}{A matrix. Each column is a point in an M-dimensional space.}
 
-\item{k}{numeric. Additional value, used with some methods.}
+\item{k}{A numeric vector. Additional value, used with some methods.}
 
-\item{method}{character. The interpolation method to use.}
+\item{method}{A string. The interpolation method to use.}
 
 \item{...}{Further arguments to the function, if \code{is.function(val)}. And some extra arguments for
 interpolant creation described in section Details.}
