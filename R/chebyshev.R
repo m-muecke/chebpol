@@ -9,7 +9,7 @@ chebyshev_knots_1d <- function(n, interval = NULL) {
   kn * diff(interval) / 2 + mean(interval)
 }
 
-#' Create a Chebyshev-grid
+#' Create a Chebyshev grid
 #'
 #' Create a Chebyshev grid on a hypercube.
 #'
@@ -17,10 +17,10 @@ chebyshev_knots_1d <- function(n, interval = NULL) {
 #' is `[-1, 1]`. Thus, standard Chebyshev knots are produced. If `dims` is of length 1, `intervals`
 #' may be a vector of length 2 rather than a list with a vector of length 2.
 #'
-#' @param dims The number of grid-points in each dimension. For Chebyshev-polynomial of degree
+#' @param dims The number of grid points in each dimension. For Chebyshev polynomial of degree
 #'   `dims-1`.
 #' @param intervals A list of vectors of length 2. The lower and upper bounds of the hypercube.
-#' @return An array of dimension `dims`. The Chebyshev grid-points.
+#' @return An array of dimension `dims`. The Chebyshev grid points.
 #' @export
 #' @examples
 #' # Standard knots for degree 3
@@ -45,22 +45,22 @@ chebknots <- function(dims, intervals = NULL) {
   Map(chebyshev_knots_1d, dims, intervals)
 }
 
-#' Compute Chebyshev-coefficients given values on a Chebyshev grid
+#' Compute Chebyshev coefficients given values on a Chebyshev grid
 #'
-#' Compute the multivariate Chebyshev-coefficients, given values on a Chebyshev grid.
+#' Compute the multivariate Chebyshev coefficients, given values on a Chebyshev grid.
 #'
-#' If `val` has no `dim`-attribute, it is assumed to be one-dimensional with length `length(val)`.
+#' If `val` has no `dim` attribute, it is assumed to be one-dimensional with length `length(val)`.
 #'
 #' If chebpol was compiled without FFTW, running `chebcoef()` on large grids may be slow and
 #' memory-demanding.
 #'
-#' @param val An `array` of function values on a Chebyshev grid. The `dim`-attribute must be
+#' @param val An `array` of function values on a Chebyshev grid. The `dim` attribute must be
 #'   appropriately set. If not set, it is assumed to be one-dimensional.
 #' @param dct A logical. Since the Chebyshev coefficients are closely related to the DCT-II
 #'   transform of `val`, the non-normalized real-even DCT-II coefficients may be retrieved instead.
 #'   I.e. those from `FFTW_REDFT10` in each dimension. This is not used anywhere in the package, it
 #'   is merely provided as a convenience for those who might need it.
-#' @return An array of Chebyshev-coefficients for an interpolating Chebyshev-polynomial.
+#' @return An array of Chebyshev coefficients for an interpolating Chebyshev polynomial.
 #' @seealso [has_fftw()]
 #' @export
 #' @examples

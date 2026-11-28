@@ -18,7 +18,7 @@ ipol(
 }
 \arguments{
 \item{val}{An array or a function. Function values on a grid, or the function itself. If it is
-the values, the \code{"dim"}-attribute must be appropriately set. If it is a function, it will be
+the values, the \code{"dim"} attribute must be appropriately set. If it is a function, it will be
 evaluated in the grid points.}
 
 \item{dims}{An integer vector. The number of grid points in each dimension. Not needed if \code{val}
@@ -27,8 +27,8 @@ is an array or \code{grid} is used.}
 \item{intervals}{A list of numeric vectors of length 2. The lower and upper bound in each
 dimension. Not used if \code{grid} is specified.}
 
-\item{grid}{A list. Each element is a vector of ordered grid-points for a dimension. These need
-not be Chebyshev-knots, nor evenly spaced.}
+\item{grid}{A list. Each element is a vector of ordered grid points for a dimension. These need
+not be Chebyshev knots, nor evenly spaced.}
 
 \item{knots}{A matrix. Each column is a point in an M-dimensional space.}
 
@@ -88,9 +88,9 @@ If knots are required, but the \code{grid} argument is given, knots are construc
 There are also some usage examples and more in \code{vignette("chebpol")} and \code{vignette("chebusage")}.
 }
 \examples{
-# evenly spaced grid-points
+# evenly spaced grid points
 su <- seq(0, 1, length.out = 10)
-# irregularly spaced grid-points
+# irregularly spaced grid points
 s <- su^3
 # create approximation on the irregularly spaced grid
 ml1 <- ipol(exp, grid = list(s), method = "multilinear")

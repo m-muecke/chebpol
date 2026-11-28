@@ -2,12 +2,12 @@
 % Please edit documentation in R/chebyshev.R
 \name{chebcoef}
 \alias{chebcoef}
-\title{Compute Chebyshev-coefficients given values on a Chebyshev grid}
+\title{Compute Chebyshev coefficients given values on a Chebyshev grid}
 \usage{
 chebcoef(val, dct = FALSE)
 }
 \arguments{
-\item{val}{An \code{array} of function values on a Chebyshev grid. The \code{dim}-attribute must be
+\item{val}{An \code{array} of function values on a Chebyshev grid. The \code{dim} attribute must be
 appropriately set. If not set, it is assumed to be one-dimensional.}
 
 \item{dct}{A logical. Since the Chebyshev coefficients are closely related to the DCT-II
@@ -16,13 +16,13 @@ I.e. those from \code{FFTW_REDFT10} in each dimension. This is not used anywhere
 is merely provided as a convenience for those who might need it.}
 }
 \value{
-An array of Chebyshev-coefficients for an interpolating Chebyshev-polynomial.
+An array of Chebyshev coefficients for an interpolating Chebyshev polynomial.
 }
 \description{
-Compute the multivariate Chebyshev-coefficients, given values on a Chebyshev grid.
+Compute the multivariate Chebyshev coefficients, given values on a Chebyshev grid.
 }
 \details{
-If \code{val} has no \code{dim}-attribute, it is assumed to be one-dimensional with length \code{length(val)}.
+If \code{val} has no \code{dim} attribute, it is assumed to be one-dimensional with length \code{length(val)}.
 
 If chebpol was compiled without FFTW, running \code{chebcoef()} on large grids may be slow and
 memory-demanding.

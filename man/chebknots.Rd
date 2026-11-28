@@ -2,18 +2,18 @@
 % Please edit documentation in R/chebyshev.R
 \name{chebknots}
 \alias{chebknots}
-\title{Create a Chebyshev-grid}
+\title{Create a Chebyshev grid}
 \usage{
 chebknots(dims, intervals = NULL)
 }
 \arguments{
-\item{dims}{The number of grid-points in each dimension. For Chebyshev-polynomial of degree
+\item{dims}{The number of grid points in each dimension. For Chebyshev polynomial of degree
 \code{dims-1}.}
 
 \item{intervals}{A list of vectors of length 2. The lower and upper bounds of the hypercube.}
 }
 \value{
-An array of dimension \code{dims}. The Chebyshev grid-points.
+An array of dimension \code{dims}. The Chebyshev grid points.
 }
 \description{
 Create a Chebyshev grid on a hypercube.

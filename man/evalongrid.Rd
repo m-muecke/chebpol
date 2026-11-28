@@ -13,7 +13,7 @@ evalongridV(fun, dims, intervals = NULL, ..., grid = NULL)
 \item{fun}{A multivariate real-valued function to be evaluated. Must be defined on the hypercube
 described by \code{intervals}.}
 
-\item{dims}{A vector of integers. The number of grid-points in each dimension.}
+\item{dims}{A vector of integers. The number of grid points in each dimension.}
 
 \item{intervals}{A list. Each entry is a vector of length 2 with the lower and upper end of the
 interval in each dimension.}
