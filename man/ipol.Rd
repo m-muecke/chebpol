@@ -34,7 +34,9 @@ not be Chebyshev knots, nor evenly spaced.}
 
 \item{k}{A numeric vector. Additional value, used with some methods.}
 
-\item{method}{A string. The interpolation method to use.}
+\item{method}{A string. The interpolation method to use, one of \code{"chebyshev"} (the default),
+\code{"multilinear"}, \code{"fh"}, \code{"uniform"}, \code{"general"}, \code{"polyharmonic"}, \code{"simplexlinear"},
+\code{"hstalker"}, \code{"stalker"} and \code{"oldstalker"}. See Details for the arguments each one needs.}
 
 \item{...}{Further arguments to the function, if \code{is.function(val)}. And some extra arguments for
 interpolant creation described in section Details.}
@@ -62,12 +64,16 @@ The method \code{"uniform"} is similar to the \code{"chebyshev"}, but uniformly 
 The argument \code{intervals} generally goes with \code{dims} when other than standard intervals \verb{[-1, 1]}
 are used.
 
-The methods \code{"multilinear"}, \code{"fh"} (Floater-Hormann), \code{"stalker"}, \code{"hstalker"}, and \code{"general"}
-need the argument \code{grid}. These are the methods which can use arbitrary Cartesian grids. The
-stalker spline is described in \code{vignette("stalker")}. The Floater-Hormann method (\code{"fh"}) also
-needs the \code{k} argument, the degree of the blending polynomials. It defaults to 4. It must be
-between 0 and one less than the number of grid points in each dimension. Give either one value
-for all dimensions or one value per dimension.
+The methods \code{"multilinear"}, \code{"fh"} (Floater-Hormann), \code{"stalker"}, \code{"hstalker"}, \code{"oldstalker"},
+and \code{"general"} need the argument \code{grid}. These are the methods which can use arbitrary Cartesian
+grids. The stalker spline is described in \code{vignette("stalker")}. The Floater-Hormann method
+(\code{"fh"}) also needs the \code{k} argument, the degree of the blending polynomials. It defaults to 4.
+It must be between 0 and one less than the number of grid points in each dimension. Give either
+one value for all dimensions or one value per dimension.
+
+The method \code{"oldstalker"} is an older implementation of the stalker spline with a fixed degree.
+The degree is given by \code{k}, which defaults to 2, either one value for all dimensions or one value
+per dimension. With \code{k = NA} the degree is chosen from the data, as with \code{"stalker"}.
 
 The method \code{"polyharmonic"} needs the arguments \code{knots} and \code{k}. In addition it can take the
 logical argument \code{normalize} for normalizing the knots to the unit hypercube. The default is

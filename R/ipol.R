@@ -13,12 +13,16 @@
 #' The argument `intervals` generally goes with `dims` when other than standard intervals `[-1, 1]`
 #' are used.
 #'
-#' The methods `"multilinear"`, `"fh"` (Floater-Hormann), `"stalker"`, `"hstalker"`, and `"general"`
-#' need the argument `grid`. These are the methods which can use arbitrary Cartesian grids. The
-#' stalker spline is described in `vignette("stalker")`. The Floater-Hormann method (`"fh"`) also
-#' needs the `k` argument, the degree of the blending polynomials. It defaults to 4. It must be
-#' between 0 and one less than the number of grid points in each dimension. Give either one value
-#' for all dimensions or one value per dimension.
+#' The methods `"multilinear"`, `"fh"` (Floater-Hormann), `"stalker"`, `"hstalker"`, `"oldstalker"`,
+#' and `"general"` need the argument `grid`. These are the methods which can use arbitrary Cartesian
+#' grids. The stalker spline is described in `vignette("stalker")`. The Floater-Hormann method
+#' (`"fh"`) also needs the `k` argument, the degree of the blending polynomials. It defaults to 4.
+#' It must be between 0 and one less than the number of grid points in each dimension. Give either
+#' one value for all dimensions or one value per dimension.
+#'
+#' The method `"oldstalker"` is an older implementation of the stalker spline with a fixed degree.
+#' The degree is given by `k`, which defaults to 2, either one value for all dimensions or one value
+#' per dimension. With `k = NA` the degree is chosen from the data, as with `"stalker"`.
 #'
 #' The method `"polyharmonic"` needs the arguments `knots` and `k`. In addition it can take the
 #' logical argument `normalize` for normalizing the knots to the unit hypercube. The default is
@@ -49,7 +53,9 @@
 #'   not be Chebyshev knots, nor evenly spaced.
 #' @param knots A matrix. Each column is a point in an M-dimensional space.
 #' @param k A numeric vector. Additional value, used with some methods.
-#' @param method A string. The interpolation method to use.
+#' @param method A string. The interpolation method to use, one of `"chebyshev"` (the default),
+#'   `"multilinear"`, `"fh"`, `"uniform"`, `"general"`, `"polyharmonic"`, `"simplexlinear"`,
+#'   `"hstalker"`, `"stalker"` and `"oldstalker"`. See Details for the arguments each one needs.
 #' @param ... Further arguments to the function, if `is.function(val)`. And some extra arguments for
 #'   interpolant creation described in section Details.
 #' @return A `function(x, threads = getOption("chebpol.threads"))` defined on a hypercube, an
