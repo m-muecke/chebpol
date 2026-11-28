@@ -181,23 +181,13 @@ ipol_chebyshev <- function(val, dims = NULL, intervals = NULL, ...) {
 
 # Interpolate on a Cartesian grid that is not a Chebyshev grid. `val` holds the function values in
 # the order of expand.grid(grid), and each grid dimension, increasing or decreasing, is mapped onto
-# the Chebyshev knots in [-1, 1]. This may be less accurate than a Chebyshev interpolation. Without
-# a `grid`, `val` must be on a Chebyshev grid and carry its dimensions.
-ipol_general <- function(val, grid = NULL, ...) {
-  if (is.null(grid)) {
-    return(ipol_chebyshev(val))
-  }
+# the Chebyshev knots in [-1, 1]. This may be less accurate than a Chebyshev interpolation.
+ipol_general <- function(val, grid, ...) {
   if (is.function(val)) {
-    if (!is.list(grid)) {
-      grid <- list(grid)
-    }
     val <- evalongrid(val, ..., grid = grid)
   }
   if (is.null(dim(val))) {
     dim(val) <- length(val)
-  }
-  if (!is.list(grid) && length(grid) == length(val)) {
-    grid <- list(grid)
   }
   if (prod(lengths(grid)) != length(val)) {
     stop(sprintf("`val` must have one value per grid point (%d), not %d.", prod(lengths(grid)), length(val)))

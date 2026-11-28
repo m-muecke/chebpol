@@ -1,7 +1,4 @@
 ipol_multilinear <- function(val, grid, ..., blend = NULL) {
-  if (is.numeric(grid)) {
-    grid <- list(grid)
-  }
   if (any(vapply(grid, is.unsorted, logical(1L)))) {
     if (!is.function(val)) {
       stop("`grid` must be increasing for method = \"multilinear\".")

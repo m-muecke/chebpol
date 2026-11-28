@@ -1,10 +1,6 @@
 # General grids, Floater-Hormann
 
 ipol_fh <- function(val, grid = NULL, degree = 1L, ...) {
-  if (!is.list(grid)) {
-    grid <- list(grid)
-  }
-  grid <- lapply(grid, as.numeric)
   if (is.function(val)) {
     val <- evalongrid(val, grid = grid, ...)
   }

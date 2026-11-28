@@ -7,10 +7,6 @@ stalker_context <- function(dmin, dplus, degree) {
 }
 
 ipol_oldstalker <- function(val, grid, degree = 2, ..., blend = NULL) {
-  if (!is.list(grid)) {
-    grid <- list(grid)
-  }
-  grid <- lapply(grid, as.numeric)
   if (any(vapply(grid, is.unsorted, logical(1L)))) {
     if (!is.function(val)) {
       stop("`grid` must be increasing for method = \"oldstalker\".")
@@ -58,10 +54,6 @@ ipol_oldstalker <- function(val, grid, degree = 2, ..., blend = NULL) {
 }
 
 ipol_hstalker <- function(val, grid, ..., blend = NULL) {
-  if (!is.list(grid)) {
-    grid <- list(grid)
-  }
-  grid <- lapply(grid, as.numeric)
   if (any(vapply(grid, is.unsorted, logical(1L)))) {
     if (!is.function(val)) {
       stop("`grid` must be increasing for method = \"hstalker\".")
@@ -85,10 +77,6 @@ ipol_hstalker <- function(val, grid, ..., blend = NULL) {
 }
 
 ipol_stalker <- function(val, grid, ..., blend = NULL) {
-  if (!is.list(grid)) {
-    grid <- list(grid)
-  }
-  grid <- lapply(grid, as.numeric)
   if (any(vapply(grid, is.unsorted, logical(1L)))) {
     if (!is.function(val)) {
       stop("`grid` must be increasing for method = \"stalker\".")
