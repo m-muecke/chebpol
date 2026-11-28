@@ -1,6 +1,6 @@
-# Compute Chebyshev-coefficients given values on a Chebyshev grid
+# Compute Chebyshev coefficients given values on a Chebyshev grid
 
-Compute the multivariate Chebyshev-coefficients, given values on a
+Compute the multivariate Chebyshev coefficients, given values on a
 Chebyshev grid.
 
 ## Usage
@@ -13,13 +13,13 @@ chebcoef(val, dct = FALSE)
 
 - val:
 
-  An `array` of function values on a Chebyshev grid. The `dim`-attribute
+  An `array` of function values on a Chebyshev grid. The `dim` attribute
   must be appropriately set. If not set, it is assumed to be
   one-dimensional.
 
 - dct:
 
-  Logical. Since the Chebyshev coefficients are closely related to the
+  A logical. Since the Chebyshev coefficients are closely related to the
   DCT-II transform of `val`, the non-normalized real-even DCT-II
   coefficients may be retrieved instead. I.e. those from `FFTW_REDFT10`
   in each dimension. This is not used anywhere in the package, it is
@@ -27,12 +27,12 @@ chebcoef(val, dct = FALSE)
 
 ## Value
 
-An array of Chebyshev-coefficients for an interpolating
-Chebyshev-polynomial.
+An array of Chebyshev coefficients for an interpolating Chebyshev
+polynomial.
 
 ## Details
 
-If `val` has no `dim`-attribute, it is assumed to be one-dimensional
+If `val` has no `dim` attribute, it is assumed to be one-dimensional
 with length `length(val)`.
 
 If chebpol was compiled without FFTW, running `chebcoef()` on large

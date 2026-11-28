@@ -52,7 +52,7 @@ computed by a variant of the DCT-II transform. Thus, the method is fast.
 More modern methods use splines, where the idea is to glue pieces of
 simple functions together, either low-degree polynomials or rational
 functions, subject to various constraints. Splines are in many respects
-superior to Chebyshev-interpolation.
+superior to Chebyshev interpolation.
 
 For the multivariate case, where \\f : \[-1,1\]^r \to \mathbb{R}\\, the
 DCT-II transform, being a variant of the Fourier transform, factors over
@@ -62,7 +62,7 @@ of one-dimensional knots. This is a classical way to interpolate
 multivariate real functions.
 
 This procedure is available in package **chebpol**. Either we have the
-function to interpolate, or we have the values in the Chebyshev-knots.
+function to interpolate, or we have the values in the Chebyshev knots.
 Given a function \\f\\ we may compute its Chebyshev approximation and
 plot it:
 
@@ -188,9 +188,9 @@ cat("arg:", tp, "true:", f(tp), "ch:", ch(tp), "uc:", uc(tp), "\n")
 
 In some applications not even uniformly spaced grids are feasible. In
 this case we do something similar as in the uniformly spaced case. We
-have grid-points \\\\y_i\\\_{i=1..n}\\ in ascending or descending order.
+have grid points \\\\y_i\\\_{i=1..n}\\ in ascending or descending order.
 We then use `splinefun` in package **stats** with `method = "hyman"` to
-create a monotone function \\g\\ from the grid-points
+create a monotone function \\g\\ from the grid points
 \\\\y_i\\\_{i=1..n}\\ to the Chebyshev knots \\\\x_i^n\\\_{i=1..n}\\.
 Otherwise, the same method as for uniform grids are used.
 

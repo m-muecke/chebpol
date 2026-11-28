@@ -27,7 +27,7 @@ some reasonable values.
   have the argument `blend`, one of `"linear"`, `"cubic"`, `"sigmoid"`,
   `"parodic"` and `"square"`, which chooses the blending function
   described in
-  [`vignette("stalker", package = "chebpol")`](https://m-muecke.github.io/chebpol/articles/stalker.md).
+  [`vignette("stalker")`](https://m-muecke.github.io/chebpol/articles/stalker.md).
   `"stalker"`, `"hstalker"` and `"simplexlinear"` also take `"mean"`.
   The default is `"cubic"` for `"stalker"` and `"hstalker"`, and
   `"linear"` for the others.

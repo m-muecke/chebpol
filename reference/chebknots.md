@@ -1,4 +1,4 @@
-# Create a Chebyshev-grid
+# Create a Chebyshev grid
 
 Create a Chebyshev grid on a hypercube.
 
@@ -12,7 +12,7 @@ chebknots(dims, intervals = NULL)
 
 - dims:
 
-  The number of grid-points in each dimension. For Chebyshev-polynomial
+  The number of grid points in each dimension. For Chebyshev polynomial
   of degree `dims-1`.
 
 - intervals:
@@ -22,7 +22,7 @@ chebknots(dims, intervals = NULL)
 
 ## Value
 
-An array of dimension `dims`. The Chebyshev grid-points.
+An array of dimension `dims`. The Chebyshev grid points.
 
 ## Details
 

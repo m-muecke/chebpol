@@ -132,7 +132,7 @@ fast.</p>
 <p>More modern methods use splines, where the idea is to glue pieces of
 simple functions together, either low-degree polynomials or rational
 functions, subject to various constraints. Splines are in many respects
-superior to Chebyshev-interpolation.</p>
+superior to Chebyshev interpolation.</p>
 <p>For the multivariate case, where <span class="math inline">\(f :
 [-1,1]^r \to \mathbb{R}\)</span>, the DCT-II transform, being a variant
 of the Fourier transform, factors over tensor-products, so a natural
@@ -141,7 +141,7 @@ The knots are the Cartesian product of one-dimensional knots. This is a
 classical way to interpolate multivariate real functions.</p>
 <p>This procedure is available in package <strong>chebpol</strong>.
 Either we have the function to interpolate, or we have the values in the
-Chebyshev-knots. Given a function <span class="math inline">\(f\)</span>
+Chebyshev knots. Given a function <span class="math inline">\(f\)</span>
 we may compute its Chebyshev approximation and plot it:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="fl">3</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">*</span> <span class="va">x</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fl">25</span> <span class="op">*</span> <span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="fl">0.25</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
@@ -258,11 +258,11 @@ point:</p>
 </h2>
 <p>In some applications not even uniformly spaced grids are feasible. In
 this case we do something similar as in the uniformly spaced case. We
-have grid-points <span class="math inline">\(\{y_i\}_{i=1..n}\)</span>
+have grid points <span class="math inline">\(\{y_i\}_{i=1..n}\)</span>
 in ascending or descending order. We then use <code>splinefun</code> in
 package <strong>stats</strong> with <code>method = "hyman"</code> to
 create a monotone function <span class="math inline">\(g\)</span> from
-the grid-points <span class="math inline">\(\{y_i\}_{i=1..n}\)</span> to
+the grid points <span class="math inline">\(\{y_i\}_{i=1..n}\)</span> to
 the Chebyshev knots <span class="math inline">\(\{x_i^n\}_{i=1..n}\)</span>. Otherwise, the same
 method as for uniform grids are used.</p>
 <p>The method <code>"general"</code> performs this procedure. In the

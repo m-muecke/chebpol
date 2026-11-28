@@ -51,6 +51,10 @@
 
 ### Minor improvements
 
+- Attaching chebpol no longer prints a message when it was built without
+  FFTW. Use
+  [`has_fftw()`](https://m-muecke.github.io/chebpol/reference/has_fftw.md)
+  to check.
 - chebpol can be built without FFTW or GSL by setting the environment
   variable `CHEBPOL_DISABLE_FFTW` or `CHEBPOL_DISABLE_GSL` before
   installing, as an alternative to `--configure-args`.

@@ -14,12 +14,12 @@ evalongridV(fun, dims, intervals = NULL, ..., grid = NULL)
 
 - fun:
 
-  Multivariate real-valued function to be evaluated. Must be defined on
-  the hypercube described by `intervals`.
+  A multivariate real-valued function to be evaluated. Must be defined
+  on the hypercube described by `intervals`.
 
 - dims:
 
-  A vector of integers. The number of grid-points in each dimension.
+  A vector of integers. The number of grid points in each dimension.
 
 - intervals:
 

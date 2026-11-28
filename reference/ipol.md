@@ -23,36 +23,37 @@ ipol(
 
 - val:
 
-  array or function. Function values on a grid, or the function itself.
-  If it is the values, the `"dim"`-attribute must be appropriately set.
-  If it is a function, it will be evaluated in the grid points.
+  An array or a function. Function values on a grid, or the function
+  itself. If it is the values, the `"dim"` attribute must be
+  appropriately set. If it is a function, it will be evaluated in the
+  grid points.
 
 - dims:
 
-  integer vector. The number of grid points in each dimension. Not
+  An integer vector. The number of grid points in each dimension. Not
   needed if `val` is an array or `grid` is used.
 
 - intervals:
 
-  list of length 2 numeric vectors. The lower and upper bound in each
-  dimension. Not used if `grid` is specified.
+  A list of numeric vectors of length 2. The lower and upper bound in
+  each dimension. Not used if `grid` is specified.
 
 - grid:
 
-  list. Each element is a vector of ordered grid-points for a dimension.
-  These need not be Chebyshev-knots, nor evenly spaced.
+  A list. Each element is a vector of ordered grid points for a
+  dimension. These need not be Chebyshev knots, nor evenly spaced.
 
 - knots:
 
-  matrix. Each column is a point in an M-dimensional space.
+  A matrix. Each column is a point in an M-dimensional space.
 
 - k:
 
-  numeric. Additional value, used with some methods.
+  A numeric vector. Additional value, used with some methods.
 
 - method:
 
-  character. The interpolation method to use.
+  A string. The interpolation method to use.
 
 - ...:
 
@@ -76,7 +77,7 @@ when evaluating a matrix of column vectors.
 `ipol()` is a wrapper around various interpolation methods in package
 chebpol. Which arguments to specify depends on the method. The
 interpolation methods are described in
-[`vignette("chebpol", package = "chebpol")`](https://m-muecke.github.io/chebpol/articles/chebpol.md).
+[`vignette("chebpol")`](https://m-muecke.github.io/chebpol/articles/chebpol.md).
 
 The method `"chebyshev"` needs only the number of Chebyshev knots in
 each dimension. This is either the `"dim"` attribute of the array `val`,
@@ -91,7 +92,7 @@ The methods `"multilinear"`, `"fh"` (Floater-Hormann), `"stalker"`,
 `"hstalker"`, and `"general"` need the argument `grid`. These are the
 methods which can use arbitrary Cartesian grids. The stalker spline is
 described in
-[`vignette("stalker", package = "chebpol")`](https://m-muecke.github.io/chebpol/articles/stalker.md).
+[`vignette("stalker")`](https://m-muecke.github.io/chebpol/articles/stalker.md).
 The Floater-Hormann method (`"fh"`) also needs the `k` argument, the
 degree of the blending polynomials. It defaults to 4. It must be between
 0 and one less than the number of grid points in each dimension. Give
@@ -125,9 +126,9 @@ and
 ## Examples
 
 ``` r
-# evenly spaced grid-points
+# evenly spaced grid points
 su <- seq(0, 1, length.out = 10)
-# irregularly spaced grid-points
+# irregularly spaced grid points
 s <- su^3
 # create approximation on the irregularly spaced grid
 ml1 <- ipol(exp, grid = list(s), method = "multilinear")

@@ -138,9 +138,9 @@ for the stalker splines.
 ### Chebyshev tools
 
 - [`chebknots()`](https://m-muecke.github.io/chebpol/reference/chebknots.md)
-  : Create a Chebyshev-grid
+  : Create a Chebyshev grid
 - [`chebcoef()`](https://m-muecke.github.io/chebpol/reference/chebcoef.md)
-  : Compute Chebyshev-coefficients given values on a Chebyshev grid
+  : Compute Chebyshev coefficients given values on a Chebyshev grid
 - [`chebeval()`](https://m-muecke.github.io/chebpol/reference/chebeval.md)
   : Evaluate a Chebyshev interpolation in a point
 - [`evalongrid()`](https://m-muecke.github.io/chebpol/reference/evalongrid.md)

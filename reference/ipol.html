@@ -75,36 +75,36 @@
 
 
 <dl><dt id="arg-val">val<a class="anchor" aria-label="anchor" href="#arg-val"></a></dt>
-<dd><p>array or function. Function values on a grid, or the function itself. If it is the
-values, the <code>"dim"</code>-attribute must be appropriately set. If it is a function, it will be
+<dd><p>An array or a function. Function values on a grid, or the function itself. If it is
+the values, the <code>"dim"</code> attribute must be appropriately set. If it is a function, it will be
 evaluated in the grid points.</p></dd>
 
 
 <dt id="arg-dims">dims<a class="anchor" aria-label="anchor" href="#arg-dims"></a></dt>
-<dd><p>integer vector. The number of grid points in each dimension. Not needed if <code>val</code> is
-an array or <code>grid</code> is used.</p></dd>
+<dd><p>An integer vector. The number of grid points in each dimension. Not needed if <code>val</code>
+is an array or <code>grid</code> is used.</p></dd>
 
 
 <dt id="arg-intervals">intervals<a class="anchor" aria-label="anchor" href="#arg-intervals"></a></dt>
-<dd><p>list of length 2 numeric vectors. The lower and upper bound in each dimension.
-Not used if <code>grid</code> is specified.</p></dd>
+<dd><p>A list of numeric vectors of length 2. The lower and upper bound in each
+dimension. Not used if <code>grid</code> is specified.</p></dd>
 
 
 <dt id="arg-grid">grid<a class="anchor" aria-label="anchor" href="#arg-grid"></a></dt>
-<dd><p>list. Each element is a vector of ordered grid-points for a dimension. These need not
-be Chebyshev-knots, nor evenly spaced.</p></dd>
+<dd><p>A list. Each element is a vector of ordered grid points for a dimension. These need
+not be Chebyshev knots, nor evenly spaced.</p></dd>
 
 
 <dt id="arg-knots">knots<a class="anchor" aria-label="anchor" href="#arg-knots"></a></dt>
-<dd><p>matrix. Each column is a point in an M-dimensional space.</p></dd>
+<dd><p>A matrix. Each column is a point in an M-dimensional space.</p></dd>
 
 
 <dt id="arg-k">k<a class="anchor" aria-label="anchor" href="#arg-k"></a></dt>
-<dd><p>numeric. Additional value, used with some methods.</p></dd>
+<dd><p>A numeric vector. Additional value, used with some methods.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
-<dd><p>character. The interpolation method to use.</p></dd>
+<dd><p>A string. The interpolation method to use.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -124,7 +124,7 @@ matrix of column vectors.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p><code>ipol()</code> is a wrapper around various interpolation methods in package chebpol. Which arguments to
-specify depends on the method. The interpolation methods are described in <code><a href="../articles/chebpol.html">vignette("chebpol", package = "chebpol")</a></code>.</p>
+specify depends on the method. The interpolation methods are described in <code><a href="../articles/chebpol.html">vignette("chebpol")</a></code>.</p>
 <p>The method <code>"chebyshev"</code> needs only the number of Chebyshev knots in each dimension. This is
 either the <code>"dim"</code> attribute of the array <code>val</code>, or the <code>dims</code> argument if <code>val</code> is a function.
 Also the intervals can be specified if different from <code>[-1, 1]</code>.</p>
@@ -133,10 +133,10 @@ The argument <code>intervals</code> generally goes with <code>dims</code> when o
 are used.</p>
 <p>The methods <code>"multilinear"</code>, <code>"fh"</code> (Floater-Hormann), <code>"stalker"</code>, <code>"hstalker"</code>, and <code>"general"</code>
 need the argument <code>grid</code>. These are the methods which can use arbitrary Cartesian grids. The
-stalker spline is described in <code><a href="../articles/stalker.html">vignette("stalker", package = "chebpol")</a></code>. The Floater-Hormann
-method (<code>"fh"</code>) also needs the <code>k</code> argument, the degree of the blending polynomials. It defaults
-to 4. It must be between 0 and one less than the number of grid points in each dimension. Give
-either one value for all dimensions or one value per dimension.</p>
+stalker spline is described in <code><a href="../articles/stalker.html">vignette("stalker")</a></code>. The Floater-Hormann method (<code>"fh"</code>) also
+needs the <code>k</code> argument, the degree of the blending polynomials. It defaults to 4. It must be
+between 0 and one less than the number of grid points in each dimension. Give either one value
+for all dimensions or one value per dimension.</p>
 <p>The method <code>"polyharmonic"</code> needs the arguments <code>knots</code> and <code>k</code>. In addition it can take the
 logical argument <code>normalize</code> for normalizing the knots to the unit hypercube. The default is
 <code>NA</code>, which uses normalization if any of the knots are outside the unit hypercube. <code>normalize</code>
@@ -155,9 +155,9 @@ barycentric coordinates.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># evenly spaced grid-points</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># evenly spaced grid points</span></span></span>
 <span class="r-in"><span><span class="va">su</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># irregularly spaced grid-points</span></span></span>
+<span class="r-in"><span><span class="co"># irregularly spaced grid points</span></span></span>
 <span class="r-in"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="va">su</span><span class="op">^</span><span class="fl">3</span></span></span>
 <span class="r-in"><span><span class="co"># create approximation on the irregularly spaced grid</span></span></span>
 <span class="r-in"><span><span class="va">ml1</span> <span class="op">&lt;-</span> <span class="fu">ipol</span><span class="op">(</span><span class="va">exp</span>, grid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"multilinear"</span><span class="op">)</span></span></span>
