@@ -39,14 +39,11 @@ ipol_oldstalker <- function(val, grid, degree = 2, ..., blend = NULL) {
   }
 
   n_dim <- length(grid)
-  fun <- function(
-    x,
-    threads = getOption("chebpol.threads"),
-    degree = default_degree,
-    blend = c("linear", "cubic", "sigmoid", "parodic", "square")
-  ) {
+  blends <- c("linear", "cubic", "sigmoid", "parodic", "square")
+  default_blend <- match.arg(blend, blends)
+  fun <- function(x, threads = getOption("chebpol.threads"), degree = default_degree, blend = default_blend) {
     x <- as_points(x, n_dim)
-    blend <- blend_types[[match.arg(blend)]]
+    blend <- blend_types[[match.arg(blend, blends)]]
     if (!identical(degree, default_degree)) {
       degree <- rep_len(as.numeric(degree), length(grid))
       if (!has_gsl() && any(is.na(degree) & !uniform)) {
@@ -56,8 +53,8 @@ ipol_oldstalker <- function(val, grid, degree = 2, ..., blend = NULL) {
     }
     .Call(c_eval_oldstalker, x, stalker, degree, blend, as.integer(threads))
   }
-  fun <- crate(fun, default_degree, grid, val, uniform, dmin, dplus, stalker, n_dim)
-  new_interpolant(set_default_blend(fun, blend), method = "oldstalker", arity = n_dim, domain = lapply(grid, range))
+  fun <- crate(fun, default_degree, grid, val, uniform, dmin, dplus, stalker, n_dim, blends, default_blend)
+  new_interpolant(fun, method = "oldstalker", arity = n_dim, domain = lapply(grid, range))
 }
 
 ipol_hstalker <- function(val, grid, ..., blend = NULL) {
@@ -76,17 +73,15 @@ ipol_hstalker <- function(val, grid, ..., blend = NULL) {
   }
   stalker <- .Call(c_make_hstalker, val, grid)
   n_dim <- length(grid)
-  fun <- function(
-    x,
-    threads = getOption("chebpol.threads"),
-    blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
-  ) {
+  blends <- c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
+  default_blend <- match.arg(blend, blends)
+  fun <- function(x, threads = getOption("chebpol.threads"), blend = default_blend) {
     x <- as_points(x, n_dim)
-    blend <- blend_types[[match.arg(blend)]]
+    blend <- blend_types[[match.arg(blend, blends)]]
     .Call(c_eval_hstalker, x, stalker, blend, as.integer(threads))
   }
-  fun <- crate(fun, stalker, n_dim)
-  new_interpolant(set_default_blend(fun, blend), method = "hstalker", arity = n_dim, domain = lapply(grid, range))
+  fun <- crate(fun, stalker, n_dim, blends, default_blend)
+  new_interpolant(fun, method = "hstalker", arity = n_dim, domain = lapply(grid, range))
 }
 
 ipol_stalker <- function(val, grid, ..., blend = NULL) {
@@ -105,15 +100,13 @@ ipol_stalker <- function(val, grid, ..., blend = NULL) {
   }
   stalker <- .Call(c_make_stalker, val, grid)
   n_dim <- length(grid)
-  fun <- function(
-    x,
-    threads = getOption("chebpol.threads"),
-    blend = c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
-  ) {
+  blends <- c("cubic", "linear", "sigmoid", "parodic", "square", "mean")
+  default_blend <- match.arg(blend, blends)
+  fun <- function(x, threads = getOption("chebpol.threads"), blend = default_blend) {
     x <- as_points(x, n_dim)
-    blend <- blend_types[[match.arg(blend)]]
+    blend <- blend_types[[match.arg(blend, blends)]]
     .Call(c_eval_stalker, x, stalker, blend, as.integer(threads))
   }
-  fun <- crate(fun, stalker, n_dim)
-  new_interpolant(set_default_blend(fun, blend), method = "stalker", arity = n_dim, domain = lapply(grid, range))
+  fun <- crate(fun, stalker, n_dim, blends, default_blend)
+  new_interpolant(fun, method = "stalker", arity = n_dim, domain = lapply(grid, range))
 }

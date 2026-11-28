@@ -52,13 +52,3 @@ grid_knots <- function(grid) {
 }
 
 blend_types <- c(linear = 0L, sigmoid = 1L, parodic = 2L, cubic = 3L, square = 4L, mean = 5L)
-
-set_default_blend <- function(fun, blend) {
-  if (is.null(blend)) {
-    return(fun)
-  }
-  choices <- eval(formals(fun)$blend)
-  blend <- match.arg(blend, choices)
-  formals(fun)$blend <- c(blend, setdiff(choices, blend))
-  fun
-}

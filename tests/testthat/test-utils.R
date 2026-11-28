@@ -24,25 +24,6 @@ test_that("interpolants error when the input length does not fit the number of v
   })
 })
 
-test_that("ipol() sets the default blend of the interpolant", {
-  grid <- list(c(0, 1, 2))
-  ml <- ipol(c(0, 1, 0), grid = grid, method = "multilinear", blend = "cubic")
-  expect_equal(eval(formals(ml)$blend), c("cubic", "linear", "sigmoid", "parodic", "square"))
-  for (method in c("multilinear", "stalker", "hstalker", "oldstalker")) {
-    ip <- ipol(c(0, 1, 0), grid = grid, method = method, blend = "sigmoid")
-    expect_equal(eval(formals(ip)$blend)[1], "sigmoid")
-    expect_equal(ip(0.25), ip(0.25, blend = "sigmoid"))
-  }
-})
-
-test_that("ipol() sets the default blend of a simplex linear interpolant", {
-  skip_if_not_installed("geometry")
-  knots <- grid_points(list(c(0, 1, 2), c(0, 1)))
-  sl <- ipol(c(0, 1, 0, 1, 2, 1), knots = knots, method = "simplexlinear", blend = "sigmoid")
-  expect_equal(eval(formals(sl)$blend)[1], "sigmoid")
-  expect_equal(sl(c(0.3, 0.6)), sl(c(0.3, 0.6), blend = "sigmoid"))
-})
-
 test_that("crate() keeps only the named objects in the environment of a function", {
   a <- 1
   unused <- 2

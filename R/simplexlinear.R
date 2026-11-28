@@ -19,19 +19,16 @@ ipol_simplexlinear <- function(val, knots, ..., blend = NULL) {
   # needed for transforming to barycentric coordinates. These are used for finding the right simplex.
   simplices <- .Call(c_make_simplexlinear, dtri, knots, getOption("chebpol.threads"))
   n_dim <- nrow(knots)
-  fun <- function(
-    x,
-    threads = getOption("chebpol.threads"),
-    epol = FALSE,
-    blend = c("linear", "cubic", "sigmoid", "parodic", "square", "mean")
-  ) {
+  blends <- c("linear", "cubic", "sigmoid", "parodic", "square", "mean")
+  default_blend <- match.arg(blend, blends)
+  fun <- function(x, threads = getOption("chebpol.threads"), epol = FALSE, blend = default_blend) {
     x <- as_points(x, n_dim)
     if (!is_flag(epol)) {
       stop("`epol` must be `TRUE` or `FALSE`.")
     }
-    blend <- blend_types[[match.arg(blend)]]
+    blend <- blend_types[[match.arg(blend, blends)]]
     .Call(c_eval_simplexlinear, x, knots, dtri, simplices, val, epol, blend, threads)
   }
-  fun <- crate(fun, knots, dtri, simplices, val, n_dim)
-  new_interpolant(set_default_blend(fun, blend), method = "simplexlinear", arity = n_dim, domain = knots_domain(knots))
+  fun <- crate(fun, knots, dtri, simplices, val, n_dim, blends, default_blend)
+  new_interpolant(fun, method = "simplexlinear", arity = n_dim, domain = knots_domain(knots))
 }

@@ -32,7 +32,6 @@
 #' ip(matrix(runif(12), 2), threads = 2)
 NULL
 
-# Call after any change to the formals of `fun`, `formals<-` drops the class and attributes
 new_interpolant <- function(fun, method, arity, domain = NULL) {
   structure(
     fun,
@@ -72,9 +71,6 @@ print.chebpol_interpolant <- function(x, ...) {
       names(defaults),
       function(arg) {
         value <- eval(defaults[[arg]], environment(x))
-        if (arg == "blend") {
-          value <- value[[1L]]
-        }
         paste(arg, "=", paste(deparse(value), collapse = " "))
       },
       character(1L)

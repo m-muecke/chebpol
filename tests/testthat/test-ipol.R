@@ -116,3 +116,21 @@ test_that("ipol() errors when val is neither values nor a function", {
     ipol(data.frame(a = 1:6), dims = 6, method = "chebyshev")
   })
 })
+
+test_that("ipol() sets the default blend of the interpolant", {
+  grid <- list(c(0, 1, 2))
+  for (method in c("multilinear", "stalker", "hstalker", "oldstalker")) {
+    ip <- ipol(c(0, 1, 0), grid = grid, method = method)
+    sigmoid <- ipol(c(0, 1, 0), grid = grid, method = method, blend = "sigmoid")
+    expect_equal(sigmoid(0.25), ip(0.25, blend = "sigmoid"))
+    expect_equal(sigmoid(0.25, blend = "linear"), ip(0.25, blend = "linear"))
+  }
+})
+
+test_that("ipol() sets the default blend of a simplex linear interpolant", {
+  skip_if_not_installed("geometry")
+  knots <- grid_points(list(c(0, 1, 2), c(0, 1)))
+  sl <- ipol(c(0, 1, 0, 1, 2, 1), knots = knots, method = "simplexlinear")
+  sigmoid <- ipol(c(0, 1, 0, 1, 2, 1), knots = knots, method = "simplexlinear", blend = "sigmoid")
+  expect_equal(sigmoid(c(0.3, 0.6)), sl(c(0.3, 0.6), blend = "sigmoid"))
+})

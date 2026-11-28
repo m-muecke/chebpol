@@ -74,7 +74,6 @@ test_that("blend in ipol() sets the default blending of the interpolant", {
   s <- matrix(runif(200, -1, 1), 2)
   st <- ipol(f, grid = grid, method = "stalker")
   st_linear <- ipol(f, grid = grid, method = "stalker", blend = "linear")
-  expect_equal(eval(formals(st_linear)$blend)[1], "linear")
   expect_equal(st_linear(s), st(s, blend = "linear"))
 })
 
