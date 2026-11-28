@@ -93,8 +93,8 @@ ipol_polyharmonic <- function(val, knots, k = 2, normalize = NA, nowarn = FALSE,
   # free the distance matrix before solve() makes its own copy of mat
   rm(A, B)
   rhs <- c(val, rep(0, L))
-  coefs <- try(solve(mat, rhs), silent = TRUE)
-  if (inherits(coefs, "try-error")) {
+  coefs <- tryCatch(solve(mat, rhs), error = \(e) NULL)
+  if (is.null(coefs)) {
     if (!nowarn) {
       msg <- paste0(
         "Can't fit the spline exactly, falling back to a least squares fit.",
