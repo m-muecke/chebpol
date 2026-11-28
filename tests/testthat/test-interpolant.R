@@ -28,11 +28,11 @@ test_that("an interpolant created with a blend keeps its class and attributes", 
   expect_equal(nrow(attr(ml, "domain")), 2)
 })
 
-test_that("domain columns are named after the variables, or X1, X2, ... without names", {
+test_that("domain names the variables as given, or X1, X2, ... without names", {
   f <- function(x) sum(x)
   grid <- list(seq(0, 1, length.out = 4), seq(0, 2, length.out = 3))
   knots <- grid_points(grid)
-  domain_names <- function(ip) names(attr(ip, "domain"))
+  domain_names <- function(ip) attr(ip, "domain")$variable
   expect_equal(domain_names(ipol(f, grid = grid, method = "fh")), c("X1", "X2"))
   expect_equal(domain_names(ipol(f, grid = list(a = grid[[1]], grid[[2]]), method = "multilinear")), c("a", "X2"))
   expect_equal(domain_names(ipol(f, grid = grid[[1]], method = "stalker")), "X1")
@@ -54,18 +54,18 @@ test_that("domain columns are named after the variables, or X1, X2, ... without 
 test_that("domain keeps the names of the variables as given", {
   grid <- list(`my var` = c(0, 1, 2), `my var` = c(0, 3))
   ip <- ipol(function(x) sum(x), grid = grid, method = "fh")
-  expect_named(attr(ip, "domain"), c("my var", "my var"))
+  expect_equal(attr(ip, "domain")$variable, c("my var", "my var"))
 })
 
-test_that("domain has the rows lower and upper, also for a reversed interval", {
+test_that("domain has the lower bound in lower, also for a reversed interval", {
   ip <- ipol(function(x) x, dims = 4, intervals = c(1, 0), method = "chebyshev")
-  expect_equal(attr(ip, "domain"), data.frame(X1 = c(0, 1), row.names = c("lower", "upper")))
+  expect_equal(attr(ip, "domain"), data.frame(variable = "X1", lower = 0, upper = 1))
 })
 
 test_that("a simplex linear interpolant records the range of its knots", {
   skip_if_not_installed("geometry")
   sl <- ipol(function(x) sum(x), grid = list(c(0, 1, 2), c(0, 3)), method = "simplexlinear")
-  expect_equal(attr(sl, "domain"), data.frame(X1 = c(0, 2), X2 = c(0, 3), row.names = c("lower", "upper")))
+  expect_equal(attr(sl, "domain"), data.frame(variable = c("X1", "X2"), lower = c(0, 0), upper = c(2, 3)))
 })
 
 test_that("an interpolant does not keep the extra arguments of the function", {

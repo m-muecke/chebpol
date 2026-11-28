@@ -98,7 +98,8 @@ test_that("the domain of a polyharmonic spline is the range of the knots", {
   knots <- matrix(runif(60, 5, 9), 2L)
   for (normalize in c(TRUE, FALSE)) {
     phs <- ipol(sum, knots = knots, method = "polyharmonic", normalize = normalize)
-    expect_equal(as.matrix(attr(phs, "domain")), apply(knots, 1L, range), ignore_attr = TRUE)
+    domain <- attr(phs, "domain")
+    expect_equal(rbind(domain$lower, domain$upper), apply(knots, 1L, range))
   }
 })
 

@@ -4,8 +4,8 @@
 #' points, and which fills in between with some reasonable values.
 #'
 #' Interpolants have class `chebpol_interpolant` and the attributes `method`, the interpolation method, `arity`,
-#' the number of variables, and `domain`, a data frame with one column per variable and the rows `lower` and `upper`.
-#' The columns of `domain` take their names from `grid`, `dims`, `intervals` or the row names of `knots`, and are
+#' the number of variables, and `domain`, a data frame with one row per variable and the columns `variable`, `lower`
+#' and `upper`. The variables take their names from `grid`, `dims`, `intervals` or the row names of `knots`, and are
 #' named `X1`, `X2`, ... otherwise. Printing an interpolant shows these together with the defaults of its extra
 #' arguments, such as `blend`.
 #'
@@ -42,20 +42,26 @@ new_interpolant <- function(fun, method, arity, domain) {
   )
 }
 
-# The ranges of the variables as a data frame, with the columns named X1, X2, ... where no name was given
+# One row per variable, named X1, X2, ... where no name was given
 as_domain <- function(domain) {
-  nms <- names(domain) %||% character(length(domain))
-  unnamed <- is.na(nms) | !nzchar(nms)
-  nms[unnamed] <- paste0("X", which(unnamed))
-  names(domain) <- nms
-  as.data.frame(lapply(domain, range), row.names = c("lower", "upper"), check.names = FALSE)
+  variable <- names(domain) %||% character(length(domain))
+  unnamed <- is.na(variable) | !nzchar(variable)
+  variable[unnamed] <- paste0("X", which(unnamed))
+  data.frame(
+    variable = variable,
+    lower = vapply(domain, min, numeric(1L), USE.NAMES = FALSE),
+    upper = vapply(domain, max, numeric(1L), USE.NAMES = FALSE)
+  )
 }
 
 #' @export
 print.chebpol_interpolant <- function(x, ...) {
   arity <- attr(x, "arity")
   cat(sprintf("<chebpol_interpolant> %s, %d variable%s\n", attr(x, "method"), arity, if (arity == 1L) "" else "s"))
-  bounds <- vapply(attr(x, "domain"), \(r) sprintf("[%s, %s]", format(r[[1L]]), format(r[[2L]])), character(1L))
+  domain <- attr(x, "domain")
+  lower <- vapply(domain$lower, format, character(1L))
+  upper <- vapply(domain$upper, format, character(1L))
+  bounds <- sprintf("[%s, %s]", lower, upper)
   cat("Domain: ", paste(bounds, collapse = " x "), "\n", sep = "")
   defaults <- formals(x)
   defaults <- defaults[setdiff(names(defaults), c("x", "threads"))]
