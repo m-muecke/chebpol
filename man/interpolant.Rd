@@ -10,13 +10,17 @@ can also be a matrix of column vectors.}
 \item{threads}{The number of threads to use for evaluation. All interpolants created by chebpol
 are parallelized. If given a matrix argument \code{x}, the vectors can be evaluated in parallel.}
 
-\item{...}{Other parameters. Currently used for simplex linear interpolants with the logical
-argument \code{epol} which makes the interpolant extrapolate to points outside the domain. The
-\code{"stalker"}, \code{"hstalker"}, \code{"oldstalker"}, \code{"multilinear"} and \code{"simplexlinear"} interpolants
-have the argument \code{blend}, one of \code{"linear"}, \code{"cubic"}, \code{"sigmoid"}, \code{"parodic"} and
-\code{"square"}, which chooses the blending function described in \code{vignette("stalker")}.
-\code{"stalker"}, \code{"hstalker"} and \code{"simplexlinear"} also take \code{"mean"}. The default is \code{"cubic"}
-for \code{"stalker"} and \code{"hstalker"}, and \code{"linear"} for the others.}
+\item{...}{Extra arguments, which only some methods take:
+\itemize{
+\item \code{blend}: for \code{"stalker"}, \code{"hstalker"}, \code{"oldstalker"}, \code{"multilinear"} and
+\code{"simplexlinear"}. The blending function described in \code{vignette("stalker")}, one of
+\code{"linear"}, \code{"cubic"}, \code{"sigmoid"}, \code{"parodic"} and \code{"square"}. \code{"stalker"}, \code{"hstalker"} and
+\code{"simplexlinear"} also take \code{"mean"}. Defaults to the \code{blend} given to \code{\link[=ipol]{ipol()}}, otherwise
+\code{"cubic"} for \code{"stalker"} and \code{"hstalker"}, and \code{"linear"} for the others.
+\item \code{epol}: for \code{"simplexlinear"}. If \code{TRUE}, the interpolant extrapolates to points outside the
+domain. Defaults to \code{FALSE}.
+\item \code{degree}: for \code{"oldstalker"}. The degree of the spline, overriding the \code{k} given to \code{\link[=ipol]{ipol()}}.
+}}
 }
 \value{
 A numeric. If more than one point was evaluated, a vector.
