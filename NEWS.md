@@ -17,6 +17,7 @@
 
 ## Minor improvements
 
+* Attaching chebpol no longer prints a message when it was built without FFTW. Use `has_fftw()` to check.
 * chebpol can be built without FFTW or GSL by setting the environment variable `CHEBPOL_DISABLE_FFTW` or `CHEBPOL_DISABLE_GSL` before installing, as an alternative to `--configure-args`.
 * `ipol()` with `method = "polyharmonic"` now reports the warning about falling back to a least squares fit for the `ipol()` call. Previously it showed the source of an internal function, e.g. "In (function (val, knots, k = 2, ...".
 * `ipol()` interpolants created with `method = "multilinear"`, `"stalker"` or `"hstalker"` evaluate faster in several dimensions with a blend other than `"linear"`, e.g. about four times faster for `"multilinear"` and twice as fast for the stalker methods with `blend = "sigmoid"` in five dimensions. The blending weights are now computed once per dimension instead of once per corner of the grid cell.
