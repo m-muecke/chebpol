@@ -25,17 +25,17 @@
 #' column vectors as argument. It's equivalent to `fun(t(expand.grid(grid)))`.
 #'
 #' @param fun Multivariate real-valued function to be evaluated. Must be defined on the hypercube
-#' described by `intervals`.
+#'   described by `intervals`.
 #' @param dims A vector of integers. The number of grid-points in each dimension.
 #' @param intervals A list. Each entry is a vector of length 2 with the lower and upper end of the
-#' interval in each dimension.
+#'   interval in each dimension.
 #' @param ... Further arguments to `fun`.
 #' @param grid Rather than specifying `dims` and `intervals` to get a Chebyshev grid, you may
-#' specify your own `grid` as a list of vectors whose Cartesian product will be the grid, as in
-#' `expand.grid(grid)`.
+#'   specify your own `grid` as a list of vectors whose Cartesian product will be the grid, as in
+#'   `expand.grid(grid)`.
 #' @return An array with the value of `fun` on each grid point. The `dim` attribute has been
-#' appropriately set for the grid. If `fun` returns a vector, this will be the first dimension of
-#' the returned array.
+#'   appropriately set for the grid. If `fun` returns a vector, this will be the first dimension of
+#'   the returned array.
 #' @export
 #' @examples
 #' f <- function(x) {

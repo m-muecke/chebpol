@@ -12,16 +12,16 @@
 #'
 #' @name interpolant
 #' @param x The argument of the function. A function of more than one variable takes a vector. `x`
-#' can also be a matrix of column vectors.
+#'   can also be a matrix of column vectors.
 #' @param threads The number of threads to use for evaluation. All interpolants created by chebpol
-#' are parallelized. If given a matrix argument `x`, the vectors can be evaluated in parallel.
+#'   are parallelized. If given a matrix argument `x`, the vectors can be evaluated in parallel.
 #' @param ... Other parameters. Currently used for simplex linear interpolants with the logical
-#' argument `epol` which makes the interpolant extrapolate to points outside the domain. The
-#' `"stalker"`, `"hstalker"`, `"oldstalker"`, `"multilinear"` and `"simplexlinear"` interpolants
-#' have the argument `blend`, one of `"linear"`, `"cubic"`, `"sigmoid"`, `"parodic"` and `"square"`,
-#' which chooses the blending function described in `vignette("stalker", package = "chebpol")`.
-#' `"stalker"`, `"hstalker"` and `"simplexlinear"` also take `"mean"`. The default is `"cubic"` for
-#' `"stalker"` and `"hstalker"`, and `"linear"` for the others.
+#'   argument `epol` which makes the interpolant extrapolate to points outside the domain. The
+#'   `"stalker"`, `"hstalker"`, `"oldstalker"`, `"multilinear"` and `"simplexlinear"` interpolants
+#'   have the argument `blend`, one of `"linear"`, `"cubic"`, `"sigmoid"`, `"parodic"` and
+#'   `"square"`, which chooses the blending function described in `vignette("stalker", package =
+#'   "chebpol")`. `"stalker"`, `"hstalker"` and `"simplexlinear"` also take `"mean"`. The default is
+#'   `"cubic"` for `"stalker"` and `"hstalker"`, and `"linear"` for the others.
 #' @return A numeric. If more than one point was evaluated, a vector.
 #' @examples
 #' grid <- list(x = seq(0, 1, length.out = 10), y = seq(0, 1, length.out = 10))

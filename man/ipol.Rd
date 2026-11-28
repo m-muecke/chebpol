@@ -43,9 +43,9 @@ interpolant creation described in section Details.}
 A \verb{function(x, threads = getOption("chebpol.threads"))} defined on a hypercube, an
 \link{interpolant} for the given function. The argument \code{x} can be a matrix of column vectors which
 are evaluated in parallel in a number of threads. The function yields values for arguments
-outside the hypercube as well, though it will typically be a poor approximation. \code{threads} is an
-integer specifying the number of parallel threads which should be used when evaluating a matrix
-of column vectors.
+outside the hypercube as well, though it will typically be a poor approximation. \code{threads} is
+an integer specifying the number of parallel threads which should be used when evaluating a
+matrix of column vectors.
 }
 \description{
 Create an interpolating function from given values. Several interpolation methods are supported.

@@ -18,7 +18,7 @@ chebyshev_knots_1d <- function(n, interval = NULL) {
 #' may be a vector of length 2 rather than a list with a vector of length 2.
 #'
 #' @param dims The number of grid-points in each dimension. For Chebyshev-polynomial of degree
-#' `dims-1`.
+#'   `dims-1`.
 #' @param intervals A list of vectors of length 2. The lower and upper bounds of the hypercube.
 #' @return An array of dimension `dims`. The Chebyshev grid-points.
 #' @export
@@ -55,14 +55,12 @@ chebknots <- function(dims, intervals = NULL) {
 #' memory-demanding.
 #'
 #' @param val An `array` of function values on a Chebyshev grid. The `dim`-attribute must be
-#' appropriately set. If not set, it is assumed
-#' to be one-dimensional.
+#'   appropriately set. If not set, it is assumed to be one-dimensional.
 #' @param dct Logical. Since the Chebyshev coefficients are closely related to the DCT-II transform
-#' of `val`, the non-normalized real-even DCT-II coefficients may be retrieved instead. I.e. those
-#' from `FFTW_REDFT10` in each dimension. This is not used anywhere in the package, it is merely
-#' provided as a convenience for those who might need it.
-#' @return An array of Chebyshev-coefficients for an interpolating
-#' Chebyshev-polynomial.
+#'   of `val`, the non-normalized real-even DCT-II coefficients may be retrieved instead. I.e. those
+#'   from `FFTW_REDFT10` in each dimension. This is not used anywhere in the package, it is merely
+#'   provided as a convenience for those who might need it.
+#' @return An array of Chebyshev-coefficients for an interpolating Chebyshev-polynomial.
 #' @seealso [has_fftw()]
 #' @export
 #' @examples
@@ -86,10 +84,10 @@ chebcoef <- function(val, dct = FALSE) {
 #'
 #' @param x The point to evaluate.
 #' @param coef The Chebyshev coefficients. Typically from a call to [chebcoef()], possibly modified.
-#' A vector without a `dim` attribute is treated as one-dimensional.
+#'   A vector without a `dim` attribute is treated as one-dimensional.
 #' @param intervals A list of minimum and maximum values. One for each dimension of the hypercube.
 #' @param threads An integer. In case `x` is a matrix of column vectors, use this number of threads
-#' in parallel to evaluate.
+#'   in parallel to evaluate.
 #' @return A numeric. The interpolated value.
 #' @export
 #' @examples
