@@ -5,7 +5,9 @@
       fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
     }
   };
-</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Check which optional libraries chebpol was built with — has_fftw"><meta name="description" content="chebpol can be compiled with or without two optional C libraries, each of which enables part of the package:"><meta property="og:description" content="chebpol can be compiled with or without two optional C libraries, each of which enables part of the package:"></head><body>
+</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Check which optional libraries chebpol was built with — has_fftw"><meta name="description" content="chebpol can be compiled with or without two optional C libraries, each of which enables part of
+the package:"><meta property="og:description" content="chebpol can be compiled with or without two optional C libraries, each of which enables part of
+the package:"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -52,7 +54,8 @@
     </div>
 
     <div class="ref-description section level2">
-    <p>chebpol can be compiled with or without two optional C libraries, each of which enables part of the package:</p>
+    <p>chebpol can be compiled with or without two optional C libraries, each of which enables part of
+the package:</p>
     </div>
 
     <div class="section level2">
@@ -69,14 +72,16 @@
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
-<ul><li><p>FFTW computes Chebyshev coefficients with a fast DCT. Without it, <code><a href="chebcoef.html">chebcoef()</a></code> and <code><a href="ipol.html">ipol()</a></code> with
-<code>method = "chebyshev"</code> use a matrix product, which is not feasible for high-degree polynomials: a 100x100x100
-approximation is possible, but not a one-dimensional 1000000.</p></li>
-<li><p>GSL solves for the degree of the stalker splines on a non-uniform grid. Without it, <code><a href="ipol.html">ipol()</a></code> with
-<code>method = "stalker"</code> uses degree 2 there and warns, and <code>method = "oldstalker"</code> with <code>k = NA</code> stops with an error.</p></li>
-</ul><p>When chebpol is installed from source on Linux or macOS, FFTW and GSL are used if pkg-config finds them. To build
-without one, set the environment variable <code>CHEBPOL_DISABLE_FFTW</code> or <code>CHEBPOL_DISABLE_GSL</code> to a non-empty value
-before installing, or pass <code>--disable-fftw</code> or <code>--disable-gsl</code> in <code>configure.args</code>.</p>
+<ul><li><p>FFTW computes Chebyshev coefficients with a fast DCT. Without it, <code><a href="chebcoef.html">chebcoef()</a></code> and <code><a href="ipol.html">ipol()</a></code>
+with <code>method = "chebyshev"</code> use a matrix product, which is not feasible for high-degree
+polynomials: a 100x100x100 approximation is possible, but not a one-dimensional 1000000.</p></li>
+<li><p>GSL solves for the degree of the stalker splines on a non-uniform grid. Without it, <code><a href="ipol.html">ipol()</a></code>
+with <code>method = "stalker"</code> uses degree 2 there and warns, and <code>method = "oldstalker"</code> with
+<code>k = NA</code> stops with an error.</p></li>
+</ul><p>When chebpol is installed from source on Linux or macOS, FFTW and GSL are used if pkg-config
+finds them. To build without one, set the environment variable <code>CHEBPOL_DISABLE_FFTW</code> or
+<code>CHEBPOL_DISABLE_GSL</code> to a non-empty value before installing, or pass <code>--disable-fftw</code> or
+<code>--disable-gsl</code> in <code>configure.args</code>.</p>
     </div>
 
     <div class="section level2">

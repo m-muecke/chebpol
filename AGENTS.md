@@ -90,7 +90,8 @@ desirability:
 - Every user-facing function should be exported and have roxygen2
   documentation.
 - Internal functions should not have roxygen documentation.
-- Wrap roxygen2 comments to 120 characters.
+- Wrap roxygen2 comments to 100 characters, and indent continuation
+  lines of `@param`, `@return`, `@field` and `@slot` by two spaces.
 - Whenever you add a new (non-internal) documentation topic, also add
   the topic to `_pkgdown.yml`.
 - Always re-document the package after changing a roxygen2 comment.

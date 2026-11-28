@@ -103,11 +103,12 @@
   e.g. `ipol(f, grid = grid, method = "fh", data = big)`, kept `big` in
   memory and in saved files.
 - [`ipol()`](https://m-muecke.github.io/chebpol/reference/ipol.md)
-  interpolants now name the columns of their `domain` attribute after
-  the variables, taken from `grid`, `dims`, `intervals` or the row names
-  of `knots`, and `X1`, `X2`, … otherwise. Previously unnamed variables
-  got names made from their bounds, such as `c.0..1.`, and names given
-  in `dims` were dropped. The rows are named `lower` and `upper`.
+  interpolants now have a `domain` attribute with one row per variable
+  and the columns `name`, `lower` and `upper`. The variables are named
+  after `grid`, `dims`, `intervals` or the row names of `knots`, and
+  `X1`, `X2`, … otherwise. Previously it had one column per variable,
+  with names made from the bounds for unnamed variables, such as
+  `c.0..1.`, and names given in `dims` were dropped.
 - chebpol compiles again with current versions of R. FFTW is now found
   when it is installed outside the default include path.
 - Error messages are now consistent across interpolation methods and

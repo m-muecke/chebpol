@@ -67,18 +67,17 @@
 
 
 <dl><dt id="arg-fun">fun<a class="anchor" aria-label="anchor" href="#arg-fun"></a></dt>
-<dd><p>Multivariate real-valued function to be evaluated. Must be
-defined on the hypercube described by <code>intervals</code>.</p></dd>
+<dd><p>Multivariate real-valued function to be evaluated. Must be defined on the hypercube
+described by <code>intervals</code>.</p></dd>
 
 
 <dt id="arg-dims">dims<a class="anchor" aria-label="anchor" href="#arg-dims"></a></dt>
-<dd><p>A vector of integers. The number of grid-points in each
-dimension.</p></dd>
+<dd><p>A vector of integers. The number of grid-points in each dimension.</p></dd>
 
 
 <dt id="arg-intervals">intervals<a class="anchor" aria-label="anchor" href="#arg-intervals"></a></dt>
-<dd><p>A list. Each entry is a vector of length 2 with the lower
-and upper end of the interval in each dimension.</p></dd>
+<dd><p>A list. Each entry is a vector of length 2 with the lower and upper end of the
+interval in each dimension.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -86,37 +85,34 @@ and upper end of the interval in each dimension.</p></dd>
 
 
 <dt id="arg-grid">grid<a class="anchor" aria-label="anchor" href="#arg-grid"></a></dt>
-<dd><p>Rather than specifying <code>dims</code> and <code>intervals</code> to get a Chebyshev
-grid, you may specify your own <code>grid</code> as a list of vectors whose
-Cartesian product will be the grid, as in <code>expand.grid(grid)</code>.</p></dd>
+<dd><p>Rather than specifying <code>dims</code> and <code>intervals</code> to get a Chebyshev grid, you may
+specify your own <code>grid</code> as a list of vectors whose Cartesian product will be the grid, as in
+<code>expand.grid(grid)</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An array with the value of <code>fun</code> on each grid point. The
-<code>dim</code> attribute has been appropriately set for the grid. If <code>fun</code>
-returns a vector, this will be the first dimension of the returned array.</p>
+    <p>An array with the value of <code>fun</code> on each grid point. The <code>dim</code> attribute has been
+appropriately set for the grid. If <code>fun</code> returns a vector, this will be the first dimension of
+the returned array.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The function <code>fun</code> should be a <code>function(x, ...)</code>, where
-<code>length(x)</code> equals <code>length(dims)</code> (or <code>length(grid)</code>).</p>
-<p>If <code>grid</code> is provided, <code>fun</code> is evaluated on each point in the
-Cartesian product of the vectors in <code>grid</code>.</p>
-<p>If <code>intervals</code> is not provided, it is assumed that the domain of the
-function is the hypercube <code>[-1, 1] x [-1, 1] x ... x [-1, 1]</code>. Thus, the
-function is evaluated on a standard Chebyshev grid.</p>
-<p>If <code>intervals</code> is provided, it should be a <code>list</code> with elements of
-length 2, providing minimum and maximum for each dimension.</p>
-<p>The grid itself may be produced by
-<code>expand.grid(chebknots(dims, intervals))</code>, or
+    <p>The function <code>fun</code> should be a <code>function(x, ...)</code>, where <code>length(x)</code> equals <code>length(dims)</code> (or
+<code>length(grid)</code>).</p>
+<p>If <code>grid</code> is provided, <code>fun</code> is evaluated on each point in the Cartesian product of the vectors
+in <code>grid</code>.</p>
+<p>If <code>intervals</code> is not provided, it is assumed that the domain of the function is the hypercube
+<code>[-1, 1] x [-1, 1] x ... x [-1, 1]</code>. Thus, the function is evaluated on a standard Chebyshev
+grid.</p>
+<p>If <code>intervals</code> is provided, it should be a <code>list</code> with elements of length 2, providing minimum
+and maximum for each dimension.</p>
+<p>The grid itself may be produced by <code>expand.grid(chebknots(dims, intervals))</code>, or
 <code>expand.grid(grid)</code>.</p>
-<p>This function does the same as <code>apply(expand.grid(grid), 1, fun)</code>, but
-it's faster and more memory-efficient for large grids because it does not
-actually expand the grid.</p>
-<p>The function <code>evalongridV()</code> is for vectorized functions, i.e. those that
-can take a matrix of column vectors as argument. It's equivalent to
-<code>fun(t(expand.grid(grid)))</code>.</p>
+<p>This function does the same as <code>apply(expand.grid(grid), 1, fun)</code>, but it's faster and more
+memory-efficient for large grids because it does not actually expand the grid.</p>
+<p>The function <code>evalongridV()</code> is for vectorized functions, i.e. those that can take a matrix of
+column vectors as argument. It's equivalent to <code>fun(t(expand.grid(grid)))</code>.</p>
     </div>
 
     <div class="section level2">

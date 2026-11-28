@@ -40,11 +40,11 @@ A numeric. If more than one point was evaluated, a vector.
 
 Interpolants have class `chebpol_interpolant` and the attributes
 `method`, the interpolation method, `arity`, the number of variables,
-and `domain`, a data frame with one column per variable and the rows
-`lower` and `upper`. The columns of `domain` take their names from
-`grid`, `dims`, `intervals` or the row names of `knots`, and are named
-`X1`, `X2`, ... otherwise. Printing an interpolant shows these together
-with the defaults of its extra arguments, such as `blend`.
+and `domain`, a data frame with one row per variable and the columns
+`name`, `lower` and `upper`. The variables take their names from `grid`,
+`dims`, `intervals` or the row names of `knots`, and are named `X1`,
+`X2`, ... otherwise. Printing an interpolant shows these together with
+the defaults of its extra arguments, such as `blend`.
 
 ## Examples
 

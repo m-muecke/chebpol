@@ -114,7 +114,7 @@
 <h3 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a></h3>
 <ul><li>Every user-facing function should be exported and have roxygen2 documentation.</li>
 <li>Internal functions should not have roxygen documentation.</li>
-<li>Wrap roxygen2 comments to 120 characters.</li>
+<li>Wrap roxygen2 comments to 100 characters, and indent continuation lines of <code>@param</code>, <code>@return</code>, <code>@field</code> and <code>@slot</code> by two spaces.</li>
 <li>Whenever you add a new (non-internal) documentation topic, also add the topic to <code>_pkgdown.yml</code>.</li>
 <li>Always re-document the package after changing a roxygen2 comment.</li>
 <li>Use <code><a href="https://pkgdown.r-lib.org/reference/check_pkgdown.html" class="external-link">pkgdown::check_pkgdown()</a></code> to check that all topics are included in the reference index.</li>

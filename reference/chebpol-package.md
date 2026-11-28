@@ -98,8 +98,7 @@ Authors:
 dims <- c(x = 50, y = 50, z = 50)
 f <- function(x) sqrt(1 + x[1]) * exp(x[2]) * sin(5 * x[3])^2
 value <- evalongrid(f, dims)
-# fit a Chebyshev approximation to it. Note that the value-array contains the
-# grid-structure.
+# fit a Chebyshev approximation to it. Note that the value-array contains the grid-structure.
 ch <- ipol(value, method = "chebyshev")
 # To see the grid, use the chebknots function and expand.grid. Compare the
 # values with the approximation in the first few grid points.
